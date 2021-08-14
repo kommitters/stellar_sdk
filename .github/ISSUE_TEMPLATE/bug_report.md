@@ -9,7 +9,7 @@ assignees: ''
 
 ### Precheck
 
-- [ ] Do a quick search and make sure the bug has not yet been reported.
+- [ ] Do a quick search and make sure the bug has not been reported yet.
 - [ ] Please disclose security vulnerabilities privately at info@kommit.co.
 - [ ] Finally, be nice and have fun!.
 
@@ -24,7 +24,7 @@ A clear and concise description of what the bug is.
 
 ### Current behavior
 
-Include code samples, errors and stacktraces if appropriate.
+Include code samples, errors and stack traces if appropriate.
 If reporting a bug, please include the reproducing steps.
 
 ### Expected behavior
