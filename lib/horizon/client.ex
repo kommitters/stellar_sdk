@@ -5,16 +5,18 @@ defmodule StellarSDK.Horizon.Client do
   The default is :hackney.
   """
 
-  @type http_method :: :get | :post | :put | :delete
-  @type response :: {:ok, %{status_code: pos_integer, headers: any}}
-  @type response_with_body :: {:ok, %{status_code: pos_integer, headers: any, body: binary}}
-  @type response_error :: {:error, %{reason: any}}
+  @type method :: :get | :post | :put | :delete
+  @type headers :: [{binary(), binary()}, ...]
+  @type options :: Keyword.t()
+  @type response :: {:ok, non_neg_integer(), headers()}
+  @type response_with_body :: {:ok, non_neg_integer(), headers(), binary()}
+  @type response_error :: {:error, any()}
 
   @callback request(
-              method :: http_method,
-              url :: binary,
-              req_body :: binary,
-              headers :: [{binary, binary}, ...],
-              http_opts :: any
-            ) :: response | response_with_body | response_error
+              method :: method(),
+              url :: binary(),
+              body :: binary(),
+              headers :: headers(),
+              options :: options()
+            ) :: response() | response_with_body() | response_error()
 end

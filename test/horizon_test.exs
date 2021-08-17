@@ -71,14 +71,7 @@ defmodule StellarSDK.HorizonTest do
       Application.put_env(:stellar_sdk, :network, :public)
 
       [network: :public, url: @network_url, passphrase: @network_passphrase] =
-        StellarSDK.Horizon.network_config()
-    end
-
-    test "config/1" do
-      Application.put_env(:stellar_sdk, :network, :public)
-
-      assert StellarSDK.Horizon.network_config(:url) == @network_url
-      assert StellarSDK.Horizon.network_config(:passphrase) == @network_passphrase
+        StellarSDK.Horizon.config()
     end
   end
 

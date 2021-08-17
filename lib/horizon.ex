@@ -4,17 +4,16 @@ defmodule StellarSDK.Horizon do
   @behaviour StellarSDK.Horizon.Client
 
   @impl true
-  def request(method, path, body \\ "", headers \\ [], http_opts \\ []) do
-    base_url = network_config(:url)
-    http_client().request(method, base_url <> path, body, headers, http_opts)
+  def request(method, path, headers \\ [], body \\ "", opts \\ []) do
+    base_url = config()[:url]
+    options = http_options(opts)
+
+    http_client().request(method, base_url <> path, headers, body, options)
   end
 
-  @spec network_config(atom) :: String.t()
-  def network_config(key), do: Keyword.get(network_config(), key)
-
-  @spec network_config :: Keyword.t()
-  def network_config do
-    network = Application.get_env(:stellar_sdk, :network, :public)
+  @spec config() :: Keyword.t()
+  def config do
+    network = Application.get_env(:stellar_sdk, :network, :test)
 
     [
       network: network,
@@ -23,9 +22,18 @@ defmodule StellarSDK.Horizon do
     ]
   end
 
-  @spec http_client :: atom
-  defp http_client do
-    Application.get_env(:stellar_sdk, :http_client, StellarSDK.Horizon.Hackney)
+  @spec http_client() :: atom()
+  defp http_client, do: Application.get_env(:stellar_sdk, :http_client, :hackney)
+
+  @spec http_options(options :: Keyword.t()) :: Keyword.t()
+  defp http_options(options) do
+    default_options = [recv_timeout: 30_000, follow_redirect: true]
+    override_options = Application.get_env(:stellar_sdk, :hackney_options, [])
+
+    default_options
+    |> Keyword.merge(override_options)
+    |> Keyword.merge(options)
+    |> (&[:with_body | &1]).()
   end
 
   @spec network_url(network :: atom) :: String.t()
