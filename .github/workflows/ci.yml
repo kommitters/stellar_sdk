@@ -1,0 +1,45 @@
+name: StellarSDK CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'v*.[0-9]'
+  pull_request:
+
+jobs:
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ['22.3', '23.3']
+        elixir: ['1.10', '1.11']
+    env:
+      MIX_ENV: test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-elixir@885971a72ed1f9240973bd92ab57af8c1aa68f24
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+      - uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+      - name: Install Dependencies
+        run: |
+          rm -rf deps _build
+          mix deps.get
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Run Tests
+        run: mix test
+      - name: Run Credo
+        run: mix credo --strict
+      - name: Run Excoveralls
+        run: mix coveralls.github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
