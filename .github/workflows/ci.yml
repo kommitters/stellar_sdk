@@ -39,7 +39,7 @@ jobs:
         run: mix test
       - name: Run Credo
         run: mix credo --strict
-      # - name: Run Excoveralls
-      #   run: mix coveralls.github
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Excoveralls
+        run: mix coveralls.github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
