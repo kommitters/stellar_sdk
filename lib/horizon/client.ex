@@ -1,4 +1,4 @@
-defmodule StellarSDK.Horizon.Client do
+defmodule Stellar.Horizon.Client do
   @moduledoc """
   Specifies expected behaviour of an HTTP client.
   Stellar allows you to use your HTTP client of choice, provided that it can be coerced into complying with this module's specification.

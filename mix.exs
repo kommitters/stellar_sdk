@@ -1,4 +1,4 @@
-defmodule StellarSDK.MixProject do
+defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
@@ -30,14 +30,14 @@ defmodule StellarSDK.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {StellarSDK.Application, []}
+      mod: {Stellar.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.1.0"},
+      {:stellar_base, "~> 0.2.0"},
       {:hackney, "~> 1.17", optional: true},
       {:mox, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.14", only: :test},
@@ -79,7 +79,7 @@ defmodule StellarSDK.MixProject do
 
   defp groups_for_modules do
     [
-      Horizon: ~r/^StellarSDK\.Horizon\./
+      Horizon: ~r/^Stellar\.Horizon\./
     ]
   end
 end

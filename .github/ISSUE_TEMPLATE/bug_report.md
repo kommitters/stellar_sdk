@@ -10,7 +10,7 @@ assignees: ''
 ### Precheck
 
 - [ ] Do a quick search and make sure the bug has not been reported yet.
-- [ ] Please disclose security vulnerabilities privately at info@kommit.co.
+- [ ] Please disclose security vulnerabilities privately at [oss@kommit.co](mailto:oss@kommit.co).
 - [ ] Finally, be nice and have fun!.
 
 ### Description
