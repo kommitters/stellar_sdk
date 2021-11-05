@@ -1,5 +1,5 @@
 use Mix.Config
 
 config :stellar_sdk,
-  http_client: StellarSDK.Horizon.HackneyMock,
+  http_client: Stellar.Horizon.HackneyMock,
   network: :test

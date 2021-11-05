@@ -1,7 +1,7 @@
-defmodule StellarSDK.Horizon do
+defmodule Stellar.Horizon do
   @moduledoc false
 
-  @behaviour StellarSDK.Horizon.Client
+  @behaviour Stellar.Horizon.Client
 
   @impl true
   def request(method, path, headers \\ [], body \\ "", opts \\ []) do

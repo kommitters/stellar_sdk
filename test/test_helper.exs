@@ -1,5 +1,5 @@
 # Mocks
-Mox.defmock(StellarSDK.Horizon.HackneyMock, for: StellarSDK.Horizon.Client)
-Mox.defmock(StellarSDK.Horizon.HTTPoitionMock, for: StellarSDK.Horizon.Client)
+Mox.defmock(Stellar.Horizon.HackneyMock, for: Stellar.Horizon.Client)
+Mox.defmock(Stellar.Horizon.HTTPoitionMock, for: Stellar.Horizon.Client)
 
 ExUnit.start()

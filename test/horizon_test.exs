@@ -1,10 +1,10 @@
-defmodule StellarSDK.HorizonTest do
+defmodule Stellar.HorizonTest do
   use ExUnit.Case, async: true
 
   import Mox
 
-  alias StellarSDK.Horizon
-  alias StellarSDK.Horizon.{HackneyMock, HTTPoitionMock}
+  alias Stellar.Horizon
+  alias Stellar.Horizon.{HackneyMock, HTTPoitionMock}
 
   # Make sure mocks are verified when the test exits
   setup :verify_on_exit!
@@ -71,7 +71,7 @@ defmodule StellarSDK.HorizonTest do
       Application.put_env(:stellar_sdk, :network, :public)
 
       [network: :public, url: @network_url, passphrase: @network_passphrase] =
-        StellarSDK.Horizon.config()
+        Stellar.Horizon.config()
     end
   end
 
