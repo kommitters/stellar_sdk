@@ -1,4 +1,4 @@
-defmodule Stellar.Horizon.Client.Hackney do
+defmodule Stellar.Horizon.Client.Default do
   @moduledoc """
   Hackney HTTP client implementation.
   """

@@ -23,10 +23,10 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
   end
 end
 
-defmodule Stellar.Horizon.Client.HackneyTest do
+defmodule Stellar.Horizon.Client.DefaultTest do
   use ExUnit.Case
 
-  alias Stellar.Horizon.Client.Hackney
+  alias Stellar.Horizon.Client.Default
 
   @network_url "https://horizon.stellar.org"
   @network_passphrase "Public Global Stellar Network ; September 2015"
@@ -40,15 +40,15 @@ defmodule Stellar.Horizon.Client.HackneyTest do
 
   describe "request/5" do
     test "success", %{body: body} do
-      {:ok, %{status_code: 200, body: ^body}} = Hackney.request(:get, "/accounts/id")
+      {:ok, %{status_code: 200, body: ^body}} = Default.request(:get, "/accounts/id")
     end
 
     test "not_found", %{body_404: body} do
-      {:ok, %{status_code: 404, body: ^body}} = Hackney.request(:get, "/accounts/unknow_id")
+      {:ok, %{status_code: 404, body: ^body}} = Default.request(:get, "/accounts/unknow_id")
     end
 
     test "error" do
-      {:error, %{reason: "error"}} = Hackney.request(:delete, "/accounts")
+      {:error, %{reason: "error"}} = Default.request(:delete, "/accounts")
     end
   end
 
@@ -58,13 +58,13 @@ defmodule Stellar.Horizon.Client.HackneyTest do
     end
 
     test "test" do
-      :test = Hackney.config()[:network]
+      :test = Default.config()[:network]
     end
 
     test "public" do
       Application.put_env(:stellar_sdk, :network, :public)
 
-      [network: :public, url: @network_url, passphrase: @network_passphrase] = Hackney.config()
+      [network: :public, url: @network_url, passphrase: @network_passphrase] = Default.config()
     end
   end
 end

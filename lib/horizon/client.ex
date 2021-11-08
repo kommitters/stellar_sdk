@@ -12,7 +12,6 @@ defmodule Stellar.Horizon.Client do
 
   @spec impl() :: atom()
   defp impl do
-    impl = Application.get_env(:stellar_sdk, :http_client_impl)
-    if impl, do: impl, else: Client.Hackney
+    Application.get_env(:stellar_sdk, :http_client_impl, Client.Default)
   end
 end
