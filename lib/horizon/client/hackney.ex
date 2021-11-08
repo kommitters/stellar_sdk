@@ -1,7 +1,9 @@
-defmodule Stellar.Horizon do
-  @moduledoc false
+defmodule Stellar.Horizon.Client.Hackney do
+  @moduledoc """
+  Hackney HTTP client implementation.
+  """
 
-  @behaviour Stellar.Horizon.Client
+  @behaviour Stellar.Horizon.Client.Spec
 
   @impl true
   def request(method, path, headers \\ [], body \\ "", opts \\ []) do
