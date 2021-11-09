@@ -39,7 +39,6 @@ defmodule Stellar.MixProject do
     [
       {:stellar_base, "~> 0.2.0"},
       {:hackney, "~> 1.17", optional: true},
-      {:mox, "~> 1.0", only: :test},
       {:excoveralls, "~> 0.14", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.24", only: :dev, runtime: false}

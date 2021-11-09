@@ -1,5 +1,3 @@
-# Mocks
-Mox.defmock(Stellar.Horizon.HackneyMock, for: Stellar.Horizon.Client)
-Mox.defmock(Stellar.Horizon.HTTPoitionMock, for: Stellar.Horizon.Client)
+Code.require_file("test/support/fixtures.ex")
 
 ExUnit.start()
