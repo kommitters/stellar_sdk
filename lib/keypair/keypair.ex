@@ -6,7 +6,7 @@ defmodule Stellar.KeyPair do
   @behaviour Stellar.KeyPair.Spec
 
   @impl true
-  def random(), do: impl().random()
+  def random, do: impl().random()
 
   @impl true
   def from_secret(secret), do: impl().from_secret(secret)
