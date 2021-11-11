@@ -37,7 +37,8 @@ defmodule Stellar.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.2.0"},
+      {:stellar_base, "~> 0.2.1"},
+      {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17", optional: true},
       {:excoveralls, "~> 0.14", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
