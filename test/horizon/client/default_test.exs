@@ -28,9 +28,6 @@ defmodule Stellar.Horizon.Client.DefaultTest do
 
   alias Stellar.Horizon.Client.Default
 
-  @network_url "https://horizon.stellar.org"
-  @network_passphrase "Public Global Stellar Network ; September 2015"
-
   setup do
     %{
       body: ~s<{"_embedded": { "records": [] }}>,
@@ -49,22 +46,6 @@ defmodule Stellar.Horizon.Client.DefaultTest do
 
     test "error" do
       {:error, %{reason: "error"}} = Default.request(:delete, "/accounts")
-    end
-  end
-
-  describe "config/0" do
-    setup do
-      on_exit(fn -> Application.put_env(:stellar_sdk, :network, :test) end)
-    end
-
-    test "test" do
-      :test = Default.config()[:network]
-    end
-
-    test "public" do
-      Application.put_env(:stellar_sdk, :network, :public)
-
-      [network: :public, url: @network_url, passphrase: @network_passphrase] = Default.config()
     end
   end
 end
