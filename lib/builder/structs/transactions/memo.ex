@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.Memo do
   @moduledoc """
   `Memo` struct definition.
   """
-
   alias StellarBase.XDR.{UInt64, Hash, String28, MemoType, Memo}
 
   @type value :: String.t() | integer() | binary() | nil
@@ -24,11 +23,11 @@ defmodule Stellar.Builder.Structs.Memo do
   end
 
   def new(:hash, value) when is_binary(value) do
-    %__MODULE__{type: :MEMO_NONE, value: value}
+    %__MODULE__{type: :MEMO_HASH, value: value}
   end
 
   def new(:return, value) when is_binary(value) do
-    %__MODULE__{type: :MEMO_NONE, value: value}
+    %__MODULE__{type: :MEMO_RETURN, value: value}
   end
 
   def new(:none, _value) do

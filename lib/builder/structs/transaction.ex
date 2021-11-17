@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.Transaction do
   @moduledoc """
   `Transaction` struct definition.
   """
-
   alias Stellar.Builder.Structs.{Account, BaseFee, Operations, SequenceNumber, Memo, TimeBounds}
   alias StellarBase.XDR.{Ext, Transaction}
 
