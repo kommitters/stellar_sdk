@@ -2,26 +2,16 @@ defmodule Stellar.Horizon.Client.Default do
   @moduledoc """
   Hackney HTTP client implementation.
   """
+  alias Stellar.Network
 
   @behaviour Stellar.Horizon.Client.Spec
 
   @impl true
   def request(method, path, headers \\ [], body \\ "", opts \\ []) do
-    base_url = config()[:url]
+    base_url = Network.base_url()
     options = http_options(opts)
 
     http_client().request(method, base_url <> path, headers, body, options)
-  end
-
-  @spec config() :: Keyword.t()
-  def config do
-    network = Application.get_env(:stellar_sdk, :network, :test)
-
-    [
-      network: network,
-      url: network_url(network),
-      passphrase: network_passphrase(network)
-    ]
   end
 
   @spec http_client() :: atom()
@@ -37,12 +27,4 @@ defmodule Stellar.Horizon.Client.Default do
     |> Keyword.merge(options)
     |> (&[:with_body | &1]).()
   end
-
-  @spec network_url(network :: atom) :: String.t()
-  defp network_url(:public), do: "https://horizon.stellar.org"
-  defp network_url(_network), do: "https://horizon-testnet.stellar.org"
-
-  @spec network_passphrase(network :: atom) :: String.t()
-  defp network_passphrase(:public), do: "Public Global Stellar Network ; September 2015"
-  defp network_passphrase(_network), do: "Test SDF Network ; September 2015"
 end
