@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.Operations do
   @moduledoc """
   `Operations` struct definition.
   """
-
   alias StellarBase.XDR.Operations
 
   @type t :: %__MODULE__{operations: list()}

@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.BaseFee do
   @moduledoc """
   `BaseFee` struct definition.
   """
-
   alias StellarBase.XDR.UInt32
 
   @type t :: %__MODULE__{fee: non_neg_integer(), multiplier: non_neg_integer()}
@@ -11,7 +10,7 @@ defmodule Stellar.Builder.Structs.BaseFee do
 
   @spec new(fee :: non_neg_integer(), multiplier :: non_neg_integer()) :: t()
   def new(fee \\ base_fee(), multiplier \\ 1) do
-    %__MODULE__{fee: fee, multiplier: 1}
+    %__MODULE__{fee: fee, multiplier: multiplier}
   end
 
   @spec to_xdr(base_fee :: t()) :: UInt32.t()

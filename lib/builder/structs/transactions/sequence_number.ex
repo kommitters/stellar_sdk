@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.SequenceNumber do
   @moduledoc """
   `SequenceNumber` struct definition.
   """
-
   alias Stellar.Builder.Structs.Account
   alias StellarBase.XDR.SequenceNumber
 
@@ -20,8 +19,9 @@ defmodule Stellar.Builder.Structs.SequenceNumber do
     SequenceNumber.new(sequence_number)
   end
 
+  # A fixed sequence number is set while the full feature is implemented in #27.
   @spec fetch_secuence_number(account_id :: String.t()) :: non_neg_integer()
-  defp fetch_secuence_number(account_id) do
+  defp fetch_secuence_number(_account_id) do
     4_130_487_228_432_385
   end
 end

@@ -2,7 +2,6 @@ defmodule Stellar.Builder.Structs.TimeBounds do
   @moduledoc """
   `TimeBounds` struct definition.
   """
-
   alias StellarBase.XDR.{TimePoint, TimeBounds, OptionalTimeBounds}
 
   @type t :: %__MODULE__{min_time: non_neg_integer(), max_time: non_neg_integer()}
@@ -11,7 +10,7 @@ defmodule Stellar.Builder.Structs.TimeBounds do
 
   @spec new(min_time :: non_neg_integer(), max_time :: non_neg_integer()) :: t()
   def new(min_time \\ 0, max_time \\ 0) do
-    %__MODULE__{min_time: min_time, max_time: 0}
+    %__MODULE__{min_time: min_time, max_time: max_time}
   end
 
   @spec set_max_time(max_time :: non_neg_integer()) :: t()
