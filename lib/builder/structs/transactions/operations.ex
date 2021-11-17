@@ -13,7 +13,7 @@ defmodule Stellar.Builder.Structs.Operations do
     %__MODULE__{operations: operations}
   end
 
-  @spec new(operations :: t()) :: Operations.t()
+  @spec to_xdr(operations :: t()) :: Operations.t()
   def to_xdr(%__MODULE__{operations: operations}) do
     Operations.new(operations)
   end
