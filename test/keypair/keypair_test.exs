@@ -58,7 +58,7 @@ defmodule Stellar.KeyPairTest do
   end
 
   test "sign/2" do
-    Stellar.KeyPair.sign(<<0,0,0,0>>, "SECRET")
+    Stellar.KeyPair.sign(<<0, 0, 0, 0>>, "SECRET")
     assert_receive({:signature, "SIGNATURE"})
   end
 end
