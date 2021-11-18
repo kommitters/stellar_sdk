@@ -4,7 +4,11 @@ defmodule Stellar.TxBuild do
   """
   alias Stellar.TxBuild.{Account, Memo, TimeBounds, Transaction, TransactionEnvelope}
 
-  @type t :: %__MODULE__{tx: Transaction.t(), signatures: list(), tx_envelope: TransactionEnvelope.t()}
+  @type t :: %__MODULE__{
+          tx: Transaction.t(),
+          signatures: list(),
+          tx_envelope: TransactionEnvelope.t()
+        }
 
   defstruct [:tx, :signatures, :tx_envelope]
 
