@@ -12,7 +12,9 @@ defmodule Stellar.TxBuild.SequenceNumber do
   defstruct [:sequence_number]
 
   @impl true
-  def new(%Account{account_id: account_id}) do
+  def new(account, opts \\ [])
+
+  def new(%Account{account_id: account_id}, _opts) do
     %__MODULE__{sequence_number: fetch_secuence_number(account_id)}
   end
 

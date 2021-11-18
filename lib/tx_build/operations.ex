@@ -11,7 +11,9 @@ defmodule Stellar.TxBuild.Operations do
   defstruct [:operations]
 
   @impl true
-  def new(operations \\ []) do
+  def new(operations \\ [], opts \\ [])
+
+  def new(operations, _opts) do
     %__MODULE__{operations: operations}
   end
 
