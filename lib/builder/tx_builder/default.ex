@@ -2,7 +2,6 @@ defmodule Stellar.TxBuilder.Default do
   @moduledoc """
   Default TxBuilder implementation.
   """
-  alias Stellar.Builder.TxSignature
   alias Stellar.Builder.Structs.{Account, Memo, Transaction, TxBuild, TxEnvelope}
 
   @spec new(account :: Account.t(), opts :: Keyword.t()) :: TxBuild.t()
