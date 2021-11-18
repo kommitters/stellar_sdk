@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.TxEnvelope do
+defmodule Stellar.TxBuild.TransactionEnvelope do
   @moduledoc """
-  `TxEnvelope` struct definition.
+  `Envelope` struct definition.
   """
-  alias Stellar.Builder.Structs.Transaction
+  alias Stellar.TxBuild.Transaction
 
   alias StellarBase.XDR.{
     DecoratedSignature,
@@ -12,14 +12,15 @@ defmodule Stellar.Builder.Structs.TxEnvelope do
     TransactionEnvelope
   }
 
+  @behaviour Stellar.TxBuild.Resource
+
   @type signatures :: list(DecoratedSignature.t())
-  @type xdr_value :: TransactionEnvelope.t()
 
   @type t :: %__MODULE__{tx: Transaction.t(), signatures: signatures()}
 
   defstruct [:tx, :signatures]
 
-  @spec new(tx :: Transaction.t(), signatures :: signatures()) :: t()
+  @impl true
   def new(%Transaction{} = tx, signatures) do
     %__MODULE__{
       tx: Transaction.to_xdr(tx),
@@ -27,7 +28,7 @@ defmodule Stellar.Builder.Structs.TxEnvelope do
     }
   end
 
-  @spec to_xdr(envelope :: t()) :: xdr_value()
+  @impl true
   def to_xdr(%__MODULE__{tx: tx, signatures: signatures}) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
 

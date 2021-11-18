@@ -1,4 +1,4 @@
-defmodule Stellar.TxBuild.Spec do
+defmodule Stellar.TxBuild.Resource do
   @moduledoc """
   Specifies the behaviour contract for the transaction resources.
   """
