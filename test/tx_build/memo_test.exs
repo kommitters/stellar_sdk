@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.MemoTest do
+defmodule Stellar.TxBuild.MemoTest do
   use ExUnit.Case
 
   import Stellar.Test.XDRFixtures, only: [memo_xdr: 2]
-  alias Stellar.Builder.Structs.Memo
+  alias Stellar.TxBuild.Memo
 
   describe "new/2" do
     test "default" do

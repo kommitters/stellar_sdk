@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.OperationsTest do
+defmodule Stellar.TxBuild.OperationsTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.Operations, as: OperationsXDR
-  alias Stellar.Builder.Structs.Operations
+  alias Stellar.TxBuild.Operations
 
   test "new/2" do
     %Operations{operations: []} = Operations.new()

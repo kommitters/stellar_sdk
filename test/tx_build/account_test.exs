@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.AccountTest do
+defmodule Stellar.TxBuild.AccountTest do
   use ExUnit.Case
 
   import Stellar.Test.XDRFixtures, only: [muxed_account_xdr: 1]
-  alias Stellar.Builder.Structs.Account
+  alias Stellar.TxBuild.Account
 
   setup do
     account_id = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"

@@ -1,9 +1,9 @@
-defmodule Stellar.Builder.Structs.TimeBoundsTest do
+defmodule Stellar.TxBuild.TimeBoundsTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.{TimePoint, OptionalTimeBounds}
   alias StellarBase.XDR.TimeBounds, as: TimeBoundsXDR
-  alias Stellar.Builder.Structs.TimeBounds
+  alias Stellar.TxBuild.TimeBounds
 
   test "new/2" do
     %TimeBounds{min_time: 0, max_time: 0} = TimeBounds.new()

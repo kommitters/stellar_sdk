@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.BaseFeeTest do
+defmodule Stellar.TxBuild.BaseFeeTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.UInt32
-  alias Stellar.Builder.Structs.BaseFee
+  alias Stellar.TxBuild.BaseFee
 
   test "new/2" do
     %BaseFee{fee: 100, multiplier: 1} = BaseFee.new()

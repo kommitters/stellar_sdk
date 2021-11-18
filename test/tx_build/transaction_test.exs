@@ -1,8 +1,8 @@
-defmodule Stellar.Builder.Structs.TransactionTest do
+defmodule Stellar.TxBuild.TransactionTest do
   use ExUnit.Case
 
   import Stellar.Test.XDRFixtures, only: [transaction_xdr: 1]
-  alias Stellar.Builder.Structs.{Account, Transaction, BaseFee, Memo, TimeBounds}
+  alias Stellar.TxBuild.{Account, Transaction, BaseFee, Memo, TimeBounds}
 
   setup do
     account_id = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
