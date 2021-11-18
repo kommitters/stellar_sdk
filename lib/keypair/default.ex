@@ -25,4 +25,21 @@ defmodule Stellar.KeyPair.Default do
 
     {public_key, secret}
   end
+
+  @impl true
+  def raw_ed25519_public_key(public_key) do
+    StrKey.decode!(public_key, :ed25519_public_key)
+  end
+
+  @impl true
+  def raw_ed25519_secret(secret) do
+    StrKey.decode!(secret, :ed25519_secret_seed)
+  end
+
+  @impl true
+  def sign(payload, secret) do
+    secret
+    |> raw_ed25519_secret()
+    |> (&Ed25519.signature(payload, &1)).()
+  end
 end
