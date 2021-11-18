@@ -1,20 +1,22 @@
-defmodule Stellar.Builder.Structs.SequenceNumber do
+defmodule Stellar.TxBuild.SequenceNumber do
   @moduledoc """
   `SequenceNumber` struct definition.
   """
-  alias Stellar.Builder.Structs.Account
+  alias Stellar.TxBuild.Account
   alias StellarBase.XDR.SequenceNumber
+
+  @behaviour Stellar.TxBuild.Spec
 
   @type t :: %__MODULE__{sequence_number: non_neg_integer()}
 
   defstruct [:sequence_number]
 
-  @spec new(account :: Account.t()) :: t()
+  @impl true
   def new(%Account{account_id: account_id}) do
     %__MODULE__{sequence_number: fetch_secuence_number(account_id)}
   end
 
-  @spec to_xdr(to_xdr :: t()) :: SequenceNumber.t()
+  @impl true
   def to_xdr(%__MODULE__{sequence_number: sequence_number}) do
     SequenceNumber.new(sequence_number)
   end

@@ -1,9 +1,11 @@
-defmodule Stellar.Builder.Structs.Transaction do
+defmodule Stellar.TxBuild.Transaction do
   @moduledoc """
   `Transaction` struct definition.
   """
-  alias Stellar.Builder.Structs.{Account, BaseFee, Operations, SequenceNumber, Memo, TimeBounds}
+  alias Stellar.TxBuild.{Account, BaseFee, Operations, SequenceNumber, Memo, TimeBounds}
   alias StellarBase.XDR.{Ext, Transaction}
+
+  @behaviour Stellar.TxBuild.Spec
 
   @type t :: %__MODULE__{
           source_account: Account.t(),
@@ -16,7 +18,7 @@ defmodule Stellar.Builder.Structs.Transaction do
 
   defstruct [:source_account, :sequence_number, :base_fee, :memo, :time_bounds, :operations]
 
-  @spec new(account :: Account.t(), opts :: list()) :: t()
+  @impl true
   def new(%Account{} = account, opts \\ []) do
     memo = Keyword.get(opts, :memo, Memo.new(:none))
     base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
@@ -34,7 +36,7 @@ defmodule Stellar.Builder.Structs.Transaction do
     }
   end
 
-  @spec to_xdr(account :: t()) :: Transaction.t()
+  @impl true
   def to_xdr(%__MODULE__{
         source_account: source_account,
         sequence_number: sequence_number,

@@ -1,9 +1,11 @@
-defmodule Stellar.Builder.Structs.Account do
+defmodule Stellar.TxBuild.Account do
   @moduledoc """
   `Account` struct definition.
   """
   alias Stellar.KeyPair
   alias StellarBase.XDR.{CryptoKeyType, MuxedAccount, UInt256}
+
+  @behaviour Stellar.TxBuild.Spec
 
   @type id :: nil | integer()
 
@@ -11,7 +13,7 @@ defmodule Stellar.Builder.Structs.Account do
 
   defstruct [:account_id, :id]
 
-  @spec new(account_id :: String.t(), id :: id()) :: t() | {:error, atom()}
+  @impl true
   def new(account_id, id \\ nil)
 
   def new(account_id, id) when byte_size(account_id) == 56 do
@@ -20,7 +22,7 @@ defmodule Stellar.Builder.Structs.Account do
 
   def new(_account_id, _id), do: {:error, :invalid_account_id}
 
-  @spec to_xdr(account :: t()) :: MuxedAccount.t()
+  @impl true
   def to_xdr(%__MODULE__{account_id: account_id}) do
     type = CryptoKeyType.new(:KEY_TYPE_ED25519)
 

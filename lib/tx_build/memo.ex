@@ -1,17 +1,19 @@
-defmodule Stellar.Builder.Structs.Memo do
+defmodule Stellar.TxBuild.Memo do
   @moduledoc """
   `Memo` struct definition.
   """
   alias StellarBase.XDR.{UInt64, Hash, String28, MemoType, Memo}
 
-  @type value :: String.t() | integer() | binary() | nil
-  @type xdr_value :: String28.t() | UInt64.t() | Hash.t() | nil
+  @behaviour Stellar.TxBuild.Spec
 
-  @type t :: %__MODULE__{type: atom(), value: value()}
+  @type memo_value :: String.t() | integer() | binary() | nil
+  @type xdr_memo_value :: String28.t() | UInt64.t() | Hash.t() | nil
+
+  @type t :: %__MODULE__{type: atom(), value: memo_value()}
 
   defstruct [:type, :value]
 
-  @spec new(type :: atom(), value :: value()) :: t() | {:error, atom()}
+  @impl true
   def new(type \\ :none, value \\ nil)
 
   def new(:text, value) when is_bitstring(value) and byte_size(value) < 28 do
@@ -36,7 +38,7 @@ defmodule Stellar.Builder.Structs.Memo do
 
   def new(_type, _value), do: {:error, :invalid_memo}
 
-  @spec to_xdr(memo :: t()) :: Memo.t()
+  @impl true
   def to_xdr(%__MODULE__{type: type, value: value}) do
     memo_type = MemoType.new(type)
 
@@ -45,7 +47,7 @@ defmodule Stellar.Builder.Structs.Memo do
     |> Memo.new(memo_type)
   end
 
-  @spec memo_xdr_value(value :: value(), type :: atom()) :: xdr_value()
+  @spec memo_xdr_value(value :: memo_value(), type :: atom()) :: xdr_memo_value()
   defp memo_xdr_value(_value, :MEMO_NONE), do: nil
   defp memo_xdr_value(value, :MEMO_TEXT), do: String28.new(value)
   defp memo_xdr_value(value, :MEMO_ID), do: UInt64.new(value)

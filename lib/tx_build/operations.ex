@@ -1,19 +1,21 @@
-defmodule Stellar.Builder.Structs.Operations do
+defmodule Stellar.TxBuild.Operations do
   @moduledoc """
   `Operations` struct definition.
   """
   alias StellarBase.XDR.Operations
 
+  @behaviour Stellar.TxBuild.Spec
+
   @type t :: %__MODULE__{operations: list()}
 
   defstruct [:operations]
 
-  @spec new(operations :: list()) :: t()
+  @impl true
   def new(operations \\ []) do
     %__MODULE__{operations: operations}
   end
 
-  @spec to_xdr(operations :: t()) :: Operations.t()
+  @impl true
   def to_xdr(%__MODULE__{operations: operations}) do
     Operations.new(operations)
   end
