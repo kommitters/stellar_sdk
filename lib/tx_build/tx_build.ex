@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild do
   @moduledoc """
   TxBuild implementation.
   """
-  alias Stellar.TxBuild.{Account, Memo, TimeBounds, Transaction, TransactionEnvelope}
+  alias Stellar.TxBuild.{Account, Memo, Operations, TimeBounds, Transaction, TransactionEnvelope}
 
   @type t :: %__MODULE__{
           tx: Transaction.t(),
@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild do
 
   @spec add_operation(tx_build :: t(), operation :: any()) :: t()
   def add_operation(%__MODULE__{tx: tx} = tx_build, operation) do
-    transaction = %{tx | operations: tx.operations ++ [operation]}
+    transaction = %{tx | operations: Operations.add(tx.operations, operation)}
     %{tx_build | tx: transaction}
   end
 

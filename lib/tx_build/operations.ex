@@ -21,4 +21,9 @@ defmodule Stellar.TxBuild.Operations do
   def to_xdr(%__MODULE__{operations: operations}) do
     Operations.new(operations)
   end
+
+  @spec add(operations :: t(), operation :: any()) :: t()
+  def add(%__MODULE__{operations: operations}, operation) do
+    %__MODULE__{operations: operations ++ [operation]}
+  end
 end
