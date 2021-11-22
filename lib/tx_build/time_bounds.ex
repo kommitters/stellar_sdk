@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.TimeBounds do
   """
   alias StellarBase.XDR.{TimePoint, TimeBounds, OptionalTimeBounds}
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{min_time: non_neg_integer(), max_time: non_neg_integer()}
 

@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.Memo do
   """
   alias StellarBase.XDR.{UInt64, Hash, String28, MemoType, Memo}
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type memo_value :: String.t() | integer() | binary() | nil
   @type xdr_memo_value :: String28.t() | UInt64.t() | Hash.t() | nil

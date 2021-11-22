@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.Operations do
   """
   alias StellarBase.XDR.Operations
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{operations: list()}
 

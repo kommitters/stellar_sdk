@@ -5,7 +5,7 @@ defmodule Stellar.TxBuild.Account do
   alias Stellar.KeyPair
   alias StellarBase.XDR.{CryptoKeyType, MuxedAccount, UInt256}
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type id :: nil | integer()
 

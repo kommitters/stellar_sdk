@@ -5,7 +5,7 @@ defmodule Stellar.TxBuild.Transaction do
   alias Stellar.TxBuild.{Account, BaseFee, Operations, SequenceNumber, Memo, TimeBounds}
   alias StellarBase.XDR.{Ext, Transaction}
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{
           source_account: Account.t(),

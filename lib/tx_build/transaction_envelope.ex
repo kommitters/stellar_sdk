@@ -12,7 +12,7 @@ defmodule Stellar.TxBuild.TransactionEnvelope do
     TransactionEnvelope
   }
 
-  @behaviour Stellar.TxBuild.Resource
+  @behaviour Stellar.TxBuild.XDR
 
   @type signatures :: list(DecoratedSignature.t())
 

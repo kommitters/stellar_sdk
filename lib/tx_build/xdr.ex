@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.Resource do
+defmodule Stellar.TxBuild.XDR do
   @moduledoc """
-  Specifies the behaviour contract for the transaction resources.
+  Defines the XDR construction callabcks for the transaction's components.
   """
 
   @callback new(any(), any()) :: struct() | {:error, atom()}
