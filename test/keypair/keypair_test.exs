@@ -37,6 +37,16 @@ end
 defmodule Stellar.KeyPairTest do
   use ExUnit.Case
 
+  alias Stellar.KeyPair.CannedKeyPairImpl
+
+  setup do
+    Application.put_env(:stellar_sdk, :keypair_impl, CannedKeyPairImpl)
+
+    on_exit(fn ->
+      Application.delete_env(:stellar_sdk, :keypair_impl)
+    end)
+  end
+
   test "random/0" do
     Stellar.KeyPair.random()
     assert_receive({:random, "KEY"})

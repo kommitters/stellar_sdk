@@ -5,7 +5,7 @@ defmodule Stellar.TxBuild.SequenceNumber do
   alias Stellar.TxBuild.Account
   alias StellarBase.XDR.SequenceNumber
 
-  @behaviour Stellar.TxBuild.Spec
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{sequence_number: non_neg_integer()}
 

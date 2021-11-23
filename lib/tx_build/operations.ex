@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.Operations do
   """
   alias StellarBase.XDR.Operations
 
-  @behaviour Stellar.TxBuild.Spec
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{operations: list()}
 
@@ -20,5 +20,10 @@ defmodule Stellar.TxBuild.Operations do
   @impl true
   def to_xdr(%__MODULE__{operations: operations}) do
     Operations.new(operations)
+  end
+
+  @spec add(operations :: t(), operation :: any()) :: t()
+  def add(%__MODULE__{operations: operations}, operation) do
+    %__MODULE__{operations: operations ++ [operation]}
   end
 end

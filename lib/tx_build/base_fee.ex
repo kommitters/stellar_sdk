@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.BaseFee do
   """
   alias StellarBase.XDR.UInt32
 
-  @behaviour Stellar.TxBuild.Spec
+  @behaviour Stellar.TxBuild.XDR
 
   @type t :: %__MODULE__{fee: non_neg_integer(), multiplier: non_neg_integer()}
 
