@@ -29,7 +29,7 @@ defmodule Stellar.TxBuild.TransactionSignature do
   end
 
   @spec signature_payload(tagged_tx :: struct()) :: binary()
-  def signature_payload(tagged_tx) do
+  defp signature_payload(tagged_tx) do
     network_id_xdr()
     |> TransactionSignaturePayload.new(tagged_tx)
     |> TransactionSignaturePayload.encode_xdr!()
