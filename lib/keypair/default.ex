@@ -38,8 +38,7 @@ defmodule Stellar.KeyPair.Default do
 
   @impl true
   def sign(payload, secret) do
-    secret
-    |> raw_ed25519_secret()
-    |> (&Ed25519.signature(payload, &1)).()
+    raw_secret = raw_ed25519_secret(secret)
+    Ed25519.signature(payload, raw_secret)
   end
 end

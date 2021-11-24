@@ -2,19 +2,31 @@ defmodule Stellar.TxBuildTest do
   use ExUnit.Case
 
   alias Stellar.{KeyPair, TxBuild}
-  alias Stellar.TxBuild.{Account, Memo, Operations, Transaction, TransactionEnvelope, TimeBounds}
-  alias StellarBase.XDR.TransactionEnvelope, as: TxEnvelopeXDR
+
+  alias Stellar.TxBuild.{
+    Account,
+    Memo,
+    Operations,
+    Signature,
+    Transaction,
+    TransactionEnvelope,
+    TimeBounds
+  }
 
   setup do
-    account_id = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
-    account = Account.new(account_id)
+    keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
+    public_key = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
+    account = Account.new(public_key)
     tx = Transaction.new(account)
 
     %{
       account: account,
+      keypair: keypair,
       tx: tx,
       tx_build: TxBuild.new(account),
-      tx_envelope: TransactionEnvelope.new(tx, [])
+      tx_envelope: TransactionEnvelope.new(tx, []),
+      tx_envelope_base64:
+        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQADqyoAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAECU7VvLeuntfRiJCTGesLDUPwt1TimPBEhjCBhmxSnjuxd63ubjGT+8c9ec6uuAMC8WrT21WOx9MQSma6YIWaEB"
     }
   end
 
@@ -38,25 +50,23 @@ defmodule Stellar.TxBuildTest do
       TxBuild.add_operation(tx_build, :payment)
   end
 
-  @tag :pending
-  test "sign/2", %{tx_build: tx_build} do
-    keypair = KeyPair.random()
-    ^tx_build = TxBuild.sign(tx_build, keypair)
+  test "sign/2", %{keypair: {public_key, secret} = keypair, tx_build: tx_build} do
+    signature = Signature.new(public_key, secret)
+    %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, keypair)
   end
 
   test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do
-    tx_envelope_xdr = TransactionEnvelope.to_xdr(tx_envelope)
-    ^tx_envelope_xdr = TxBuild.build(tx_build)
+    %TxBuild{tx_envelope: ^tx_envelope} = TxBuild.build(tx_build)
   end
 
-  test "to_base64/1", %{tx_envelope: tx_envelope} do
-    tx_envelope_xdr = TransactionEnvelope.to_xdr(tx_envelope)
-
-    tx_envelope_base64 =
-      tx_envelope_xdr
-      |> TxEnvelopeXDR.encode_xdr!()
-      |> Base.encode64()
-
-    ^tx_envelope_base64 = TxBuild.to_base64(tx_envelope_xdr)
+  test "envelope/1", %{
+    keypair: keypair,
+    tx_build: tx_build,
+    tx_envelope_base64: tx_envelope_base64
+  } do
+    ^tx_envelope_base64 =
+      tx_build
+      |> TxBuild.sign(keypair)
+      |> TxBuild.envelope()
   end
 end
