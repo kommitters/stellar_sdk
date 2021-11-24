@@ -13,18 +13,18 @@ defmodule Stellar.Network do
     public: "https://horizon.stellar.org"
   ]
 
-  @spec base_url :: String.t()
+  @spec base_url() :: String.t()
   def base_url do
     default = @base_urls[:test]
     Keyword.get(@base_urls, current(), default)
   end
 
-  @spec passphrase :: String.t()
+  @spec passphrase() :: String.t()
   def passphrase do
     default = @passphrases[:test]
     Keyword.get(@passphrases, current(), default)
   end
 
-  @spec current :: atom()
+  @spec current() :: atom()
   def current, do: Application.get_env(:stellar_sdk, :network, :test)
 end
