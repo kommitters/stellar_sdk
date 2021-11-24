@@ -3,9 +3,13 @@ defmodule Stellar.Test.XDRFixtures do
   Stellar's XDR data for test constructions.
   """
   alias Stellar.KeyPair
+  alias Stellar.TxBuild.TransactionSignature
+  alias Stellar.TxBuild.Transaction, as: Tx
 
   alias StellarBase.XDR.{
     CryptoKeyType,
+    DecoratedSignature,
+    EnvelopeType,
     Ext,
     Hash,
     Memo,
@@ -14,8 +18,12 @@ defmodule Stellar.Test.XDRFixtures do
     Operations,
     OptionalTimeBounds,
     SequenceNumber,
+    Signature,
+    SignatureHint,
     String28,
     Transaction,
+    TransactionV1Envelope,
+    TransactionEnvelope,
     UInt32,
     UInt64,
     UInt256
@@ -59,6 +67,36 @@ defmodule Stellar.Test.XDRFixtures do
       operations,
       Ext.new()
     )
+  end
+
+  @spec transaction_envelope_xdr(tx :: Tx.t(), signatures :: list(Signature.t())) ::
+          TransactionEnvelope.t()
+  def transaction_envelope_xdr(tx, signatures) do
+    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
+    decorated_signatures = TransactionSignature.sign(tx, signatures)
+
+    tx
+    |> Tx.to_xdr()
+    |> TransactionV1Envelope.new(decorated_signatures)
+    |> TransactionEnvelope.new(envelope_type)
+  end
+
+  @spec decorated_signature_xdr(raw_secret :: binary(), hint :: binary(), payload :: binary()) ::
+          DecoratedSignature.t()
+  def decorated_signature_xdr(raw_secret, hint, payload) do
+    payload
+    |> KeyPair.sign(raw_secret)
+    |> decorated_signature_xdr(hint)
+  end
+
+  @spec decorated_signature_xdr(raw_secret :: binary(), hint :: binary()) ::
+          DecoratedSignature.t()
+  def decorated_signature_xdr(raw_secret, hint) do
+    signature = Signature.new(raw_secret)
+
+    hint
+    |> SignatureHint.new()
+    |> DecoratedSignature.new(signature)
   end
 
   @spec memo_xdr_value(value :: any(), type :: atom()) :: struct()
