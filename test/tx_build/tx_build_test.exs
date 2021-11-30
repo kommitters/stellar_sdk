@@ -5,7 +5,9 @@ defmodule Stellar.TxBuildTest do
 
   alias Stellar.TxBuild.{
     Account,
+    CreateAccount,
     Memo,
+    Operation,
     Operations,
     Signature,
     Transaction,
@@ -44,15 +46,34 @@ defmodule Stellar.TxBuildTest do
     %TxBuild{tx: %Transaction{time_bounds: ^timeout}} = TxBuild.set_timeout(tx_build, 123_456_789)
   end
 
-  @tag :pending
-  test "add_operation/2", %{tx_build: tx_build} do
-    %TxBuild{tx: %Transaction{operations: %Operations{operations: [:payment]}}} =
-      TxBuild.add_operation(tx_build, :payment)
+  test "add_operation/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
+    op_body = CreateAccount.new(public_key, 1.5)
+    operation = Operation.new(op_body)
+
+    %TxBuild{tx: %Transaction{operations: %Operations{operations: [^operation]}}} =
+      TxBuild.add_operation(tx_build, op_body)
+  end
+
+  test "add_operation/2 multiple", %{tx_build: tx_build, keypair: {public_key, _secret}} do
+    op1 = CreateAccount.new(public_key, 1.5)
+    op2 = CreateAccount.new(public_key, 100)
+    operations = [Operation.new(op1), Operation.new(op2)]
+
+    %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}} =
+      TxBuild.add_operation(tx_build, [op1, op2])
   end
 
   test "sign/2", %{keypair: {public_key, secret} = keypair, tx_build: tx_build} do
     signature = Signature.new(public_key, secret)
     %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, keypair)
+  end
+
+  test "sign/2 multiple", %{keypair: keypair1, tx_build: tx_build} do
+    {pk1, sk1} = keypair1
+    {pk2, sk2} = keypair2 = KeyPair.random()
+    signatures = [Signature.new(pk1, sk1), Signature.new(pk2, sk2)]
+
+    %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, [keypair1, keypair2])
   end
 
   test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do

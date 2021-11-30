@@ -7,16 +7,24 @@ defmodule Stellar.Test.XDRFixtures do
   alias Stellar.TxBuild.Transaction, as: Tx
 
   alias StellarBase.XDR.{
+    AccountID,
     CryptoKeyType,
     DecoratedSignature,
     EnvelopeType,
     Ext,
     Hash,
+    Int64,
     Memo,
     MemoType,
     MuxedAccount,
+    OperationType,
+    OperationBody,
+    Operation,
     Operations,
+    OptionalMuxedAccount,
     OptionalTimeBounds,
+    PublicKey,
+    PublicKeyType,
     SequenceNumber,
     Signature,
     SignatureHint,
@@ -29,6 +37,8 @@ defmodule Stellar.Test.XDRFixtures do
     UInt256
   }
 
+  alias StellarBase.XDR.Operations.CreateAccount
+
   @spec muxed_account_xdr(account_id :: String.t()) :: MuxedAccount.t()
   def muxed_account_xdr(account_id) do
     type = CryptoKeyType.new(:KEY_TYPE_ED25519)
@@ -37,6 +47,17 @@ defmodule Stellar.Test.XDRFixtures do
     |> KeyPair.raw_ed25519_public_key()
     |> UInt256.new()
     |> MuxedAccount.new(type)
+  end
+
+  @spec account_id_xdr(public_key :: String.t()) :: MuxedAccount.t()
+  def account_id_xdr(public_key) do
+    type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
+
+    public_key
+    |> KeyPair.raw_ed25519_public_key()
+    |> UInt256.new()
+    |> PublicKey.new(type)
+    |> AccountID.new()
   end
 
   @spec memo_xdr(type :: atom(), value :: any()) :: Memo.t()
@@ -97,6 +118,26 @@ defmodule Stellar.Test.XDRFixtures do
     hint
     |> SignatureHint.new()
     |> DecoratedSignature.new(signature)
+  end
+
+  @spec operation_xdr(op_body :: struct()) :: Operation.t()
+  def operation_xdr(%CreateAccount{} = op_body) do
+    op_type = OperationType.new(:CREATE_ACCOUNT)
+    source_account = OptionalMuxedAccount.new(nil)
+
+    op_body
+    |> OperationBody.new(op_type)
+    |> (&Operation.new(source_account, &1)).()
+  end
+
+  @spec create_account_op_xdr(destination :: String.t(), amount :: non_neg_integer()) ::
+          CreateAccount.t()
+  def create_account_op_xdr(destination, amount) do
+    amount = Int64.new(amount * 10_000_000)
+
+    destination
+    |> account_id_xdr()
+    |> CreateAccount.new(amount)
   end
 
   @spec memo_xdr_value(value :: any(), type :: atom()) :: struct()
