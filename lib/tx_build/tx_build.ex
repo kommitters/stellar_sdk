@@ -15,6 +15,14 @@ defmodule Stellar.TxBuild do
 
   @type signatures :: list(Signature.t())
 
+  @type keypair :: {String.t(), String.t()}
+
+  @type keypairs :: list(keypair())
+
+  @type operation :: CreateAccount.t()
+
+  @type operations :: operation() | list(operation())
+
   @type t :: %__MODULE__{
           tx: Transaction.t(),
           signatures: signatures(),
