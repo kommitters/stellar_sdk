@@ -5,6 +5,7 @@ defmodule Stellar.TxBuild do
   alias Stellar.TxBuild.{
     Account,
     Memo,
+    Operation,
     Operations,
     Signature,
     TimeBounds,
@@ -43,13 +44,30 @@ defmodule Stellar.TxBuild do
     %{tx_build | tx: transaction}
   end
 
-  @spec add_operation(tx_build :: t(), operation :: any()) :: t()
-  def add_operation(%__MODULE__{tx: tx} = tx_build, operation) do
+  @spec add_operation(tx_build :: t(), operations :: operations()) :: t()
+  def add_operation(%__MODULE__{} = tx_build, []), do: tx_build
+
+  def add_operation(%__MODULE__{} = tx_build, [operation | operations]) do
+    tx_build
+    |> add_operation(operation)
+    |> add_operation(operations)
+  end
+
+  def add_operation(%__MODULE__{tx: tx} = tx_build, op_body) do
+    operation = Operation.new(op_body)
     transaction = %{tx | operations: Operations.add(tx.operations, operation)}
     %{tx_build | tx: transaction}
   end
 
-  @spec sign(tx_build :: t(), keypair :: tuple()) :: t()
+  @spec sign(tx_build :: t(), keypairs :: keypairs()) :: t()
+  def sign(%__MODULE__{} = tx_build, []), do: tx_build
+
+  def sign(%__MODULE__{} = tx_build, [signature | signatures]) do
+    tx_build
+    |> sign(signature)
+    |> sign(signatures)
+  end
+
   def sign(%__MODULE__{signatures: signatures} = tx_build, {public_key, secret}) do
     signature = Signature.new(public_key, secret)
     %{tx_build | signatures: signatures ++ [signature]}
