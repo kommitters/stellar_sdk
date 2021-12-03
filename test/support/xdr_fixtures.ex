@@ -127,7 +127,7 @@ defmodule Stellar.Test.XDRFixtures do
 
     op_body
     |> OperationBody.new(op_type)
-    |> (&Operation.new(source_account, &1)).()
+    |> Operation.new(source_account)
   end
 
   @spec create_account_op_xdr(destination :: String.t(), amount :: non_neg_integer()) ::
