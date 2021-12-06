@@ -53,4 +53,8 @@ defmodule Stellar.KeyPair.DefaultTest do
   test "sign/2", %{secret: secret, signature: signature} do
     ^signature = Default.sign(<<0, 0, 0, 0>>, secret)
   end
+
+  test "sign/2 invalid_values", %{secret: secret} do
+    {:error, :invalid_signature_payload} = Default.sign(nil, secret)
+  end
 end
