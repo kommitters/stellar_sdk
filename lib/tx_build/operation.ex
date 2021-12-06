@@ -42,6 +42,6 @@ defmodule Stellar.TxBuild.Operation do
 
     op_body
     |> OperationBody.new(op_type)
-    |> (&Operation.new(source_account, &1)).()
+    |> Operation.new(source_account)
   end
 end
