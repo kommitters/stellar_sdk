@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.Operations do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type t :: %__MODULE__{operations: list()}
+  @type t :: %__MODULE__{operations: list(Operation.t())}
 
   defstruct [:operations]
 

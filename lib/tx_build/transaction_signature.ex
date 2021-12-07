@@ -43,6 +43,6 @@ defmodule Stellar.TxBuild.TransactionSignature do
     |> Hash.new()
   end
 
-  @spec hash(data :: any()) :: binary()
+  @spec hash(data :: binary()) :: binary()
   defp hash(data), do: :crypto.hash(:sha256, data)
 end

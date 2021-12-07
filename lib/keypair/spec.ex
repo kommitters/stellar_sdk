@@ -3,6 +3,7 @@ defmodule Stellar.KeyPair.Spec do
   Specifies the behaviour for KeyPair generators.
   This Library allows you to use any crypto package of your choice. The default is Ed25519.
   """
+  @type error :: {:error, atom()}
 
   @callback random() :: {String.t(), String.t()}
 
@@ -12,5 +13,5 @@ defmodule Stellar.KeyPair.Spec do
 
   @callback raw_ed25519_secret(String.t()) :: binary()
 
-  @callback sign(binary(), String.t()) :: binary()
+  @callback sign(binary(), String.t()) :: binary() | error()
 end

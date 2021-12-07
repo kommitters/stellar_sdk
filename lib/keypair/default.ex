@@ -37,8 +37,10 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
-  def sign(payload, secret) do
+  def sign(<<payload::binary>>, <<secret::binary>>) do
     raw_secret = raw_ed25519_secret(secret)
     Ed25519.signature(payload, raw_secret)
   end
+
+  def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
 end
