@@ -14,4 +14,8 @@ defmodule Stellar.KeyPair.Spec do
   @callback raw_ed25519_secret(String.t()) :: binary()
 
   @callback sign(binary(), String.t()) :: binary() | error()
+
+  @callback validate_ed25519_public_key(String.t()) :: :ok | error()
+
+  @callback validate_ed25519_secret_seed(String.t()) :: :ok | error()
 end

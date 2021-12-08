@@ -43,4 +43,24 @@ defmodule Stellar.KeyPair.Default do
   end
 
   def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
+
+  @impl true
+  def validate_ed25519_public_key(public_key) when byte_size(public_key) == 56 do
+    case StrKey.decode(public_key, :ed25519_public_key) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_ed25519_public_key}
+    end
+  end
+
+  def validate_ed25519_public_key(_public_key), do: {:error, :invalid_ed25519_public_key}
+
+  @impl true
+  def validate_ed25519_secret_seed(secret) when byte_size(secret) == 56 do
+    case StrKey.decode(secret, :ed25519_secret_seed) do
+      {:ok, _secret} -> :ok
+      {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
+    end
+  end
+
+  def validate_ed25519_secret_seed(_secret), do: {:error, :invalid_ed25519_secret_seed}
 end

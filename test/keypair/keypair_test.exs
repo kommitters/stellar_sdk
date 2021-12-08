@@ -32,6 +32,18 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
     send(self(), {:signature, "SIGNATURE"})
     :ok
   end
+
+  @impl true
+  def validate_ed25519_public_key(_public_key) do
+    send(self(), {:ok, "PUBLIC_KEY"})
+    :ok
+  end
+
+  @impl true
+  def validate_ed25519_secret_seed(_secret) do
+    send(self(), {:ok, "SECRET_SEED"})
+    :ok
+  end
 end
 
 defmodule Stellar.KeyPairTest do
@@ -70,5 +82,15 @@ defmodule Stellar.KeyPairTest do
   test "sign/2" do
     Stellar.KeyPair.sign(<<0, 0, 0, 0>>, "SECRET")
     assert_receive({:signature, "SIGNATURE"})
+  end
+
+  test "validate_ed25519_public_key/1" do
+    Stellar.KeyPair.validate_ed25519_public_key("PUBLIC_KEY")
+    assert_receive({:ok, "PUBLIC_KEY"})
+  end
+
+  test "validate_ed25519_secret_seed/1" do
+    Stellar.KeyPair.validate_ed25519_secret_seed("SECRET_SEED")
+    assert_receive({:ok, "SECRET_SEED"})
   end
 end
