@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.Operation do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type operation :: CreateAccount.t() | Payment.t()
+  @type operation :: CreateAccount.t()
 
   @type source_account :: String.t() | nil
 
@@ -19,8 +19,9 @@ defmodule Stellar.TxBuild.Operation do
   def new(body, opts \\ [])
 
   def new(body, _opts) do
-    with :ok <- valid_operation(body),
-         do: %__MODULE__{body: body, source_account: body.source_account}
+    with :ok <- validate_operation(body) do
+      %__MODULE__{body: body, source_account: body.source_account}
+    end
   end
 
   @impl true
@@ -32,7 +33,7 @@ defmodule Stellar.TxBuild.Operation do
     |> Operation.new(source_account)
   end
 
-  @spec valid_operation(operation :: operation()) :: :ok | {:error, atom()}
-  defp valid_operation(%CreateAccount{}), do: :ok
-  defp valid_operation(_operation), do: {:error, :unknown_operation}
+  @spec validate_operation(operation :: operation()) :: :ok | {:error, atom()}
+  defp validate_operation(%CreateAccount{}), do: :ok
+  defp validate_operation(_operation), do: {:error, :unknown_operation}
 end

@@ -16,8 +16,11 @@ defmodule Stellar.TxBuild.AccountID do
 
   def new(account_id, _opts) do
     case KeyPair.validate_ed25519_public_key(account_id) do
-      :ok -> %__MODULE__{account_id: account_id}
-      _error -> {:error, :invalid_account_id}
+      :ok ->
+        %__MODULE__{account_id: account_id}
+
+      {:error, _reason} ->
+        {:error, :invalid_account_id}
     end
   end
 
