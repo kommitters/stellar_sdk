@@ -11,9 +11,13 @@ defmodule Stellar.TxBuild.TimeBounds do
   defstruct [:min_time, :max_time]
 
   @impl true
-  def new(min_time \\ 0, max_time \\ 0) do
+  def new(min_time \\ 0, max_time \\ 0)
+
+  def new(min_time, max_time) when is_integer(min_time) and is_integer(max_time) do
     %__MODULE__{min_time: min_time, max_time: max_time}
   end
+
+  def new(_min_time, _max_time), do: {:error, :invalid_time_bounds}
 
   @impl true
   def to_xdr(%__MODULE__{min_time: 0, max_time: 0}) do
@@ -30,7 +34,9 @@ defmodule Stellar.TxBuild.TimeBounds do
   end
 
   @spec set_max_time(max_time :: non_neg_integer()) :: t()
-  def set_max_time(max_time) do
+  def set_max_time(max_time) when is_integer(max_time) do
     %__MODULE__{min_time: 0, max_time: max_time}
   end
+
+  def set_max_time(_max_time), do: {:error, :invalid_time_bounds}
 end

@@ -14,11 +14,12 @@ defmodule Stellar.TxBuild.AccountID do
   @impl true
   def new(account_id, opts \\ [])
 
-  def new(account_id, _opts) when byte_size(account_id) == 56 do
-    %__MODULE__{account_id: account_id}
+  def new(account_id, _opts) do
+    case KeyPair.validate_ed25519_public_key(account_id) do
+      :ok -> %__MODULE__{account_id: account_id}
+      _error -> {:error, :invalid_account_id}
+    end
   end
-
-  def new(_account_id, _opts), do: {:error, :invalid_account_id}
 
   @impl true
   def to_xdr(%__MODULE__{account_id: account_id}) do
