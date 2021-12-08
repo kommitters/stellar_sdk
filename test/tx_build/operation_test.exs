@@ -27,37 +27,35 @@ defmodule Stellar.TxBuild.OperationTest do
     amount = 100
     public_key = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
     source_account = "GBFJE2R5ZXJYMVUJHFPHKIQO3PSTKCC42AGYY3WPEY3NPOBYX2NK542R"
-    op_body_xdr = create_account_op_xdr(public_key, amount)
+    body_xdr = create_account_op_xdr(public_key, amount)
 
     %{
       public_key: public_key,
       amount: amount,
       source_account: source_account,
-      op_body: CreateAccount.new(public_key, amount),
-      xdr: operation_xdr(op_body_xdr)
+      body: CreateAccount.new(destination: public_key, starting_balance: amount),
+      xdr: operation_xdr(body_xdr)
     }
   end
 
-  test "new/2", %{op_body: op_body} do
-    %Operation{op_body: ^op_body, source_account: nil} = Operation.new(op_body)
+  test "new/2", %{body: body} do
+    %Operation{body: ^body, source_account: nil} = Operation.new(body)
   end
 
-  test "new/2 with source_account", %{op_body: op_body, source_account: source_account} do
-    %Operation{op_body: ^op_body, source_account: ^source_account} =
-      Operation.new(op_body, source_account: source_account)
+  test "new/2 with source_account", %{body: body} do
+    %Operation{body: ^body} = Operation.new(body)
   end
 
-  test "to_xdr/1", %{xdr: xdr, op_body: op_body} do
-    ^xdr =
-      op_body
-      |> Operation.new()
-      |> Operation.to_xdr()
-  end
-
-  test "to_xdr/1 invalid_operation" do
-    {:error, :invalid_operation} =
+  test "new/2 unknown_operation" do
+    {:error, :unknown_operation} =
       "ABCD"
       |> FakeOperation.new(10)
+      |> Operation.new()
+  end
+
+  test "to_xdr/1", %{xdr: xdr, body: body} do
+    ^xdr =
+      body
       |> Operation.new()
       |> Operation.to_xdr()
   end

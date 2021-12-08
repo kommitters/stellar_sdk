@@ -121,23 +121,21 @@ defmodule Stellar.Test.XDRFixtures do
   end
 
   @spec operation_xdr(op_body :: struct()) :: Operation.t()
-  def operation_xdr(%CreateAccount{} = op_body) do
-    op_type = OperationType.new(:CREATE_ACCOUNT)
+  def operation_xdr(%OperationBody{} = op_body) do
     source_account = OptionalMuxedAccount.new(nil)
-
-    op_body
-    |> OperationBody.new(op_type)
-    |> Operation.new(source_account)
+    Operation.new(op_body, source_account)
   end
 
   @spec create_account_op_xdr(destination :: String.t(), amount :: non_neg_integer()) ::
           CreateAccount.t()
   def create_account_op_xdr(destination, amount) do
+    op_type = OperationType.new(:CREATE_ACCOUNT)
     amount = Int64.new(amount * 10_000_000)
 
     destination
     |> account_id_xdr()
     |> CreateAccount.new(amount)
+    |> OperationBody.new(op_type)
   end
 
   @spec memo_xdr_value(value :: any(), type :: atom()) :: struct()
