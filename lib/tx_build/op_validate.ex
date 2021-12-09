@@ -2,9 +2,10 @@ defmodule Stellar.TxBuild.OpValidate do
   @moduledoc """
   Validates operation components.
   """
-  alias Stellar.TxBuild.{Account, AccountID, Amount}
+  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset}
 
   @type account_id :: String.t()
+  @type asset :: {String.t(), account_id()} | Keyword.t() | atom()
   @type value :: account_id() | asset() | number()
   @type component :: {atom(), value()}
   @type validation :: {:ok, any()} | {:error, atom()}
@@ -21,6 +22,14 @@ defmodule Stellar.TxBuild.OpValidate do
   def validate_account({field, account}) do
     case Account.new(account) do
       %Account{} = account -> {:ok, account}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_asset(component :: component()) :: validation()
+  def validate_asset({field, asset}) do
+    case Asset.new(asset) do
+      %Asset{} = asset -> {:ok, asset}
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
