@@ -18,7 +18,7 @@ defmodule Stellar.TxBuild.AccountID do
 
   def new(account_id, _opts) do
     with {:ok, account_id} <- validate_account_id(account_id),
-    do: %__MODULE__{account_id: account_id}
+         do: %__MODULE__{account_id: account_id}
   end
 
   @impl true
