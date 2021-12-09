@@ -53,7 +53,7 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   @spec build_signature(public_key :: String.t(), secret :: String.t()) :: t()
-  def build_signature(public_key, secret) do
+  defp build_signature(public_key, secret) do
     raw_public_key = KeyPair.raw_ed25519_public_key(public_key)
     raw_secret = KeyPair.raw_ed25519_secret(secret)
     signature_hint = signature_hint(raw_public_key)
