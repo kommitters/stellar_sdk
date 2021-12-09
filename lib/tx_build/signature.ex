@@ -27,17 +27,9 @@ defmodule Stellar.TxBuild.Signature do
 
   @impl true
   def new(public_key, secret) do
-    raw_public_key = KeyPair.raw_ed25519_public_key(public_key)
-    raw_secret = KeyPair.raw_ed25519_secret(secret)
-    signature_hint = signature_hint(raw_public_key)
-
-    %__MODULE__{
-      public_key: public_key,
-      raw_public_key: raw_public_key,
-      secret: secret,
-      raw_secret: raw_secret,
-      hint: signature_hint
-    }
+    with :ok <- KeyPair.validate_ed25519_public_key(public_key),
+         :ok <- KeyPair.validate_ed25519_secret_seed(secret),
+         do: build_signature(public_key, secret)
   end
 
   @spec to_xdr(signature :: t(), base_signature :: binary()) :: DecoratedSignature.t()
@@ -58,6 +50,21 @@ defmodule Stellar.TxBuild.Signature do
     hint
     |> SignatureHint.new()
     |> DecoratedSignature.new(signature)
+  end
+
+  @spec build_signature(public_key :: String.t(), secret :: String.t()) :: t()
+  defp build_signature(public_key, secret) do
+    raw_public_key = KeyPair.raw_ed25519_public_key(public_key)
+    raw_secret = KeyPair.raw_ed25519_secret(secret)
+    signature_hint = signature_hint(raw_public_key)
+
+    %__MODULE__{
+      public_key: public_key,
+      raw_public_key: raw_public_key,
+      secret: secret,
+      raw_secret: raw_secret,
+      hint: signature_hint
+    }
   end
 
   @spec signature_hint(raw_public_key :: binary()) :: binary()

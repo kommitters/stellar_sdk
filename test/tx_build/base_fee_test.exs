@@ -8,8 +8,8 @@ defmodule Stellar.TxBuild.BaseFeeTest do
     %BaseFee{fee: 100, multiplier: 1} = BaseFee.new()
   end
 
-  test "new/2 with_values" do
-    %BaseFee{fee: 500, multiplier: 3} = BaseFee.new(500, 3)
+  test "new/2 invalid_values" do
+    {:error, :invalid_fee} = BaseFee.new(500, "a")
   end
 
   test "to_xdr/1" do

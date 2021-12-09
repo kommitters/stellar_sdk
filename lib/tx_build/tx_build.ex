@@ -4,7 +4,6 @@ defmodule Stellar.TxBuild do
   """
   alias Stellar.TxBuild.{
     Account,
-    CreateAccount,
     Memo,
     Operation,
     Operations,
@@ -14,13 +13,11 @@ defmodule Stellar.TxBuild do
     TransactionEnvelope
   }
 
-  @type signatures :: list(Signature.t())
+  @type signature :: Signature.t()
 
-  @type keypair :: {String.t(), String.t()}
+  @type signatures :: signature() | list(signature())
 
-  @type keypairs :: list(keypair())
-
-  @type operation :: CreateAccount.t()
+  @type operation :: Operation.t()
 
   @type operations :: operation() | list(operation())
 
@@ -47,9 +44,9 @@ defmodule Stellar.TxBuild do
     %{tx_build | tx: transaction}
   end
 
-  @spec set_timeout(tx_build :: t(), timeout :: non_neg_integer()) :: t()
-  def set_timeout(%__MODULE__{tx: tx} = tx_build, timeout) when is_integer(timeout) do
-    transaction = %{tx | time_bounds: TimeBounds.set_max_time(timeout)}
+  @spec set_timeout(tx_build :: t(), timeout :: TimeBounds.t()) :: t()
+  def set_timeout(%__MODULE__{tx: tx} = tx_build, %TimeBounds{} = timeout) do
+    transaction = %{tx | time_bounds: timeout}
     %{tx_build | tx: transaction}
   end
 
@@ -62,23 +59,22 @@ defmodule Stellar.TxBuild do
     |> add_operation(operations)
   end
 
-  def add_operation(%__MODULE__{tx: tx} = tx_build, op_body) do
-    operation = Operation.new(op_body)
+  def add_operation(%__MODULE__{tx: tx} = tx_build, operation) do
+    operation = Operation.new(operation)
     transaction = %{tx | operations: Operations.add(tx.operations, operation)}
     %{tx_build | tx: transaction}
   end
 
-  @spec sign(tx_build :: t(), keypairs :: keypairs()) :: t()
+  @spec sign(tx_build :: t(), signatures :: signatures()) :: t()
   def sign(%__MODULE__{} = tx_build, []), do: tx_build
 
-  def sign(%__MODULE__{} = tx_build, [signature | signatures]) do
+  def sign(%__MODULE__{} = tx_build, [%Signature{} = signature | signatures]) do
     tx_build
     |> sign(signature)
     |> sign(signatures)
   end
 
-  def sign(%__MODULE__{signatures: signatures} = tx_build, {public_key, secret}) do
-    signature = Signature.new(public_key, secret)
+  def sign(%__MODULE__{signatures: signatures} = tx_build, %Signature{} = signature) do
     %{tx_build | signatures: signatures ++ [signature]}
   end
 

@@ -57,4 +57,20 @@ defmodule Stellar.KeyPair.DefaultTest do
   test "sign/2 invalid_values", %{secret: secret} do
     {:error, :invalid_signature_payload} = Default.sign(nil, secret)
   end
+
+  test "validate_ed25519_public_key/1", %{public_key: public_key} do
+    :ok = Default.validate_ed25519_public_key(public_key)
+  end
+
+  test "validate_ed25519_public_key/1 invalid_key" do
+    {:error, :invalid_ed25519_public_key} = Default.validate_ed25519_public_key("ABC")
+  end
+
+  test "validate_ed25519_secret_seed/1", %{secret: secret} do
+    :ok = Default.validate_ed25519_secret_seed(secret)
+  end
+
+  test "validate_ed25519_secret_seed/1 invalid_secret" do
+    {:error, :invalid_ed25519_secret_seed} = Default.validate_ed25519_secret_seed("ABC")
+  end
 end

@@ -17,11 +17,11 @@ defmodule Stellar.TxBuild.Amount do
   @impl true
   def new(amount, opts \\ [])
 
-  def new(amount, _opts) when is_integer(amount) do
+  def new(amount, _opts) when is_integer(amount) and amount > 0 do
     %__MODULE__{amount: amount, raw_amount: amount * @unit}
   end
 
-  def new(amount, _opts) when is_float(amount) do
+  def new(amount, _opts) when is_float(amount) and amount > 0 do
     %__MODULE__{amount: amount, raw_amount: trunc(amount * @unit)}
   end
 

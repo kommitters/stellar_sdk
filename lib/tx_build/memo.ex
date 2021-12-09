@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.Memo do
   @behaviour Stellar.TxBuild.XDR
 
   @type memo_value :: String.t() | integer() | binary() | nil
+
   @type xdr_memo_value :: String28.t() | UInt64.t() | Hash.t() | nil
 
   @type t :: %__MODULE__{type: atom(), value: memo_value()}

@@ -7,6 +7,8 @@ defmodule Stellar.TxBuild.AccountID do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type validation :: {:ok, any()} | {:error, atom()}
+
   @type t :: %__MODULE__{account_id: String.t()}
 
   defstruct [:account_id]
@@ -14,11 +16,10 @@ defmodule Stellar.TxBuild.AccountID do
   @impl true
   def new(account_id, opts \\ [])
 
-  def new(account_id, _opts) when byte_size(account_id) == 56 do
-    %__MODULE__{account_id: account_id}
+  def new(account_id, _opts) do
+    with {:ok, account_id} <- validate_account_id(account_id),
+         do: %__MODULE__{account_id: account_id}
   end
-
-  def new(_account_id, _opts), do: {:error, :invalid_account_id}
 
   @impl true
   def to_xdr(%__MODULE__{account_id: account_id}) do
@@ -29,5 +30,13 @@ defmodule Stellar.TxBuild.AccountID do
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
+  end
+
+  @spec validate_account_id(account_id :: String.t()) :: validation()
+  defp validate_account_id(account_id) do
+    case KeyPair.validate_ed25519_public_key(account_id) do
+      :ok -> {:ok, account_id}
+      _error -> {:error, :invalid_account_id}
+    end
   end
 end

@@ -8,7 +8,6 @@ defmodule Stellar.TxBuild.Transaction do
     Operations,
     SequenceNumber,
     Memo,
-    Operation,
     TimeBounds
   }
 
@@ -33,7 +32,7 @@ defmodule Stellar.TxBuild.Transaction do
     base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
     seq_number = Keyword.get(opts, :sequence_number, SequenceNumber.new(account))
     time_bounds = Keyword.get(opts, :time_bounds, TimeBounds.new())
-    operations = Keyword.get(opts, :operations, Operations.new())
+    operations = Operations.new()
 
     %__MODULE__{
       source_account: account,

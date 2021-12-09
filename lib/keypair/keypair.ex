@@ -20,6 +20,12 @@ defmodule Stellar.KeyPair do
   @impl true
   def sign(payload, secret), do: impl().sign(payload, secret)
 
+  @impl true
+  def validate_ed25519_public_key(public_key), do: impl().validate_ed25519_public_key(public_key)
+
+  @impl true
+  def validate_ed25519_secret_seed(secret), do: impl().validate_ed25519_secret_seed(secret)
+
   @spec impl() :: atom()
   defp impl do
     Application.get_env(:stellar_sdk, :keypair_impl, Stellar.KeyPair.Default)

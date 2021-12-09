@@ -11,9 +11,13 @@ defmodule Stellar.TxBuild.BaseFee do
   defstruct [:fee, :multiplier]
 
   @impl true
-  def new(fee \\ base_fee(), multiplier \\ 1) do
+  def new(fee \\ base_fee(), multiplier \\ 1)
+
+  def new(fee, multiplier) when is_integer(fee) and is_integer(multiplier) do
     %__MODULE__{fee: fee, multiplier: multiplier}
   end
+
+  def new(_fee, _multiplier), do: {:error, :invalid_fee}
 
   @impl true
   def to_xdr(%__MODULE__{fee: fee, multiplier: multiplier}) do

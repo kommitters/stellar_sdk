@@ -5,7 +5,12 @@ defmodule Stellar.TxBuild.OperationsTest do
   alias Stellar.TxBuild.{Operation, Operations, CreateAccount}
 
   setup do
-    op_body = CreateAccount.new("GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V", 1.5)
+    op_body =
+      CreateAccount.new(
+        destination: "GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V",
+        starting_balance: 1.5
+      )
+
     operation = Operation.new(op_body)
 
     %{

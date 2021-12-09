@@ -25,13 +25,23 @@ defmodule Stellar.TxBuild.CreateAccountTest do
     amount: amount
   } do
     %CreateAccount{destination: ^destination, starting_balance: ^starting_balance} =
-      CreateAccount.new(public_key, amount)
+      CreateAccount.new(destination: public_key, starting_balance: amount)
+  end
+
+  test "new/2 with_invalid_destination", %{amount: amount} do
+    {:error, :invalid_destination} =
+      CreateAccount.new(destination: "ABC", starting_balance: amount)
+  end
+
+  test "new/2 with_invalid_amount", %{public_key: public_key} do
+    {:error, :invalid_starting_balance} =
+      CreateAccount.new(destination: public_key, starting_balance: "123")
   end
 
   test "to_xdr/1", %{xdr: xdr, public_key: public_key, amount: amount} do
     ^xdr =
-      public_key
-      |> CreateAccount.new(amount)
+      [destination: public_key, starting_balance: amount]
+      |> CreateAccount.new()
       |> CreateAccount.to_xdr()
   end
 end

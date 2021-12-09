@@ -16,14 +16,17 @@ defmodule Stellar.TxBuildTest do
   }
 
   setup do
-    keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
-    public_key = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
-    account = Account.new(public_key)
+    {public_key, secret} =
+      keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
+
+    signature = Signature.new(public_key, secret)
+    account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
     tx = Transaction.new(account)
 
     %{
       account: account,
       keypair: keypair,
+      signature: signature,
       tx: tx,
       tx_build: TxBuild.new(account),
       tx_envelope: TransactionEnvelope.new(tx, []),
@@ -43,11 +46,11 @@ defmodule Stellar.TxBuildTest do
 
   test "set_timeout/2", %{tx_build: tx_build} do
     timeout = TimeBounds.set_max_time(123_456_789)
-    %TxBuild{tx: %Transaction{time_bounds: ^timeout}} = TxBuild.set_timeout(tx_build, 123_456_789)
+    %TxBuild{tx: %Transaction{time_bounds: ^timeout}} = TxBuild.set_timeout(tx_build, timeout)
   end
 
   test "add_operation/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
-    op_body = CreateAccount.new(public_key, 1.5)
+    op_body = CreateAccount.new(destination: public_key, starting_balance: 1.5)
     operation = Operation.new(op_body)
 
     %TxBuild{tx: %Transaction{operations: %Operations{operations: [^operation]}}} =
@@ -55,25 +58,24 @@ defmodule Stellar.TxBuildTest do
   end
 
   test "add_operation/2 multiple", %{tx_build: tx_build, keypair: {public_key, _secret}} do
-    op1 = CreateAccount.new(public_key, 1.5)
-    op2 = CreateAccount.new(public_key, 100)
+    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
+    op2 = CreateAccount.new(destination: public_key, starting_balance: 100)
     operations = [Operation.new(op1), Operation.new(op2)]
 
     %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}} =
       TxBuild.add_operation(tx_build, [op1, op2])
   end
 
-  test "sign/2", %{keypair: {public_key, secret} = keypair, tx_build: tx_build} do
+  test "sign/2", %{keypair: {public_key, secret}, tx_build: tx_build} do
     signature = Signature.new(public_key, secret)
-    %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, keypair)
+    %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, signature)
   end
 
-  test "sign/2 multiple", %{keypair: keypair1, tx_build: tx_build} do
-    {pk1, sk1} = keypair1
-    {pk2, sk2} = keypair2 = KeyPair.random()
-    signatures = [Signature.new(pk1, sk1), Signature.new(pk2, sk2)]
+  test "sign/2 multiple", %{signature: signature, tx_build: tx_build} do
+    {pk, sk} = KeyPair.random()
+    signatures = [signature, Signature.new(pk, sk)]
 
-    %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, [keypair1, keypair2])
+    %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, signatures)
   end
 
   test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do
@@ -81,13 +83,13 @@ defmodule Stellar.TxBuildTest do
   end
 
   test "envelope/1", %{
-    keypair: keypair,
+    signature: signature,
     tx_build: tx_build,
     tx_envelope_base64: tx_envelope_base64
   } do
     ^tx_envelope_base64 =
       tx_build
-      |> TxBuild.sign(keypair)
+      |> TxBuild.sign(signature)
       |> TxBuild.envelope()
   end
 end
