@@ -8,7 +8,6 @@ defmodule Stellar.TxBuild.Transaction do
     Operations,
     SequenceNumber,
     Memo,
-    Operation,
     TimeBounds
   }
 
