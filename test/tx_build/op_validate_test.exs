@@ -12,7 +12,8 @@ defmodule Stellar.TxBuild.OpValidateTest do
   end
 
   test "validate_account_id/2 error" do
-    {:error, [destination: :invalid_account_id]} = OpValidate.validate_account_id({:destination, "ABC"})
+    {:error, [destination: :invalid_account_id]} =
+      OpValidate.validate_account_id({:destination, "ABC"})
   end
 
   test "validate_account/2", %{account_id: account_id} do
@@ -20,7 +21,8 @@ defmodule Stellar.TxBuild.OpValidateTest do
   end
 
   test "validate_account/2 error" do
-    {:error, [destination: :invalid_account_id]} = OpValidate.validate_account_id({:destination, "ABC"})
+    {:error, [destination: :invalid_account_id]} =
+      OpValidate.validate_account_id({:destination, "ABC"})
   end
 
   test "validate_amount/2" do
@@ -28,6 +30,7 @@ defmodule Stellar.TxBuild.OpValidateTest do
   end
 
   test "validate_amount/2 error" do
-    {:error, [starting_balance: :invalid_amount]} = OpValidate.validate_amount({:starting_balance, "100"})
+    {:error, [starting_balance: :invalid_amount]} =
+      OpValidate.validate_amount({:starting_balance, "100"})
   end
 end
