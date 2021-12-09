@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.CreateAccount do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type error :: {:error, atom()}
+  @type validation :: {:ok, any()} | {:error, atom()}
 
   @type source_account :: String.t() | nil
 
@@ -27,19 +27,17 @@ defmodule Stellar.TxBuild.CreateAccount do
     starting_balance = Keyword.get(args, :starting_balance)
     source_account = Keyword.get(args, :source_account)
 
-    with %AccountID{} = account_id <- AccountID.new(destination),
-         %Amount{} = amount <- Amount.new(starting_balance) do
+    with {:ok, destination} <- validate_destination(destination),
+         {:ok, starting_balance} <- validate_starting_balance(starting_balance) do
       %__MODULE__{
-        destination: account_id,
-        starting_balance: amount,
+        destination: destination,
+        starting_balance: starting_balance,
         source_account: source_account
       }
-    else
-      error -> error_message(error)
     end
   end
 
-  def new(_args, _opts), do: {:error, :invalid_arguments}
+  def new(_args, _opts), do: {:error, :invalid_operation_attributes}
 
   @impl true
   def to_xdr(%__MODULE__{destination: destination, starting_balance: starting_balance}) do
@@ -52,7 +50,19 @@ defmodule Stellar.TxBuild.CreateAccount do
     |> OperationBody.new(op_type)
   end
 
-  @spec error_message(error :: error()) :: error()
-  defp error_message({:error, :invalid_account_id}), do: {:error, :invalid_destination}
-  defp error_message({:error, :invalid_amount}), do: {:error, :invalid_starting_balance}
+  @spec validate_destination(destination :: String.t()) :: validation()
+  defp validate_destination(destination) do
+    case AccountID.new(destination) do
+      %AccountID{} = destination -> {:ok, destination}
+      _error -> {:error, :invalid_destination}
+    end
+  end
+
+  @spec validate_starting_balance(starting_balance :: String.t()) :: validation()
+  defp validate_starting_balance(starting_balance) do
+    case Amount.new(starting_balance) do
+      %Amount{} = starting_balance -> {:ok, starting_balance}
+      _error -> {:error, :invalid_starting_balance}
+    end
+  end
 end

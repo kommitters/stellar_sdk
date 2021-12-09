@@ -7,6 +7,8 @@ defmodule Stellar.TxBuild.Account do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type validation :: {:ok, any()} | {:error, atom()}
+
   @type id :: integer() | nil
 
   @type t :: %__MODULE__{account_id: String.t(), id: id()}
@@ -17,10 +19,8 @@ defmodule Stellar.TxBuild.Account do
   def new(account_id, id \\ nil)
 
   def new(account_id, id) do
-    case KeyPair.validate_ed25519_public_key(account_id) do
-      :ok -> %__MODULE__{account_id: account_id, id: id}
-      {:error, _reason} -> {:error, :invalid_account_id}
-    end
+    with {:ok, account_id} <- validate_account_id(account_id),
+    do: %__MODULE__{account_id: account_id, id: id}
   end
 
   @impl true
@@ -31,5 +31,13 @@ defmodule Stellar.TxBuild.Account do
     |> KeyPair.raw_ed25519_public_key()
     |> UInt256.new()
     |> MuxedAccount.new(type)
+  end
+
+  @spec validate_account_id(account_id :: String.t()) :: validation()
+  defp validate_account_id(account_id) do
+    case KeyPair.validate_ed25519_public_key(account_id) do
+      :ok -> {:ok, account_id}
+      _error -> {:error, :invalid_account_id}
+    end
   end
 end
