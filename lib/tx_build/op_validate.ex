@@ -5,7 +5,7 @@ defmodule Stellar.TxBuild.OpValidate do
   alias Stellar.TxBuild.{Account, AccountID, Amount}
 
   @type account_id :: String.t()
-  @type value :: account_id() | number()
+  @type value :: account_id() | asset() | number()
   @type component :: {atom(), value()}
   @type validation :: {:ok, any()} | {:error, atom()}
 
