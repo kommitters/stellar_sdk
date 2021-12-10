@@ -1,13 +1,13 @@
 defmodule Stellar.TxBuild.CreateAccount do
   @moduledoc """
-  `CreateAccountOp` struct definition.
+  Creates and funds a new account with the specified starting balance.
   """
+  import Stellar.TxBuild.OpValidate
+
   alias Stellar.TxBuild.{AccountID, Amount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.CreateAccount}
 
   @behaviour Stellar.TxBuild.XDR
-
-  @type validation :: {:ok, any()} | {:error, atom()}
 
   @type source_account :: String.t() | nil
 
@@ -27,8 +27,8 @@ defmodule Stellar.TxBuild.CreateAccount do
     starting_balance = Keyword.get(args, :starting_balance)
     source_account = Keyword.get(args, :source_account)
 
-    with {:ok, destination} <- validate_destination(destination),
-         {:ok, starting_balance} <- validate_starting_balance(starting_balance) do
+    with {:ok, destination} <- validate_account_id({:destination, destination}),
+         {:ok, starting_balance} <- validate_amount({:starting_balance, starting_balance}) do
       %__MODULE__{
         destination: destination,
         starting_balance: starting_balance,
@@ -48,21 +48,5 @@ defmodule Stellar.TxBuild.CreateAccount do
     destination
     |> CreateAccount.new(amount)
     |> OperationBody.new(op_type)
-  end
-
-  @spec validate_destination(destination :: String.t()) :: validation()
-  defp validate_destination(destination) do
-    case AccountID.new(destination) do
-      %AccountID{} = destination -> {:ok, destination}
-      _error -> {:error, :invalid_destination}
-    end
-  end
-
-  @spec validate_starting_balance(starting_balance :: String.t()) :: validation()
-  defp validate_starting_balance(starting_balance) do
-    case Amount.new(starting_balance) do
-      %Amount{} = starting_balance -> {:ok, starting_balance}
-      _error -> {:error, :invalid_starting_balance}
-    end
   end
 end
