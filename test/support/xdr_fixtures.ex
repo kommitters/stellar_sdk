@@ -46,6 +46,8 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.Operations.{CreateAccount, Payment}
 
+  @type optional_account_id :: String.t() | nil
+
   @unit 10_000_000
 
   @spec muxed_account_xdr(account_id :: String.t()) :: MuxedAccount.t()
@@ -58,11 +60,11 @@ defmodule Stellar.Test.XDRFixtures do
     |> MuxedAccount.new(type)
   end
 
-  @spec account_id_xdr(public_key :: String.t()) :: MuxedAccount.t()
-  def account_id_xdr(public_key) do
+  @spec account_id_xdr(account_id :: String.t()) :: MuxedAccount.t()
+  def account_id_xdr(account_id) do
     type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
 
-    public_key
+    account_id
     |> KeyPair.raw_ed25519_public_key()
     |> UInt256.new()
     |> PublicKey.new(type)
@@ -129,9 +131,11 @@ defmodule Stellar.Test.XDRFixtures do
     |> DecoratedSignature.new(signature)
   end
 
-  @spec operation_xdr(op_body :: struct()) :: Operation.t()
-  def operation_xdr(%OperationBody{} = op_body) do
-    source_account = OptionalMuxedAccount.new(nil)
+  @spec operation_xdr(op_body :: struct(), source_account :: optional_account_id()) ::
+          Operation.t()
+  def operation_xdr(%OperationBody{} = op_body, source_account \\ nil) do
+    account = if is_nil(source_account), do: nil, else: muxed_account_xdr(source_account)
+    source_account = OptionalMuxedAccount.new(account)
     Operation.new(op_body, source_account)
   end
 

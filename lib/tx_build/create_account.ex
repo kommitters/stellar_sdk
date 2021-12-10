@@ -4,17 +4,15 @@ defmodule Stellar.TxBuild.CreateAccount do
   """
   import Stellar.TxBuild.OpValidate
 
-  alias Stellar.TxBuild.{AccountID, Amount}
+  alias Stellar.TxBuild.{AccountID, Amount, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.CreateAccount}
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type source_account :: String.t() | nil
-
   @type t :: %__MODULE__{
           destination: AccountID.t(),
           starting_balance: Amount.t(),
-          source_account: source_account()
+          source_account: OptionalAccount.t()
         }
 
   defstruct [:destination, :starting_balance, :source_account]
@@ -28,7 +26,8 @@ defmodule Stellar.TxBuild.CreateAccount do
     source_account = Keyword.get(args, :source_account)
 
     with {:ok, destination} <- validate_account_id({:destination, destination}),
-         {:ok, starting_balance} <- validate_amount({:starting_balance, starting_balance}) do
+         {:ok, starting_balance} <- validate_amount({:starting_balance, starting_balance}),
+         {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
       %__MODULE__{
         destination: destination,
         starting_balance: starting_balance,

@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.Payment do
   """
   import Stellar.TxBuild.OpValidate
 
-  alias Stellar.TxBuild.{Account, Amount, Asset}
+  alias Stellar.TxBuild.{Account, Amount, Asset, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.Payment}
 
   @behaviour Stellar.TxBuild.XDR
@@ -12,13 +12,12 @@ defmodule Stellar.TxBuild.Payment do
   @type asset_issuer :: String.t()
   @type asset_code :: String.t()
   @type asset :: {asset_code(), asset_issuer()} | Keyword.t() | atom()
-  @type source_account :: String.t() | nil
 
   @type t :: %__MODULE__{
           destination: Account.t(),
           asset: Asset.t(),
           amount: Amount.t(),
-          source_account: source_account()
+          source_account: OptionalAccount.t()
         }
 
   defstruct [:destination, :asset, :amount, :source_account]
@@ -34,7 +33,8 @@ defmodule Stellar.TxBuild.Payment do
 
     with {:ok, destination} <- validate_account({:destination, destination}),
          {:ok, asset} <- validate_asset({:asset, asset}),
-         {:ok, amount} <- validate_amount({:amount, amount}) do
+         {:ok, amount} <- validate_amount({:amount, amount}),
+         {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
       %__MODULE__{
         destination: destination,
         asset: asset,
