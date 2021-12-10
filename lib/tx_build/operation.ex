@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.Operation do
   @moduledoc """
   `Operation` struct definition.
   """
-  alias Stellar.TxBuild.CreateAccount
+  alias Stellar.TxBuild.{CreateAccount, Payment}
   alias StellarBase.XDR.{Operation, OptionalMuxedAccount}
 
   @behaviour Stellar.TxBuild.XDR
@@ -35,5 +35,6 @@ defmodule Stellar.TxBuild.Operation do
 
   @spec validate_operation(operation :: operation()) :: :ok | {:error, atom()}
   defp validate_operation(%CreateAccount{}), do: :ok
+  defp validate_operation(%Payment{}), do: :ok
   defp validate_operation(_operation), do: {:error, :unknown_operation}
 end

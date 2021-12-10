@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.OpValidateTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{Account, AccountID, Amount, OpValidate}
+  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, OpValidate}
 
   setup do
     %{account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"}
@@ -32,5 +32,14 @@ defmodule Stellar.TxBuild.OpValidateTest do
   test "validate_amount/2 error" do
     {:error, [starting_balance: :invalid_amount]} =
       OpValidate.validate_amount({:starting_balance, "100"})
+  end
+
+  test "validate_asset/2" do
+    {:ok, %Asset{}} = OpValidate.validate_asset({:asset, :native})
+  end
+
+  test "validate_asset/2 error" do
+    {:error, [dest_asset: :invalid_asset_issuer]} =
+      OpValidate.validate_asset({:dest_asset, {"BTCN", "ABC"}})
   end
 end

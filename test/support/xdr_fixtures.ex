@@ -8,6 +8,12 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.{
     AccountID,
+    AlphaNum12,
+    AlphaNum4,
+    Asset,
+    AssetCode4,
+    AssetCode12,
+    AssetType,
     CryptoKeyType,
     DecoratedSignature,
     EnvelopeType,
@@ -34,10 +40,13 @@ defmodule Stellar.Test.XDRFixtures do
     TransactionEnvelope,
     UInt32,
     UInt64,
-    UInt256
+    UInt256,
+    Void
   }
 
-  alias StellarBase.XDR.Operations.CreateAccount
+  alias StellarBase.XDR.Operations.{CreateAccount, Payment}
+
+  @unit 10_000_000
 
   @spec muxed_account_xdr(account_id :: String.t()) :: MuxedAccount.t()
   def muxed_account_xdr(account_id) do
@@ -130,12 +139,59 @@ defmodule Stellar.Test.XDRFixtures do
           CreateAccount.t()
   def create_account_op_xdr(destination, amount) do
     op_type = OperationType.new(:CREATE_ACCOUNT)
-    amount = Int64.new(amount * 10_000_000)
+    amount = Int64.new(amount * @unit)
 
     destination
     |> account_id_xdr()
     |> CreateAccount.new(amount)
     |> OperationBody.new(op_type)
+  end
+
+  @spec create_payment_op_xdr(
+          destination :: String.t(),
+          asset :: tuple(),
+          amount :: non_neg_integer()
+        ) :: Payment.t()
+  def create_payment_op_xdr(destination, {asset_code, asset_issuer}, amount) do
+    op_type = OperationType.new(:PAYMENT)
+    amount = Int64.new(amount * @unit)
+
+    asset =
+      if String.length(asset_code) > 4,
+        do: create_asset12_xdr(asset_code, asset_issuer),
+        else: create_asset4_xdr(asset_code, asset_issuer)
+
+    destination
+    |> muxed_account_xdr()
+    |> Payment.new(asset, amount)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec create_asset_native_xdr() :: Asset.t()
+  def create_asset_native_xdr do
+    Asset.new(Void.new(), AssetType.new(:ASSET_TYPE_NATIVE))
+  end
+
+  @spec create_asset4_xdr(code :: String.t(), issuer :: String.t()) :: Asset.t()
+  def create_asset4_xdr(code, issuer) do
+    asset_type = AssetType.new(:ASSET_TYPE_CREDIT_ALPHANUM4)
+    issuer = account_id_xdr(issuer)
+
+    code
+    |> AssetCode4.new()
+    |> AlphaNum4.new(issuer)
+    |> Asset.new(asset_type)
+  end
+
+  @spec create_asset12_xdr(code :: String.t(), issuer :: String.t()) :: Asset.t()
+  def create_asset12_xdr(code, issuer) do
+    asset_type = AssetType.new(:ASSET_TYPE_CREDIT_ALPHANUM12)
+    issuer = account_id_xdr(issuer)
+
+    code
+    |> AssetCode12.new()
+    |> AlphaNum12.new(issuer)
+    |> Asset.new(asset_type)
   end
 
   @spec memo_xdr_value(value :: any(), type :: atom()) :: struct()
