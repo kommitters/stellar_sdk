@@ -14,11 +14,8 @@ defmodule Stellar.TxBuild do
   }
 
   @type signature :: Signature.t()
-
   @type signatures :: signature() | list(signature())
-
   @type operation :: Operation.t()
-
   @type operations :: operation() | list(operation())
 
   @type t :: %__MODULE__{

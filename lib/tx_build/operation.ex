@@ -2,16 +2,14 @@ defmodule Stellar.TxBuild.Operation do
   @moduledoc """
   `Operation` struct definition.
   """
-  alias Stellar.TxBuild.{CreateAccount, Payment}
-  alias StellarBase.XDR.{Operation, OptionalMuxedAccount}
+  alias Stellar.TxBuild.{CreateAccount, OptionalAccount, Payment}
+  alias StellarBase.XDR.Operation
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type operation :: CreateAccount.t()
+  @type operation :: CreateAccount.t() | Payment.t()
 
-  @type source_account :: String.t() | nil
-
-  @type t :: %__MODULE__{body: operation(), source_account: source_account()}
+  @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
   defstruct [:body, :source_account]
 
@@ -26,7 +24,7 @@ defmodule Stellar.TxBuild.Operation do
 
   @impl true
   def to_xdr(%__MODULE__{body: %{__struct__: operation} = body, source_account: source_account}) do
-    source_account = OptionalMuxedAccount.new(source_account)
+    source_account = OptionalAccount.to_xdr(source_account)
 
     body
     |> operation.to_xdr()
@@ -36,5 +34,5 @@ defmodule Stellar.TxBuild.Operation do
   @spec validate_operation(operation :: operation()) :: :ok | {:error, atom()}
   defp validate_operation(%CreateAccount{}), do: :ok
   defp validate_operation(%Payment{}), do: :ok
-  defp validate_operation(_operation), do: {:error, :unknown_operation}
+  defp validate_operation(operation), do: {:error, [{:unknown_operation, operation}]}
 end
