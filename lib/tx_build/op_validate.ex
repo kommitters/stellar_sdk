@@ -9,7 +9,7 @@ defmodule Stellar.TxBuild.OpValidate do
   @type value :: account_id() | asset() | number()
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()
-  @type validation :: {:ok, any()} | {:error, Keyword.t()}
+  @type validation :: {:ok, any()} | {:error, error()}
 
   @spec validate_account_id(component :: component()) :: validation()
   def validate_account_id({field, account_id}) do
