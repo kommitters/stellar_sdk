@@ -5,11 +5,11 @@ defmodule Stellar.TxBuild.AmountTest do
   alias StellarBase.XDR.Int64
 
   test "new/2 integer" do
-    %Amount{amount: 7, raw_amount: 70_000_000} = Amount.new(7)
+    %Amount{amount: 7, raw: 70_000_000} = Amount.new(7)
   end
 
   test "new/2 float" do
-    %Amount{amount: 3.141516, raw_amount: 31_415_160} = Amount.new(3.141516)
+    %Amount{amount: 3.141516, raw: 31_415_160} = Amount.new(3.141516)
   end
 
   test "new/2 invalid" do
