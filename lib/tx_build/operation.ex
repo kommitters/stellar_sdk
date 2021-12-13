@@ -48,8 +48,7 @@ defmodule Stellar.TxBuild.Operation do
       CreateAccount,
       Payment,
       PathPaymentStrictSend,
-      PathPaymentStrictReceive,
-      ManageSellOffer
+      PathPaymentStrictReceive
     ]
 
     if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}
