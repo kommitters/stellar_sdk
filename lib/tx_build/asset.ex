@@ -7,9 +7,10 @@ defmodule Stellar.TxBuild.Asset do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type issuer :: AccountID.t() | nil
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type t :: %__MODULE__{code: String.t(), issuer: String.t(), type: atom()}
+  @type t :: %__MODULE__{code: String.t(), issuer: issuer() | nil, type: atom()}
 
   defstruct [:code, :issuer, :type]
 
