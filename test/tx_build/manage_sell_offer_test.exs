@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.ManageSellOfferTest do
   use ExUnit.Case
 
   import Stellar.TxBuild.Utils, only: [number_to_fraction: 1]
-  import Stellar.Test.XDRFixtures, only: [create_manage_sell_offer_op_xdr: 5]
+  import Stellar.Test.XDRFixtures, only: [manage_sell_offer_op_xdr: 5]
 
   alias Stellar.TxBuild.{Amount, Asset, ManageSellOffer, Price}
 
@@ -23,7 +23,7 @@ defmodule Stellar.TxBuild.ManageSellOfferTest do
       price: price,
       offer_id: offer_id,
       xdr:
-        create_manage_sell_offer_op_xdr(
+        manage_sell_offer_op_xdr(
           selling,
           buying,
           amount,
