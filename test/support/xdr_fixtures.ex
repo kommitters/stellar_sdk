@@ -20,6 +20,7 @@ defmodule Stellar.Test.XDRFixtures do
     EnvelopeType,
     Ext,
     Hash,
+    Int32,
     Int64,
     Memo,
     MemoType,
@@ -30,6 +31,7 @@ defmodule Stellar.Test.XDRFixtures do
     Operations,
     OptionalMuxedAccount,
     OptionalTimeBounds,
+    Price,
     PublicKey,
     PublicKeyType,
     SequenceNumber,
@@ -47,6 +49,7 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.Operations.{
     CreateAccount,
+    ManageSellOffer,
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive
@@ -246,6 +249,33 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(path_payment, op_type)
+  end
+
+  @spec create_manage_sell_offer_op_xdr(
+          selling :: raw_asset(),
+          buying :: raw_asset(),
+          amount :: non_neg_integer(),
+          price :: number(),
+          offer_id :: non_neg_integer()
+        ) :: ManageSellOffer.t()
+  def create_manage_sell_offer_op_xdr(selling, buying, amount, {price_n, price_d}, offer_id) do
+    op_type = OperationType.new(:MANAGE_SELL_OFFER)
+    selling = build_asset_xdr(selling)
+    buying = build_asset_xdr(buying)
+    amount = Int64.new(amount * @unit)
+    price = Price.new(Int32.new(price_n), Int32.new(price_d))
+    offer_id = Int64.new(offer_id)
+
+    manage_sell_offer =
+      ManageSellOffer.new(
+        selling,
+        buying,
+        amount,
+        price,
+        offer_id
+      )
+
+    OperationBody.new(manage_sell_offer, op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()

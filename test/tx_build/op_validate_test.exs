@@ -1,10 +1,18 @@
 defmodule Stellar.TxBuild.OpValidateTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, AssetsPath, OpValidate}
+  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, AssetsPath, OpValidate, Price}
 
   setup do
     %{account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"}
+  end
+
+  test "validate_pos_integer/1" do
+    {:ok, 123} = OpValidate.validate_pos_integer({:offer_id, 123})
+  end
+
+  test "validate_pos_integer/1 error" do
+    {:error, [offer_id: :integer_expected]} = OpValidate.validate_pos_integer({:offer_id, "123"})
   end
 
   test "validate_account_id/1", %{account_id: account_id} do
@@ -55,5 +63,13 @@ defmodule Stellar.TxBuild.OpValidateTest do
   test "validate_optional_assets_path/1 error" do
     {:error, [path: :invalid_asset_issuer]} =
       OpValidate.validate_optional_assets_path({:path, [:native, {"BTCN", "ABC"}]})
+  end
+
+  test "validate_price/1" do
+    {:ok, %Price{}} = OpValidate.validate_price({:price, 2.15})
+  end
+
+  test "validate_price/1 error" do
+    {:error, [price: :invalid_price]} = OpValidate.validate_price({:price, "2.15"})
   end
 end
