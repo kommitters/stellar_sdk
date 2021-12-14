@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.PathPaymentStrictSendTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [create_path_payment_strict_send_op_xdr: 6]
+  import Stellar.Test.XDRFixtures, only: [path_payment_strict_send_op_xdr: 6]
 
   alias Stellar.TxBuild.{Account, Amount, Asset, AssetsPath, PathPaymentStrictSend}
 
@@ -25,7 +25,7 @@ defmodule Stellar.TxBuild.PathPaymentStrictSendTest do
       dest_min: dest_min,
       path: path,
       xdr:
-        create_path_payment_strict_send_op_xdr(
+        path_payment_strict_send_op_xdr(
           destination,
           send_asset,
           send_amount,
