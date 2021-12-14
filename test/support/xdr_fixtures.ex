@@ -45,7 +45,12 @@ defmodule Stellar.Test.XDRFixtures do
     Void
   }
 
-  alias StellarBase.XDR.Operations.{CreateAccount, Payment, PathPaymentStrictSend}
+  alias StellarBase.XDR.Operations.{
+    CreateAccount,
+    Payment,
+    PathPaymentStrictSend,
+    PathPaymentStrictReceive
+  }
 
   @type optional_account_id :: String.t() | nil
   @type raw_asset :: atom() | {String.t(), String.t()}
@@ -200,6 +205,43 @@ defmodule Stellar.Test.XDRFixtures do
         destination,
         dest_asset,
         dest_min,
+        path
+      )
+
+    OperationBody.new(path_payment, op_type)
+  end
+
+  @spec create_path_payment_strict_receive_op_xdr(
+          destination :: String.t(),
+          send_asset :: raw_asset(),
+          send_max :: non_neg_integer(),
+          dest_asset :: raw_asset(),
+          dest_amount :: non_neg_integer(),
+          path :: list(raw_asset())
+        ) :: PathPaymentStrictReceive.t()
+  def create_path_payment_strict_receive_op_xdr(
+        destination,
+        send_asset,
+        send_max,
+        dest_asset,
+        dest_amount,
+        path
+      ) do
+    op_type = OperationType.new(:PATH_PAYMENT_STRICT_RECEIVE)
+    destination = muxed_account_xdr(destination)
+    send_asset = build_asset_xdr(send_asset)
+    send_max = Int64.new(send_max * @unit)
+    dest_asset = build_asset_xdr(dest_asset)
+    dest_amount = Int64.new(dest_amount * @unit)
+    path = assets_path_xdr(path)
+
+    path_payment =
+      PathPaymentStrictReceive.new(
+        send_asset,
+        send_max,
+        destination,
+        dest_asset,
+        dest_amount,
         path
       )
 
