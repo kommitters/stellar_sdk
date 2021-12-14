@@ -9,7 +9,7 @@ defmodule Stellar.TxBuild.Utils do
 
   def number_to_fraction(number) when is_float(number) do
     precision = float_precision(number)
-    base = Integer.pow(10, precision)
+    base = :math.pow(10, precision) |> trunc()
 
     numerator = trunc(number * base)
     denominator = 1 * base
