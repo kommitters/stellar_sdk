@@ -11,6 +11,7 @@ defmodule Stellar.Test.XDRFixtures do
     AlphaNum12,
     AlphaNum4,
     Asset,
+    Assets,
     AssetCode4,
     AssetCode12,
     AssetType,
@@ -44,9 +45,10 @@ defmodule Stellar.Test.XDRFixtures do
     Void
   }
 
-  alias StellarBase.XDR.Operations.{CreateAccount, Payment}
+  alias StellarBase.XDR.Operations.{CreateAccount, Payment, PathPaymentStrictSend}
 
   @type optional_account_id :: String.t() | nil
+  @type raw_asset :: atom() | {String.t(), String.t()}
 
   @unit 10_000_000
 
@@ -153,22 +155,55 @@ defmodule Stellar.Test.XDRFixtures do
 
   @spec create_payment_op_xdr(
           destination :: String.t(),
-          asset :: tuple(),
+          asset :: raw_asset(),
           amount :: non_neg_integer()
         ) :: Payment.t()
-  def create_payment_op_xdr(destination, {asset_code, asset_issuer}, amount) do
+  def create_payment_op_xdr(destination, asset, amount) do
     op_type = OperationType.new(:PAYMENT)
     amount = Int64.new(amount * @unit)
-
-    asset =
-      if String.length(asset_code) > 4,
-        do: create_asset12_xdr(asset_code, asset_issuer),
-        else: create_asset4_xdr(asset_code, asset_issuer)
+    asset = build_asset_xdr(asset)
 
     destination
     |> muxed_account_xdr()
     |> Payment.new(asset, amount)
     |> OperationBody.new(op_type)
+  end
+
+  @spec create_path_payment_strict_send_op_xdr(
+          destination :: String.t(),
+          send_asset :: raw_asset(),
+          send_amount :: non_neg_integer(),
+          dest_asset :: raw_asset(),
+          dest_min :: non_neg_integer(),
+          path :: list(raw_asset())
+        ) :: PathPaymentStrictSend.t()
+  def create_path_payment_strict_send_op_xdr(
+        destination,
+        send_asset,
+        send_amount,
+        dest_asset,
+        dest_min,
+        path
+      ) do
+    op_type = OperationType.new(:PATH_PAYMENT_STRICT_SEND)
+    destination = muxed_account_xdr(destination)
+    send_asset = build_asset_xdr(send_asset)
+    send_amount = Int64.new(send_amount * @unit)
+    dest_asset = build_asset_xdr(dest_asset)
+    dest_min = Int64.new(dest_min * @unit)
+    path = assets_path_xdr(path)
+
+    path_payment =
+      PathPaymentStrictSend.new(
+        send_asset,
+        send_amount,
+        destination,
+        dest_asset,
+        dest_min,
+        path
+      )
+
+    OperationBody.new(path_payment, op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()
@@ -197,6 +232,21 @@ defmodule Stellar.Test.XDRFixtures do
     |> AlphaNum12.new(issuer)
     |> Asset.new(asset_type)
   end
+
+  @spec assets_path_xdr(assets :: list(raw_asset())) :: list(Asset.t())
+  def assets_path_xdr(assets) do
+    assets
+    |> Enum.map(&build_asset_xdr/1)
+    |> Assets.new()
+  end
+
+  @spec build_asset_xdr(asset :: any()) :: list(Asset.t())
+  defp build_asset_xdr(:native), do: create_asset_native_xdr()
+
+  defp build_asset_xdr({code, issuer}) when byte_size(code) < 5,
+    do: create_asset4_xdr(code, issuer)
+
+  defp build_asset_xdr({code, issuer}), do: create_asset12_xdr(code, issuer)
 
   @spec memo_xdr_value(value :: any(), type :: atom()) :: struct()
   defp memo_xdr_value(_value, :MEMO_NONE), do: nil

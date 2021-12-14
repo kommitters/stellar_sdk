@@ -2,12 +2,12 @@ defmodule Stellar.TxBuild.Operation do
   @moduledoc """
   `Operation` struct definition.
   """
-  alias Stellar.TxBuild.{CreateAccount, OptionalAccount, Payment}
+  alias Stellar.TxBuild.{CreateAccount, OptionalAccount, Payment, PathPaymentStrictSend}
   alias StellarBase.XDR.Operation
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type operation :: CreateAccount.t() | Payment.t()
+  @type operation :: CreateAccount.t() | Payment.t() | PathPaymentStrictSend.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -32,7 +32,8 @@ defmodule Stellar.TxBuild.Operation do
   end
 
   @spec validate_operation(operation :: operation()) :: :ok | {:error, atom()}
-  defp validate_operation(%CreateAccount{}), do: :ok
-  defp validate_operation(%Payment{}), do: :ok
-  defp validate_operation(operation), do: {:error, [{:unknown_operation, operation}]}
+  defp validate_operation(%{__struct__: op_type} = op_body) do
+    op_types = [CreateAccount, Payment, PathPaymentStrictSend]
+    if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}
+  end
 end
