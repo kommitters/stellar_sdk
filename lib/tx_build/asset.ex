@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.Asset do
   @type issuer :: AccountID.t() | nil
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type t :: %__MODULE__{code: String.t(), issuer: issuer() | nil, type: atom()}
+  @type t :: %__MODULE__{code: String.t(), issuer: issuer(), type: atom()}
 
   defstruct [:code, :issuer, :type]
 
