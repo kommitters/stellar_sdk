@@ -52,6 +52,7 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.Operations.{
     AccountMerge,
+    BumpSequence,
     CreateAccount,
     ManageData,
     ManageBuyOffer,
@@ -330,6 +331,16 @@ defmodule Stellar.Test.XDRFixtures do
     entry_name
     |> String64.new()
     |> ManageData.new(entry_value_xdr)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec bump_sequence_op_xdr(bump_to :: pos_integer()) :: BumpSequence.t()
+  def bump_sequence_op_xdr(bump_to) do
+    op_type = OperationType.new(:BUMP_SEQUENCE)
+
+    bump_to
+    |> SequenceNumber.new()
+    |> BumpSequence.new()
     |> OperationBody.new(op_type)
   end
 
