@@ -3,13 +3,15 @@ defmodule Stellar.TxBuild.Operation do
   `Operation` struct definition.
   """
   alias Stellar.TxBuild.{
+    AccountMerge,
     CreateAccount,
     ManageSellOffer,
     ManageBuyOffer,
     OptionalAccount,
     Payment,
     PathPaymentStrictSend,
-    PathPaymentStrictReceive
+    PathPaymentStrictReceive,
+    ManageSellOffer
   }
 
   alias StellarBase.XDR.Operation
@@ -17,12 +19,14 @@ defmodule Stellar.TxBuild.Operation do
   @behaviour Stellar.TxBuild.XDR
 
   @type operation ::
-          CreateAccount.t()
+          AccountMerge.t()
+          | CreateAccount.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
           | Payment.t()
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
+          | ManageSellOffer.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -49,6 +53,7 @@ defmodule Stellar.TxBuild.Operation do
   @spec validate_operation(operation :: operation()) :: :ok | {:error, atom()}
   defp validate_operation(%{__struct__: op_type} = op_body) do
     op_types = [
+      AccountMerge,
       CreateAccount,
       ManageBuyOffer,
       ManageSellOffer,
