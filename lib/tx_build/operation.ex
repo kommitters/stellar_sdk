@@ -5,6 +5,7 @@ defmodule Stellar.TxBuild.Operation do
   alias Stellar.TxBuild.{
     AccountMerge,
     CreateAccount,
+    ManageData,
     ManageSellOffer,
     ManageBuyOffer,
     OptionalAccount,
@@ -21,6 +22,7 @@ defmodule Stellar.TxBuild.Operation do
   @type operation ::
           AccountMerge.t()
           | CreateAccount.t()
+          | ManageData.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
           | Payment.t()
@@ -55,6 +57,7 @@ defmodule Stellar.TxBuild.Operation do
     op_types = [
       AccountMerge,
       CreateAccount,
+      ManageData,
       ManageBuyOffer,
       ManageSellOffer,
       Payment,
