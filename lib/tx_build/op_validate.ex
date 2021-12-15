@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.OpValidate do
   @moduledoc """
   Validates operation components.
   """
-  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, AssetsPath, OptionalAccount}
+  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, AssetsPath, OptionalAccount, Price}
 
   @type account_id :: String.t()
   @type asset :: {String.t(), account_id()} | Keyword.t() | atom()
@@ -10,6 +10,12 @@ defmodule Stellar.TxBuild.OpValidate do
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()
   @type validation :: {:ok, any()} | {:error, error()}
+
+  @spec validate_pos_integer(component :: component()) :: validation()
+  def validate_pos_integer({_field, number}) when is_integer(number) and number >= 0,
+    do: {:ok, number}
+
+  def validate_pos_integer({field, _number}), do: {:error, [{field, :integer_expected}]}
 
   @spec validate_account_id(component :: component()) :: validation()
   def validate_account_id({field, account_id}) do
@@ -58,6 +64,14 @@ defmodule Stellar.TxBuild.OpValidate do
   def validate_amount({field, amount}) do
     case Amount.new(amount) do
       %Amount{} = amount -> {:ok, amount}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_price(component :: component()) :: validation()
+  def validate_price({field, price}) do
+    case Price.new(price) do
+      %Price{} = price -> {:ok, price}
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
