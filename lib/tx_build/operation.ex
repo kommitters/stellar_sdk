@@ -4,6 +4,7 @@ defmodule Stellar.TxBuild.Operation do
   """
   alias Stellar.TxBuild.{
     AccountMerge,
+    BumpSequence,
     CreateAccount,
     ManageData,
     ManageSellOffer,
@@ -21,6 +22,7 @@ defmodule Stellar.TxBuild.Operation do
 
   @type operation ::
           AccountMerge.t()
+          | BumpSequence.t()
           | CreateAccount.t()
           | ManageData.t()
           | ManageSellOffer.t()
@@ -56,6 +58,7 @@ defmodule Stellar.TxBuild.Operation do
   defp validate_operation(%{__struct__: op_type} = op_body) do
     op_types = [
       AccountMerge,
+      BumpSequence,
       CreateAccount,
       ManageData,
       ManageBuyOffer,
