@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.PaymentTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [create_payment_op_xdr: 3]
+  import Stellar.Test.XDRFixtures, only: [payment_op_xdr: 3]
 
   alias Stellar.TxBuild.{Account, Amount, Asset, Payment}
 
@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.PaymentTest do
       destination: destination,
       asset: {asset_code, asset_issuer},
       amount: amount,
-      xdr: create_payment_op_xdr(destination, {asset_code, asset_issuer}, amount)
+      xdr: payment_op_xdr(destination, {asset_code, asset_issuer}, amount)
     }
   end
 

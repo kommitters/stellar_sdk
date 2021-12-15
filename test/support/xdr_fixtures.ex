@@ -49,6 +49,7 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.Operations.{
     CreateAccount,
+    ManageBuyOffer,
     ManageSellOffer,
     Payment,
     PathPaymentStrictSend,
@@ -161,12 +162,12 @@ defmodule Stellar.Test.XDRFixtures do
     |> OperationBody.new(op_type)
   end
 
-  @spec create_payment_op_xdr(
+  @spec payment_op_xdr(
           destination :: String.t(),
           asset :: raw_asset(),
           amount :: non_neg_integer()
         ) :: Payment.t()
-  def create_payment_op_xdr(destination, asset, amount) do
+  def payment_op_xdr(destination, asset, amount) do
     op_type = OperationType.new(:PAYMENT)
     amount = Int64.new(amount * @unit)
     asset = build_asset_xdr(asset)
@@ -177,7 +178,7 @@ defmodule Stellar.Test.XDRFixtures do
     |> OperationBody.new(op_type)
   end
 
-  @spec create_path_payment_strict_send_op_xdr(
+  @spec path_payment_strict_send_op_xdr(
           destination :: String.t(),
           send_asset :: raw_asset(),
           send_amount :: non_neg_integer(),
@@ -185,7 +186,7 @@ defmodule Stellar.Test.XDRFixtures do
           dest_min :: non_neg_integer(),
           path :: list(raw_asset())
         ) :: PathPaymentStrictSend.t()
-  def create_path_payment_strict_send_op_xdr(
+  def path_payment_strict_send_op_xdr(
         destination,
         send_asset,
         send_amount,
@@ -214,7 +215,7 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody.new(path_payment, op_type)
   end
 
-  @spec create_path_payment_strict_receive_op_xdr(
+  @spec path_payment_strict_receive_op_xdr(
           destination :: String.t(),
           send_asset :: raw_asset(),
           send_max :: non_neg_integer(),
@@ -222,7 +223,7 @@ defmodule Stellar.Test.XDRFixtures do
           dest_amount :: non_neg_integer(),
           path :: list(raw_asset())
         ) :: PathPaymentStrictReceive.t()
-  def create_path_payment_strict_receive_op_xdr(
+  def path_payment_strict_receive_op_xdr(
         destination,
         send_asset,
         send_max,
@@ -276,6 +277,33 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(manage_sell_offer, op_type)
+  end
+
+  @spec manage_buy_offer_op_xdr(
+          selling :: raw_asset(),
+          buying :: raw_asset(),
+          amount :: non_neg_integer(),
+          price :: number(),
+          offer_id :: non_neg_integer()
+        ) :: ManageBuyOffer.t()
+  def manage_buy_offer_op_xdr(selling, buying, amount, {price_n, price_d}, offer_id) do
+    op_type = OperationType.new(:MANAGE_BUY_OFFER)
+    selling = build_asset_xdr(selling)
+    buying = build_asset_xdr(buying)
+    amount = Int64.new(amount * @unit)
+    price = Price.new(Int32.new(price_n), Int32.new(price_d))
+    offer_id = Int64.new(offer_id)
+
+    manage_buy_offer =
+      ManageBuyOffer.new(
+        selling,
+        buying,
+        amount,
+        price,
+        offer_id
+      )
+
+    OperationBody.new(manage_buy_offer, op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()

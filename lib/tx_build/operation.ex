@@ -4,11 +4,12 @@ defmodule Stellar.TxBuild.Operation do
   """
   alias Stellar.TxBuild.{
     CreateAccount,
+    ManageSellOffer,
+    ManageBuyOffer,
     OptionalAccount,
     Payment,
     PathPaymentStrictSend,
-    PathPaymentStrictReceive,
-    ManageSellOffer
+    PathPaymentStrictReceive
   }
 
   alias StellarBase.XDR.Operation
@@ -17,10 +18,11 @@ defmodule Stellar.TxBuild.Operation do
 
   @type operation ::
           CreateAccount.t()
+          | ManageSellOffer.t()
+          | ManageBuyOffer.t()
           | Payment.t()
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
-          | ManageSellOffer.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -48,10 +50,11 @@ defmodule Stellar.TxBuild.Operation do
   defp validate_operation(%{__struct__: op_type} = op_body) do
     op_types = [
       CreateAccount,
+      ManageBuyOffer,
+      ManageSellOffer,
       Payment,
-      PathPaymentStrictSend,
       PathPaymentStrictReceive,
-      ManageSellOffer
+      PathPaymentStrictSend
     ]
 
     if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}
