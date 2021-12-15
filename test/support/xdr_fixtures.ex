@@ -48,6 +48,7 @@ defmodule Stellar.Test.XDRFixtures do
   }
 
   alias StellarBase.XDR.Operations.{
+    AccountMerge,
     CreateAccount,
     ManageBuyOffer,
     ManageSellOffer,
@@ -159,6 +160,16 @@ defmodule Stellar.Test.XDRFixtures do
     destination
     |> account_id_xdr()
     |> CreateAccount.new(amount)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec account_merge_op_xdr(destination :: String.t()) :: AccountMerge.t()
+  def account_merge_op_xdr(destination) do
+    op_type = OperationType.new(:ACCOUNT_MERGE)
+
+    destination
+    |> muxed_account_xdr()
+    |> AccountMerge.new()
     |> OperationBody.new(op_type)
   end
 
