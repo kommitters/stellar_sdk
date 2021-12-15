@@ -16,6 +16,7 @@ defmodule Stellar.Test.XDRFixtures do
     AssetCode12,
     AssetType,
     CryptoKeyType,
+    DataValue,
     DecoratedSignature,
     EnvelopeType,
     Ext,
@@ -29,6 +30,7 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody,
     Operation,
     Operations,
+    OptionalDataValue,
     OptionalMuxedAccount,
     OptionalTimeBounds,
     Price,
@@ -38,6 +40,7 @@ defmodule Stellar.Test.XDRFixtures do
     Signature,
     SignatureHint,
     String28,
+    String64,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -50,6 +53,7 @@ defmodule Stellar.Test.XDRFixtures do
   alias StellarBase.XDR.Operations.{
     AccountMerge,
     CreateAccount,
+    ManageData,
     ManageBuyOffer,
     ManageSellOffer,
     Payment,
@@ -315,6 +319,18 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(manage_buy_offer, op_type)
+  end
+
+  @spec manage_data_op_xdr(entry_name :: String.t(), entry_value: any()) :: AccountMerge.t()
+  def manage_data_op_xdr(entry_name, entry_value) do
+    op_type = OperationType.new(:MANAGE_DATA)
+    value = if is_nil(entry_value), do: nil, else: DataValue.new(entry_value)
+    entry_value_xdr = OptionalDataValue.new(value)
+
+    entry_name
+    |> String64.new()
+    |> ManageData.new(entry_value_xdr)
+    |> OperationBody.new(op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()
