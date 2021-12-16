@@ -5,8 +5,10 @@ defmodule Stellar.TxBuild.Operation do
   alias Stellar.TxBuild.{
     AccountMerge,
     BumpSequence,
+    BeginSponsoringFutureReserves,
     CreateAccount,
     CreatePassiveSellOffer,
+    EndSponsoringFutureReserves,
     ManageData,
     ManageSellOffer,
     ManageBuyOffer,
@@ -24,8 +26,10 @@ defmodule Stellar.TxBuild.Operation do
   @type operation ::
           AccountMerge.t()
           | BumpSequence.t()
+          | BeginSponsoringFutureReserves.t()
           | CreateAccount.t()
           | CreatePassiveSellOffer.t()
+          | EndSponsoringFutureReserves.t()
           | ManageData.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
@@ -61,8 +65,10 @@ defmodule Stellar.TxBuild.Operation do
     op_types = [
       AccountMerge,
       BumpSequence,
+      BeginSponsoringFutureReserves,
       CreateAccount,
       CreatePassiveSellOffer,
+      EndSponsoringFutureReserves,
       ManageData,
       ManageBuyOffer,
       ManageSellOffer,
