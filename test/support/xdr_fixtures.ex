@@ -55,6 +55,7 @@ defmodule Stellar.Test.XDRFixtures do
     BumpSequence,
     CreateAccount,
     ManageData,
+    CreatePassiveSellOffer,
     ManageBuyOffer,
     ManageSellOffer,
     Payment,
@@ -342,6 +343,30 @@ defmodule Stellar.Test.XDRFixtures do
     |> SequenceNumber.new()
     |> BumpSequence.new()
     |> OperationBody.new(op_type)
+  end
+
+  @spec create_passive_sell_offer_op_xdr(
+          selling :: raw_asset(),
+          buying :: raw_asset(),
+          amount :: non_neg_integer(),
+          price :: number()
+        ) :: CreatePassiveSellOffer.t()
+  def create_passive_sell_offer_op_xdr(selling, buying, amount, {price_n, price_d}) do
+    op_type = OperationType.new(:CREATE_PASSIVE_SELL_OFFER)
+    selling = build_asset_xdr(selling)
+    buying = build_asset_xdr(buying)
+    amount = Int64.new(amount * @unit)
+    price = Price.new(Int32.new(price_n), Int32.new(price_d))
+
+    passive_sell_offer =
+      CreatePassiveSellOffer.new(
+        selling,
+        buying,
+        amount,
+        price
+      )
+
+    OperationBody.new(passive_sell_offer, op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()

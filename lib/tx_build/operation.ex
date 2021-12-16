@@ -6,6 +6,7 @@ defmodule Stellar.TxBuild.Operation do
     AccountMerge,
     BumpSequence,
     CreateAccount,
+    CreatePassiveSellOffer,
     ManageData,
     ManageSellOffer,
     ManageBuyOffer,
@@ -24,6 +25,7 @@ defmodule Stellar.TxBuild.Operation do
           AccountMerge.t()
           | BumpSequence.t()
           | CreateAccount.t()
+          | CreatePassiveSellOffer.t()
           | ManageData.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
@@ -60,6 +62,7 @@ defmodule Stellar.TxBuild.Operation do
       AccountMerge,
       BumpSequence,
       CreateAccount,
+      CreatePassiveSellOffer,
       ManageData,
       ManageBuyOffer,
       ManageSellOffer,
