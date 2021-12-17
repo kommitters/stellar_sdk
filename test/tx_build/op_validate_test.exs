@@ -1,10 +1,22 @@
 defmodule Stellar.TxBuild.OpValidateTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{Account, AccountID, Amount, Asset, AssetsPath, OpValidate, Price}
+  alias Stellar.TxBuild.{
+    Account,
+    AccountID,
+    Amount,
+    Asset,
+    AssetsPath,
+    ClaimableBalanceID,
+    OpValidate,
+    Price
+  }
 
   setup do
-    %{account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"}
+    %{
+      account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS",
+      balance_id: "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+    }
   end
 
   test "validate_pos_integer/1" do
@@ -71,5 +83,15 @@ defmodule Stellar.TxBuild.OpValidateTest do
 
   test "validate_price/1 error" do
     {:error, [price: :invalid_price]} = OpValidate.validate_price({:price, "2.15"})
+  end
+
+  test "validate_claimable_balance_id/1", %{balance_id: balance_id} do
+    {:ok, %ClaimableBalanceID{}} =
+      OpValidate.validate_claimable_balance_id({:claimable_balance_id, balance_id})
+  end
+
+  test "validate_claimable_balance_id/1 error" do
+    {:error, [claimable_balance_id: :invalid_balance_id]} =
+      OpValidate.validate_claimable_balance_id({:claimable_balance_id, "ABC"})
   end
 end

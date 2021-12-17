@@ -6,6 +6,8 @@ defmodule Stellar.TxBuild.Operation do
     AccountMerge,
     BumpSequence,
     BeginSponsoringFutureReserves,
+    Clawback,
+    ClawbackClaimableBalance,
     CreateAccount,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
@@ -15,8 +17,7 @@ defmodule Stellar.TxBuild.Operation do
     OptionalAccount,
     Payment,
     PathPaymentStrictSend,
-    PathPaymentStrictReceive,
-    ManageSellOffer
+    PathPaymentStrictReceive
   }
 
   alias StellarBase.XDR.Operation
@@ -27,6 +28,8 @@ defmodule Stellar.TxBuild.Operation do
           AccountMerge.t()
           | BumpSequence.t()
           | BeginSponsoringFutureReserves.t()
+          | Clawback.t()
+          | ClawbackClaimableBalance.t()
           | CreateAccount.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
@@ -36,7 +39,6 @@ defmodule Stellar.TxBuild.Operation do
           | Payment.t()
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
-          | ManageSellOffer.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -66,6 +68,8 @@ defmodule Stellar.TxBuild.Operation do
       AccountMerge,
       BumpSequence,
       BeginSponsoringFutureReserves,
+      Clawback,
+      ClawbackClaimableBalance,
       CreateAccount,
       CreatePassiveSellOffer,
       EndSponsoringFutureReserves,
