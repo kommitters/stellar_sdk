@@ -52,6 +52,7 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.Operations.{
     AccountMerge,
+    BeginSponsoringFutureReserves,
     BumpSequence,
     CreateAccount,
     ManageData,
@@ -323,28 +324,6 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody.new(manage_buy_offer, op_type)
   end
 
-  @spec manage_data_op_xdr(entry_name :: String.t(), entry_value: any()) :: AccountMerge.t()
-  def manage_data_op_xdr(entry_name, entry_value) do
-    op_type = OperationType.new(:MANAGE_DATA)
-    value = if is_nil(entry_value), do: nil, else: DataValue.new(entry_value)
-    entry_value_xdr = OptionalDataValue.new(value)
-
-    entry_name
-    |> String64.new()
-    |> ManageData.new(entry_value_xdr)
-    |> OperationBody.new(op_type)
-  end
-
-  @spec bump_sequence_op_xdr(bump_to :: pos_integer()) :: BumpSequence.t()
-  def bump_sequence_op_xdr(bump_to) do
-    op_type = OperationType.new(:BUMP_SEQUENCE)
-
-    bump_to
-    |> SequenceNumber.new()
-    |> BumpSequence.new()
-    |> OperationBody.new(op_type)
-  end
-
   @spec create_passive_sell_offer_op_xdr(
           selling :: raw_asset(),
           buying :: raw_asset(),
@@ -367,6 +346,45 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(passive_sell_offer, op_type)
+  end
+
+  @spec manage_data_op_xdr(entry_name :: String.t(), entry_value: any()) :: AccountMerge.t()
+  def manage_data_op_xdr(entry_name, entry_value) do
+    op_type = OperationType.new(:MANAGE_DATA)
+    value = if is_nil(entry_value), do: nil, else: DataValue.new(entry_value)
+    entry_value_xdr = OptionalDataValue.new(value)
+
+    entry_name
+    |> String64.new()
+    |> ManageData.new(entry_value_xdr)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec bump_sequence_op_xdr(bump_to :: pos_integer()) :: BumpSequence.t()
+  def bump_sequence_op_xdr(bump_to) do
+    op_type = OperationType.new(:BUMP_SEQUENCE)
+
+    bump_to
+    |> SequenceNumber.new()
+    |> BumpSequence.new()
+    |> OperationBody.new(op_type)
+  end
+
+  @spec begin_sponsoring_future_reserves_op_xdr(sponsored_id :: String.t()) ::
+          BeginSponsoringFutureReserves.t()
+  def begin_sponsoring_future_reserves_op_xdr(sponsored_id) do
+    op_type = OperationType.new(:BEGIN_SPONSORING_FUTURE_RESERVES)
+
+    sponsored_id
+    |> account_id_xdr()
+    |> BeginSponsoringFutureReserves.new()
+    |> OperationBody.new(op_type)
+  end
+
+  @spec end_sponsoring_future_reserves_op_xdr() :: EndSponsoringFutureReserves.t()
+  def end_sponsoring_future_reserves_op_xdr do
+    op_type = OperationType.new(:END_SPONSORING_FUTURE_RESERVES)
+    OperationBody.new(Void.new(), op_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()
