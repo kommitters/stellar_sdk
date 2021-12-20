@@ -15,6 +15,8 @@ defmodule Stellar.Test.XDRFixtures do
     AssetCode4,
     AssetCode12,
     AssetType,
+    ClaimableBalanceID,
+    ClaimableBalanceIDType,
     CryptoKeyType,
     DataValue,
     DecoratedSignature,
@@ -54,6 +56,8 @@ defmodule Stellar.Test.XDRFixtures do
     AccountMerge,
     BeginSponsoringFutureReserves,
     BumpSequence,
+    Clawback,
+    ClawbackClaimableBalance,
     CreateAccount,
     ManageData,
     CreatePassiveSellOffer,
@@ -385,6 +389,45 @@ defmodule Stellar.Test.XDRFixtures do
   def end_sponsoring_future_reserves_op_xdr do
     op_type = OperationType.new(:END_SPONSORING_FUTURE_RESERVES)
     OperationBody.new(Void.new(), op_type)
+  end
+
+  @spec clawback_op_xdr(
+          asset :: raw_asset(),
+          from :: String.t(),
+          amount :: non_neg_integer()
+        ) :: Clawback.t()
+  def clawback_op_xdr(asset, from, amount) do
+    op_type = OperationType.new(:CLAWBACK)
+    from = muxed_account_xdr(from)
+    amount = Int64.new(amount * @unit)
+
+    asset
+    |> build_asset_xdr()
+    |> Clawback.new(from, amount)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec clawback_claimable_balance_op_xdr(balance_id :: String.t()) ::
+          ClawbackClaimableBalance.t()
+  def clawback_claimable_balance_op_xdr(balance_id) do
+    op_type = OperationType.new(:CLAWBACK_CLAIMABLE_BALANCE)
+
+    balance_id
+    |> claimable_balance_id_xdr()
+    |> ClawbackClaimableBalance.new()
+    |> OperationBody.new(op_type)
+  end
+
+  @spec claimable_balance_id_xdr(balance_id :: String.t()) :: ClaimableBalanceID.t()
+  def claimable_balance_id_xdr(balance_id) do
+    claimable_balance_id_type = ClaimableBalanceIDType.new(:CLAIMABLE_BALANCE_ID_TYPE_V0)
+
+    claimable_balance_id =
+      balance_id
+      |> (&:crypto.hash(:sha256, &1)).()
+      |> Hash.new()
+
+    ClaimableBalanceID.new(claimable_balance_id, claimable_balance_id_type)
   end
 
   @spec create_asset_native_xdr() :: Asset.t()
