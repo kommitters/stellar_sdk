@@ -37,7 +37,7 @@ defmodule Stellar.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.2.3"},
+      {:stellar_base, "~> 0.3.0"},
       {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17", optional: true},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
@@ -80,7 +80,9 @@ defmodule Stellar.MixProject do
 
   defp groups_for_modules do
     [
-      Horizon: ~r/^Stellar\.Horizon\./
+      Horizon: ~r/^Stellar\.Horizon\./,
+      KeyPair: ~r/^Stellar\.KeyPair\./,
+      TxBuild: ~r/^Stellar\.TxBuild\./
     ]
   end
 end
