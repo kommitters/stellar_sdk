@@ -12,16 +12,18 @@ defmodule Stellar.TxBuild.Amount do
 
   @type t :: %__MODULE__{amount: amount(), raw: non_neg_integer()}
 
+  @max_size 0x7FFFFFFFFFFFFFFF
+
   defstruct [:amount, :raw]
 
   @impl true
   def new(amount, opts \\ [])
 
-  def new(amount, _opts) when is_integer(amount) and amount >= 0 do
-    %__MODULE__{amount: amount, raw: amount * @unit}
+  def new(:max, _opts) do
+    %__MODULE__{amount: @max_size / @unit, raw: @max_size}
   end
 
-  def new(amount, _opts) when is_float(amount) and amount >= 0 do
+  def new(amount, _opts) when is_number(amount) and amount >= 0 and amount <= @max_size do
     %__MODULE__{amount: amount, raw: trunc(amount * @unit)}
   end
 

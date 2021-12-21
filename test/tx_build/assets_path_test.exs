@@ -28,7 +28,7 @@ defmodule Stellar.TxBuild.AssetsPathTest do
   end
 
   test "new/2 with_invalid_arguments" do
-    {:error, :invalid_asset_issuer} = Asset.new([:native, {"TEST", "issuer"}])
+    {:error, :invalid_asset_issuer} = AssetsPath.new([:native, {"TEST", "issuer"}])
   end
 
   test "to_xdr/1", %{assets_path_xdr: xdr, raw_assets: raw_assets} do
