@@ -10,6 +10,7 @@ defmodule Stellar.TxBuild.OpValidate do
     AssetsPath,
     ClaimableBalanceID,
     OptionalAccount,
+    OptionalAccountID,
     Price
   }
 
@@ -31,6 +32,15 @@ defmodule Stellar.TxBuild.OpValidate do
     case AccountID.new(account_id) do
       %AccountID{} = account_id -> {:ok, account_id}
       {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_optional_account_id(component :: component()) :: validation()
+  def validate_optional_account_id({_field, nil}), do: {:ok, OptionalAccountID.new()}
+
+  def validate_optional_account_id({field, account_id}) do
+    with {:ok, _account} <- validate_account_id({field, account_id}) do
+      {:ok, OptionalAccountID.new(account_id)}
     end
   end
 

@@ -9,6 +9,7 @@ defmodule Stellar.TxBuild.OpValidateTest do
     AssetsPath,
     ClaimableBalanceID,
     OpValidate,
+    OptionalAccountID,
     Price
   }
 
@@ -34,6 +35,21 @@ defmodule Stellar.TxBuild.OpValidateTest do
   test "validate_account_id/1 error" do
     {:error, [destination: :invalid_account_id]} =
       OpValidate.validate_account_id({:destination, "ABC"})
+  end
+
+  test "validate_optional_account_id/1", %{account_id: account_id} do
+    {:ok, %OptionalAccountID{}} =
+      OpValidate.validate_optional_account_id({:destination, account_id})
+  end
+
+  test "validate_optional_account_id/1 none" do
+    {:ok, %OptionalAccountID{account_id: nil}} =
+      OpValidate.validate_optional_account_id({:destination, nil})
+  end
+
+  test "validate_optional_account_id/1 error" do
+    {:error, [destination: :invalid_account_id]} =
+      OpValidate.validate_optional_account_id({:destination, "2"})
   end
 
   test "validate_account/1", %{account_id: account_id} do
