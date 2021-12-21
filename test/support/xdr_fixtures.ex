@@ -32,9 +32,13 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody,
     Operation,
     Operations,
+    OptionalAccountID,
     OptionalDataValue,
     OptionalMuxedAccount,
+    OptionalSigner,
+    OptionalString32,
     OptionalTimeBounds,
+    OptionalUInt32,
     Price,
     PublicKey,
     PublicKeyType,
@@ -42,7 +46,11 @@ defmodule Stellar.Test.XDRFixtures do
     Signature,
     SignatureHint,
     String28,
+    String32,
     String64,
+    Signer,
+    SignerKey,
+    SignerKeyType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -65,11 +73,17 @@ defmodule Stellar.Test.XDRFixtures do
     ManageSellOffer,
     Payment,
     PathPaymentStrictSend,
-    PathPaymentStrictReceive
+    PathPaymentStrictReceive,
+    SetOptions
   }
 
   @type optional_account_id :: String.t() | nil
   @type raw_asset :: atom() | {String.t(), String.t()}
+  @type signer_type :: :ed25519 | :sha256_hash | :pre_auth_tx
+  @type weight :: pos_integer() | nil
+  @type flags :: list(atom()) | nil
+  @type optional_signer :: Keyword.t() | nil
+  @type optional_string32 :: String.t() | nil
 
   @unit 10_000_000
 
@@ -92,6 +106,40 @@ defmodule Stellar.Test.XDRFixtures do
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
+  end
+
+  @spec signer_xdr(signer :: Keyword.t()) :: Signer.t()
+  def signer_xdr(ed25519: key, weight: weight) do
+    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_ED25519)
+    weight = UInt32.new(weight)
+
+    key
+    |> KeyPair.raw_ed25519_public_key()
+    |> UInt256.new()
+    |> SignerKey.new(signer_type)
+    |> Signer.new(weight)
+  end
+
+  def signer_xdr(sha256_hash: key, weight: weight) do
+    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_HASH_X)
+    weight = UInt32.new(weight)
+
+    key
+    |> (&:crypto.hash(:sha256, &1)).()
+    |> UInt256.new()
+    |> SignerKey.new(signer_type)
+    |> Signer.new(weight)
+  end
+
+  def signer_xdr(pre_auth_tx: key, weight: weight) do
+    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_PRE_AUTH_TX)
+    weight = UInt32.new(weight)
+
+    key
+    |> (&:crypto.hash(:sha256, &1)).()
+    |> UInt256.new()
+    |> SignerKey.new(signer_type)
+    |> Signer.new(weight)
   end
 
   @spec memo_xdr(type :: atom(), value :: any()) :: Memo.t()
@@ -374,6 +422,51 @@ defmodule Stellar.Test.XDRFixtures do
     |> OperationBody.new(op_type)
   end
 
+  @spec set_options_xdr(
+          inflation_destination :: String.t(),
+          clear_flags :: flags(),
+          set_flags :: flags(),
+          master_weight :: weight(),
+          tresholds :: Keyword.t(),
+          home_domain :: String.t(),
+          signer :: Keyword.t()
+        ) :: BumpSequence.t()
+  def set_options_xdr(
+        inflation_destination,
+        clear_flags,
+        set_flags,
+        master_weight,
+        tresholds,
+        home_domain,
+        signer
+      ) do
+    op_type = OperationType.new(:SET_OPTIONS)
+    inflation_destination = optional_account_id_xdr(inflation_destination)
+    clear_flags = clear_flags |> flags_bit_mask() |> optional_uint32_xdr()
+    set_flags = set_flags |> flags_bit_mask() |> optional_uint32_xdr()
+    master_weight = optional_uint32_xdr(master_weight)
+    low_threshold = optional_uint32_xdr(tresholds[:low])
+    med_threshold = optional_uint32_xdr(tresholds[:med])
+    high_threshold = optional_uint32_xdr(tresholds[:high])
+    home_domain = optional_string32_xdr(home_domain)
+    signer = optional_signer_xdr(signer)
+
+    set_options =
+      SetOptions.new(
+        inflation_destination,
+        clear_flags,
+        set_flags,
+        master_weight,
+        low_threshold,
+        med_threshold,
+        high_threshold,
+        home_domain,
+        signer
+      )
+
+    OperationBody.new(set_options, op_type)
+  end
+
   @spec begin_sponsoring_future_reserves_op_xdr(sponsored_id :: String.t()) ::
           BeginSponsoringFutureReserves.t()
   def begin_sponsoring_future_reserves_op_xdr(sponsored_id) do
@@ -464,6 +557,42 @@ defmodule Stellar.Test.XDRFixtures do
     |> Assets.new()
   end
 
+  @spec optional_account_id_xdr(account_id :: optional_account_id()) :: OptionalAccountID.t()
+  def optional_account_id_xdr(nil), do: OptionalAccountID.new()
+
+  def optional_account_id_xdr(account_id) do
+    account_id
+    |> account_id_xdr()
+    |> OptionalAccountID.new()
+  end
+
+  @spec optional_signer_xdr(signer :: optional_signer()) :: OptionalSigner.t()
+  def optional_signer_xdr(nil), do: OptionalSigner.new()
+
+  def optional_signer_xdr(signer) do
+    signer
+    |> signer_xdr()
+    |> OptionalSigner.new()
+  end
+
+  @spec optional_uint32_xdr(value :: weight()) :: OptionalUInt32.t()
+  def optional_uint32_xdr(nil), do: OptionalUInt32.new()
+
+  def optional_uint32_xdr(value) do
+    value
+    |> UInt32.new()
+    |> OptionalUInt32.new()
+  end
+
+  @spec optional_string32_xdr(value :: optional_string32()) :: OptionalString32.t()
+  def optional_string32_xdr(nil), do: OptionalString32.new()
+
+  def optional_string32_xdr(value) do
+    value
+    |> String32.new()
+    |> OptionalString32.new()
+  end
+
   @spec build_asset_xdr(asset :: any()) :: list(Asset.t())
   defp build_asset_xdr(:native), do: create_asset_native_xdr()
 
@@ -478,4 +607,16 @@ defmodule Stellar.Test.XDRFixtures do
   defp memo_xdr_value(value, :MEMO_ID), do: UInt64.new(value)
   defp memo_xdr_value(value, :MEMO_HASH), do: Hash.new(value)
   defp memo_xdr_value(value, :MEMO_RETURN), do: Hash.new(value)
+
+  @spec flags_bit_mask(flags :: flags()) :: integer()
+  defp flags_bit_mask(nil), do: 0
+
+  defp flags_bit_mask(flags) do
+    available_flags = [required: 0x1, revocable: 0x2, inmutable: 0x4, clawback_enabled: 0x8]
+
+    flags
+    |> Enum.filter(&is_atom(&1))
+    |> Enum.map(&Keyword.get(available_flags, &1, 0x0))
+    |> Enum.reduce(0, &(&1 + &2))
+  end
 end
