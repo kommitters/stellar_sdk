@@ -15,6 +15,7 @@ defmodule Stellar.Test.XDRFixtures do
     AssetCode4,
     AssetCode12,
     AssetType,
+    ChangeTrustAsset,
     ClaimableBalanceID,
     ClaimableBalanceIDType,
     CryptoKeyType,
@@ -64,6 +65,7 @@ defmodule Stellar.Test.XDRFixtures do
     AccountMerge,
     BeginSponsoringFutureReserves,
     BumpSequence,
+    ChangeTrust,
     Clawback,
     ClawbackClaimableBalance,
     CreateAccount,
@@ -465,6 +467,18 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(set_options, op_type)
+  end
+
+  @spec change_trust_xdr(asset :: raw_asset(), amount :: non_neg_integer()) :: ChangeTrust.t()
+  def change_trust_xdr(asset, amount) do
+    op_type = OperationType.new(:CHANGE_TRUST)
+    amount = Int64.new(amount * @unit)
+    %Asset{asset: asset, type: asset_type} = build_asset_xdr(asset)
+
+    asset
+    |> ChangeTrustAsset.new(asset_type)
+    |> ChangeTrust.new(amount)
+    |> OperationBody.new(op_type)
   end
 
   @spec begin_sponsoring_future_reserves_op_xdr(sponsored_id :: String.t()) ::
