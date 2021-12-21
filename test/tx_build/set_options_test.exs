@@ -3,7 +3,18 @@ defmodule Stellar.TxBuild.SetOptionsTest do
 
   import Stellar.Test.XDRFixtures, only: [set_options_xdr: 7]
 
-  alias Stellar.TxBuild.{Flags, OptionalAccountID, OptionalFlags, OptionalSigner, OptionalString32, OptionalWeight, SetOptions, Signer, String32, Weight}
+  alias Stellar.TxBuild.{
+    Flags,
+    OptionalAccountID,
+    OptionalFlags,
+    OptionalSigner,
+    OptionalString32,
+    OptionalWeight,
+    SetOptions,
+    Signer,
+    String32,
+    Weight
+  }
 
   setup do
     inflation_destination = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
@@ -17,7 +28,6 @@ defmodule Stellar.TxBuild.SetOptionsTest do
       pre_auth_tx: "f798b14cca436cb215073fec67219f1d13d051c4eff8adeed094a7ea807e66e4",
       weight: 1
     ]
-
 
     %{
       inflation_destination: inflation_destination,
@@ -125,7 +135,6 @@ defmodule Stellar.TxBuild.SetOptionsTest do
     home_domain: home_domain,
     signer: signer
   } do
-
     set_options =
       SetOptions.new(
         inflation_destination: inflation_destination,
