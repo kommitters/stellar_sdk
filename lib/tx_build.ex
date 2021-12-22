@@ -6,7 +6,7 @@ defmodule Stellar.TxBuild do
   @behaviour Stellar.TxBuild.Spec
 
   @impl true
-  def new(account, opts), do: impl().new(account, opts)
+  def new(account, opts \\ []), do: impl().new(account, opts)
 
   @impl true
   def add_memo(tx, memo), do: impl().add_memo(tx, memo)
