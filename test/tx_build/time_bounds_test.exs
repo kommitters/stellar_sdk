@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.TimeBoundsTest do
   end
 
   test "new/2 with_values" do
-    %TimeBounds{min_time: 123, max_time: 0} = TimeBounds.new(123)
+    %TimeBounds{min_time: 0, max_time: 123} = TimeBounds.new(min_time: 0, max_time: 123)
   end
 
   test "set_max_time/1" do
@@ -27,6 +27,6 @@ defmodule Stellar.TxBuild.TimeBoundsTest do
     time_bounds = TimeBoundsXDR.new(min_time, max_time)
 
     %OptionalTimeBounds{time_bounds: ^time_bounds} =
-      TimeBounds.new(123, 456) |> TimeBounds.to_xdr()
+      TimeBounds.new({123, 456}) |> TimeBounds.to_xdr()
   end
 end
