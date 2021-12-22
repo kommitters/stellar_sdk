@@ -1,96 +1,97 @@
+defmodule Stellar.TxBuild.CannedTxBuildImpl do
+  @moduledoc false
+
+  @behaviour Stellar.TxBuild.Spec
+
+  @impl true
+  def new(_account, _opts) do
+    send(self(), {:new, "NEW_TX"})
+    :ok
+  end
+
+  @impl true
+  def add_memo(_tx, _memo) do
+    send(self(), {:add_memo, "MEMO_ADDED"})
+    :ok
+  end
+
+  @impl true
+  def set_timeout(_tx, _time_bounds) do
+    send(self(), {:set_timeout, "TIMEOUT_SET"})
+    :ok
+  end
+
+  @impl true
+  def add_operation(_tx, _operations) do
+    send(self(), {:add_operation, "OP_ADDED"})
+    :ok
+  end
+
+  @impl true
+  def sign(_tx, _signatures) do
+    send(self(), {:sign, "TX_SIGNED"})
+    :ok
+  end
+
+  @impl true
+  def build(_tx) do
+    send(self(), {:build, "TX_CREATED"})
+    :ok
+  end
+
+  @impl true
+  def envelope(_tx) do
+    send(self(), {:envelope, "TX_ENVELOPE_GENERATED"})
+    :ok
+  end
+end
+
 defmodule Stellar.TxBuildTest do
   use ExUnit.Case
 
-  alias Stellar.{KeyPair, TxBuild}
-
-  alias Stellar.TxBuild.{
-    Account,
-    CreateAccount,
-    Memo,
-    Operation,
-    Operations,
-    Payment,
-    Signature,
-    Transaction,
-    TransactionEnvelope,
-    TimeBounds
-  }
+  alias Stellar.TxBuild.{Account, CannedTxBuildImpl}
+  alias Stellar.TxBuild.Default, as: TxBuild
 
   setup do
-    {public_key, secret} =
-      keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
+    Application.put_env(:stellar_sdk, :tx_build_impl, CannedTxBuildImpl)
 
-    signature = Signature.new(public_key, secret)
-    account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
-    tx = Transaction.new(account)
-
-    %{
-      account: account,
-      keypair: keypair,
-      signature: signature,
-      tx: tx,
-      tx_build: TxBuild.new(account),
-      tx_envelope: TransactionEnvelope.new(tx, []),
-      tx_envelope_base64:
-        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQADqyoAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAECU7VvLeuntfRiJCTGesLDUPwt1TimPBEhjCBhmxSnjuxd63ubjGT+8c9ec6uuAMC8WrT21WOx9MQSma6YIWaEB"
-    }
+    on_exit(fn ->
+      Application.delete_env(:stellar_sdk, :tx_build_impl)
+    end)
   end
 
-  test "new/2", %{account: account, tx: tx} do
-    %TxBuild{tx: ^tx, signatures: [], tx_envelope: nil} = TxBuild.new(account)
+  test "new/2" do
+    Stellar.TxBuild.new(%Account{}, [])
+    assert_receive({:new, "NEW_TX"})
   end
 
-  test "add_memo/2", %{tx_build: tx_build} do
-    memo = Memo.new(:text, "hello")
-    %TxBuild{tx: %Transaction{memo: ^memo}} = TxBuild.add_memo(tx_build, memo)
+  test "add_memo/2" do
+    Stellar.TxBuild.add_memo(%TxBuild{}, :memo)
+    assert_receive({:add_memo, "MEMO_ADDED"})
   end
 
-  test "set_timeout/2", %{tx_build: tx_build} do
-    timeout = TimeBounds.set_max_time(123_456_789)
-    %TxBuild{tx: %Transaction{time_bounds: ^timeout}} = TxBuild.set_timeout(tx_build, timeout)
+  test "set_timeout/1" do
+    Stellar.TxBuild.set_timeout(%TxBuild{}, :timeout)
+    assert_receive({:set_timeout, "TIMEOUT_SET"})
   end
 
-  test "add_operation/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
-    op_body = CreateAccount.new(destination: public_key, starting_balance: 1.5)
-    operation = Operation.new(op_body)
-
-    %TxBuild{tx: %Transaction{operations: %Operations{operations: [^operation]}}} =
-      TxBuild.add_operation(tx_build, op_body)
+  test "add_operation/1" do
+    Stellar.TxBuild.add_operation(%TxBuild{}, :operation)
+    assert_receive({:add_operation, "OP_ADDED"})
   end
 
-  test "add_operation/2 multiple", %{tx_build: tx_build, keypair: {public_key, _secret}} do
-    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
-    op2 = Payment.new(destination: public_key, asset: :native, amount: 100)
-    operations = [Operation.new(op1), Operation.new(op2)]
-
-    %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}} =
-      TxBuild.add_operation(tx_build, [op1, op2])
+  test "sign/2" do
+    Stellar.TxBuild.sign(%TxBuild{}, :signature)
+    assert_receive({:sign, "TX_SIGNED"})
   end
 
-  test "sign/2", %{keypair: {public_key, secret}, tx_build: tx_build} do
-    signature = Signature.new(public_key, secret)
-    %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, signature)
+  test "build/1" do
+    Stellar.TxBuild.build(%TxBuild{})
+    assert_receive({:build, "TX_CREATED"})
   end
 
-  test "sign/2 multiple", %{signature: signature, tx_build: tx_build} do
-    {pk, sk} = KeyPair.random()
-    signatures = [signature, Signature.new(pk, sk)]
-
-    %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, signatures)
-  end
-
-  test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do
-    %TxBuild{tx_envelope: ^tx_envelope} = TxBuild.build(tx_build)
-  end
-
-  test "envelope/1", %{
-    signature: signature,
-    tx_build: tx_build,
-    tx_envelope_base64: tx_envelope_base64
-  } do
-    ^tx_envelope_base64 =
-      tx_build
-      |> TxBuild.sign(signature)
-      |> TxBuild.envelope()
+  test "envelope/1" do
+    Stellar.TxBuild.envelope(%TxBuild{})
+    assert_receive({:envelope, "TX_ENVELOPE_GENERATED"})
   end
 end

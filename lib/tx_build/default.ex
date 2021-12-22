@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild do
+defmodule Stellar.TxBuild.Default do
   @moduledoc """
-  Transaction build implementation.
+  Default TxBuild implementation.
   """
   alias Stellar.TxBuild.{
     Account,
@@ -13,20 +13,21 @@ defmodule Stellar.TxBuild do
     TransactionEnvelope
   }
 
-  @type signature :: Signature.t()
-  @type signatures :: signature() | list(signature())
-  @type operation :: Operation.t()
-  @type operations :: operation() | list(operation())
+  @behaviour Stellar.TxBuild.Spec
+
+  @type tx :: Transaction.t()
+  @type signatures :: Signature.t() | list(Signature.t())
+  @type tx_envelope :: TransactionEnvelope.t() | nil
 
   @type t :: %__MODULE__{
-          tx: Transaction.t(),
+          tx: tx(),
           signatures: signatures(),
-          tx_envelope: TransactionEnvelope.t() | nil
+          tx_envelope: tx_envelope()
         }
 
   defstruct [:tx, :signatures, :tx_envelope]
 
-  @spec new(account :: Account.t(), opts :: Keyword.t()) :: t()
+  @impl true
   def new(%Account{} = account, opts \\ []) do
     %__MODULE__{
       tx: Transaction.new(account, opts),
@@ -35,19 +36,19 @@ defmodule Stellar.TxBuild do
     }
   end
 
-  @spec add_memo(tx_build :: t(), memo :: Memo.t()) :: t()
+  @impl true
   def add_memo(%__MODULE__{tx: tx} = tx_build, %Memo{} = memo) do
     transaction = %{tx | memo: memo}
     %{tx_build | tx: transaction}
   end
 
-  @spec set_timeout(tx_build :: t(), timeout :: TimeBounds.t()) :: t()
+  @impl true
   def set_timeout(%__MODULE__{tx: tx} = tx_build, %TimeBounds{} = timeout) do
     transaction = %{tx | time_bounds: timeout}
     %{tx_build | tx: transaction}
   end
 
-  @spec add_operation(tx_build :: t(), operations :: operations()) :: t()
+  @impl true
   def add_operation(%__MODULE__{} = tx_build, []), do: tx_build
 
   def add_operation(%__MODULE__{} = tx_build, [operation | operations]) do
@@ -62,7 +63,7 @@ defmodule Stellar.TxBuild do
     %{tx_build | tx: transaction}
   end
 
-  @spec sign(tx_build :: t(), signatures :: signatures()) :: t()
+  @impl true
   def sign(%__MODULE__{} = tx_build, []), do: tx_build
 
   def sign(%__MODULE__{} = tx_build, [%Signature{} = signature | signatures]) do
@@ -75,12 +76,12 @@ defmodule Stellar.TxBuild do
     %{tx_build | signatures: signatures ++ [signature]}
   end
 
-  @spec build(tx_build :: t()) :: t()
+  @impl true
   def build(%__MODULE__{tx: tx, signatures: signatures} = tx_build) do
     %{tx_build | tx_envelope: TransactionEnvelope.new(tx, signatures)}
   end
 
-  @spec envelope(tx_build :: t()) :: String.t()
+  @impl true
   def envelope(%__MODULE__{tx: tx, signatures: signatures}) do
     tx
     |> TransactionEnvelope.new(signatures)
