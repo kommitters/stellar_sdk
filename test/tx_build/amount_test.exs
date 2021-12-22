@@ -4,8 +4,6 @@ defmodule Stellar.TxBuild.AmountTest do
   alias Stellar.TxBuild.Amount
   alias StellarBase.XDR.Int64
 
-  @max 0x7FFFFFFFFFFFFFFF
-
   test "new/2 integer" do
     %Amount{amount: 7, raw: 70_000_000} = Amount.new(7)
   end
@@ -15,7 +13,7 @@ defmodule Stellar.TxBuild.AmountTest do
   end
 
   test "new/2 max" do
-    %Amount{raw: @max} = Amount.new(:max)
+    %Amount{amount: 922_337_203_685.4775, raw: 9_223_372_036_854_775_807} = Amount.new(:max)
   end
 
   test "new/2 invalid" do
