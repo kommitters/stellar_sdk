@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.Amount do
   @behaviour Stellar.TxBuild.XDR
 
   @unit 10_000_000
+  @max_size 9_223_372_036_854_775_807
 
   @type amount :: non_neg_integer() | float()
 
@@ -17,11 +18,11 @@ defmodule Stellar.TxBuild.Amount do
   @impl true
   def new(amount, opts \\ [])
 
-  def new(amount, _opts) when is_integer(amount) and amount >= 0 do
-    %__MODULE__{amount: amount, raw: amount * @unit}
+  def new(:max, _opts) do
+    %__MODULE__{amount: @max_size / @unit, raw: @max_size}
   end
 
-  def new(amount, _opts) when is_float(amount) and amount >= 0 do
+  def new(amount, _opts) when is_number(amount) and amount >= 0 and amount <= @max_size do
     %__MODULE__{amount: amount, raw: trunc(amount * @unit)}
   end
 

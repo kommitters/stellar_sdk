@@ -23,9 +23,8 @@ defmodule Stellar.TxBuild.Asset do
 
   def new({code, issuer}, _opts), do: new(code: code, issuer: issuer)
 
-  def new(args, _opts) when is_list(args) do
-    code = Keyword.get(args, :code, "") |> String.trim()
-    issuer = Keyword.get(args, :issuer)
+  def new([code: code, issuer: issuer], _opts) do
+    code = code |> to_string() |> String.trim()
 
     with {:ok, code} <- validate_asset_code(code),
          {:ok, issuer} <- validate_asset_issuer(issuer) do

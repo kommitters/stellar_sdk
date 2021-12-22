@@ -70,6 +70,20 @@ defmodule Stellar.TxBuild.OpValidateTest do
       OpValidate.validate_amount({:starting_balance, "100"})
   end
 
+  test "validate_optional_amount/1" do
+    {:ok, %Amount{}} = OpValidate.validate_optional_amount({:trust_limit, 100})
+  end
+
+  test "validate_optional_amount/1 none" do
+    {:ok, %Amount{raw: 0x7FFFFFFFFFFFFFFF}} =
+      OpValidate.validate_optional_amount({:trust_limit, nil})
+  end
+
+  test "validate_optional_amount/1 error" do
+    {:error, [trust_limit: :invalid_amount]} =
+      OpValidate.validate_optional_amount({:trust_limit, "2"})
+  end
+
   test "validate_asset/1" do
     {:ok, %Asset{}} = OpValidate.validate_asset({:asset, :native})
   end

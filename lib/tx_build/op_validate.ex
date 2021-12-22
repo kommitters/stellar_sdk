@@ -87,6 +87,13 @@ defmodule Stellar.TxBuild.OpValidate do
     end
   end
 
+  @spec validate_optional_amount(component :: component()) :: validation()
+  def validate_optional_amount({_field, nil}), do: {:ok, Amount.new(:max)}
+
+  def validate_optional_amount({field, value}) do
+    validate_amount({field, value})
+  end
+
   @spec validate_price(component :: component()) :: validation()
   def validate_price({field, price}) do
     case Price.new(price) do
