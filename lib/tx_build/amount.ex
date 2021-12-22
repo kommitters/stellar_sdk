@@ -7,12 +7,11 @@ defmodule Stellar.TxBuild.Amount do
   @behaviour Stellar.TxBuild.XDR
 
   @unit 10_000_000
+  @max_size 9_223_372_036_854_775_807
 
   @type amount :: non_neg_integer() | float()
 
   @type t :: %__MODULE__{amount: amount(), raw: non_neg_integer()}
-
-  @max_size 0x7FFFFFFFFFFFFFFF
 
   defstruct [:amount, :raw]
 
