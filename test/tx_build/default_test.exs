@@ -20,7 +20,7 @@ defmodule Stellar.TxBuild.DefaultTest do
     {public_key, secret} =
       keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
 
-    signature = Signature.new(public_key, secret)
+    signature = Signature.new({public_key, secret})
     account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
     tx = Transaction.new(account)
 
@@ -41,7 +41,7 @@ defmodule Stellar.TxBuild.DefaultTest do
   end
 
   test "add_memo/2", %{tx_build: tx_build} do
-    memo = Memo.new(:text, "hello")
+    memo = Memo.new(text: "hello")
     %TxBuild{tx: %Transaction{memo: ^memo}} = TxBuild.add_memo(tx_build, memo)
   end
 
@@ -74,7 +74,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "sign/2 multiple", %{signature: signature, tx_build: tx_build} do
     {pk, sk} = KeyPair.random()
-    signatures = [signature, Signature.new(pk, sk)]
+    signatures = [signature, Signature.new({pk, sk})]
 
     %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, signatures)
   end

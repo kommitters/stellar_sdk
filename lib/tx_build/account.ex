@@ -7,20 +7,19 @@ defmodule Stellar.TxBuild.Account do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type validation :: {:ok, any()} | {:error, atom()}
+  @type account_id :: String.t()
+  @type validation :: {:ok, account_id()} | {:error, atom()}
 
-  @type id :: integer() | nil
+  @type t :: %__MODULE__{account_id: account_id()}
 
-  @type t :: %__MODULE__{account_id: String.t(), id: id()}
-
-  defstruct [:account_id, :id]
+  defstruct [:account_id]
 
   @impl true
-  def new(account_id, id \\ nil)
+  def new(account_id, opts \\ [])
 
-  def new(account_id, id) do
-    with {:ok, account_id} <- validate_account_id(account_id),
-         do: %__MODULE__{account_id: account_id, id: id}
+  def new(account_id, _opts) do
+    with {:ok, account_id} <- validate_raw_account_id(account_id),
+         do: %__MODULE__{account_id: account_id}
   end
 
   @impl true
@@ -33,8 +32,8 @@ defmodule Stellar.TxBuild.Account do
     |> MuxedAccount.new(type)
   end
 
-  @spec validate_account_id(account_id :: String.t()) :: validation()
-  defp validate_account_id(account_id) do
+  @spec validate_raw_account_id(account_id :: account_id()) :: validation()
+  defp validate_raw_account_id(account_id) do
     case KeyPair.validate_ed25519_public_key(account_id) do
       :ok -> {:ok, account_id}
       _error -> {:error, :invalid_account_id}

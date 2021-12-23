@@ -17,7 +17,7 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
       <<221, 182, 124, 1, 170, 219, 95, 188, 245, 30, 147, 123, 228, 111, 20, 56, 22, 55, 101, 74,
         206, 105, 230, 184, 209, 120, 244, 158, 120, 75, 183, 37>>
 
-    signature = Signature.new(public_key, secret)
+    signature = Signature.new({public_key, secret})
 
     %{
       tx: tx,

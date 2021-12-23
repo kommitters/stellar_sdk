@@ -619,8 +619,13 @@ defmodule Stellar.Test.XDRFixtures do
   defp memo_xdr_value(_value, :MEMO_NONE), do: nil
   defp memo_xdr_value(value, :MEMO_TEXT), do: String28.new(value)
   defp memo_xdr_value(value, :MEMO_ID), do: UInt64.new(value)
-  defp memo_xdr_value(value, :MEMO_HASH), do: Hash.new(value)
-  defp memo_xdr_value(value, :MEMO_RETURN), do: Hash.new(value)
+
+  defp memo_xdr_value(value, _type) do
+    value
+    |> String.upcase()
+    |> Base.decode16!()
+    |> Hash.new()
+  end
 
   @spec flags_bit_mask(flags :: flags()) :: integer()
   defp flags_bit_mask(nil), do: 0
