@@ -1,4 +1,4 @@
-defmodule Stellar.TxBuild.OpValidate do
+defmodule Stellar.TxBuild.Validations do
   @moduledoc """
   Validates operation components.
   """
@@ -15,7 +15,8 @@ defmodule Stellar.TxBuild.OpValidate do
   }
 
   @type account_id :: String.t()
-  @type asset :: {String.t(), account_id()} | Keyword.t() | atom()
+  @type asset_code :: String.t()
+  @type asset :: {asset_code(), account_id()} | Keyword.t() | atom()
   @type value :: account_id() | asset() | number()
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()

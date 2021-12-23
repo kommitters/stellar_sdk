@@ -2,7 +2,8 @@ defmodule Stellar.TxBuild.ClawbackClaimableBalance do
   @moduledoc """
   Creates a clawback operation for a claimable balance.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [validate_claimable_balance_id: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{ClaimableBalanceID, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.ClawbackClaimableBalance}

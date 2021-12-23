@@ -2,7 +2,8 @@ defmodule Stellar.TxBuild.BumpSequence do
   @moduledoc """
   Bumps sequence number.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [validate_pos_integer: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.OptionalAccount
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.BumpSequence, SequenceNumber}

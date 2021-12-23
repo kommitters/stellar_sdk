@@ -2,7 +2,14 @@ defmodule Stellar.TxBuild.PathPaymentStrictReceive do
   @moduledoc """
   Sends an amount in a specific asset to a destination account through a path of offers.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_account: 1,
+      validate_asset: 1,
+      validate_optional_assets_path: 1,
+      validate_amount: 1,
+      validate_optional_account: 1
+    ]
 
   alias Stellar.TxBuild.{Account, Amount, Asset, AssetsPath, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.PathPaymentStrictReceive}

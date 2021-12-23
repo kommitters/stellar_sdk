@@ -2,7 +2,13 @@ defmodule Stellar.TxBuild.Clawback do
   @moduledoc """
   Creates a clawback operation.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_account: 1,
+      validate_asset: 1,
+      validate_amount: 1,
+      validate_optional_account: 1
+    ]
 
   alias Stellar.TxBuild.{Account, Amount, Asset, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.Clawback}

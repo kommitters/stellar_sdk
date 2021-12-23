@@ -2,7 +2,8 @@ defmodule Stellar.TxBuild.CreateAccount do
   @moduledoc """
   Creates and funds a new account with the specified starting balance.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [validate_account_id: 1, validate_amount: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{AccountID, Amount, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.CreateAccount}

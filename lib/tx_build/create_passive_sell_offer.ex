@@ -2,7 +2,8 @@ defmodule Stellar.TxBuild.CreatePassiveSellOffer do
   @moduledoc """
   Creates an offer that does not take another offer of equal price when created.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [validate_asset: 1, validate_amount: 1, validate_price: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{Amount, Asset, OptionalAccount, Price}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.CreatePassiveSellOffer}

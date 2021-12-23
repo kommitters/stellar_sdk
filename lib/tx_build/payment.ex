@@ -2,16 +2,18 @@ defmodule Stellar.TxBuild.Payment do
   @moduledoc """
   Sends an amount in a specific asset to a destination account.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_account: 1,
+      validate_asset: 1,
+      validate_amount: 1,
+      validate_optional_account: 1
+    ]
 
   alias Stellar.TxBuild.{Account, Amount, Asset, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.Payment}
 
   @behaviour Stellar.TxBuild.XDR
-
-  @type asset_issuer :: String.t()
-  @type asset_code :: String.t()
-  @type asset :: {asset_code(), asset_issuer()} | Keyword.t() | atom()
 
   @type t :: %__MODULE__{
           destination: Account.t(),
