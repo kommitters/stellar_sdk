@@ -1,6 +1,6 @@
 defmodule Stellar.TxBuild.Validations do
   @moduledoc """
-  Validates operation components.
+  Ensures that child components/structures used by operations are properly initialized otherwise, returns a formatted error.
   """
   alias Stellar.TxBuild.{
     Account,
@@ -8,10 +8,18 @@ defmodule Stellar.TxBuild.Validations do
     Amount,
     Asset,
     AssetsPath,
+    Flags,
     ClaimableBalanceID,
     OptionalAccount,
     OptionalAccountID,
-    Price
+    OptionalFlags,
+    OptionalWeight,
+    OptionalSigner,
+    OptionalString32,
+    Price,
+    Signer,
+    String32,
+    Weight
   }
 
   @type account_id :: String.t()
@@ -107,6 +115,46 @@ defmodule Stellar.TxBuild.Validations do
   def validate_claimable_balance_id({field, balance_id}) do
     case ClaimableBalanceID.new(balance_id) do
       %ClaimableBalanceID{} = claimable_balance_id -> {:ok, claimable_balance_id}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_optional_flags(component :: component()) :: validation()
+  def validate_optional_flags({_field, nil}), do: {:ok, OptionalFlags.new()}
+
+  def validate_optional_flags({field, value}) do
+    case Flags.new(value) do
+      %Flags{} = flags -> {:ok, OptionalFlags.new(flags)}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_optional_weight(component :: component()) :: validation()
+  def validate_optional_weight({_field, nil}), do: {:ok, OptionalWeight.new()}
+
+  def validate_optional_weight({field, value}) do
+    case Weight.new(value) do
+      %Weight{} = weight -> {:ok, OptionalWeight.new(weight)}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_optional_string32(component :: component()) :: validation()
+  def validate_optional_string32({_field, nil}), do: {:ok, OptionalString32.new()}
+
+  def validate_optional_string32({field, value}) do
+    case String32.new(value) do
+      %String32{} = str -> {:ok, OptionalString32.new(str)}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_optional_signer(component :: component()) :: validation()
+  def validate_optional_signer({_field, nil}), do: {:ok, OptionalSigner.new()}
+
+  def validate_optional_signer({field, value}) do
+    case Signer.new(value) do
+      %Signer{} = signer -> {:ok, OptionalSigner.new(signer)}
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
