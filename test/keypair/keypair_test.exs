@@ -10,19 +10,19 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
-  def from_secret(_secret) do
+  def from_secret_seed(_secret) do
     send(self(), {:secret, "SECRET"})
     :ok
   end
 
   @impl true
-  def raw_ed25519_public_key(_public_key) do
+  def raw_public_key(_public_key) do
     send(self(), {:raw_public_key, "RAW_PUBLIC_KEY"})
     :ok
   end
 
   @impl true
-  def raw_ed25519_secret(_secret) do
+  def raw_secret_seed(_secret) do
     send(self(), {:raw_secret, "RAW_SECRET"})
     :ok
   end
@@ -34,13 +34,13 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
-  def validate_ed25519_public_key(_public_key) do
+  def validate_public_key(_public_key) do
     send(self(), {:ok, "PUBLIC_KEY"})
     :ok
   end
 
   @impl true
-  def validate_ed25519_secret_seed(_secret) do
+  def validate_secret_seed(_secret) do
     send(self(), {:ok, "SECRET_SEED"})
     :ok
   end
@@ -64,18 +64,18 @@ defmodule Stellar.KeyPairTest do
     assert_receive({:random, "KEY"})
   end
 
-  test "from_secret/1" do
-    Stellar.KeyPair.from_secret("SECRET")
+  test "from_secret_seed/1" do
+    Stellar.KeyPair.from_secret_seed("SECRET")
     assert_receive({:secret, "SECRET"})
   end
 
-  test "raw_ed25519_public_key/1" do
-    Stellar.KeyPair.raw_ed25519_public_key("RAW_PUBLIC_KEY")
+  test "raw_public_key/1" do
+    Stellar.KeyPair.raw_public_key("RAW_PUBLIC_KEY")
     assert_receive({:raw_public_key, "RAW_PUBLIC_KEY"})
   end
 
-  test "raw_ed25519_secret/1" do
-    Stellar.KeyPair.raw_ed25519_secret("SECRET")
+  test "raw_secret_seed/1" do
+    Stellar.KeyPair.raw_secret_seed("SECRET")
     assert_receive({:raw_secret, "RAW_SECRET"})
   end
 
@@ -84,13 +84,13 @@ defmodule Stellar.KeyPairTest do
     assert_receive({:signature, "SIGNATURE"})
   end
 
-  test "validate_ed25519_public_key/1" do
-    Stellar.KeyPair.validate_ed25519_public_key("PUBLIC_KEY")
+  test "validate_public_key/1" do
+    Stellar.KeyPair.validate_public_key("PUBLIC_KEY")
     assert_receive({:ok, "PUBLIC_KEY"})
   end
 
-  test "validate_ed25519_secret_seed/1" do
-    Stellar.KeyPair.validate_ed25519_secret_seed("SECRET_SEED")
+  test "validate_secret_seed/1" do
+    Stellar.KeyPair.validate_secret_seed("SECRET_SEED")
     assert_receive({:ok, "SECRET_SEED"})
   end
 end

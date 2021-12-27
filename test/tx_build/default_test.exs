@@ -18,7 +18,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   setup do
     {public_key, secret} =
-      keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
+      keypair = KeyPair.from_secret_seed("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
 
     signature = Signature.new({public_key, secret})
     account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")

@@ -29,8 +29,8 @@ defmodule Stellar.TxBuild.Signature do
   def new(keypair, opts \\ [])
 
   def new({public_key, secret}, _opts) do
-    with :ok <- KeyPair.validate_ed25519_public_key(public_key),
-         :ok <- KeyPair.validate_ed25519_secret_seed(secret),
+    with :ok <- KeyPair.validate_public_key(public_key),
+         :ok <- KeyPair.validate_secret_seed(secret),
          do: build_signature(public_key, secret)
   end
 
@@ -56,8 +56,8 @@ defmodule Stellar.TxBuild.Signature do
 
   @spec build_signature(public_key :: String.t(), secret :: String.t()) :: t()
   defp build_signature(public_key, secret) do
-    raw_public_key = KeyPair.raw_ed25519_public_key(public_key)
-    raw_secret = KeyPair.raw_ed25519_secret(secret)
+    raw_public_key = KeyPair.raw_public_key(public_key)
+    raw_secret = KeyPair.raw_secret_seed(secret)
     signature_hint = signature_hint(raw_public_key)
 
     %__MODULE__{

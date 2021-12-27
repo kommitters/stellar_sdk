@@ -39,7 +39,7 @@ defmodule Stellar.TxBuild.Signer do
     weight = Weight.to_xdr(weight)
 
     key
-    |> KeyPair.raw_ed25519_public_key()
+    |> KeyPair.raw_public_key()
     |> UInt256.new()
     |> SignerKey.new(signer_type)
     |> Signer.new(weight)
@@ -81,7 +81,7 @@ defmodule Stellar.TxBuild.Signer do
 
   @spec validate_signer_key(signer :: signer()) :: validation()
   defp validate_signer_key({:ed25519, key}) do
-    case KeyPair.validate_ed25519_public_key(key) do
+    case KeyPair.validate_public_key(key) do
       :ok -> {:ok, key}
       _error -> {:error, :invalid_signer_key}
     end
