@@ -5,6 +5,20 @@ defmodule Stellar.TxBuild do
 
   @behaviour Stellar.TxBuild.Spec
 
+  alias Stellar.TxBuild.{Signature, Transaction, TransactionEnvelope}
+
+  @type tx :: Transaction.t()
+  @type signatures :: Signature.t() | list(Signature.t())
+  @type tx_envelope :: TransactionEnvelope.t() | nil
+
+  @type t :: %__MODULE__{
+          tx: tx(),
+          signatures: signatures(),
+          tx_envelope: tx_envelope()
+        }
+
+  defstruct [:tx, :signatures, :tx_envelope]
+
   @impl true
   def new(account, opts \\ []), do: impl().new(account, opts)
 

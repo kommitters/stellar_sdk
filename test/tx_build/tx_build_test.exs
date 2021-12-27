@@ -49,8 +49,8 @@ end
 defmodule Stellar.TxBuildTest do
   use ExUnit.Case
 
+  alias Stellar.TxBuild
   alias Stellar.TxBuild.{Account, CannedTxBuildImpl}
-  alias Stellar.TxBuild.Default, as: TxBuild
 
   setup do
     Application.put_env(:stellar_sdk, :tx_build_impl, CannedTxBuildImpl)

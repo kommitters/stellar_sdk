@@ -16,8 +16,6 @@ defmodule Stellar.TxBuild.DefaultTest do
     TimeBounds
   }
 
-  alias Stellar.TxBuild.Default, as: TxBuild
-
   setup do
     {public_key, secret} =
       keypair = KeyPair.from_secret("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
