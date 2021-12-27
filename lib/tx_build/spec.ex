@@ -1,7 +1,8 @@
 defmodule Stellar.TxBuild.Spec do
   @moduledoc """
-  Defines the contracts to build a Stellar transaction.
+  Defines contracts to build a Stellar transaction.
   """
+
   alias Stellar.TxBuild.{Account, Memo, Operation, Signature, TimeBounds}
 
   @type opts :: Keyword.t()

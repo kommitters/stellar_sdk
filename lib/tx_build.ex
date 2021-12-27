@@ -1,6 +1,6 @@
 defmodule Stellar.TxBuild do
   @moduledoc """
-  Specifies the API for building Stellar transactions.
+  Specifies an API to build Stellar transactions.
   """
 
   @behaviour Stellar.TxBuild.Spec
