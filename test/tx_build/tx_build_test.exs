@@ -76,7 +76,7 @@ defmodule Stellar.TxBuildTest do
     assert_receive({:add_memo, "MEMO_ADDED"})
   end
 
-  test "set_timeout/w" do
+  test "set_timeout/2" do
     Stellar.TxBuild.set_timeout(%TxBuild{}, :timeout)
     assert_receive({:set_timeout, "TIMEOUT_SET"})
   end
