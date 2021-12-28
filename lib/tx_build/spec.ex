@@ -18,7 +18,6 @@ defmodule Stellar.TxBuild.Spec do
     ManageSellOffer,
     ManageBuyOffer,
     Memo,
-    Operation,
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
