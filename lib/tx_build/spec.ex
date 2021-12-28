@@ -3,7 +3,29 @@ defmodule Stellar.TxBuild.Spec do
   Defines contracts to build a Stellar transaction.
   """
 
-  alias Stellar.TxBuild.{Account, Memo, Operation, Signature, TimeBounds}
+  alias Stellar.TxBuild.{
+    Account,
+    AccountMerge,
+    BumpSequence,
+    BeginSponsoringFutureReserves,
+    ChangeTrust,
+    Clawback,
+    ClawbackClaimableBalance,
+    CreateAccount,
+    CreatePassiveSellOffer,
+    EndSponsoringFutureReserves,
+    ManageData,
+    ManageSellOffer,
+    ManageBuyOffer,
+    Memo,
+    Operation,
+    Payment,
+    PathPaymentStrictSend,
+    PathPaymentStrictReceive,
+    SetOptions,
+    Signature,
+    TimeBounds
+  }
 
   @type opts :: Keyword.t()
   @type tx :: struct()
@@ -11,7 +33,23 @@ defmodule Stellar.TxBuild.Spec do
   @type memo :: Memo.t()
   @type time_bounds :: TimeBounds.t()
   @type signatures :: Signature.t() | list(Signature.t())
-  @type operation :: Operation.t()
+  @type operation ::
+          AccountMerge.t()
+          | BumpSequence.t()
+          | BeginSponsoringFutureReserves.t()
+          | ChangeTrust.t()
+          | Clawback.t()
+          | ClawbackClaimableBalance.t()
+          | CreateAccount.t()
+          | CreatePassiveSellOffer.t()
+          | EndSponsoringFutureReserves.t()
+          | ManageData.t()
+          | ManageSellOffer.t()
+          | ManageBuyOffer.t()
+          | Payment.t()
+          | PathPaymentStrictSend.t()
+          | PathPaymentStrictReceive.t()
+          | SetOptions.t()
   @type operations :: list(operation())
   @type tx_envelope :: String.t()
 
