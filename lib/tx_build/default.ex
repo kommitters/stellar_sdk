@@ -19,11 +19,7 @@ defmodule Stellar.TxBuild.Default do
 
   @impl true
   def new(%Account{} = account, opts \\ []) do
-    %TxBuild{
-      tx: Transaction.new(account, opts),
-      signatures: [],
-      tx_envelope: nil
-    }
+    %TxBuild{tx: Transaction.new(account, opts), signatures: [], tx_envelope: nil}
   end
 
   @impl true
@@ -39,14 +35,15 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def add_operation(%TxBuild{} = tx_build, []), do: tx_build
+  def add_operations(%TxBuild{} = tx_build, []), do: tx_build
 
-  def add_operation(%TxBuild{} = tx_build, [operation | operations]) do
+  def add_operations(%TxBuild{} = tx_build, [operation | operations]) do
     tx_build
     |> add_operation(operation)
-    |> add_operation(operations)
+    |> add_operations(operations)
   end
 
+  @impl true
   def add_operation(%TxBuild{tx: tx} = tx_build, operation) do
     operation = Operation.new(operation)
     transaction = %{tx | operations: Operations.add(tx.operations, operation)}

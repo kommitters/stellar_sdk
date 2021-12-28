@@ -29,7 +29,10 @@ defmodule Stellar.TxBuild do
   def set_timeout(tx, time_bounds), do: impl().set_timeout(tx, time_bounds)
 
   @impl true
-  def add_operation(tx, operations), do: impl().add_operation(tx, operations)
+  def add_operation(tx, operation), do: impl().add_operation(tx, operation)
+
+  @impl true
+  def add_operations(tx, operations), do: impl().add_operations(tx, operations)
 
   @impl true
   def sign(tx, signatures), do: impl().sign(tx, signatures)

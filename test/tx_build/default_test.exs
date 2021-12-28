@@ -58,13 +58,13 @@ defmodule Stellar.TxBuild.DefaultTest do
       TxBuild.add_operation(tx_build, op_body)
   end
 
-  test "add_operation/2 multiple", %{tx_build: tx_build, keypair: {public_key, _secret}} do
+  test "add_operations/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
     op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
     op2 = Payment.new(destination: public_key, asset: :native, amount: 100)
     operations = [Operation.new(op1), Operation.new(op2)]
 
     %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}} =
-      TxBuild.add_operation(tx_build, [op1, op2])
+      TxBuild.add_operations(tx_build, [op1, op2])
   end
 
   test "sign/2", %{keypair: {public_key, secret}, tx_build: tx_build} do

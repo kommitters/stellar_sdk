@@ -28,6 +28,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
+  def add_operations(_tx, _operations) do
+    send(self(), {:add_operations, "OPS_ADDED"})
+    :ok
+  end
+
+  @impl true
   def sign(_tx, _signatures) do
     send(self(), {:sign, "TX_SIGNED"})
     :ok
@@ -70,14 +76,19 @@ defmodule Stellar.TxBuildTest do
     assert_receive({:add_memo, "MEMO_ADDED"})
   end
 
-  test "set_timeout/1" do
+  test "set_timeout/w" do
     Stellar.TxBuild.set_timeout(%TxBuild{}, :timeout)
     assert_receive({:set_timeout, "TIMEOUT_SET"})
   end
 
-  test "add_operation/1" do
+  test "add_operation/2" do
     Stellar.TxBuild.add_operation(%TxBuild{}, :operation)
     assert_receive({:add_operation, "OP_ADDED"})
+  end
+
+  test "add_operations/2" do
+    Stellar.TxBuild.add_operations(%TxBuild{}, [:op1, :op2])
+    assert_receive({:add_operations, "OPS_ADDED"})
   end
 
   test "sign/2" do
