@@ -67,8 +67,8 @@ defmodule Stellar.TxBuild.DefaultTest do
       TxBuild.add_operations(tx_build, [op1, op2])
   end
 
-  test "sign/2", %{keypair: {public_key, secret}, tx_build: tx_build} do
-    signature = Signature.new(public_key, secret)
+  test "sign/2", %{keypair: keypair, tx_build: tx_build} do
+    signature = Signature.new(keypair)
     %TxBuild{signatures: [^signature | _signatures]} = TxBuild.sign(tx_build, signature)
   end
 
