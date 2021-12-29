@@ -19,13 +19,13 @@ defmodule Stellar.TxBuild.SignatureTest do
       secret: secret,
       raw_secret: raw_secret,
       hint: hint,
-      signature: Signature.new(public_key, secret)
+      signature: Signature.new({public_key, secret})
     }
   end
 
   test "new/2", %{public_key: public_key, secret: secret, raw_secret: raw_secret, hint: hint} do
     %Signature{public_key: ^public_key, hint: ^hint, raw_secret: ^raw_secret} =
-      Signature.new(public_key, secret)
+      Signature.new({public_key, secret})
   end
 
   test "to_xdr/2", %{signature: signature, secret: raw_secret, hint: hint} do

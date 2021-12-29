@@ -1,4 +1,4 @@
-defmodule Stellar.TxBuild.OpValidateTest do
+defmodule Stellar.TxBuild.ValidationsTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.{
@@ -8,7 +8,7 @@ defmodule Stellar.TxBuild.OpValidateTest do
     Asset,
     AssetsPath,
     ClaimableBalanceID,
-    OpValidate,
+    Validations,
     OptionalAccountID,
     Price
   }
@@ -21,107 +21,107 @@ defmodule Stellar.TxBuild.OpValidateTest do
   end
 
   test "validate_pos_integer/1" do
-    {:ok, 123} = OpValidate.validate_pos_integer({:offer_id, 123})
+    {:ok, 123} = Validations.validate_pos_integer({:offer_id, 123})
   end
 
   test "validate_pos_integer/1 error" do
-    {:error, [offer_id: :integer_expected]} = OpValidate.validate_pos_integer({:offer_id, "123"})
+    {:error, [offer_id: :integer_expected]} = Validations.validate_pos_integer({:offer_id, "123"})
   end
 
   test "validate_account_id/1", %{account_id: account_id} do
-    {:ok, %AccountID{}} = OpValidate.validate_account_id({:destination, account_id})
+    {:ok, %AccountID{}} = Validations.validate_account_id({:destination, account_id})
   end
 
   test "validate_account_id/1 error" do
     {:error, [destination: :invalid_account_id]} =
-      OpValidate.validate_account_id({:destination, "ABC"})
+      Validations.validate_account_id({:destination, "ABC"})
   end
 
   test "validate_optional_account_id/1", %{account_id: account_id} do
     {:ok, %OptionalAccountID{}} =
-      OpValidate.validate_optional_account_id({:destination, account_id})
+      Validations.validate_optional_account_id({:destination, account_id})
   end
 
   test "validate_optional_account_id/1 none" do
     {:ok, %OptionalAccountID{account_id: nil}} =
-      OpValidate.validate_optional_account_id({:destination, nil})
+      Validations.validate_optional_account_id({:destination, nil})
   end
 
   test "validate_optional_account_id/1 error" do
     {:error, [destination: :invalid_account_id]} =
-      OpValidate.validate_optional_account_id({:destination, "2"})
+      Validations.validate_optional_account_id({:destination, "2"})
   end
 
   test "validate_account/1", %{account_id: account_id} do
-    {:ok, %Account{}} = OpValidate.validate_account({:destination, account_id})
+    {:ok, %Account{}} = Validations.validate_account({:destination, account_id})
   end
 
   test "validate_account/1 error" do
     {:error, [destination: :invalid_account_id]} =
-      OpValidate.validate_account_id({:destination, "ABC"})
+      Validations.validate_account_id({:destination, "ABC"})
   end
 
   test "validate_amount/1" do
-    {:ok, %Amount{}} = OpValidate.validate_amount({:starting_balance, 100})
+    {:ok, %Amount{}} = Validations.validate_amount({:starting_balance, 100})
   end
 
   test "validate_amount/1 error" do
     {:error, [starting_balance: :invalid_amount]} =
-      OpValidate.validate_amount({:starting_balance, "100"})
+      Validations.validate_amount({:starting_balance, "100"})
   end
 
   test "validate_optional_amount/1" do
-    {:ok, %Amount{}} = OpValidate.validate_optional_amount({:trust_limit, 100})
+    {:ok, %Amount{}} = Validations.validate_optional_amount({:trust_limit, 100})
   end
 
   test "validate_optional_amount/1 none" do
     {:ok, %Amount{raw: 0x7FFFFFFFFFFFFFFF}} =
-      OpValidate.validate_optional_amount({:trust_limit, nil})
+      Validations.validate_optional_amount({:trust_limit, nil})
   end
 
   test "validate_optional_amount/1 error" do
     {:error, [trust_limit: :invalid_amount]} =
-      OpValidate.validate_optional_amount({:trust_limit, "2"})
+      Validations.validate_optional_amount({:trust_limit, "2"})
   end
 
   test "validate_asset/1" do
-    {:ok, %Asset{}} = OpValidate.validate_asset({:asset, :native})
+    {:ok, %Asset{}} = Validations.validate_asset({:asset, :native})
   end
 
   test "validate_asset/1 error" do
     {:error, [dest_asset: :invalid_asset_issuer]} =
-      OpValidate.validate_asset({:dest_asset, {"BTCN", "ABC"}})
+      Validations.validate_asset({:dest_asset, {"BTCN", "ABC"}})
   end
 
   test "validate_optional_assets_path/1", %{account_id: account_id} do
     {:ok, %AssetsPath{}} =
-      OpValidate.validate_optional_assets_path({:path, [:native, {"BTCN", account_id}]})
+      Validations.validate_optional_assets_path({:path, [:native, {"BTCN", account_id}]})
   end
 
   test "validate_optional_assets_path/1 empty_list" do
-    {:ok, %AssetsPath{assets: []}} = OpValidate.validate_optional_assets_path({:path, nil})
+    {:ok, %AssetsPath{assets: []}} = Validations.validate_optional_assets_path({:path, nil})
   end
 
   test "validate_optional_assets_path/1 error" do
     {:error, [path: :invalid_asset_issuer]} =
-      OpValidate.validate_optional_assets_path({:path, [:native, {"BTCN", "ABC"}]})
+      Validations.validate_optional_assets_path({:path, [:native, {"BTCN", "ABC"}]})
   end
 
   test "validate_price/1" do
-    {:ok, %Price{}} = OpValidate.validate_price({:price, 2.15})
+    {:ok, %Price{}} = Validations.validate_price({:price, 2.15})
   end
 
   test "validate_price/1 error" do
-    {:error, [price: :invalid_price]} = OpValidate.validate_price({:price, "2.15"})
+    {:error, [price: :invalid_price]} = Validations.validate_price({:price, "2.15"})
   end
 
   test "validate_claimable_balance_id/1", %{balance_id: balance_id} do
     {:ok, %ClaimableBalanceID{}} =
-      OpValidate.validate_claimable_balance_id({:claimable_balance_id, balance_id})
+      Validations.validate_claimable_balance_id({:claimable_balance_id, balance_id})
   end
 
   test "validate_claimable_balance_id/1 error" do
     {:error, [claimable_balance_id: :invalid_balance_id]} =
-      OpValidate.validate_claimable_balance_id({:claimable_balance_id, "ABC"})
+      Validations.validate_claimable_balance_id({:claimable_balance_id, "ABC"})
   end
 end

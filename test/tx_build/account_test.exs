@@ -14,7 +14,7 @@ defmodule Stellar.TxBuild.AccountTest do
   end
 
   test "new/2", %{account_id: account_id} do
-    %Account{account_id: ^account_id, id: nil} = Account.new(account_id)
+    %Account{account_id: ^account_id} = Account.new(account_id)
   end
 
   test "new/2 invalid_key" do

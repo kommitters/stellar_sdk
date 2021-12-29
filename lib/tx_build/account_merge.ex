@@ -1,8 +1,9 @@
 defmodule Stellar.TxBuild.AccountMerge do
   @moduledoc """
-  Transfers the native balance (the amount of XLM an account holds) to another account and removes the source account from the ledger.
+  Transfers the native balance (the amount of XLM an account holds) to another
+  account and removes the source account from the ledger.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations, only: [validate_account: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{Account, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.AccountMerge}

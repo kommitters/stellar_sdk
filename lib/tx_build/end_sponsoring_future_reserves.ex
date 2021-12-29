@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.EndSponsoringFutureReserves do
   @moduledoc """
   Ends a sponsorship.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]
 
   alias Stellar.TxBuild.OptionalAccount
   alias StellarBase.XDR.{OperationBody, OperationType, Void}

@@ -24,9 +24,9 @@ defmodule Stellar.TxBuild.Signer do
   def new(args, opts \\ [])
 
   def new([{type, key}, {:weight, weight}], _opts) do
-    with {:ok, type} <- validate_type(type),
-         {:ok, key} <- validate_key({type, key}),
-         {:ok, weight} <- validate_weight(weight) do
+    with {:ok, type} <- validate_signer_type(type),
+         {:ok, key} <- validate_signer_key({type, key}),
+         {:ok, weight} <- validate_signer_weight(weight) do
       %__MODULE__{type: type, key: key, weight: weight}
     end
   end
@@ -67,29 +67,29 @@ defmodule Stellar.TxBuild.Signer do
     |> Signer.new(weight)
   end
 
-  @spec validate_type(type :: signer_type()) :: validation()
-  defp validate_type(type) when type in @signer_types, do: {:ok, type}
-  defp validate_type(_type), do: {:error, :invalid_signer_type}
+  @spec validate_signer_type(type :: signer_type()) :: validation()
+  defp validate_signer_type(type) when type in @signer_types, do: {:ok, type}
+  defp validate_signer_type(_type), do: {:error, :invalid_signer_type}
 
-  @spec validate_weight(weight :: non_neg_integer()) :: validation()
-  defp validate_weight(weight) do
+  @spec validate_signer_weight(weight :: non_neg_integer()) :: validation()
+  defp validate_signer_weight(weight) do
     case Weight.new(weight) do
       %Weight{} = weight -> {:ok, weight}
       {:error, _reason} -> {:error, :invalid_signer_weight}
     end
   end
 
-  @spec validate_key(signer :: signer()) :: validation()
-  defp validate_key({:ed25519, key}) do
+  @spec validate_signer_key(signer :: signer()) :: validation()
+  defp validate_signer_key({:ed25519, key}) do
     case KeyPair.validate_ed25519_public_key(key) do
       :ok -> {:ok, key}
       _error -> {:error, :invalid_signer_key}
     end
   end
 
-  defp validate_key({type, key})
+  defp validate_signer_key({type, key})
        when type in [:sha256_hash, :pre_auth_tx] and byte_size(key) == 64,
        do: {:ok, key}
 
-  defp validate_key(_type), do: {:error, :invalid_signer_key}
+  defp validate_signer_key(_type), do: {:error, :invalid_signer_key}
 end

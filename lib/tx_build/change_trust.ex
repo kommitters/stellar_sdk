@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.ChangeTrust do
   @moduledoc """
   Creates, updates, or deletes a trustline.
   """
-  import Stellar.TxBuild.OpValidate,
+  import Stellar.TxBuild.Validations,
     only: [validate_asset: 1, validate_optional_account: 1, validate_optional_amount: 1]
 
   alias Stellar.TxBuild.{Amount, Asset, OptionalAccount}

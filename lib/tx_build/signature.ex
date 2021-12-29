@@ -26,7 +26,9 @@ defmodule Stellar.TxBuild.Signature do
   defstruct [:public_key, :secret, :raw_public_key, :raw_secret, :hint]
 
   @impl true
-  def new(public_key, secret) do
+  def new(keypair, opts \\ [])
+
+  def new({public_key, secret}, _opts) do
     with :ok <- KeyPair.validate_ed25519_public_key(public_key),
          :ok <- KeyPair.validate_ed25519_secret_seed(secret),
          do: build_signature(public_key, secret)

@@ -2,7 +2,14 @@ defmodule Stellar.TxBuild.ManageSellOffer do
   @moduledoc """
   Creates, updates, or deletes an offer.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_asset: 1,
+      validate_pos_integer: 1,
+      validate_amount: 1,
+      validate_price: 1,
+      validate_optional_account: 1
+    ]
 
   alias Stellar.TxBuild.{Amount, Asset, OptionalAccount, Price}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.ManageSellOffer, Int64}

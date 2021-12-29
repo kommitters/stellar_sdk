@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
     secret = "SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z"
     account = Account.new(public_key)
     tx = Transaction.new(account)
-    signature = Signature.new(public_key, secret)
+    signature = Signature.new({public_key, secret})
     signatures = [signature]
 
     %{

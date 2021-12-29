@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.ManageData do
   @moduledoc """
   Sets, modifies, or deletes a Data Entry (name/value pair).
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]
 
   alias Stellar.TxBuild.OptionalAccount
 

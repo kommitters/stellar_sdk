@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.BeginSponsoringFutureReserves do
   Initiates a sponsorship.
   There must be a corresponding EndSponsoringFutureReserves operation in the same transaction.
   """
-  import Stellar.TxBuild.OpValidate
+  import Stellar.TxBuild.Validations, only: [validate_account_id: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{AccountID, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.BeginSponsoringFutureReserves}
