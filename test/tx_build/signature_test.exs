@@ -9,8 +9,8 @@ defmodule Stellar.TxBuild.SignatureTest do
   setup do
     public_key = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
     secret = "SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z"
-    raw_public_key = KeyPair.raw_ed25519_public_key(public_key)
-    raw_secret = KeyPair.raw_ed25519_secret(secret)
+    raw_public_key = KeyPair.raw_public_key(public_key)
+    raw_secret = KeyPair.raw_secret_seed(secret)
     hint = <<196, 132, 98, 77>>
 
     %{

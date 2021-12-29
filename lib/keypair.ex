@@ -1,6 +1,8 @@
 defmodule Stellar.KeyPair do
   @moduledoc """
-  Specifies the API for processing HTTP requests in the Stellar network.
+  Specifies an API to operate Stellar KeyPairs.
+
+  `KeyPairs` represents public (and secret) keys of the account.
   """
 
   @behaviour Stellar.KeyPair.Spec
@@ -9,22 +11,22 @@ defmodule Stellar.KeyPair do
   def random, do: impl().random()
 
   @impl true
-  def from_secret(secret), do: impl().from_secret(secret)
+  def from_secret_seed(secret), do: impl().from_secret_seed(secret)
 
   @impl true
-  def raw_ed25519_public_key(public_key), do: impl().raw_ed25519_public_key(public_key)
+  def raw_public_key(public_key), do: impl().raw_public_key(public_key)
 
   @impl true
-  def raw_ed25519_secret(secret), do: impl().raw_ed25519_secret(secret)
+  def raw_secret_seed(secret), do: impl().raw_secret_seed(secret)
 
   @impl true
   def sign(payload, secret), do: impl().sign(payload, secret)
 
   @impl true
-  def validate_ed25519_public_key(public_key), do: impl().validate_ed25519_public_key(public_key)
+  def validate_public_key(public_key), do: impl().validate_public_key(public_key)
 
   @impl true
-  def validate_ed25519_secret_seed(secret), do: impl().validate_ed25519_secret_seed(secret)
+  def validate_secret_seed(secret), do: impl().validate_secret_seed(secret)
 
   @spec impl() :: atom()
   defp impl do

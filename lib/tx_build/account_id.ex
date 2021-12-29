@@ -27,15 +27,15 @@ defmodule Stellar.TxBuild.AccountID do
     type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
 
     account_id
-    |> KeyPair.raw_ed25519_public_key()
+    |> KeyPair.raw_public_key()
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
   end
 
-  @spec validate_raw_account_id(account_id :: account_id()) :: validation()
+  @spec validate_raw_account_id(account_id :: String.t()) :: validation()
   defp validate_raw_account_id(account_id) do
-    case KeyPair.validate_ed25519_public_key(account_id) do
+    case KeyPair.validate_public_key(account_id) do
       :ok -> {:ok, account_id}
       _error -> {:error, :invalid_account_id}
     end

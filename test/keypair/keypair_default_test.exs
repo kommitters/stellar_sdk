@@ -35,19 +35,19 @@ defmodule Stellar.KeyPair.DefaultTest do
     assert String.starts_with?(secret, "S")
   end
 
-  test "from_secret/1", %{public_key: public_key, secret: secret} do
-    {^public_key, ^secret} = Default.from_secret(secret)
+  test "from_secret_seed/1", %{public_key: public_key, secret: secret} do
+    {^public_key, ^secret} = Default.from_secret_seed(secret)
   end
 
-  test "raw_ed25519_public_key/1", %{
+  test "raw_public_key/1", %{
     public_key: public_key,
     encoded_public_key: encoded_public_key
   } do
-    ^encoded_public_key = Default.raw_ed25519_public_key(public_key)
+    ^encoded_public_key = Default.raw_public_key(public_key)
   end
 
-  test "raw_ed25519_secret/1", %{secret: secret, encoded_secret: encoded_secret} do
-    ^encoded_secret = Default.raw_ed25519_secret(secret)
+  test "raw_secret_seed/1", %{secret: secret, encoded_secret: encoded_secret} do
+    ^encoded_secret = Default.raw_secret_seed(secret)
   end
 
   test "sign/2", %{secret: secret, signature: signature} do
@@ -58,19 +58,19 @@ defmodule Stellar.KeyPair.DefaultTest do
     {:error, :invalid_signature_payload} = Default.sign(nil, secret)
   end
 
-  test "validate_ed25519_public_key/1", %{public_key: public_key} do
-    :ok = Default.validate_ed25519_public_key(public_key)
+  test "validate_public_key/1", %{public_key: public_key} do
+    :ok = Default.validate_public_key(public_key)
   end
 
-  test "validate_ed25519_public_key/1 invalid_key" do
-    {:error, :invalid_ed25519_public_key} = Default.validate_ed25519_public_key("ABC")
+  test "validate_public_key/1 invalid_key" do
+    {:error, :invalid_ed25519_public_key} = Default.validate_public_key("ABC")
   end
 
-  test "validate_ed25519_secret_seed/1", %{secret: secret} do
-    :ok = Default.validate_ed25519_secret_seed(secret)
+  test "validate_secret_seed/1", %{secret: secret} do
+    :ok = Default.validate_secret_seed(secret)
   end
 
-  test "validate_ed25519_secret_seed/1 invalid_secret" do
-    {:error, :invalid_ed25519_secret_seed} = Default.validate_ed25519_secret_seed("ABC")
+  test "validate_secret_seed/1 invalid_secret" do
+    {:error, :invalid_ed25519_secret_seed} = Default.validate_secret_seed("ABC")
   end
 end

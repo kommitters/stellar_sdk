@@ -1,7 +1,8 @@
 defmodule Stellar.KeyPair.Spec do
   @moduledoc """
-  Specifies the behaviour for KeyPair generators.
-  This Library allows you to use any crypto package of your choice.
+  Defines contracts to generate, validate and encode/decode Stellar KeyPairs.
+
+  This `behaviour` allows you to use any crypto package of your choice.
   The default is Ed25519.
   """
 
@@ -12,15 +13,15 @@ defmodule Stellar.KeyPair.Spec do
 
   @callback random() :: {public_key(), secret_seed()}
 
-  @callback from_secret(secret_seed()) :: {public_key(), secret_seed()}
+  @callback from_secret_seed(secret_seed()) :: {public_key(), secret_seed()}
 
-  @callback raw_ed25519_public_key(public_key()) :: binary()
+  @callback raw_public_key(public_key()) :: binary()
 
-  @callback raw_ed25519_secret(public_key()) :: binary()
+  @callback raw_secret_seed(public_key()) :: binary()
+
+  @callback validate_public_key(String.t()) :: validation()
+
+  @callback validate_secret_seed(String.t()) :: validation()
 
   @callback sign(binary(), secret_seed()) :: binary() | error()
-
-  @callback validate_ed25519_public_key(String.t()) :: validation()
-
-  @callback validate_ed25519_secret_seed(String.t()) :: validation()
 end

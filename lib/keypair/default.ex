@@ -16,7 +16,7 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
-  def from_secret(secret) do
+  def from_secret_seed(secret) do
     public_key =
       secret
       |> StrKey.decode!(:ed25519_secret_seed)
@@ -27,40 +27,40 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
-  def raw_ed25519_public_key(public_key) do
+  def raw_public_key(public_key) do
     StrKey.decode!(public_key, :ed25519_public_key)
   end
 
   @impl true
-  def raw_ed25519_secret(secret) do
+  def raw_secret_seed(secret) do
     StrKey.decode!(secret, :ed25519_secret_seed)
   end
 
   @impl true
   def sign(<<payload::binary>>, <<secret::binary>>) do
-    raw_secret = raw_ed25519_secret(secret)
+    raw_secret = raw_secret_seed(secret)
     Ed25519.signature(payload, raw_secret)
   end
 
   def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
 
   @impl true
-  def validate_ed25519_public_key(public_key) when byte_size(public_key) == 56 do
+  def validate_public_key(public_key) when byte_size(public_key) == 56 do
     case StrKey.decode(public_key, :ed25519_public_key) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_public_key}
     end
   end
 
-  def validate_ed25519_public_key(_public_key), do: {:error, :invalid_ed25519_public_key}
+  def validate_public_key(_public_key), do: {:error, :invalid_ed25519_public_key}
 
   @impl true
-  def validate_ed25519_secret_seed(secret) when byte_size(secret) == 56 do
+  def validate_secret_seed(secret) when byte_size(secret) == 56 do
     case StrKey.decode(secret, :ed25519_secret_seed) do
       {:ok, _secret} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
     end
   end
 
-  def validate_ed25519_secret_seed(_secret), do: {:error, :invalid_ed25519_secret_seed}
+  def validate_secret_seed(_secret), do: {:error, :invalid_ed25519_secret_seed}
 end

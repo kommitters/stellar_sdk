@@ -94,7 +94,7 @@ defmodule Stellar.Test.XDRFixtures do
     type = CryptoKeyType.new(:KEY_TYPE_ED25519)
 
     account_id
-    |> KeyPair.raw_ed25519_public_key()
+    |> KeyPair.raw_public_key()
     |> UInt256.new()
     |> MuxedAccount.new(type)
   end
@@ -104,7 +104,7 @@ defmodule Stellar.Test.XDRFixtures do
     type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
 
     account_id
-    |> KeyPair.raw_ed25519_public_key()
+    |> KeyPair.raw_public_key()
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
@@ -116,7 +116,7 @@ defmodule Stellar.Test.XDRFixtures do
     weight = UInt32.new(weight)
 
     key
-    |> KeyPair.raw_ed25519_public_key()
+    |> KeyPair.raw_public_key()
     |> UInt256.new()
     |> SignerKey.new(signer_type)
     |> Signer.new(weight)
