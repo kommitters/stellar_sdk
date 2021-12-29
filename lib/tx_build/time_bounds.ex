@@ -11,9 +11,11 @@ defmodule Stellar.TxBuild.TimeBounds do
   defstruct [:min_time, :max_time]
 
   @impl true
-  def new(min_time \\ 0, max_time \\ 0)
+  def new(time_bounds \\ {0, 0}, _opts \\ [])
 
-  def new(min_time, max_time) when is_integer(min_time) and is_integer(max_time) do
+  def new([min_time: min_time, max_time: max_time], _opts), do: new({min_time, max_time})
+
+  def new({min_time, max_time}, _opts) when is_integer(min_time) and is_integer(max_time) do
     %__MODULE__{min_time: min_time, max_time: max_time}
   end
 
