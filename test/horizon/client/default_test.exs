@@ -1,6 +1,8 @@
 defmodule Stellar.Horizon.Client.CannedHTTPClient do
   @moduledoc false
 
+  alias Stellar.Test.Fixtures.Horizon
+
   @base_url "https://horizon-testnet.stellar.org"
 
   @spec request(
@@ -10,42 +12,58 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
           body :: String.t(),
           options :: list()
         ) :: {:ok, map()} | {:error, map()}
-  def request(:get, @base_url <> "/accounts/unknow_id", _headers, _body, _opts) do
-    {:ok, %{status_code: 404, body: ~s<{"status": 404, "title": "Resource Missing"}>}}
+  def request(:get, @base_url <> "/transactions/unknow_id", _headers, _body, _opts) do
+    json_error = Horizon.fixture(:not_found)
+    {:ok, 404, [], json_error}
   end
 
-  def request(:get, _path, _headers, _body, _opts) do
-    {:ok, %{status_code: 200, body: ~s<{"_embedded": { "records": [] }}>}}
+  def request(:get, @base_url <> "/transactions/" <> _hash, _headers, _body, _opts) do
+    json_body = Horizon.fixture(:transaction)
+    {:ok, 200, [], json_body}
   end
 
-  def request(:delete, _path, _headers, _body, _opts) do
-    {:error, %{reason: "error"}}
+  def request(:post, @base_url <> "/transactions?tx=bad", _headers, _body, _opts) do
+    json_error = Horizon.fixture(:error)
+    {:ok, 400, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/network_error", _headers, _body, _opts) do
+    {:error, :nxdomain}
   end
 end
 
 defmodule Stellar.Horizon.Client.DefaultTest do
   use ExUnit.Case
 
+  alias Stellar.Horizon.Error
   alias Stellar.Horizon.Client.Default
 
   setup do
     %{
-      body: ~s<{"_embedded": { "records": [] }}>,
-      body_404: ~s<{"status": 404, "title": "Resource Missing"}>
+      source_account: "GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC",
+      tx_hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31"
     }
   end
 
   describe "request/5" do
-    test "success", %{body: body} do
-      {:ok, %{status_code: 200, body: ^body}} = Default.request(:get, "/accounts/id")
+    test "success", %{source_account: source_account, tx_hash: tx_hash} do
+      {:ok, %{source_account: ^source_account, hash: ^tx_hash}} =
+        Default.request(:get, "/transactions/#{tx_hash}")
     end
 
-    test "not_found", %{body_404: body} do
-      {:ok, %{status_code: 404, body: ^body}} = Default.request(:get, "/accounts/unknow_id")
+    test "not_found" do
+      {:error, %Error{title: "Resource Missing", status_code: 404}} =
+        Default.request(:get, "/transactions/unknow_id")
     end
 
     test "error" do
-      {:error, %{reason: "error"}} = Default.request(:delete, "/accounts")
+      {:error, %Error{title: "Transaction Failed", status_code: 400}} =
+        Default.request(:post, "/transactions?tx=bad")
+    end
+
+    test "network_error" do
+      {:error, %Error{title: "Network error", status_code: :network_error}} =
+        Default.request(:post, "/network_error")
     end
   end
 end

@@ -1,6 +1,6 @@
 defmodule Stellar.Network do
   @moduledoc """
-  Stellar's network configuration.
+  Utility that handles Stellar's network configuration.
   """
 
   @passphrases [
