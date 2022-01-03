@@ -12,19 +12,40 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
           body :: String.t(),
           options :: list()
         ) :: {:ok, map()} | {:error, map()}
-  def request(:get, @base_url <> "/transactions/unknow_id", _headers, _body, _opts) do
-    json_error = Horizon.fixture(:not_found)
-    {:ok, 404, [], json_error}
-  end
 
   def request(:get, @base_url <> "/transactions/" <> _hash, _headers, _body, _opts) do
-    json_body = Horizon.fixture(:transaction)
+    json_body = Horizon.fixture("200")
     {:ok, 200, [], json_body}
   end
 
   def request(:post, @base_url <> "/transactions?tx=bad", _headers, _body, _opts) do
-    json_error = Horizon.fixture(:error)
+    json_error =  Horizon.fixture("400")
     {:ok, 400, [], json_error}
+  end
+
+  def request(:get, @base_url <> "/accounts/unknow_id", _headers, _body, _opts) do
+    json_error =  Horizon.fixture("404")
+    {:ok, 404, [], json_error}
+  end
+
+  def request(:get, @base_url <> "/accounts/id.html", _headers, _body, _opts) do
+    json_error = Horizon.fixture("406")
+    {:ok, 406, [], json_error}
+  end
+
+  def request(:get, @base_url <> "/accounts?cursor=old", _headers, _body, _opts) do
+    json_error = Horizon.fixture("410")
+    {:ok, 410, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions?tx=stale", _headers, _body, _opts) do
+    json_error = Horizon.fixture("503")
+    {:ok, 503, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions?tx=timeout", _headers, _body, _opts) do
+    json_error = Horizon.fixture("504")
+    {:ok, 504, [], json_error}
   end
 
   def request(:post, @base_url <> "/network_error", _headers, _body, _opts) do
@@ -51,14 +72,34 @@ defmodule Stellar.Horizon.Client.DefaultTest do
         Default.request(:get, "/transactions/#{tx_hash}")
     end
 
-    test "not_found" do
-      {:error, %Error{title: "Resource Missing", status_code: 404}} =
-        Default.request(:get, "/transactions/unknow_id")
-    end
-
-    test "error" do
+    test "bad_request" do
       {:error, %Error{title: "Transaction Failed", status_code: 400}} =
         Default.request(:post, "/transactions?tx=bad")
+    end
+
+    test "not_found" do
+      {:error, %Error{title: "Resource Missing", status_code: 404}} =
+        Default.request(:get, "/accounts/unknow_id")
+    end
+
+    test "not_acceptable" do
+      {:error, %Error{title: "Not Acceptable", status_code: 406}} =
+        Default.request(:get, "/accounts/id.html")
+    end
+
+    test "before_history" do
+      {:error, %Error{title: "Data Requested Is Before Recorded History", status_code: 410}} =
+        Default.request(:get, "/accounts?cursor=old")
+    end
+
+    test "stale_history" do
+      {:error, %Error{title: "Historical DB Is Too Stale", status_code: 503}} =
+        Default.request(:post, "/transactions?tx=stale")
+    end
+
+    test "timeout" do
+      {:error, %Error{title: "Timeout", status_code: 504}} =
+        Default.request(:post, "/transactions?tx=timeout")
     end
 
     test "network_error" do

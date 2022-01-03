@@ -34,7 +34,7 @@ defmodule Stellar.Horizon.Client.Default do
     {:ok, decoded_body}
   end
 
-  defp handle_response({:ok, status, _headers, body}) when status >= 300 and status <= 599 do
+  defp handle_response({:ok, status, _headers, body}) when status >= 400 and status <= 599 do
     decoded_body = json_library().decode!(body, keys: :atoms)
     error = Error.new({:horizon, decoded_body})
     {:error, error}
