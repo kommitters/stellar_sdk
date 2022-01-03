@@ -19,12 +19,12 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
   end
 
   def request(:post, @base_url <> "/transactions?tx=bad", _headers, _body, _opts) do
-    json_error =  Horizon.fixture("400")
+    json_error = Horizon.fixture("400")
     {:ok, 400, [], json_error}
   end
 
   def request(:get, @base_url <> "/accounts/unknow_id", _headers, _body, _opts) do
-    json_error =  Horizon.fixture("404")
+    json_error = Horizon.fixture("404")
     {:ok, 404, [], json_error}
   end
 
