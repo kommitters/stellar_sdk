@@ -1,0 +1,6 @@
+{
+  "type": "https://stellar.org/horizon-errors/not_acceptable",
+  "title": "Not Acceptable",
+  "status": 406,
+  "detail": "The request does not have an acceptable response content-type."
+}

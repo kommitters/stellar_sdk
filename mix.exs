@@ -40,6 +40,7 @@ defmodule Stellar.MixProject do
       {:stellar_base, "~> 0.3.0"},
       {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17", optional: true},
+      {:jason, "~> 1.0", optional: true},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
