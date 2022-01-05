@@ -1,4 +1,4 @@
-defmodule Stellar.Horizon.Client.CannedTransactionsRequests do
+defmodule Stellar.Horizon.Client.CannedTransactionRequests do
   @moduledoc false
 
   alias Stellar.Horizon.Error
@@ -27,12 +27,12 @@ end
 defmodule Stellar.Horizon.TransactionsTest do
   use ExUnit.Case
 
-  alias Stellar.Horizon.Client.CannedTransactionsRequests
+  alias Stellar.Horizon.Client.CannedTransactionRequests
   alias Stellar.Horizon.{Error, Transactions}
   alias Stellar.Horizon.Resource.Transaction
 
   setup do
-    Application.put_env(:stellar_sdk, :http_client, CannedTransactionsRequests)
+    Application.put_env(:stellar_sdk, :http_client, CannedTransactionRequests)
 
     on_exit(fn ->
       Application.delete_env(:stellar_sdk, :http_client)
