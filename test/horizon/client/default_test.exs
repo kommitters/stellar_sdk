@@ -11,8 +11,7 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
           headers :: list(),
           body :: String.t(),
           options :: list()
-        ) :: {:ok, map()} | {:error, map()}
-
+        ) :: {:ok, non_neg_integer(), list(), String.t()} | {:error, atom()}
   def request(:get, @base_url <> "/transactions/" <> _hash, _headers, _body, _opts) do
     json_body = Horizon.fixture("200")
     {:ok, 200, [], json_body}
@@ -57,9 +56,15 @@ defmodule Stellar.Horizon.Client.DefaultTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Error
-  alias Stellar.Horizon.Client.Default
+  alias Stellar.Horizon.Client.{Default, CannedHTTPClient}
 
   setup do
+    Application.put_env(:stellar_sdk, :http_client, CannedHTTPClient)
+
+    on_exit(fn ->
+      Application.delete_env(:stellar_sdk, :http_client)
+    end)
+
     %{
       source_account: "GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC",
       tx_hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31"
