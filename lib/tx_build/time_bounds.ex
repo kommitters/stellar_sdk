@@ -23,7 +23,7 @@ defmodule Stellar.TxBuild.TimeBounds do
 
   @impl true
   def to_xdr(%__MODULE__{min_time: 0, max_time: 0}) do
-    OptionalTimeBounds.new(nil)
+    OptionalTimeBounds.new()
   end
 
   def to_xdr(%__MODULE__{min_time: min_time, max_time: max_time}) do
