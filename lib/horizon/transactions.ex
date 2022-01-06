@@ -21,8 +21,9 @@ defmodule Stellar.Horizon.Transactions do
     headers = [{"Content-Type", "application/x-www-form-urlencoded"}]
     body = URI.encode_query(tx: base64_envelope)
 
-    with {:ok, tx} <- Horizon.request(:post, @endpoint, headers, body) do
-      {:ok, Transaction.new(tx)}
+    case Horizon.request(:post, @endpoint, headers, body) do
+      {:ok, tx} -> {:ok, Transaction.new(tx)}
+      error -> error
     end
   end
 end
