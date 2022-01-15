@@ -14,6 +14,15 @@ defmodule Stellar.Horizon.ClientTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client
+  alias Stellar.Horizon.Client.CannedClientImpl
+
+  setup do
+    Application.put_env(:stellar_sdk, :http_client_impl, CannedClientImpl)
+
+    on_exit(fn ->
+      Application.delete_env(:stellar_sdk, :http_client_impl)
+    end)
+  end
 
   test "request/5" do
     Client.request(:get, "/accounts/GAYOLLLUIZE4DZMBB2ZBKGBUBZLIOYU6XBNXCW4BVA")
