@@ -1,7 +1,7 @@
 defmodule Stellar.Horizon.Mapping do
   @moduledoc """
   Takes a result map or list of maps from Horizon response and returns a struct
-  (e.g. `%Horizon.Resource.Transaction{}`) or list of structs.
+  (e.g. `%Horizon.Transaction{}`) or list of structs.
   """
 
   @type attr_type :: :integer | :float | :date_time | struct()
