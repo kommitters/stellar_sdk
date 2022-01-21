@@ -13,12 +13,12 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
           body :: String.t(),
           options :: list()
         ) :: {:ok, non_neg_integer(), list(), String.t()} | {:error, atom()}
-  def request(:post, @base_url <> "/transactions", _headers, "tx=bad", _opts) do
+  def request(:post, @base_url <> "/transactions/", _headers, "tx=bad", _opts) do
     json_error = Horizon.fixture("400")
     {:ok, 400, [], json_error}
   end
 
-  def request(:post, @base_url <> "/transactions", _headers, "tx=" <> _hash, _opts) do
+  def request(:post, @base_url <> "/transactions/", _headers, "tx=" <> _hash, _opts) do
     json_body = Horizon.fixture("transaction")
     {:ok, 200, [], json_body}
   end
@@ -28,8 +28,7 @@ defmodule Stellar.Horizon.TransactionsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedTransactionRequests
-  alias Stellar.Horizon.{Error, Transactions}
-  alias Stellar.Horizon.Resource.Transaction
+  alias Stellar.Horizon.{Error, Transaction, Transactions}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedTransactionRequests)

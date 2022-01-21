@@ -1,13 +1,32 @@
-defmodule Stellar.Horizon.Resource.FakeTransaction do
+defmodule Stellar.Horizon.FakeTransaction do
   @moduledoc false
 
-  defstruct [:id, :source_account, :fee, :created_at]
+  defstruct [:id, :source_account, :fee, :created_at, :operation]
 end
 
-defmodule Stellar.Horizon.Resource.MappingTest do
+defmodule Stellar.Horizon.FakeOperation do
+  @moduledoc false
+
+  @behaviour Stellar.Horizon.Resource
+
+  defstruct [:id, :hash, :fee, :balance]
+
+  @impl true
+  def new(attrs \\ %{}, opts \\ [])
+
+  def new(attrs, _opts) do
+    %__MODULE__{
+      id: Map.get(attrs, :id),
+      hash: Map.get(attrs, :hash),
+      balance: Map.get(attrs, :balance)
+    }
+  end
+end
+
+defmodule Stellar.Horizon.MappingTest do
   use ExUnit.Case
 
-  alias Stellar.Horizon.Resource.{Mapping, FakeTransaction}
+  alias Stellar.Horizon.{Mapping, FakeTransaction, FakeOperation}
 
   setup do
     %{
@@ -61,5 +80,31 @@ defmodule Stellar.Horizon.Resource.MappingTest do
       resource
       |> Mapping.build(%{fee: "100"})
       |> Mapping.parse(fee: :integer)
+  end
+
+  test "parse/2 float", %{resource: resource} do
+    %FakeTransaction{fee: 100.15} =
+      resource
+      |> Mapping.build(%{fee: "100.15"})
+      |> Mapping.parse(fee: :float)
+  end
+
+  test "parse/2 struct", %{id: id, resource: resource} do
+    %FakeTransaction{operation: %FakeOperation{}} =
+      resource
+      |> Mapping.build(%{operation: %{id: id, hash: id, balance: 100}})
+      |> Mapping.parse(operation: %FakeOperation{})
+  end
+
+  test "parse/2 list_of_structs", %{id: id, resource: resource} do
+    raw_operations = [
+      %{id: id, hash: id, balance: 100},
+      %{id: id, hash: id, balance: 200}
+    ]
+
+    %FakeTransaction{operation: [%FakeOperation{balance: 100}, %FakeOperation{balance: 200}]} =
+      resource
+      |> Mapping.build(%{operation: raw_operations})
+      |> Mapping.parse(operation: %FakeOperation{})
   end
 end
