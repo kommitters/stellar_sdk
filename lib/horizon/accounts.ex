@@ -28,8 +28,9 @@ defmodule Stellar.Horizon.Accounts do
 
   @spec fetch_next_sequence_number(account_id :: account_id()) :: response()
   def fetch_next_sequence_number(account_id) do
-    with {:ok, %Account{sequence: sequence}} <- retrieve(account_id) do
-      {:ok, sequence + 1}
+    case retrieve(account_id) do
+      {:ok, %Account{sequence: sequence}} -> {:ok, sequence + 1}
+      error -> error
     end
   end
 end
