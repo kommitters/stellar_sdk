@@ -1,8 +1,8 @@
-defmodule Stellar.Horizon.Resource.TransactionTest do
+defmodule Stellar.Horizon.TransactionTest do
   use ExUnit.Case
 
   alias Stellar.Test.Fixtures.Horizon
-  alias Stellar.Horizon.Resource.Transaction
+  alias Stellar.Horizon.Transaction
 
   setup do
     json_body = Horizon.fixture("transaction")

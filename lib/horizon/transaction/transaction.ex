@@ -1,11 +1,11 @@
-defmodule Stellar.Horizon.Resource.Transaction do
+defmodule Stellar.Horizon.Transaction do
   @moduledoc """
   Represents a `Transaction` resource from Horizon API.
   """
 
-  @behaviour Stellar.Horizon.Resource.Spec
+  @behaviour Stellar.Horizon.Resource
 
-  alias Stellar.Horizon.Resource.Mapping
+  alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -54,12 +54,12 @@ defmodule Stellar.Horizon.Resource.Transaction do
   ]
 
   @mapping [
-    {:max_fee, :integer},
-    {:source_account_sequence, :integer},
-    {:fee_charged, :integer},
-    {:created_at, :date_time},
-    {:valid_after, :date_time},
-    {:valid_before, :date_time}
+    max_fee: :integer,
+    source_account_sequence: :integer,
+    fee_charged: :integer,
+    created_at: :date_time,
+    valid_after: :date_time,
+    valid_before: :date_time
   ]
 
   @impl true

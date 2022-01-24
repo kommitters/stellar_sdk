@@ -8,13 +8,12 @@ defmodule Stellar.Horizon.Transactions do
   Horizon API reference: https://developers.stellar.org/api/resources/transactions/
   """
 
-  alias Stellar.Horizon.Error
-  alias Stellar.Horizon.Resource.Transaction
+  alias Stellar.Horizon.{Error, Transaction}
   alias Stellar.Horizon.Client, as: Horizon
 
   @type response :: {:ok, Transaction.t()} | {:error, Error.t()}
 
-  @endpoint "/transactions"
+  @endpoint "/transactions/"
 
   @spec create(base64_envelope :: String.t()) :: response()
   def create(base64_envelope) do
