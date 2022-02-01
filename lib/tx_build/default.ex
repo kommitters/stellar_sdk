@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.Default do
   alias Stellar.TxBuild.{
     Account,
     Memo,
+    BaseFee,
     Operation,
     Operations,
     Signature,
@@ -69,8 +70,10 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def envelope(%TxBuild{tx: tx, signatures: signatures}) do
-    tx
+  def envelope(%TxBuild{tx: %{operations: operations} = tx, signatures: signatures}) do
+    transaction = %{tx | base_fee: BaseFee.new(operations.count)}
+
+    transaction
     |> TransactionEnvelope.new(signatures)
     |> TransactionEnvelope.to_xdr()
     |> TransactionEnvelope.to_base64()
