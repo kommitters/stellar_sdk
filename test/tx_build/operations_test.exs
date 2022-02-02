@@ -20,11 +20,11 @@ defmodule Stellar.TxBuild.OperationsTest do
   end
 
   test "new/2" do
-    %Operations{operations: []} = Operations.new()
+    %Operations{operations: [], count: 0} = Operations.new()
   end
 
   test "add/1", %{operations: operations, operation: operation} do
-    %Operations{operations: [^operation]} = Operations.add(operations, operation)
+    %Operations{operations: [^operation], count: 1} = Operations.add(operations, operation)
   end
 
   test "to_xdr/1", %{operations: operations} do

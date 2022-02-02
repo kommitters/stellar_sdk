@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.Default do
   alias Stellar.TxBuild.{
     Account,
     Memo,
+    BaseFee,
     Operation,
     Operations,
     Signature,
@@ -44,9 +45,12 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def add_operation(%TxBuild{tx: tx} = tx_build, operation) do
-    operation = Operation.new(operation)
-    transaction = %{tx | operations: Operations.add(tx.operations, operation)}
+  def add_operation(%TxBuild{tx: tx} = tx_build, operation_body) do
+    operation = Operation.new(operation_body)
+    operations = Operations.add(tx.operations, operation)
+    base_fee = BaseFee.new(operations.count)
+
+    transaction = %{tx | operations: operations, base_fee: base_fee}
     %{tx_build | tx: transaction}
   end
 
