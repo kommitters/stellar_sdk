@@ -5,6 +5,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   alias Stellar.TxBuild.{
     Account,
+    BaseFee,
     CreateAccount,
     Memo,
     Operation,
@@ -65,6 +66,14 @@ defmodule Stellar.TxBuild.DefaultTest do
     operations = [Operation.new(op1), Operation.new(op2)]
 
     %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}} =
+      TxBuild.add_operations(tx_build, [op1, op2])
+  end
+
+  test "add_operations/2 updated_base_fee", %{tx_build: tx_build, keypair: {public_key, _secret}} do
+    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
+    op2 = Payment.new(destination: public_key, asset: :native, amount: 100)
+
+    %TxBuild{tx: %Transaction{base_fee: %BaseFee{fee: 200}, operations: %Operations{count: 2}}} =
       TxBuild.add_operations(tx_build, [op1, op2])
   end
 

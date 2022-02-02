@@ -45,9 +45,12 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def add_operation(%TxBuild{tx: tx} = tx_build, operation) do
-    operation = Operation.new(operation)
-    transaction = %{tx | operations: Operations.add(tx.operations, operation)}
+  def add_operation(%TxBuild{tx: tx} = tx_build, operation_body) do
+    operation = Operation.new(operation_body)
+    operations = Operations.add(tx.operations, operation)
+    base_fee = BaseFee.new(operations.count)
+
+    transaction = %{tx | operations: operations, base_fee: base_fee}
     %{tx_build | tx: transaction}
   end
 
@@ -70,10 +73,8 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def envelope(%TxBuild{tx: %{operations: operations} = tx, signatures: signatures}) do
-    transaction = %{tx | base_fee: BaseFee.new(operations.count)}
-
-    transaction
+  def envelope(%TxBuild{tx: tx, signatures: signatures}) do
+    tx
     |> TransactionEnvelope.new(signatures)
     |> TransactionEnvelope.to_xdr()
     |> TransactionEnvelope.to_base64()
