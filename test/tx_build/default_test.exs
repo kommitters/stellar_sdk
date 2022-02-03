@@ -11,6 +11,7 @@ defmodule Stellar.TxBuild.DefaultTest do
     Operation,
     Operations,
     Payment,
+    SequenceNumber,
     Signature,
     Transaction,
     TransactionEnvelope,

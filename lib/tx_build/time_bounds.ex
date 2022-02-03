@@ -6,20 +6,25 @@ defmodule Stellar.TxBuild.TimeBounds do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type t :: %__MODULE__{min_time: non_neg_integer(), max_time: non_neg_integer()}
+  @type date_time :: DateTime.t() | non_neg_integer()
+  @type unix_date_time :: non_neg_integer()
+  @type validation :: {:ok, unix_date_time()} | {:error, :atom}
+
+  @type t :: %__MODULE__{min_time: unix_date_time(), max_time: unix_date_time()}
 
   defstruct [:min_time, :max_time]
 
   @impl true
-  def new(time_bounds \\ {0, 0}, _opts \\ [])
+  def new(time_bounds \\ [min_time: 0, max_time: 0], opts \\ [])
 
-  def new([min_time: min_time, max_time: max_time], _opts), do: new({min_time, max_time})
+  def new(:none, _opts), do: new(min_time: 0, max_time: 0)
 
-  def new({min_time, max_time}, _opts) when is_integer(min_time) and is_integer(max_time) do
-    %__MODULE__{min_time: min_time, max_time: max_time}
+  def new([min_time: min_time, max_time: max_time], _opts) do
+    with {:ok, min_time} <- validate_date_time(min_time),
+         {:ok, max_time} <- validate_date_time(max_time) do
+      %__MODULE__{min_time: min_time, max_time: max_time}
+    end
   end
-
-  def new(_min_time, _max_time), do: {:error, :invalid_time_bounds}
 
   @impl true
   def to_xdr(%__MODULE__{min_time: 0, max_time: 0}) do
@@ -35,10 +40,16 @@ defmodule Stellar.TxBuild.TimeBounds do
     |> OptionalTimeBounds.new()
   end
 
-  @spec set_max_time(max_time :: non_neg_integer()) :: t()
-  def set_max_time(max_time) when is_integer(max_time) do
-    %__MODULE__{min_time: 0, max_time: max_time}
+  @spec set_timeout(max_time :: date_time()) :: t() | {:error, atom()}
+  def set_timeout(max_time), do: new(min_time: 0, max_time: max_time)
+
+  @spec validate_date_time(date_time :: date_time()) :: validation()
+  defp validate_date_time(%DateTime{} = date_time) do
+    {:ok, DateTime.to_unix(date_time)}
   end
 
-  def set_max_time(_max_time), do: {:error, :invalid_time_bounds}
+  defp validate_date_time(date_time) when is_integer(date_time) and date_time >= 0,
+    do: {:ok, date_time}
+
+  defp validate_date_time(_date_time), do: {:error, :invalid_time_bounds}
 end
