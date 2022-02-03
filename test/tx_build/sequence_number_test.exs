@@ -2,18 +2,18 @@ defmodule Stellar.TxBuild.SequenceNumberTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.SequenceNumber, as: SequenceNumberXDR
-  alias Stellar.TxBuild.{Account, SequenceNumber}
+  alias Stellar.TxBuild.{SequenceNumber}
 
   setup do
-    %{account: Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")}
+    %{sequence_number: 4_130_487_228_432_385}
   end
 
-  test "new/2", %{account: account} do
-    %SequenceNumber{sequence_number: 4_130_487_228_432_385} = SequenceNumber.new(account)
+  test "new/2", %{sequence_number: sequence_number} do
+    %SequenceNumber{sequence_number: ^sequence_number} = SequenceNumber.new(sequence_number)
   end
 
-  test "to_xdr/1", %{account: account} do
-    %SequenceNumberXDR{sequence_number: 4_130_487_228_432_385} =
-      SequenceNumber.new(account) |> SequenceNumber.to_xdr()
+  test "to_xdr/1", %{sequence_number: sequence_number} do
+    %SequenceNumberXDR{sequence_number: ^sequence_number} =
+      SequenceNumber.new(sequence_number) |> SequenceNumber.to_xdr()
   end
 end

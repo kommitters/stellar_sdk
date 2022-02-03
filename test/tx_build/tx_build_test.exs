@@ -16,8 +16,20 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
-  def set_timeout(_tx, _time_bounds) do
-    send(self(), {:set_timeout, "TIMEOUT_SET"})
+  def set_time_bounds(_tx, _time_bounds) do
+    send(self(), {:set_time_bounds, "TIME_BOUNDS_SET"})
+    :ok
+  end
+
+  @impl true
+  def set_sequence_number(_tx, _seq_number) do
+    send(self(), {:set_sequence_number, "SEQ_NUMBER"})
+    :ok
+  end
+
+  @impl true
+  def set_base_fee(_tx, _base_fee) do
+    send(self(), {:set_base_fee, "BASE_FEE"})
     :ok
   end
 
@@ -76,9 +88,19 @@ defmodule Stellar.TxBuildTest do
     assert_receive({:add_memo, "MEMO_ADDED"})
   end
 
-  test "set_timeout/2" do
-    Stellar.TxBuild.set_timeout(%TxBuild{}, :timeout)
-    assert_receive({:set_timeout, "TIMEOUT_SET"})
+  test "set_time_bounds/2" do
+    Stellar.TxBuild.set_time_bounds(%TxBuild{}, :time_bounds)
+    assert_receive({:set_time_bounds, "TIME_BOUNDS_SET"})
+  end
+
+  test "set_base_fee/2" do
+    Stellar.TxBuild.set_base_fee(%TxBuild{}, :base_fee)
+    assert_receive({:set_base_fee, "BASE_FEE"})
+  end
+
+  test "set_sequence_number/2" do
+    Stellar.TxBuild.set_sequence_number(%TxBuild{}, :seq_number)
+    assert_receive({:set_sequence_number, "SEQ_NUMBER"})
   end
 
   test "add_operation/2" do

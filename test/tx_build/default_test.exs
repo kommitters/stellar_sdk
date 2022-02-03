@@ -24,23 +24,57 @@ defmodule Stellar.TxBuild.DefaultTest do
       KeyPair.from_secret_seed("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
 
     signature = Signature.new({public_key, secret})
-    account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
-    tx = Transaction.new(account)
+    source_account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
+
+    %TxBuild{tx: tx} = tx_build = TxBuild.new(source_account)
 
     %{
-      account: account,
+      source_account: source_account,
       keypair: keypair,
       signature: signature,
       tx: tx,
-      tx_build: TxBuild.new(account),
+      tx_build: tx_build,
       tx_envelope: TransactionEnvelope.new(tx, []),
       tx_envelope_base64:
-        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQADqyoAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAECU7VvLeuntfRiJCTGesLDUPwt1TimPBEhjCBhmxSnjuxd63ubjGT+8c9ec6uuAMC8WrT21WOx9MQSma6YIWaEB"
+        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO"
     }
   end
 
-  test "new/2", %{account: account, tx: tx} do
-    %TxBuild{tx: ^tx, signatures: [], tx_envelope: nil} = TxBuild.new(account)
+  test "new/2", %{source_account: source_account, tx: tx} do
+    %TxBuild{tx: ^tx, signatures: [], tx_envelope: nil} = TxBuild.new(source_account)
+  end
+
+  test "new/2 with_options", %{source_account: source_account, keypair: {public_key, _secret}} do
+    sequence_number = SequenceNumber.new(123_456)
+    base_fee = BaseFee.new(500)
+    memo = Memo.new(text: "TEST")
+
+    op =
+      [destination: public_key, starting_balance: 1.5]
+      |> CreateAccount.new()
+      |> Operation.new()
+
+    operations = Operations.new([op])
+
+    %TxBuild{
+      tx: %Transaction{
+        sequence_number: ^sequence_number,
+        base_fee: ^base_fee,
+        memo: ^memo,
+        operations: ^operations
+      }
+    } =
+      TxBuild.new(
+        source_account,
+        sequence_number: sequence_number,
+        base_fee: base_fee,
+        memo: memo,
+        operations: operations
+      )
+  end
+
+  test "new/2 with_bad_arguments", %{source_account: source_account} do
+    {:error, :invalid_time_bounds} = TxBuild.new(source_account, time_bounds: nil)
   end
 
   test "add_memo/2", %{tx_build: tx_build} do
@@ -48,9 +82,24 @@ defmodule Stellar.TxBuild.DefaultTest do
     %TxBuild{tx: %Transaction{memo: ^memo}} = TxBuild.add_memo(tx_build, memo)
   end
 
-  test "set_timeout/2", %{tx_build: tx_build} do
-    timeout = TimeBounds.set_max_time(123_456_789)
-    %TxBuild{tx: %Transaction{time_bounds: ^timeout}} = TxBuild.set_timeout(tx_build, timeout)
+  test "set_time_bounds/2", %{tx_build: tx_build} do
+    time_bounds = TimeBounds.new(min_time: 0, max_time: 123_456_789)
+
+    %TxBuild{tx: %Transaction{time_bounds: ^time_bounds}} =
+      TxBuild.set_time_bounds(tx_build, time_bounds)
+  end
+
+  test "set_sequence_number/2", %{tx_build: tx_build} do
+    seq_number = SequenceNumber.new(123_456_789)
+
+    %TxBuild{tx: %Transaction{sequence_number: ^seq_number}} =
+      TxBuild.set_sequence_number(tx_build, seq_number)
+  end
+
+  test "set_base_fee/2", %{tx_build: tx_build} do
+    base_fee = BaseFee.new(1_500)
+
+    %TxBuild{tx: %Transaction{base_fee: ^base_fee}} = TxBuild.set_base_fee(tx_build, base_fee)
   end
 
   test "add_operation/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
