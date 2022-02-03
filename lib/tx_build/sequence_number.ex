@@ -2,7 +2,6 @@ defmodule Stellar.TxBuild.SequenceNumber do
   @moduledoc """
   `SequenceNumber` struct definition.
   """
-  alias Stellar.TxBuild.Account
   alias StellarBase.XDR.SequenceNumber
 
   @behaviour Stellar.TxBuild.XDR
