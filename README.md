@@ -59,15 +59,14 @@ Stellar relies on public key cryptography to ensure that transactions are secure
 [Transactions][stellar-docs-tx] are commands that modify the ledger state. They consist of a list of operations (up to 100) used to send payments, enter orders into the decentralized exchange, change settings on accounts, and authorize accounts to hold assets.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # initialize a transaction
 Stellar.TxBuild.new(source_account)
 
 # initialize a transaction with options
-# allowed options: sequence_number, base_fee, time_bounds, memo
+# allowed options: memo, sequence_number, base_fee, time_bounds
 Stellar.TxBuild.new(source_account, memo: memo, sequence_number: sequence_number)
 ```
 
@@ -80,18 +79,17 @@ A [memo][stellar-docs-memo] contains optional extra information for the transact
 * **`MEMO_RETURN`** : A 32 byte hash intended to be interpreted as the hash of the transaction the sender is refunding.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# set a memo
+# build a memo
 memo = Stellar.TxBuild.Memo.new(:none)
 memo = Stellar.TxBuild.Memo.new(text: "MEMO")
 memo = Stellar.TxBuild.Memo.new(id: 123_4565)
 memo = Stellar.TxBuild.Memo.new(hash: "0859239b58d3f32972fc9124559cea7251225f2dbc6f0d83f67dc041e6608510")
 memo = Stellar.TxBuild.Memo.new(return: "d83f67dc041e66085100859239b58d3f32924559cea72512272fc915f2dbc6f0")
 
-# add a memo to a transaction
+# add a memo for the transaction
 tx =
   source_account
   |> Stellar.TxBuild.new()
@@ -102,17 +100,16 @@ tx =
 Each transaction has a [sequence number][stellar-docs-sequence-number] associated with the source account. Transactions follow a strict ordering rule when it comes to processing transactions per account in order to prevent double-spending.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# fetch next sequence number for the source account from Horizon API
+# fetch next account's sequence number from Horizon
 {:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# set the sequence number
+# build a sequence number
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
-# add sequence number to a transaction
+# set the sequence number for the transaction
 tx =
   source_account
   |> Stellar.TxBuild.new()
@@ -123,14 +120,13 @@ tx =
 Each transaction incurs a [fee][stellar-docs-fee], which is paid by the source account. When you submit a transaction, you set the maximum that you are willing to pay per operation, but you’re charged the minimum fee possible based on network activity.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# set a transaction fee
+# build a fee
 base_fee = Stellar.TxBuild.BaseFee.new(1_000)
 
-# add a fee to a transaction
+# set a fee for the transaction
 tx =
   source_account
   |> Stellar.TxBuild.new()
@@ -141,29 +137,28 @@ tx =
 [TimeBounds][stellar-docs-time-bounds] are optional UNIX timestamps (in seconds), determined by ledger time. A lower and upper bound of when this transaction will be valid.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # no time bounds for a transaction
 time_bounds = Stellar.TxBuild.TimeBounds.new(:none)
 
-# set the time bounds using UNIX timestamps
+# time bounds using UNIX timestamps
 time_bounds = Stellar.TxBuild.TimeBounds.new(
     min_time: 1_643_558_792,
     max_time: 1_643_990_815
   )
 
-# set the time bounds using DateTime
+# time bounds using DateTime
 time_bounds = Stellar.TxBuild.TimeBounds.new(
     min_time: ~U[2022-01-30 16:06:32.963238Z],
     max_time: ~U[2022-02-04 16:06:55.734317Z]
   )
 
-# set a timeout
+# timeout
 time_bounds = Stellar.TxBuild.TimeBounds.set_timeout(1_643_990_815)
 
-# add time bounds to a transaction
+# set the time bounds for the transaction
 tx =
   source_account
   |> Stellar.TxBuild.new()
@@ -174,19 +169,18 @@ tx =
 [Operations][stellar-docs-list-operations] represent a desired change to the ledger: payments, offers to exchange currency, changes made to account options, etc. Operations are submitted to the Stellar network grouped in a Transaction. Single transactions may have up to 100 operations.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build a create_account operation
-# the destination account GDWD... should exist in the ledger
+# the destination account does not exist in the ledger
 create_account_op = Stellar.TxBuild.CreateAccount.new(
     destination: "GDWD36NCYNN4UFX63F2235QGA2XVGTXG7NQW6MN754SHTQM4XSLTXLYK",
     starting_balance: 2
   )
 
 # build a payment operation
-# the destination account GDWD... should exist in the ledger
+# the destination account should exist in the ledger
 payment_op = Stellar.TxBuild.Payment.new(
     destination: "GDWD36NCYNN4UFX63F2235QGA2XVGTXG7NQW6MN754SHTQM4XSLTXLYK",
     asset: :native,
@@ -213,20 +207,19 @@ Stellar uses [signatures][stellar-docs-tx-signatures] as authorization. Transact
 In two cases, a transaction may need more than one signature. If the transaction has operations that affect more than one account, it will need authorization from every account in question. A transaction will also need additional signatures if the account associated with the transaction has multiple public keys.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build an operation
-# GDWD... destination account already exists in the ledger
+# the destination account should exist in the ledger
 operation = Stellar.TxBuild.Payment.new(
     destination: "GDWD36NCYNN4UFX63F2235QGA2XVGTXG7NQW6MN754SHTQM4XSLTXLYK",
     asset: :native,
     amount: 5
   )
 
-# build the transaction signatures
-# SBJJ... SA2N... signer accounts should exist in the ledger
+# build transaction signatures
+# signer accounts should exist in the ledger
 signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
 signer_key_pair2 = Stellar.KeyPair.from_secret_seed("SA2NWVOPQMQYAU5RATOE7HJLMPLQZRNPGSOQGGEG6P2ZSYTWFORY5AV5")
 
@@ -253,12 +246,11 @@ tx =
 Once a transaction has been filled out, it is wrapped in a [Transaction envelope][stellar-docs-tx-envelope] containing the transaction as well as a set of signatures.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build an operation
-# GDW... the destination account should exist in the ledger
+# the destination account should exist in the ledger
 operation = Stellar.TxBuild.Payment.new(
     destination: "GDWD36NCYNN4UFX63F2235QGA2XVGTXG7NQW6MN754SHTQM4XSLTXLYK",
     asset: :native,
@@ -266,7 +258,7 @@ operation = Stellar.TxBuild.Payment.new(
   )
 
 # build the transaction signatures
-# SBJJ... should be an account that already exists in the ledger
+# signer account should exist in the ledger
 signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
 signature = Stellar.TxBuild.Signature.new(signer_key_pair)
 
@@ -285,11 +277,10 @@ tx =
 The transaction can now be submitted to the Stellar network.
 
 ```elixir
-# set the source account
-# GDC3... should be an account that already exists in the ledger
+# set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# fetch next sequence number for the source account from Horizon API
+# fetch next account's sequence number from Horizon
 {:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # set the sequence number
@@ -299,7 +290,7 @@ sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 memo = Stellar.TxBuild.Memo.new(text: "MEMO")
 
 # build an operation
-# GDW... the destination account should exist in the ledger
+# the destination account should exist in the ledger
 operation = Stellar.TxBuild.Payment.new(
     destination: "GDWD36NCYNN4UFX63F2235QGA2XVGTXG7NQW6MN754SHTQM4XSLTXLYK",
     asset: :native,
@@ -307,7 +298,7 @@ operation = Stellar.TxBuild.Payment.new(
   )
 
 # build the transaction signatures
-# SBJJ... should be an account that already exists in the ledger
+# signer account should exist in the ledger
 signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
 signature = Stellar.TxBuild.Signature.new(signer_key_pair)
 
