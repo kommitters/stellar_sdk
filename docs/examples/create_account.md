@@ -1,8 +1,4 @@
----
-title: Create an account
----
-
-## Create an account
+# Creating an account
 
 ```elixir
 # 1. set the founder account

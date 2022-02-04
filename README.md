@@ -324,7 +324,7 @@ base64_envelope =
 {:ok, submitted_tx} = Stellar.Horizon.Transactions.create(base64_envelope)
 ```
 
-More examples can be found in the [**tests**](/test/tx_build/).
+More examples can be found in the [**tests**][sdk-tests].
 
 ---
 
@@ -354,6 +354,7 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [contributing]: https://github.com/kommitters/stellar_sdk/blob/main/CONTRIBUTING.md
 [base]: https://github.com/kommitters/stellar_base
 [sdk]: https://github.com/kommitters/stellar_sdk
+[sdk-tests]: https://github.com/kommitters/stellar_sdk/blob/main/test/tx_build
 [hex]: https://hex.pm/packages/stellar_sdk
 [stellar]: https://www.stellar.org/
 [http_client_spec]: https://github.com/kommitters/stellar_sdk/blob/main/lib/horizon/client/spec.ex

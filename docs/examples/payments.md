@@ -1,6 +1,4 @@
----
-title: Payments
----
+# Payments
 
 ## XLM-native payment
 
