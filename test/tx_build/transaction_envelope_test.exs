@@ -3,13 +3,40 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
 
   import Stellar.Test.XDRFixtures, only: [transaction_envelope_xdr: 2]
 
-  alias Stellar.TxBuild.{Account, Signature, Transaction, TransactionEnvelope}
+  alias Stellar.TxBuild.{
+    Account,
+    BaseFee,
+    CreateAccount,
+    Memo,
+    Operation,
+    Operations,
+    SequenceNumber,
+    Signature,
+    TimeBounds,
+    Transaction,
+    TransactionEnvelope
+  }
 
   setup do
     public_key = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
     secret = "SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z"
-    account = Account.new(public_key)
-    tx = Transaction.new(account)
+    source_account = Account.new(public_key)
+
+    op =
+      [destination: public_key, starting_balance: 1.5]
+      |> CreateAccount.new()
+      |> Operation.new()
+
+    tx =
+      Transaction.new(
+        source_account: source_account,
+        sequence_number: SequenceNumber.new(123_456),
+        base_fee: BaseFee.new(500),
+        time_bounds: TimeBounds.new(:none),
+        memo: Memo.new(:none),
+        operations: Operations.new([op])
+      )
+
     signature = Signature.new({public_key, secret})
     signatures = [signature]
 
@@ -19,7 +46,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
       tx_envelope: TransactionEnvelope.new(tx, signatures),
       tx_envelope_xdr: transaction_envelope_xdr(tx, signatures),
       tx_envelope_base64:
-        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQADqyoAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAECU7VvLeuntfRiJCTGesLDUPwt1TimPBEhjCBhmxSnjuxd63ubjGT+8c9ec6uuAMC8WrT21WOx9MQSma6YIWaEB"
+        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAw1AAAAAAAAHiQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAP+vE9o3jcA09johM/VtYWpdEhIl0TD4eRCmqtPEhGJNAAAAAADk4cAAAAAAAAAAAcSEYk0AAABA/ZXTNzCemP6Mwb/SGIUGhFKk/w4VVurCsJf7td7LrConewwxkrQGNuaYODTVlqQFHNp8RhZQtI/i5lDQ5Z5qAQ=="
     }
   end
 

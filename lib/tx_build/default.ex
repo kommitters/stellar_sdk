@@ -10,6 +10,7 @@ defmodule Stellar.TxBuild.Default do
     BaseFee,
     Operation,
     Operations,
+    SequenceNumber,
     Signature,
     TimeBounds,
     Transaction,
@@ -19,8 +20,27 @@ defmodule Stellar.TxBuild.Default do
   @behaviour Stellar.TxBuild.Spec
 
   @impl true
-  def new(%Account{} = account, opts \\ []) do
-    %TxBuild{tx: Transaction.new(account, opts), signatures: [], tx_envelope: nil}
+  def new(%Account{} = source_account, opts \\ []) do
+    sequence_number = Keyword.get(opts, :sequence_number, SequenceNumber.new())
+    base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
+    time_bounds = Keyword.get(opts, :time_bounds, TimeBounds.new())
+    memo = Keyword.get(opts, :memo, Memo.new())
+    operations = Keyword.get(opts, :operations, Operations.new())
+
+    case Transaction.new(
+           source_account: source_account,
+           sequence_number: sequence_number,
+           base_fee: base_fee,
+           time_bounds: time_bounds,
+           memo: memo,
+           operations: operations
+         ) do
+      %Transaction{} = transaction ->
+        %TxBuild{tx: transaction, signatures: [], tx_envelope: nil}
+
+      error ->
+        error
+    end
   end
 
   @impl true
@@ -30,8 +50,20 @@ defmodule Stellar.TxBuild.Default do
   end
 
   @impl true
-  def set_timeout(%TxBuild{tx: tx} = tx_build, %TimeBounds{} = timeout) do
+  def set_time_bounds(%TxBuild{tx: tx} = tx_build, %TimeBounds{} = timeout) do
     transaction = %{tx | time_bounds: timeout}
+    %{tx_build | tx: transaction}
+  end
+
+  @impl true
+  def set_base_fee(%TxBuild{tx: tx} = tx_build, %BaseFee{} = base_fee) do
+    transaction = %{tx | base_fee: base_fee}
+    %{tx_build | tx: transaction}
+  end
+
+  @impl true
+  def set_sequence_number(%TxBuild{tx: tx} = tx_build, %SequenceNumber{} = sequence_number) do
+    transaction = %{tx | sequence_number: sequence_number}
     %{tx_build | tx: transaction}
   end
 

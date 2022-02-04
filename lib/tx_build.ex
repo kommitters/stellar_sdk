@@ -26,7 +26,14 @@ defmodule Stellar.TxBuild do
   def add_memo(tx, memo), do: impl().add_memo(tx, memo)
 
   @impl true
-  def set_timeout(tx, time_bounds), do: impl().set_timeout(tx, time_bounds)
+  def set_time_bounds(tx, time_bounds), do: impl().set_time_bounds(tx, time_bounds)
+
+  @impl true
+  def set_base_fee(tx, timeout), do: impl().set_base_fee(tx, timeout)
+
+  @impl true
+  def set_sequence_number(tx, sequence_number),
+    do: impl().set_sequence_number(tx, sequence_number)
 
   @impl true
   def add_operation(tx, operation), do: impl().add_operation(tx, operation)
