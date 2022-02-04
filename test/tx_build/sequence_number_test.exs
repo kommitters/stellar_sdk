@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.SequenceNumberTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.SequenceNumber, as: SequenceNumberXDR
-  alias Stellar.TxBuild.{SequenceNumber}
+  alias Stellar.TxBuild.SequenceNumber
 
   setup do
     %{sequence_number: 4_130_487_228_432_385}
