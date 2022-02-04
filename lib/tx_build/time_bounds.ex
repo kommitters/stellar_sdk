@@ -6,8 +6,8 @@ defmodule Stellar.TxBuild.TimeBounds do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type date_time :: DateTime.t() | non_neg_integer()
   @type unix_date_time :: non_neg_integer()
+  @type date_time :: DateTime.t() | unix_date_time()
   @type validation :: {:ok, unix_date_time()} | {:error, :atom}
 
   @type t :: %__MODULE__{min_time: unix_date_time(), max_time: unix_date_time()}
