@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
@@ -74,8 +74,9 @@ defmodule Stellar.MixProject do
       source_ref: "v#{@version}",
       source_url: @github_url,
       canonical: "http://hexdocs.pm/stellar_sdk",
-      extras: ["README.md", "CHANGELOG.md", "CONTRIBUTING.md"],
-      groups_for_modules: groups_for_modules()
+      extras: extras(),
+      groups_for_modules: groups_for_modules(),
+      groups_for_extras: groups_for_extras()
     ]
   end
 
@@ -84,6 +85,23 @@ defmodule Stellar.MixProject do
       Horizon: ~r/^Stellar\.Horizon\./,
       KeyPair: ~r/^Stellar\.KeyPair\./,
       TxBuild: ~r/^Stellar\.TxBuild\./
+    ]
+  end
+
+  defp extras() do
+    [
+      "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "docs/examples.md",
+      "docs/examples/create_account.md",
+      "docs/examples/payments.md"
+    ]
+  end
+
+  defp groups_for_extras do
+    [
+      Examples: ~r/docs\/examples\/.?/
     ]
   end
 end
