@@ -1,8 +1,8 @@
-defmodule StellarSDK.MixProject do
+defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
@@ -30,16 +30,18 @@ defmodule StellarSDK.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {StellarSDK.Application, []}
+      mod: {Stellar.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.1.0"},
+      {:stellar_base, "~> 0.3.0"},
+      {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17", optional: true},
-      {:mox, "~> 1.0", only: :test},
+      {:jason, "~> 1.0", optional: true},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.24", only: :dev, runtime: false}
@@ -72,14 +74,34 @@ defmodule StellarSDK.MixProject do
       source_ref: "v#{@version}",
       source_url: @github_url,
       canonical: "http://hexdocs.pm/stellar_sdk",
-      extras: ["README.md", "CHANGELOG.md", "CONTRIBUTING.md"],
-      groups_for_modules: groups_for_modules()
+      extras: extras(),
+      groups_for_modules: groups_for_modules(),
+      groups_for_extras: groups_for_extras()
     ]
   end
 
   defp groups_for_modules do
     [
-      Horizon: ~r/^StellarSDK\.Horizon\./
+      Horizon: ~r/^Stellar\.Horizon\./,
+      KeyPair: ~r/^Stellar\.KeyPair\./,
+      TxBuild: ~r/^Stellar\.TxBuild\./
+    ]
+  end
+
+  defp extras() do
+    [
+      "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "docs/examples.md",
+      "docs/examples/create_account.md",
+      "docs/examples/payments.md"
+    ]
+  end
+
+  defp groups_for_extras do
+    [
+      Examples: ~r/docs\/examples\/.?/
     ]
   end
 end

@@ -1,22 +1,17 @@
-defmodule StellarSDK.Horizon.Client do
+defmodule Stellar.Horizon.Client do
   @moduledoc """
-  Specifies expected behaviour of an HTTP client.
-  Stellar allows you to use your HTTP client of choice, provided that it can be coerced into complying with this module's specification.
-  The default is :hackney.
+  Specifies the API for processing HTTP requests in the Stellar network.
   """
+  alias Stellar.Horizon.Client
 
-  @type method :: :get | :post | :put | :delete
-  @type headers :: [{binary(), binary()}, ...]
-  @type options :: Keyword.t()
-  @type response :: {:ok, non_neg_integer(), headers()}
-  @type response_with_body :: {:ok, non_neg_integer(), headers(), binary()}
-  @type response_error :: {:error, any()}
+  @behaviour Client.Spec
 
-  @callback request(
-              method :: method(),
-              url :: binary(),
-              body :: binary(),
-              headers :: headers(),
-              options :: options()
-            ) :: response() | response_with_body() | response_error()
+  @impl true
+  def request(method, path, headers \\ [], body \\ "", opts \\ []),
+    do: impl().request(method, path, headers, body, opts)
+
+  @spec impl() :: atom()
+  defp impl do
+    Application.get_env(:stellar_sdk, :http_client_impl, Client.Default)
+  end
 end
