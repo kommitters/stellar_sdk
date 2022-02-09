@@ -27,6 +27,16 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def from_raw_public_key(public_key) do
+    StrKey.encode!(public_key, :ed25519_public_key)
+  end
+
+  @impl true
+  def from_raw_muxed_account(muxed_account) do
+    StrKey.encode!(muxed_account, :muxed_account)
+  end
+
+  @impl true
   def raw_public_key(public_key) do
     StrKey.decode!(public_key, :ed25519_public_key)
   end
@@ -34,6 +44,11 @@ defmodule Stellar.KeyPair.Default do
   @impl true
   def raw_secret_seed(secret) do
     StrKey.decode!(secret, :ed25519_secret_seed)
+  end
+
+  @impl true
+  def raw_muxed_account(muxed_account) do
+    StrKey.decode!(muxed_account, :muxed_account)
   end
 
   @impl true
@@ -45,22 +60,26 @@ defmodule Stellar.KeyPair.Default do
   def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
 
   @impl true
-  def validate_public_key(public_key) when byte_size(public_key) == 56 do
+  def validate_public_key(public_key) do
     case StrKey.decode(public_key, :ed25519_public_key) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_public_key}
     end
   end
 
-  def validate_public_key(_public_key), do: {:error, :invalid_ed25519_public_key}
-
   @impl true
-  def validate_secret_seed(secret) when byte_size(secret) == 56 do
-    case StrKey.decode(secret, :ed25519_secret_seed) do
-      {:ok, _secret} -> :ok
-      {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
+  def validate_muxed_account(muxed_account) do
+    case StrKey.decode(muxed_account, :muxed_account) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_ed25519_muxed_account}
     end
   end
 
-  def validate_secret_seed(_secret), do: {:error, :invalid_ed25519_secret_seed}
+  @impl true
+  def validate_secret_seed(secret) do
+    case StrKey.decode(secret, :ed25519_secret_seed) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
+    end
+  end
 end
