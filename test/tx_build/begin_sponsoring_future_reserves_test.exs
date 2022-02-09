@@ -21,7 +21,7 @@ defmodule Stellar.TxBuild.BeginSponsoringFutureReservesTest do
   end
 
   test "new/2 with_invalid_sponsored_id" do
-    {:error, [sponsored_id: :invalid_account_id]} =
+    {:error, [sponsored_id: :invalid_ed25519_public_key]} =
       BeginSponsoringFutureReserves.new(sponsored_id: "ABC")
   end
 

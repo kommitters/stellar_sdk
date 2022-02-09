@@ -20,7 +20,7 @@ defmodule Stellar.TxBuild.AccountMergeTest do
   end
 
   test "new/2 with_invalid_destination" do
-    {:error, [destination: :invalid_account_id]} = AccountMerge.new(destination: "ABC")
+    {:error, [destination: :invalid_ed25519_public_key]} = AccountMerge.new(destination: "ABC")
   end
 
   test "new/2 with_invalid_attributes" do

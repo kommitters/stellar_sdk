@@ -66,7 +66,7 @@ defmodule Stellar.TxBuild.PathPaymentStrictReceiveTest do
   end
 
   test "new/2 with_invalid_destination" do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       PathPaymentStrictReceive.new(
         destination: "ABC",
         send_asset: :native,

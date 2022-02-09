@@ -29,7 +29,7 @@ defmodule Stellar.TxBuild.CreateAccountTest do
   end
 
   test "new/2 with_invalid_destination", %{amount: amount} do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       CreateAccount.new(destination: "ABC", starting_balance: amount)
   end
 
