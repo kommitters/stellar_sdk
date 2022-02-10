@@ -1,6 +1,6 @@
 defmodule Stellar.Test.Fixtures.XDR do
   @moduledoc """
-  Mocks XDR constructions.
+  Mocks for XDR constructions.
   """
 
   alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions}
