@@ -50,7 +50,9 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
   def transaction(_address), do: :error
 
   @spec transaction_with_muxed_account(address :: address()) :: xdr()
-  def transaction_with_muxed_account("MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ") do
+  def transaction_with_muxed_account(
+        "MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ"
+      ) do
     %Transaction{
       ext: %Ext{type: 0, value: %Void{value: nil}},
       fee: %UInt32{datum: 100},
