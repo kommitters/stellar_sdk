@@ -26,7 +26,7 @@ defmodule Stellar.TxBuild.AccountTest do
       %Account{
         address: ^muxed_address,
         account_id: ^account_id,
-        id: 4,
+        muxed_id: 4,
         type: :ed25519_muxed_account
       } = Account.new(muxed_address)
     end
@@ -67,7 +67,7 @@ defmodule Stellar.TxBuild.AccountTest do
       %Account{
         address: ^muxed_address,
         account_id: ^account_id,
-        id: 4,
+        muxed_id: 4,
         type: :ed25519_muxed_account
       } = Account.create_muxed(account_id, 4)
     end

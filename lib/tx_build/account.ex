@@ -9,25 +9,30 @@ defmodule Stellar.TxBuild.Account do
 
   @type address :: String.t()
   @type account_id :: String.t()
-  @type id :: integer() | nil
+  @type muxed_id :: integer() | nil
   @type type :: :ed25519_public_key | :ed25519_muxed_account
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
 
-  @type t :: %__MODULE__{address: address(), account_id: account_id(), id: id(), type: type()}
+  @type t :: %__MODULE__{
+          address: address(),
+          account_id: account_id(),
+          muxed_id: muxed_id(),
+          type: type()
+        }
 
-  defstruct [:address, :account_id, :id, :type]
+  defstruct [:address, :account_id, :muxed_id, :type]
 
   @impl true
   def new(address, opts \\ [])
 
   def new(address, _opts) when byte_size(address) == 69 do
     with {:ok, address} <- validate_muxed_address(address),
-         {:ok, {account_id, id}} <- parse_muxed_address(address) do
+         {:ok, {account_id, muxed_id}} <- parse_muxed_address(address) do
       %__MODULE__{
         address: address,
         account_id: account_id,
-        id: id,
+        muxed_id: muxed_id,
         type: :ed25519_muxed_account
       }
     end
@@ -50,11 +55,11 @@ defmodule Stellar.TxBuild.Account do
   def new(_address, _opts), do: {:error, :invalid_ed25519_public_key}
 
   @impl true
-  def to_xdr(%__MODULE__{account_id: account_id, id: id, type: :ed25519_muxed_account}) do
+  def to_xdr(%__MODULE__{account_id: account_id, muxed_id: muxed_id, type: :ed25519_muxed_account}) do
     type = CryptoKeyType.new(:KEY_TYPE_MUXED_ED25519)
     ed25519_public_key_xdr = ed25519_public_key_xdr(account_id)
 
-    id
+    muxed_id
     |> UInt64.new()
     |> MuxedAccountMed25519.new(ed25519_public_key_xdr)
     |> MuxedAccount.new(type)
@@ -67,11 +72,12 @@ defmodule Stellar.TxBuild.Account do
     MuxedAccount.new(ed25519_public_key_xdr, type)
   end
 
-  @spec create_muxed(account_id :: account_id(), id :: id()) :: t()
-  def create_muxed(account_id, id) when byte_size(account_id) == 56 and is_integer(id) do
+  @spec create_muxed(account_id :: account_id(), muxed_id :: muxed_id()) :: t()
+  def create_muxed(account_id, muxed_id)
+      when byte_size(account_id) == 56 and is_integer(muxed_id) do
     account_id
     |> KeyPair.raw_public_key()
-    |> Kernel.<>(<<id::big-unsigned-integer-size(64)>>)
+    |> Kernel.<>(<<muxed_id::big-unsigned-integer-size(64)>>)
     |> KeyPair.from_raw_muxed_account()
     |> new()
   end
@@ -94,7 +100,7 @@ defmodule Stellar.TxBuild.Account do
     end
   end
 
-  @spec parse_muxed_address(address :: address()) :: {:ok, {account_id(), id()}} | error()
+  @spec parse_muxed_address(address :: address()) :: {:ok, {account_id(), muxed_id()}} | error()
   defp parse_muxed_address(address) do
     address
     |> KeyPair.raw_muxed_account()
@@ -102,10 +108,10 @@ defmodule Stellar.TxBuild.Account do
   end
 
   @spec encode_muxed_address(decoded_address :: binary()) ::
-          {:ok, {account_id(), id()}} | error()
-  defp encode_muxed_address(<<decoded::binary-size(32), id::big-unsigned-integer-size(64)>>) do
+          {:ok, {account_id(), muxed_id()}} | error()
+  defp encode_muxed_address(<<decoded::binary-size(32), muxed_id::big-unsigned-integer-size(64)>>) do
     ed25519_key = KeyPair.from_raw_public_key(decoded)
-    {:ok, {ed25519_key, id}}
+    {:ok, {ed25519_key, muxed_id}}
   end
 
   defp encode_muxed_address(_muxed_account), do: {:error, :invalid_muxed_address}
