@@ -33,7 +33,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
   end
 
   test "validate_account_id/1 error" do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       Validations.validate_account_id({:destination, "ABC"})
   end
 
@@ -48,7 +48,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
   end
 
   test "validate_optional_account_id/1 error" do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       Validations.validate_optional_account_id({:destination, "2"})
   end
 
@@ -57,7 +57,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
   end
 
   test "validate_account/1 error" do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       Validations.validate_account_id({:destination, "ABC"})
   end
 

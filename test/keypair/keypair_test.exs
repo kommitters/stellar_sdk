@@ -16,6 +16,12 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
+  def from_raw_public_key(_public_key) do
+    send(self(), {:from_raw_public_key, "PUBLIC_KEY"})
+    :ok
+  end
+
+  @impl true
   def raw_public_key(_public_key) do
     send(self(), {:raw_public_key, "RAW_PUBLIC_KEY"})
     :ok
@@ -24,6 +30,12 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   @impl true
   def raw_secret_seed(_secret) do
     send(self(), {:raw_secret, "RAW_SECRET"})
+    :ok
+  end
+
+  @impl true
+  def raw_muxed_account(_muxed_account) do
+    send(self(), {:raw_muxed_account, "RAW_MUXED_ACCOUNT"})
     :ok
   end
 
@@ -42,6 +54,12 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   @impl true
   def validate_secret_seed(_secret) do
     send(self(), {:ok, "SECRET_SEED"})
+    :ok
+  end
+
+  @impl true
+  def validate_muxed_account(_muxed_account) do
+    send(self(), {:validate_muxed_account, "MUXED_ACCOUNT"})
     :ok
   end
 end
@@ -69,6 +87,11 @@ defmodule Stellar.KeyPairTest do
     assert_receive({:secret, "SECRET"})
   end
 
+  test "from_raw_public_key/2" do
+    Stellar.KeyPair.from_raw_public_key("RAW_PUBLIC_KEY")
+    assert_receive({:from_raw_public_key, "PUBLIC_KEY"})
+  end
+
   test "raw_public_key/1" do
     Stellar.KeyPair.raw_public_key("RAW_PUBLIC_KEY")
     assert_receive({:raw_public_key, "RAW_PUBLIC_KEY"})
@@ -77,6 +100,11 @@ defmodule Stellar.KeyPairTest do
   test "raw_secret_seed/1" do
     Stellar.KeyPair.raw_secret_seed("SECRET")
     assert_receive({:raw_secret, "RAW_SECRET"})
+  end
+
+  test "raw_muxed_account/2" do
+    Stellar.KeyPair.raw_muxed_account("MUXED_ACCOUNT")
+    assert_receive({:raw_muxed_account, "RAW_MUXED_ACCOUNT"})
   end
 
   test "sign/2" do
@@ -92,5 +120,10 @@ defmodule Stellar.KeyPairTest do
   test "validate_secret_seed/1" do
     Stellar.KeyPair.validate_secret_seed("SECRET_SEED")
     assert_receive({:ok, "SECRET_SEED"})
+  end
+
+  test "validate_muxed_account/2" do
+    Stellar.KeyPair.validate_muxed_account("MUXED_ACCOUNT")
+    assert_receive({:validate_muxed_account, "MUXED_ACCOUNT"})
   end
 end

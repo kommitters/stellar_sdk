@@ -33,7 +33,7 @@ defmodule Stellar.TxBuild.PaymentTest do
   end
 
   test "new/2 with_invalid_destination" do
-    {:error, [destination: :invalid_account_id]} =
+    {:error, [destination: :invalid_ed25519_public_key]} =
       Payment.new(
         destination: "ABC",
         asset: :native,
