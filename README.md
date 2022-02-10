@@ -19,7 +19,7 @@ This library is aimed at developers building Elixir applications that interact w
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.2.0"}
+    {:stellar_sdk, "~> 0.3.0"}
   ]
 end
 ```
@@ -43,6 +43,40 @@ config :stellar_sdk, :http_client_impl, YourApp.CustomClientImpl
 ```
 
 ## Usage
+
+### Accounts
+Accounts are the central data structure in Stellar. They hold balances, sign transactions, and issue assets. All entries that persist on the ledger are owned by a particular account.
+
+```elixir
+# initialize an account
+account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
+
+```
+
+### Muxed accounts
+A **muxed** (or **multiplexed**) account is an account that exists “virtually” under a traditional Stellar account address. It combines the familiar `GABC...` address with a `64-bit` integer `ID` and can be used to distinguish multiple “virtual” accounts that share an underlying “real” account. More details in [**CAP-27**][stellar-cap-27].
+
+```elixir
+# initialize an account with a muxed address
+account = Stellar.TxBuild.Account.new("MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ")
+
+account.account_id
+# GBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMQQH
+
+account.muxed_id
+# 4
+
+```
+#### Create a muxed account
+
+```elixir
+# create a muxed account
+account = Stellar.TxBuild.Account.create_muxed("GBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMQQH", 4)
+
+account.address
+# MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ
+
+```
 
 ### KeyPairs
 Stellar relies on public key cryptography to ensure that transactions are secure: every account requires a valid keypair consisting of a public key and a private key.
@@ -106,7 +140,7 @@ source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQW
 # fetch next account's sequence number from Horizon
 {:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
-# build a sequence number
+# set the sequence number
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # set the sequence number for the transaction
@@ -358,3 +392,4 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [stellar-docs-tx-envelope]: https://developers.stellar.org/docs/glossary/transactions/#transaction-envelopes
 [stellar-docs-list-operations]: https://developers.stellar.org/docs/start/list-of-operations
 [stellar-docs-tx-signatures]: https://developers.stellar.org/docs/glossary/multisig/#transaction-signatures
+[stellar-cap-27]: https://stellar.org/protocol/cap-27

@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0 (11.02.2022)
+* CAP-0027 Add suport for multiplexed accounts.
+
 ## 0.2.0 (07.02.2022)
 * Add base documentation and initial examples.
 * Dynamically update the transaction's BaseFee.
