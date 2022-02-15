@@ -18,8 +18,10 @@ defmodule Stellar.TxBuild.AccountID do
   def new(account_id, opts \\ [])
 
   def new(account_id, _opts) do
-    with {:ok, account_id} <- validate_raw_account_id(account_id),
-         do: %__MODULE__{account_id: account_id}
+    case KeyPair.validate_public_key(account_id) do
+      :ok -> %__MODULE__{account_id: account_id}
+      error -> error
+    end
   end
 
   @impl true
@@ -31,13 +33,5 @@ defmodule Stellar.TxBuild.AccountID do
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
-  end
-
-  @spec validate_raw_account_id(account_id :: String.t()) :: validation()
-  defp validate_raw_account_id(account_id) do
-    case KeyPair.validate_public_key(account_id) do
-      :ok -> {:ok, account_id}
-      _error -> {:error, :invalid_account_id}
-    end
   end
 end

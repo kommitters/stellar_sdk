@@ -18,7 +18,7 @@ defmodule Stellar.TxBuild.AccountIDTest do
   end
 
   test "new/2 invalid_key" do
-    {:error, :invalid_account_id} = AccountID.new("ABCD")
+    {:error, :invalid_ed25519_public_key} = AccountID.new("ABCD")
   end
 
   test "to_xdr/1", %{xdr: xdr, account_id: account_id} do

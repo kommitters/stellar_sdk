@@ -33,7 +33,7 @@ defmodule Stellar.TxBuild.ClawbackTest do
   end
 
   test "new/2 with_invalid_from" do
-    {:error, [from: :invalid_account_id]} =
+    {:error, [from: :invalid_ed25519_public_key]} =
       Clawback.new(
         asset: :native,
         from: "ABC",

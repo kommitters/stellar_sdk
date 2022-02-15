@@ -101,7 +101,7 @@ defmodule Stellar.TxBuild.SetOptionsTest do
   end
 
   test "new/2 with_invalid_destination" do
-    {:error, [inflation_destination: :invalid_account_id]} =
+    {:error, [inflation_destination: :invalid_ed25519_public_key]} =
       SetOptions.new(inflation_destination: "ABC", master_weight: 1)
   end
 
