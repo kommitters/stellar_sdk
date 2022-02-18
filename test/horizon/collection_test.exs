@@ -37,26 +37,4 @@ defmodule Stellar.Horizon.CollectionTest do
       } = Collection.new({Transaction, response})
     end
   end
-
-  describe "query_arguments/2" do
-    test "valid" do
-      "?cursor=12345&order=desc&limit=25" =
-        Collection.query_arguments(cursor: 12_345, order: :desc, limit: 25)
-    end
-
-    test "extra_arguments" do
-      "?cursor=12345&include_failed=true" =
-        Collection.query_arguments([cursor: 12_345, include_failed: true],
-          extra_args: [:include_failed]
-        )
-    end
-
-    test "invalid_arguments" do
-      "?cursor=12345" = Collection.query_arguments(cursor: 12_345, test: true)
-    end
-
-    test "no_arguments" do
-      "" = Collection.query_arguments([])
-    end
-  end
 end
