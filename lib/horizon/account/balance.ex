@@ -8,7 +8,7 @@ defmodule Stellar.Horizon.Account.Balance do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          balance: non_neg_integer(),
+          balance: float(),
           asset_type: String.t(),
           buying_liabilities: float(),
           selling_liabilities: float(),

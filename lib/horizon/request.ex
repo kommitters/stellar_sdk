@@ -95,12 +95,12 @@ defmodule Stellar.Horizon.Request do
   def results(error, _resource), do: error
 
   @spec build_request_url(request :: t()) :: binary()
-  def build_request_url(%__MODULE__{
-        endpoint: endpoint,
-        path: path,
-        segment: segment,
-        encoded_query: encoded_query
-      }) do
+  defp build_request_url(%__MODULE__{
+         endpoint: endpoint,
+         path: path,
+         segment: segment,
+         encoded_query: encoded_query
+       }) do
     IO.iodata_to_binary([
       if(endpoint, do: ["/" | endpoint], else: []),
       if(path, do: ["/" | path], else: []),
@@ -110,12 +110,16 @@ defmodule Stellar.Horizon.Request do
   end
 
   @spec build_query_string(params :: params(), query_params :: query_params()) :: encoded_query()
-  def build_query_string(params, query_params) do
+  defp build_query_string(params, query_params) do
     params
     |> Keyword.take(query_params)
     |> Enum.reject(&is_empty_param/1)
-    |> URI.encode_query()
+    |> encode_query()
   end
+
+  @spec encode_query(query :: query()) :: encoded_query()
+  defp encode_query([]), do: nil
+  defp encode_query(query), do: URI.encode_query(query)
 
   @spec is_empty_param(param :: {atom(), any()}) :: boolean()
   defp is_empty_param({_key, nil}), do: true
