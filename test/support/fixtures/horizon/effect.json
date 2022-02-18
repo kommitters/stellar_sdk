@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon-testnet.stellar.org/operations/549755817992"
+    },
+    "precedes": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=asc&cursor=549755817992-1"
+    },
+    "succeeds": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=desc&cursor=549755817992-1"
+    }
+  },
+  "account": "GCNP7JE6KR5CKHMVVFTZJUSP7ALAXWP62SK6IMIY4IF3JCHEZKBJKDZF",
+  "asset_code": "TEST",
+  "asset_issuer": "GDNFUWF2EO4OWXYLI4TDEH4DXUCN6PB24R6XQW4VATORK6WGMHGRXJVB",
+  "asset_type": "credit_alphanum4",
+  "created_at": "2021-12-15T09:38:34Z",
+  "id": "0000000549755817992-0000000001",
+  "limit": "922337203685.4775807",
+  "paging_token": "549755817992-1",
+  "type": "trustline_created",
+  "type_i": 20
+}
