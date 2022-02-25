@@ -1,0 +1,33 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/liquidity_pools/0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434"
+    },
+    "transactions": {
+      "href": "https://horizon.stellar.org/liquidity_pools/0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434/transactions{?cursor,limit,order}",
+      "templated": true
+    },
+    "operations": {
+      "href": "https://horizon.stellar.org/liquidity_pools/0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434/operations{?cursor,limit,order}",
+      "templated": true
+    }
+  },
+  "id": "0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434",
+  "paging_token": "0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434",
+  "fee_bp": 30,
+  "type": "constant_product",
+  "total_trustlines": "1",
+  "total_shares": "500000000.0000000",
+  "reserves": [
+    {
+      "asset": "XAU:GB3OE4IBQTYQFZZS5RXQHE4IPQL7ONOFOSAIS2NFRNMJKZEAI3AAUT2A",
+      "amount": "522256061.0743940"
+    },
+    {
+      "asset": "ERRES:GA6ZAQGLDUEODDUUD3UD6PUFJYABWQA26SG5RK6E6CZ6OMD6AZKK5QNF",
+      "amount": "533666459.4045717"
+    }
+  ],
+  "last_modified_ledger": 39767560,
+  "last_modified_time": "2022-02-24T11:48:09Z"
+}
