@@ -6,7 +6,7 @@ defmodule Stellar.Horizon.Account do
   @behaviour Stellar.Horizon.Resource
 
   alias Stellar.Horizon.Mapping
-  alias Stellar.Horizon.Account.{Balance, Signer, Thresholds, Flags}
+  alias Stellar.Horizon.Account.{Balance, Flags, Signer, Thresholds}
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -49,10 +49,10 @@ defmodule Stellar.Horizon.Account do
   @mapping [
     sequence: :integer,
     last_modified_time: :date_time,
-    thresholds: %Thresholds{},
-    flags: %Flags{},
-    balances: %Balance{},
-    signers: %Signer{}
+    thresholds: {:struct, Thresholds},
+    flags: {:struct, Flags},
+    balances: {:list, :struct, Balance},
+    signers: {:list, :struct, Signer}
   ]
 
   @impl true

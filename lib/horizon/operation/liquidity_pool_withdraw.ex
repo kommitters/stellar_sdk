@@ -9,14 +9,18 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolWithdraw do
 
   @type t :: %__MODULE__{
           liquidity_pool_id: String.t(),
-          reserves_min: list(),
+          reserves_min: list(map()),
           shares: integer(),
-          reserves_received: list()
+          reserves_received: list(map())
         }
 
   defstruct [:liquidity_pool_id, :reserves_min, :shares, :reserves_received]
 
-  @mapping [shares: :integer]
+  @mapping [
+    shares: :integer,
+    reserves_received: {:list, :map, [amount: :float]},
+    reserves_min: {:list, :map, [amount: :float]}
+  ]
 
   @impl true
   def new(attrs, opts \\ [])

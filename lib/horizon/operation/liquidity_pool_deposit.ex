@@ -9,12 +9,12 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolDeposit do
 
   @type t :: %__MODULE__{
           liquidity_pool_id: String.t(),
-          reserves_max: list(),
+          reserves_max: list(map()),
           min_price: float(),
           min_price_r: map(),
           max_price: float(),
           max_price_r: map(),
-          reserves_deposited: list(),
+          reserves_deposited: list(map()),
           shares_received: integer()
         }
 
@@ -29,7 +29,13 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolDeposit do
     :shares_received
   ]
 
-  @mapping [min_price: :float, max_price: :float, shares_received: :integer]
+  @mapping [
+    min_price: :float,
+    max_price: :float,
+    shares_received: :integer,
+    reserves_max: {:list, :map, [amount: :float]},
+    reserves_deposited: {:list, :map, [amount: :float]}
+  ]
 
   @impl true
   def new(attrs, opts \\ [])

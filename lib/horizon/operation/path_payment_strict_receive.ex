@@ -14,7 +14,7 @@ defmodule Stellar.Horizon.Operation.PathPaymentStrictReceive do
           from: String.t(),
           to: String.t(),
           amount: float(),
-          path: list(),
+          path: list(map()),
           source_amount: String.t(),
           source_max: String.t(),
           source_asset_type: String.t(),

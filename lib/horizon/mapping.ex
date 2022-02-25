@@ -4,8 +4,14 @@ defmodule Stellar.Horizon.Mapping do
   (e.g. `%Horizon.Transaction{}`) or list of structs.
   """
 
-  @type attr_type :: :integer | :float | :date_time | struct()
-  @type attr_value :: String.t() | integer() | float() | boolean() | struct() | list() | nil
+  @type attr_value :: any()
+  @type attr_type ::
+          :integer
+          | :float
+          | :date_time
+          | {:map, Keyword.t()}
+          | {:struct, module()}
+          | {:list, atom(), Keyword.t() | module()}
 
   @spec build(module :: struct(), attrs :: map()) :: struct()
   def build(module, attrs) do
@@ -42,11 +48,24 @@ defmodule Stellar.Horizon.Mapping do
     end
   end
 
-  defp do_parse(%{__struct__: module}, values) when is_list(values) do
-    Enum.map(values, &module.new(&1))
+  defp do_parse({:map, mapping}, value) when is_map(value) do
+    Enum.reduce(mapping, value, fn {key, type}, acc ->
+      acc
+      |> Map.get(key)
+      |> (&do_parse(type, &1)).()
+      |> (&Map.replace(acc, key, &1)).()
+    end)
   end
 
-  defp do_parse(%{__struct__: module}, value) when not is_nil(value), do: module.new(value)
+  defp do_parse({:struct, module}, value) when not is_nil(value), do: module.new(value)
+
+  defp do_parse({:list, :map, mapping}, values) when is_list(values) do
+    Enum.map(values, &do_parse({:map, mapping}, &1))
+  end
+
+  defp do_parse({:list, :struct, module}, values) when is_list(values) do
+    Enum.map(values, &module.new(&1))
+  end
 
   defp do_parse(_type, value), do: value
 end

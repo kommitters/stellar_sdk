@@ -40,20 +40,18 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolDepositTest do
     attrs:
       %{
         liquidity_pool_id: liquidity_pool_id,
-        reserves_max: reserves_max,
         min_price_r: min_price_r,
-        max_price_r: max_price_r,
-        reserves_deposited: reserves_deposited
+        max_price_r: max_price_r
       } = attrs
   } do
     %LiquidityPoolDeposit{
       liquidity_pool_id: ^liquidity_pool_id,
-      reserves_max: ^reserves_max,
+      reserves_max: [%{amount: 1000.0000005}, %{amount: 3000.0000005}],
       min_price: 0.268,
       min_price_r: ^min_price_r,
       max_price: 0.368,
       max_price_r: ^max_price_r,
-      reserves_deposited: ^reserves_deposited,
+      reserves_deposited: [%{amount: 983.0000005}, %{amount: 2378.0000005}],
       shares_received: 1000
     } = LiquidityPoolDeposit.new(attrs)
   end

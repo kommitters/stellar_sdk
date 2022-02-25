@@ -1,7 +1,7 @@
 defmodule Stellar.Horizon.FakeTransaction do
   @moduledoc false
 
-  defstruct [:id, :source_account, :fee, :created_at, :operation]
+  defstruct [:id, :source_account, :fee, :created_at, :operation, :balances]
 end
 
 defmodule Stellar.Horizon.FakeOperation do
@@ -89,11 +89,25 @@ defmodule Stellar.Horizon.MappingTest do
       |> Mapping.parse(fee: :float)
   end
 
+  test "parse/2 map", %{resource: resource} do
+    %FakeTransaction{fee: %{amount: 100.15}} =
+      resource
+      |> Mapping.build(%{fee: %{amount: "100.15"}})
+      |> Mapping.parse(fee: {:map, [amount: :float]})
+  end
+
+  test "parse/2 list_of_maps", %{resource: resource} do
+    %FakeTransaction{balances: [%{amount: 100.010}, %{amount: 200.15}]} =
+      resource
+      |> Mapping.build(%{balances: [%{amount: "100.010"}, %{amount: "200.15"}]})
+      |> Mapping.parse(balances: {:list, :map, [amount: :float]})
+  end
+
   test "parse/2 struct", %{id: id, resource: resource} do
     %FakeTransaction{operation: %FakeOperation{}} =
       resource
       |> Mapping.build(%{operation: %{id: id, hash: id, balance: 100}})
-      |> Mapping.parse(operation: %FakeOperation{})
+      |> Mapping.parse(operation: {:struct, FakeOperation})
   end
 
   test "parse/2 list_of_structs", %{id: id, resource: resource} do
@@ -105,6 +119,6 @@ defmodule Stellar.Horizon.MappingTest do
     %FakeTransaction{operation: [%FakeOperation{balance: 100}, %FakeOperation{balance: 200}]} =
       resource
       |> Mapping.build(%{operation: raw_operations})
-      |> Mapping.parse(operation: %FakeOperation{})
+      |> Mapping.parse(operation: {:list, :struct, FakeOperation})
   end
 end
