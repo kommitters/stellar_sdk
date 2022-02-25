@@ -23,7 +23,7 @@ defmodule Stellar.Horizon.OfferTest do
       buying: %{
         asset_type: "native"
       },
-      amount: 18421.4486092,
+      amount: 18_421.4486092,
       price_r: %{
         n: 45_112_058,
         d: 941_460_545

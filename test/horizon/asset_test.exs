@@ -16,7 +16,7 @@ defmodule Stellar.Horizon.AssetTest do
       asset_type: "credit_alphanum4",
       asset_code: "USD",
       asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
-      claimable_balances_amount: 36303.8674450,
+      claimable_balances_amount: 36_303.8674450,
       amount: 1_347_404.4083346,
       num_accounts: 9390,
       accounts: %{
