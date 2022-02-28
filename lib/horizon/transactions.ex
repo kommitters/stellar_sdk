@@ -5,13 +5,14 @@ defmodule Stellar.Horizon.Transactions do
   You can:
   * Create a transaction.
   * Retrieve a transaction.
-  * List transactions.
+  * List all transactions.
   * List transaction's effects.
+  * List transaction's operations.
 
   Horizon API reference: https://developers.stellar.org/api/resources/transactions/
   """
 
-  alias Stellar.Horizon.{Collection, Effect, Error, Transaction, Request}
+  alias Stellar.Horizon.{Collection, Effect, Error, Operation, Transaction, Request}
 
   @type hash :: String.t()
   @type params :: Keyword.t()
@@ -54,5 +55,14 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.add_query(params, extra_params: [:include_failed])
     |> Request.perform()
     |> Request.results(&Collection.new({Effect, &1}))
+  end
+
+  @spec list_operations(hash :: hash(), params :: params()) :: response()
+  def list_operations(hash, params \\ []) do
+    :get
+    |> Request.new(@endpoint, path: hash, segment: "operations")
+    |> Request.add_query(params, extra_params: [:include_failed, :join])
+    |> Request.perform()
+    |> Request.results(&Collection.new({Operation, &1}))
   end
 end

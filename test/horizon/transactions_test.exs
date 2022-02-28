@@ -26,6 +26,19 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
     {:ok, 200, [], json_body}
   end
 
+  def request(
+        :get,
+        @base_url <>
+          "/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?" <>
+          _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body = Horizon.fixture("operations")
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/transactions/" <> _hash, _headers, _body, _opts) do
     json_body = Horizon.fixture("transaction")
     {:ok, 200, [], json_body}
@@ -57,7 +70,7 @@ defmodule Stellar.Horizon.TransactionsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedTransactionRequests
-  alias Stellar.Horizon.{Collection, Effect, Error, Transaction, Transactions}
+  alias Stellar.Horizon.{Collection, Effect, Error, Operation, Transaction, Transactions}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedTransactionRequests)
@@ -110,6 +123,19 @@ defmodule Stellar.Horizon.TransactionsTest do
          %Effect{type: "signer_created"}
        ]
      }} = Transactions.list_effects(hash, limit: 3)
+  end
+
+  test "list_operations/2", %{hash: hash} do
+    {:ok,
+     %Collection{
+       next:
+         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905985&limit=3&order=desc",
+       records: [
+         %Operation{type: "set_options"},
+         %Operation{type: "payment"},
+         %Operation{type: "create_account"}
+       ]
+     }} = Transactions.list_operations(hash, limit: 3, order: :desc)
   end
 
   test "error" do
