@@ -33,13 +33,24 @@ defmodule Stellar.Horizon.Request do
           endpoint: endpoint(),
           path: path(),
           segment: segment(),
+          segment_path: path(),
           query: query(),
           headers: headers(),
           body: body(),
           encoded_query: encoded_query()
         }
 
-  defstruct [:method, :headers, :body, :endpoint, :path, :segment, :query, :encoded_query]
+  defstruct [
+    :method,
+    :headers,
+    :body,
+    :endpoint,
+    :path,
+    :segment,
+    :segment_path,
+    :query,
+    :encoded_query
+  ]
 
   @default_query_params ~w(cursor order limit)a
 
@@ -47,12 +58,14 @@ defmodule Stellar.Horizon.Request do
   def new(method, endpoint, opts \\ []) when method in [:get, :post] do
     path = Keyword.get(opts, :path)
     segment = Keyword.get(opts, :segment)
+    segment_path = Keyword.get(opts, :segment_path)
 
     %__MODULE__{
       method: method,
       endpoint: endpoint,
       path: path,
       segment: segment,
+      segment_path: segment_path,
       query: [],
       headers: [],
       body: []
@@ -99,12 +112,14 @@ defmodule Stellar.Horizon.Request do
          endpoint: endpoint,
          path: path,
          segment: segment,
+         segment_path: segment_path,
          encoded_query: encoded_query
        }) do
     IO.iodata_to_binary([
       if(endpoint, do: ["/" | endpoint], else: []),
       if(path, do: ["/" | path], else: []),
       if(segment, do: ["/" | segment], else: []),
+      if(segment_path, do: ["/" | segment_path], else: []),
       if(encoded_query, do: ["?" | encoded_query], else: [])
     ])
   end

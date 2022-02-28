@@ -4,7 +4,7 @@ defmodule Stellar.Horizon.Client.CannedRequestImpl do
   @behaviour Stellar.Horizon.Client.Spec
 
   @impl true
-  def request(_method, "/transactions/f08b8/effects?limit=10", _headers, _body, _opts) do
+  def request(_method, "/transactions/f08b8/effects" <> _query, _headers, _body, _opts) do
     send(self(), {:horizon_requested, 200})
     {:ok, 200, [], nil}
   end
@@ -29,13 +29,41 @@ defmodule Stellar.Horizon.RequestTest do
     body = [tx: "AAAAAgAAABAAAAAAAAAA==="]
     headers = [{"Content-Type", "application/x-www-form-urlencoded"}]
     query = [cursor: "549755817992-1", order: "desc", limit: 25]
+    segment = "trades"
+    segment_path = "0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434"
 
-    %{endpoint: endpoint, hash: hash, body: body, headers: headers, query: query}
+    %{
+      endpoint: endpoint,
+      hash: hash,
+      segment: segment,
+      segment_path: segment_path,
+      body: body,
+      headers: headers,
+      query: query
+    }
   end
 
   test "new/1", %{endpoint: endpoint, hash: hash} do
     %Request{method: :get, endpoint: ^endpoint, path: ^hash, body: [], headers: [], query: []} =
       Request.new(:get, endpoint, path: hash)
+  end
+
+  test "new/1 with_segment", %{
+    endpoint: endpoint,
+    hash: hash,
+    segment: segment,
+    segment_path: segment_path
+  } do
+    %Request{
+      method: :get,
+      endpoint: ^endpoint,
+      path: ^hash,
+      segment: ^segment,
+      segment_path: ^segment_path,
+      body: [],
+      headers: [],
+      query: []
+    } = Request.new(:get, endpoint, path: hash, segment: segment, segment_path: segment_path)
   end
 
   test "add_body/2", %{endpoint: endpoint, body: body} do
@@ -93,7 +121,7 @@ defmodule Stellar.Horizon.RequestTest do
 
   test "perform/2" do
     :get
-    |> Request.new("transactions", path: "f08b8", segment: "effects")
+    |> Request.new("transactions", path: "f08b8", segment: "effects", segment_path: "123")
     |> Request.add_query(limit: 10)
     |> Request.perform()
 
