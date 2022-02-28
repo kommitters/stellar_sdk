@@ -32,18 +32,11 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolWithdrawTest do
     }
   end
 
-  test "new/2", %{
-    attrs:
-      %{
-        liquidity_pool_id: liquidity_pool_id,
-        reserves_received: reserves_received,
-        reserves_min: reserves_min
-      } = attrs
-  } do
+  test "new/2", %{attrs: %{liquidity_pool_id: liquidity_pool_id} = attrs} do
     %LiquidityPoolWithdraw{
       liquidity_pool_id: ^liquidity_pool_id,
-      reserves_received: ^reserves_received,
-      reserves_min: ^reserves_min,
+      reserves_received: [%{amount: 1000.0000005}, %{amount: 3000.0000005}],
+      reserves_min: [%{amount: 983.0000005}, %{amount: 2378.0000005}],
       shares: 1000
     } = LiquidityPoolWithdraw.new(attrs)
   end
