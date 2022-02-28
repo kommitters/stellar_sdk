@@ -53,7 +53,7 @@ defmodule Stellar.Horizon.Mapping do
       acc
       |> Map.get(key)
       |> (&do_parse(type, &1)).()
-      |> (&Map.replace(acc, key, &1)).()
+      |> (&Map.put(acc, key, &1)).()
     end)
   end
 
