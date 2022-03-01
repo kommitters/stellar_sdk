@@ -56,7 +56,7 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
   end
 
   def request(:post, @base_url <> "/transactions", _headers, "tx=bad", _opts) do
-    json_error = Horizon.fixture("400")
+    json_error = Horizon.fixture("400_invalid_tx")
     {:ok, 400, [], json_error}
   end
 
