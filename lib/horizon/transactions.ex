@@ -6,8 +6,8 @@ defmodule Stellar.Horizon.Transactions do
   * Create a transaction.
   * Retrieve a transaction.
   * List all transactions.
-  * List transaction's effects.
-  * List transaction's operations.
+  * List a transaction's effects.
+  * List a transaction's operations.
 
   Horizon API reference: https://developers.stellar.org/api/resources/transactions/
   """
