@@ -16,7 +16,7 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
   def request(
         :get,
         @base_url <>
-          "/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/effects?" <>
+          "/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/effects" <>
           _query,
         _headers,
         _body,
@@ -29,7 +29,7 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
   def request(
         :get,
         @base_url <>
-          "/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?" <>
+          "/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations" <>
           _query,
         _headers,
         _body,
@@ -71,6 +71,7 @@ defmodule Stellar.Horizon.TransactionsTest do
 
   alias Stellar.Horizon.Client.CannedTransactionRequests
   alias Stellar.Horizon.{Collection, Effect, Error, Operation, Transaction, Transactions}
+  alias Stellar.Horizon.Operation.{CreateAccount, Payment, SetOptions}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedTransactionRequests)
@@ -80,6 +81,7 @@ defmodule Stellar.Horizon.TransactionsTest do
     end)
 
     %{
+      source_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
       base64_envelope:
         "AAAAAJ2kP2xLaOVLj6DRwX1mMyA0mubYnYvu0g8OdoDqxXuFAAAAZADjfzAACzBMAAAAAQAAAAAAAAAAAAAAAF4vYIYAAAABAAAABjI5ODQyNAAAAAAAAQAAAAAAAAABAAAAAKdeYELovtcnTxqPEVsdbxHLMoMRalZsK7lo/+3ARzUZAAAAAAAAAADUFJPYAAAAAAAAAAHqxXuFAAAAQBpLpQyh+mwDd5nDSxTaAh5wopBBUaSD1eOK9MdiO+4kWKVTqSr/Ko3kYE/+J42Opsewf81TwINONPbY2CtPggE=",
       hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31"
@@ -91,8 +93,33 @@ defmodule Stellar.Horizon.TransactionsTest do
       Transactions.create(base64_envelope)
   end
 
-  test "retrieve/1", %{hash: hash} do
-    {:ok, %Transaction{hash: ^hash}} = Transactions.retrieve(hash)
+  test "retrieve/1", %{
+    hash: hash,
+    base64_envelope: base64_envelope,
+    source_account: source_account
+  } do
+    {:ok,
+     %Transaction{
+       created_at: ~U[2020-01-27 22:13:17Z],
+       envelope_xdr: ^base64_envelope,
+       fee_charged: 100,
+       hash: ^hash,
+       id: ^hash,
+       ledger: 27_956_256,
+       max_fee: 100,
+       memo: "298424",
+       memo_type: "text",
+       operation_count: 1,
+       result_xdr: "AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAA=",
+       signatures: [
+         "GkulDKH6bAN3mcNLFNoCHnCikEFRpIPV44r0x2I77iRYpVOpKv8qjeRgT/4njY6mx7B/zVPAg0409tjYK0+CAQ=="
+       ],
+       source_account: ^source_account,
+       source_account_sequence: 64_034_663_849_209_932,
+       successful: true,
+       valid_after: ~U[1970-01-01 00:00:00Z],
+       valid_before: ~U[2020-01-27 22:13:26Z]
+     }} = Transactions.retrieve(hash)
   end
 
   test "all/1" do
@@ -117,23 +144,44 @@ defmodule Stellar.Horizon.TransactionsTest do
   test "list_effects/2", %{hash: hash} do
     {:ok,
      %Collection{
+       next:
+         "https://horizon.stellar.org/effects?cursor=12884905985-3\u0026limit=3\u0026order=asc",
+       prev:
+         "https://horizon.stellar.org/effects?cursor=12884905985-1\u0026limit=3\u0026order=desc",
        records: [
-         %Effect{type: "account_created"},
-         %Effect{type: "account_debited"},
-         %Effect{type: "signer_created"}
+         %Effect{type: "account_created", created_at: ~U[2015-09-30 17:15:54Z]},
+         %Effect{type: "account_debited", created_at: ~U[2015-09-30 17:16:54Z]},
+         %Effect{type: "signer_created", created_at: ~U[2015-09-30 17:17:54Z]}
        ]
      }} = Transactions.list_effects(hash, limit: 3)
   end
 
-  test "list_operations/2", %{hash: hash} do
+  test "list_operations/2", %{hash: hash, source_account: source_account} do
     {:ok,
      %Collection{
        next:
          "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905985&limit=3&order=desc",
+       prev:
+         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905987&limit=3&order=asc",
        records: [
-         %Operation{type: "set_options"},
-         %Operation{type: "payment"},
-         %Operation{type: "create_account"}
+         %Operation{
+           body: %SetOptions{},
+           source_account: ^source_account,
+           type: "set_options",
+           type_i: 5
+         },
+         %Operation{
+           body: %Payment{},
+           source_account: ^source_account,
+           type: "payment",
+           type_i: 1
+         },
+         %Operation{
+           body: %CreateAccount{},
+           source_account: ^source_account,
+           type: "create_account",
+           type_i: 0
+         }
        ]
      }} = Transactions.list_operations(hash, limit: 3, order: :desc)
   end
