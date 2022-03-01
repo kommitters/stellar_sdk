@@ -116,10 +116,10 @@ defmodule Stellar.Horizon.Request do
          encoded_query: encoded_query
        }) do
     IO.iodata_to_binary([
-      if(endpoint, do: ["/" | endpoint], else: []),
-      if(path, do: ["/" | path], else: []),
-      if(segment, do: ["/" | segment], else: []),
-      if(segment_path, do: ["/" | segment_path], else: []),
+      if(endpoint, do: ["/" | to_string(endpoint)], else: []),
+      if(path, do: ["/" | to_string(path)], else: []),
+      if(segment, do: ["/" | to_string(segment)], else: []),
+      if(segment_path, do: ["/" | to_string(segment_path)], else: []),
       if(encoded_query, do: ["?" | encoded_query], else: [])
     ])
   end
