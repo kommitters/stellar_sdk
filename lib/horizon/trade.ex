@@ -54,6 +54,7 @@ defmodule Stellar.Horizon.Trade do
   ]
 
   @mapping [
+    base_offer_id: :integer,
     ledger_close_time: :date_time,
     base_amount: :float,
     counter_amount: :float

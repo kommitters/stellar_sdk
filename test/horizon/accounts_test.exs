@@ -260,17 +260,17 @@ defmodule Stellar.Horizon.AccountsTest do
      %Collection{
        records: [
          %Trade{
-           base_offer_id: "104078276",
+           base_offer_id: 165_561_423,
            counter_account: ^account_id,
            base_amount: 4433.20
          },
          %Trade{
-           base_offer_id: "104273938",
+           base_offer_id: 165_561_423,
            counter_account: ^account_id,
            base_amount: 10.0
          },
          %Trade{
-           base_offer_id: "104299223",
+           base_offer_id: 165_561_423,
            counter_account: ^account_id,
            base_amount: 748.5338945
          }
