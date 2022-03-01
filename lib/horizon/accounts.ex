@@ -6,13 +6,13 @@ defmodule Stellar.Horizon.Accounts do
   * Retrieve an account.
   * Fetch an account next sequence number.
   * List all accounts.
-  * List account's effects.
-  * List account's offers.
-  * List account's trades.
-  * List account's transactions.
-  * List account's operations.
-  * List account's payments.
-  * List account's data.
+  * List an account's effects.
+  * List an account's offers.
+  * List an account's trades.
+  * List an account's transactions.
+  * List an account's operations.
+  * List an account's payments.
+  * List an account's data.
 
   Horizon API reference: https://developers.stellar.org/api/resources/accounts/
   """
