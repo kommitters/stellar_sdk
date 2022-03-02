@@ -58,7 +58,7 @@ defmodule Stellar.Horizon.OperationTest do
         to: "GBZH7S5NC57XNHKHJ75C5DGMI3SP6ZFJLIKW74K6OSMA5E5DFMYBDD2Z"
       },
       created_at: ~U[2020-04-04 13:47:50Z],
-      id: "124624072438579201",
+      id: 124_624_072_438_579_201,
       paging_token: "124624072438579201",
       source_account: "GBZH7S5NC57XNHKHJ75C5DGMI3SP6ZFJLIKW74K6OSMA5E5DFMYBDD2Z",
       transaction: nil,
