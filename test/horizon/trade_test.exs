@@ -16,7 +16,7 @@ defmodule Stellar.Horizon.TradeTest do
       id: "3697472920621057-2",
       ledger_close_time: ~U[2015-11-18 03:47:47Z],
       trade_type: "orderbook",
-      base_offer_id: "8",
+      base_offer_id: 8,
       base_account: "GAVH5JM5OKXGMQDS7YPRJ4MQCPXJUGH26LYQPQJ4SOMOJ4SXY472ZM7G",
       base_amount: 20.0000000,
       base_asset_type: "native",
