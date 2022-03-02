@@ -79,6 +79,7 @@ defmodule Stellar.Horizon.Operation do
   ]
 
   @mapping [
+    id: :integer,
     type_i: :integer,
     transaction: {:struct, Transaction},
     created_at: :date_time
