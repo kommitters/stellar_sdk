@@ -1,0 +1,116 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/assets?cursor=&limit=3&order=desc"
+    },
+    "next": {
+      "href": "https://horizon-testnet.stellar.org/assets?cursor=MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4&limit=3&order=desc"
+    },
+    "prev": {
+      "href": "https://horizon-testnet.stellar.org/assets?cursor=BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12&limit=3&order=asc"
+    }
+  },
+  "_embedded": {
+    "records": [
+      {
+        "_links": {
+          "toml": {
+            "href": "https://https://tracified.com/.well-known/stellar.toml"
+          }
+        },
+        "asset_type": "credit_alphanum12",
+        "asset_code": "BTCNEW2022",
+        "asset_issuer": "GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW",
+        "paging_token": "BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12",
+        "num_accounts": 1,
+        "num_claimable_balances": 0,
+        "num_liquidity_pools": 0,
+        "amount": "10000000.0000",
+        "accounts": {
+          "authorized": 1,
+          "authorized_to_maintain_liabilities": 0,
+          "unauthorized": 0
+        },
+        "claimable_balances_amount": "0.0000000",
+        "liquidity_pools_amount": "0.0000000",
+        "balances": {
+          "authorized": "1.0000000",
+          "authorized_to_maintain_liabilities": "0.0000000",
+          "unauthorized": "0.0000000"
+        },
+        "flags": {
+          "auth_required": false,
+          "auth_revocable": false,
+          "auth_immutable": false,
+          "auth_clawback_enabled": false
+        }
+      },
+      {
+        "_links": {
+          "toml": {
+            "href": ""
+          }
+        },
+        "asset_type": "credit_alphanum4",
+        "asset_code": "BTCN",
+        "asset_issuer": "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+        "paging_token": "BTCN_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4",
+        "num_accounts": 1,
+        "num_claimable_balances": 0,
+        "num_liquidity_pools": 0,
+        "amount": "20000.0000000",
+        "accounts": {
+          "authorized": 1,
+          "authorized_to_maintain_liabilities": 0,
+          "unauthorized": 0
+        },
+        "claimable_balances_amount": "0.0000000",
+        "liquidity_pools_amount": "0.0000000",
+        "balances": {
+          "authorized": "1001.0000000",
+          "authorized_to_maintain_liabilities": "0.0000000",
+          "unauthorized": "0.0000000"
+        },
+        "flags": {
+          "auth_required": false,
+          "auth_revocable": false,
+          "auth_immutable": false,
+          "auth_clawback_enabled": false
+        }
+      },
+      {
+        "_links": {
+          "toml": {
+            "href": ""
+          }
+        },
+        "asset_type": "credit_alphanum4",
+        "asset_code": "MTK",
+        "asset_issuer": "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+        "paging_token": "MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4",
+        "num_accounts": 2,
+        "num_claimable_balances": 0,
+        "num_liquidity_pools": 0,
+        "amount": "10004.0000000",
+        "accounts": {
+          "authorized": 2,
+          "authorized_to_maintain_liabilities": 0,
+          "unauthorized": 0
+        },
+        "claimable_balances_amount": "0.0000000",
+        "liquidity_pools_amount": "0.0000000",
+        "balances": {
+          "authorized": "10004.0000000",
+          "authorized_to_maintain_liabilities": "0.0000000",
+          "unauthorized": "0.0000000"
+        },
+        "flags": {
+          "auth_required": false,
+          "auth_revocable": false,
+          "auth_immutable": false,
+          "auth_clawback_enabled": false
+        }
+      }
+    ]
+  }
+}
