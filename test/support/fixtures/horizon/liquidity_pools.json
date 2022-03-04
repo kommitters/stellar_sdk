@@ -1,0 +1,116 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/liquidity_pools?cursor=&limit=3&order=desc"
+    },
+    "next": {
+      "href": "https://horizon-testnet.stellar.org/liquidity_pools?cursor=fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38&limit=3&order=desc"
+    },
+    "prev": {
+      "href": "https://horizon-testnet.stellar.org/liquidity_pools?cursor=fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9&limit=3&order=asc"
+    }
+  },
+  "_embedded": {
+    "records": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9",
+        "paging_token": "fe6490f5e64f25e62df49a6a4b5542b8e5411e84c6d3158613abb2271824deb9",
+        "fee_bp": 30,
+        "type": "constant_product",
+        "total_trustlines": "1",
+        "total_shares": "1.9800000",
+        "reserves": [
+          {
+            "asset": "BTCN:GDGUZCQFXCLZ775VZH3YGWRUIBKD6XKDJEW3E7CE5COT4EO7A3W22YUX",
+            "amount": "228.6851160"
+          },
+          {
+            "asset": "ETH:GATPY6X6OYTXKNRKVP6LEMUUQKFDUW5P7HL4XI3KWRCY52RAWYJ5FLMC",
+            "amount": "0.0174209"
+          }
+        ],
+        "last_modified_ledger": 1137275,
+        "last_modified_time": "2022-02-22T13:30:09Z"
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fdccc907a78a11e592c122144f702fdb093160c510c0f4327994d9be5d951092"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fdccc907a78a11e592c122144f702fdb093160c510c0f4327994d9be5d951092/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fdccc907a78a11e592c122144f702fdb093160c510c0f4327994d9be5d951092/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "fdccc907a78a11e592c122144f702fdb093160c510c0f4327994d9be5d951092",
+        "paging_token": "fdccc907a78a11e592c122144f702fdb093160c510c0f4327994d9be5d951092",
+        "fee_bp": 30,
+        "type": "constant_product",
+        "total_trustlines": "1",
+        "total_shares": "100000.0000000",
+        "reserves": [
+          {
+            "asset": "DOLLAR:GCO7B6KEDWOBM5X642ZOTPYTYTTBZIGVGUED4ZSBILJOAU4XB7ISJBFF",
+            "amount": "100005.0152960"
+          },
+          {
+            "asset": "JasonHartman:GA5P6KUCQAKEZCVXBCTYQH2ANNPZSYNAGIEYEEWDLGLBOHIO73GVTRYO",
+            "amount": "99995.0000000"
+          }
+        ],
+        "last_modified_ledger": 384280,
+        "last_modified_time": "2022-01-07T18:19:08Z"
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/liquidity_pools/fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38",
+        "paging_token": "fd498c395920d57156e86b2d52acd2bbbfc164836a204c73d3b64bec33874d38",
+        "fee_bp": 30,
+        "type": "constant_product",
+        "total_trustlines": "4",
+        "total_shares": "180.8936510",
+        "reserves": [
+          {
+            "asset": "native",
+            "amount": "130.8900524"
+          },
+          {
+            "asset": "EURC:GDBDEI3NV72XSORX7DNYMGRRNXAXF62RPTGGVEXM2RLXIUIUU5DNZWWH",
+            "amount": "249.9999998"
+          }
+        ],
+        "last_modified_ledger": 973360,
+        "last_modified_time": "2022-02-12T14:16:51Z"
+      }
+    ]
+  }
+}
