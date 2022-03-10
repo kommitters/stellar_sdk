@@ -116,14 +116,14 @@ defmodule Stellar.MixProject do
         Stellar.Horizon.LiquidityPools,
         Stellar.Horizon.Accounts
       ],
-      "KeyPairs": [
+      KeyPairs: [
         Stellar.KeyPair,
         Stellar.KeyPair.Spec,
         Stellar.KeyPair.Default
       ],
       "Horizon Resources": ~r/^Stellar\.Horizon\./,
       "TxBuild Resources": ~r/^Stellar\.TxBuild\./,
-      "Utils": Stellar.Network
+      Utils: Stellar.Network
     ]
   end
 
