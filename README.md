@@ -10,7 +10,7 @@
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
 ## Documentation
-* [**Build transactions**](#building-a-transaction)
+* [**Building transactions**](#building-transactions)
 * [**Querying Horizon**](#querying-horizon)
 * [**Examples**](/docs/examples.md)
 
@@ -43,7 +43,7 @@ Stellar allows you to use your HTTP client of choice. Specification in [**Stella
 config :stellar_sdk, :http_client_impl, YourApp.CustomClientImpl
 ```
 
-## Building a transaction
+## Building transactions
 
 ### Accounts
 Accounts are the central data structure in Stellar. They hold balances, sign transactions, and issue assets. All entries that persist on the ledger are owned by a particular account.
@@ -367,7 +367,7 @@ To make it possible to explore the millions of records for resources like transa
  }} = Ledgers.retrieve(1234)
 ```
 
-A group of records is called a collection, records are returned as a list in the [**Stellar.Horizon.Collection**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Collection.html#content) structure. To move between pages of a collection of records, use the `next` and `prev` attributes.
+A group of records is called a **collection**, records are returned as a list in the [**Stellar.Horizon.Collection**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Collection.html#content) structure. To move between pages of a collection of records, use the `next` and `prev` attributes.
 
 ```elixir
 {:ok,
