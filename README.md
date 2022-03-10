@@ -369,6 +369,7 @@ To make it possible to explore the millions of records for resources like transa
 
 A group of records is called a **collection**, records are returned as a list in the [**Stellar.Horizon.Collection**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Collection.html#content) structure. To move between pages of a collection of records, use the `next` and `prev` attributes.
 
+
 ```elixir
 {:ok,
  %Stellar.Horizon.Collection{
