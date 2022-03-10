@@ -82,9 +82,48 @@ defmodule Stellar.MixProject do
 
   defp groups_for_modules do
     [
-      Horizon: ~r/^Stellar\.Horizon\./,
-      KeyPair: ~r/^Stellar\.KeyPair\./,
-      TxBuild: ~r/^Stellar\.TxBuild\./
+      "Building a Transaction": [
+        Stellar.TxBuild,
+        Stellar.TxBuild.Spec,
+        Stellar.TxBuild.Default,
+        Stellar.TxBuild.AccountMerge,
+        Stellar.TxBuild.BumpSequence,
+        Stellar.TxBuild.BeginSponsoringFutureReserves,
+        Stellar.TxBuild.ChangeTrust,
+        Stellar.TxBuild.Clawback,
+        Stellar.TxBuild.ClawbackClaimableBalance,
+        Stellar.TxBuild.CreateAccount,
+        Stellar.TxBuild.CreatePassiveSellOffer,
+        Stellar.TxBuild.EndSponsoringFutureReserves,
+        Stellar.TxBuild.ManageData,
+        Stellar.TxBuild.ManageSellOffer,
+        Stellar.TxBuild.ManageBuyOffer,
+        Stellar.TxBuild.Payment,
+        Stellar.TxBuild.PathPaymentStrictSend,
+        Stellar.TxBuild.PathPaymentStrictReceive,
+        Stellar.TxBuild.SetOptions
+      ],
+      "Querying Horizon": [
+        Stellar.Horizon.Ledgers,
+        Stellar.Horizon.Transactions,
+        Stellar.Horizon.Operations,
+        Stellar.Horizon.Effects,
+        Stellar.Horizon.Accounts,
+        Stellar.Horizon.Offers,
+        Stellar.Horizon.Trades,
+        Stellar.Horizon.Assets,
+        Stellar.Horizon.ClaimableBalances,
+        Stellar.Horizon.LiquidityPools,
+        Stellar.Horizon.Accounts
+      ],
+      "KeyPairs": [
+        Stellar.KeyPair,
+        Stellar.KeyPair.Spec,
+        Stellar.KeyPair.Default
+      ],
+      "Horizon Resources": ~r/^Stellar\.Horizon\./,
+      "TxBuild Resources": ~r/^Stellar\.TxBuild\./,
+      "Utils": Stellar.Network
     ]
   end
 
