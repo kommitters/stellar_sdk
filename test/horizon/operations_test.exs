@@ -174,7 +174,7 @@ defmodule Stellar.Horizon.OperationsTest do
      }} = Operations.list_effects(operation_id, limit: 3)
   end
 
-  test "all_payments/1" do
+  test "list_payments/1" do
     {:ok,
      %Collection{
        records: [
@@ -196,7 +196,7 @@ defmodule Stellar.Horizon.OperationsTest do
            type_i: 1
          }
        ]
-     }} = Operations.all_payments(limit: 3)
+     }} = Operations.list_payments(limit: 3)
   end
 
   test "error" do
