@@ -20,7 +20,7 @@ This library is aimed at developers building Elixir applications that interact w
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.3.0"}
+    {:stellar_sdk, "~> 0.4.0"}
   ]
 end
 ```
