@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0 (11.03.2022)
+* Compose functional Horizon requests.
+* Build structures for Horizon resources.
+* Build structures for all the operation types.
+* Implement functions to consume Horizon endpoints.
+* Querying Horizon docs.
+
 ## 0.3.0 (11.02.2022)
 * CAP-0027 Add suport for multiplexed accounts.
 

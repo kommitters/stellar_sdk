@@ -1,0 +1,125 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/claimable_balances/?cursor=&limit=3&order=desc"
+    },
+    "next": {
+      "href": "https://horizon-testnet.stellar.org/claimable_balances/?cursor=1268715-0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea&limit=3&order=desc"
+    },
+    "prev": {
+      "href": "https://horizon-testnet.stellar.org/claimable_balances/?cursor=1269595-00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f&limit=3&order=asc"
+    }
+  },
+  "_embedded": {
+    "records": [
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f",
+        "asset": "BTCN:GDGHQTCJ3SGFBWBHJGVRUFBRLZGS5VS52HEDH4GVPX5GZRJQAOW7ZM37",
+        "amount": "82.4190840",
+        "sponsor": "GBXISGJYYKE6RUO6L6KXBUJ7FJU4CWF647FLQAT3TZ2Q47IZHXFNYKYH",
+        "last_modified_ledger": 1269595,
+        "last_modified_time": "2022-03-02T14:39:20Z",
+        "claimants": [
+          {
+            "destination": "GATBAGTTQLQ4VKZMXLINLS6M4F2PEXMAZCK5ZE5ES4B6A2DXNGCFRX54",
+            "predicate": {
+              "abs_before": "2001-09-09T01:46:40Z",
+              "abs_before_epoch": "1000000000"
+            }
+          }
+        ],
+        "flags": {
+          "clawback_enabled": true
+        },
+        "paging_token": "1269595-00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f"
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072",
+        "asset": "y00XLM:GDGHQTCJ3SGFBWBHJGVRUFBRLZGS5VS52HEDH4GVPX5GZRJQAOW7ZM37",
+        "amount": "912.5569285",
+        "sponsor": "GBXISGJYYKE6RUO6L6KXBUJ7FJU4CWF647FLQAT3TZ2Q47IZHXFNYKYH",
+        "last_modified_ledger": 1269432,
+        "last_modified_time": "2022-03-02T14:25:09Z",
+        "claimants": [
+          {
+            "destination": "GATBAGTTQLQ4VKZMXLINLS6M4F2PEXMAZCK5ZE5ES4B6A2DXNGCFRX54",
+            "predicate": {
+              "not": {
+                "unconditional": true
+              }
+            }
+          }
+        ],
+        "flags": {
+          "clawback_enabled": true
+        },
+        "paging_token": "1269432-00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+      },
+      {
+        "_links": {
+          "self": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea"
+          },
+          "transactions": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea/transactions{?cursor,limit,order}",
+            "templated": true
+          },
+          "operations": {
+            "href": "https://horizon-testnet.stellar.org/claimable_balances/0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea/operations{?cursor,limit,order}",
+            "templated": true
+          }
+        },
+        "id": "0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea",
+        "asset": "OxCBQksBk:GB3A3CK64CZDZ63FZTVI3OKK7ZCD75YQCPA2EKHPDFD6ABKEQ3ESTWVV",
+        "amount": "0.0000001",
+        "sponsor": "GB3A3CK64CZDZ63FZTVI3OKK7ZCD75YQCPA2EKHPDFD6ABKEQ3ESTWVV",
+        "last_modified_ledger": 1268715,
+        "last_modified_time": "2022-03-02T13:22:04Z",
+        "claimants": [
+          {
+            "destination": "GASY6U7YOOQSBSWORHZ3QI4N46XHZUKEAKOP7XEZZ5XOFP5HMNV5CFZ6",
+            "predicate": {
+              "unconditional": true
+            }
+          },
+          {
+            "destination": "GB3A3CK64CZDZ63FZTVI3OKK7ZCD75YQCPA2EKHPDFD6ABKEQ3ESTWVV",
+            "predicate": {
+              "unconditional": true
+            }
+          }
+        ],
+        "flags": {
+          "clawback_enabled": false
+        },
+        "paging_token": "1268715-0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea"
+      }
+    ]
+  }
+}

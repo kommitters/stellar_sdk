@@ -19,7 +19,7 @@ defmodule Stellar.Horizon.TransactionTest do
       max_fee: 100,
       operation_count: 1,
       hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31",
-      source_account: "GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC",
+      source_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
       source_account_sequence: 64_034_663_849_209_932,
       created_at: ~U[2020-01-27 22:13:17Z],
       result_xdr: "AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAA=",
