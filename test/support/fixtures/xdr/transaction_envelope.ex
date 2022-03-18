@@ -72,7 +72,7 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
             type: 0,
             value: %Void{value: nil}
           },
-          fee: %UInt32{datum: 50000},
+          fee: %UInt32{datum: 50_000},
           memo: %Memo{
             type: %MemoType{identifier: :MEMO_NONE},
             value: %Void{value: nil}
@@ -143,7 +143,7 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
             type: 0,
             value: %Void{value: nil}
           },
-          fee: %UInt32{datum: 50000},
+          fee: %UInt32{datum: 50_000},
           memo: %Memo{
             type: %MemoType{identifier: :MEMO_NONE},
             value: nil

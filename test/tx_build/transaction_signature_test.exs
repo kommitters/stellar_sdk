@@ -21,8 +21,12 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
   alias StellarBase.XDR.{DecoratedSignature, DecoratedSignatures, SignatureHint}
 
   setup do
-    {public_key, _secret} = keypair1 = KeyPair.from_secret_seed("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
-    keypair2 = KeyPair.from_secret_seed( "SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3")
+    {public_key, _secret} =
+      keypair1 =
+      KeyPair.from_secret_seed("SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z")
+
+    keypair2 =
+      KeyPair.from_secret_seed("SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3")
 
     source_account = Account.new(public_key)
 
@@ -64,7 +68,12 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
   end
 
   test "sign_xdr/2", %{tx_envelope: tx_envelope, signatures: [_signature, extra_signature]} do
-    %DecoratedSignatures{signatures: [_signature, %DecoratedSignature{hint: %SignatureHint{hint: <<243, 78, 123, 134>>}}]} =
+    %DecoratedSignatures{
+      signatures: [
+        _signature,
+        %DecoratedSignature{hint: %SignatureHint{hint: <<243, 78, 123, 134>>}}
+      ]
+    } =
       tx_envelope
       |> TransactionEnvelope.to_xdr()
       |> TransactionSignature.sign_xdr(extra_signature)

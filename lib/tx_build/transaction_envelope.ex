@@ -38,15 +38,12 @@ defmodule Stellar.TxBuild.TransactionEnvelope do
   @spec add_signature(tx_base64 :: tx_base64, signature :: Signature.t()) ::
           TransactionEnvelope.t()
   def add_signature(tx_base64, %Signature{} = signature) do
-    try do
-      with %TransactionEnvelope{envelope: inner_envelope} = tx_envelope_xdr <-
-             from_base64(tx_base64),
-           signatures <- TransactionSignature.sign_xdr(tx_envelope_xdr, signature) do
-        %{tx_envelope_xdr | envelope: %{inner_envelope | signatures: signatures}}
-      end
-    rescue
-      ArgumentError -> {:error, :invalid_transaction_envelope}
+    with %TransactionEnvelope{envelope: envelope} = tx_envelope_xdr <- from_base64(tx_base64),
+         signatures <- TransactionSignature.sign_xdr(tx_envelope_xdr, signature) do
+      %{tx_envelope_xdr | envelope: %{envelope | signatures: signatures}}
     end
+  rescue
+    ArgumentError -> {:error, :invalid_transaction_envelope}
   end
 
   @spec to_base64(tx_envelope_xdr :: TransactionEnvelope.t()) :: String.t()
