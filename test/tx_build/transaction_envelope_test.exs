@@ -1,7 +1,9 @@
 defmodule Stellar.TxBuild.TransactionEnvelopeTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [transaction_envelope_xdr: 2]
+  alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
+
+  alias Stellar.KeyPair
 
   alias Stellar.TxBuild.{
     Account,
@@ -44,7 +46,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
       tx: tx,
       signatures: signatures,
       tx_envelope: TransactionEnvelope.new(tx, signatures),
-      tx_envelope_xdr: transaction_envelope_xdr(tx, signatures),
+      tx_envelope_xdr: XDRFixtures.transaction_envelope(),
       tx_envelope_base64:
         "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAw1AAAAAAAAHiQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAP+vE9o3jcA09johM/VtYWpdEhIl0TD4eRCmqtPEhGJNAAAAAADk4cAAAAAAAAAAAcSEYk0AAABA/ZXTNzCemP6Mwb/SGIUGhFKk/w4VVurCsJf7td7LrConewwxkrQGNuaYODTVlqQFHNp8RhZQtI/i5lDQ5Z5qAQ=="
     }
@@ -64,5 +66,26 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
       tx_envelope
       |> TransactionEnvelope.to_xdr()
       |> TransactionEnvelope.to_base64()
+  end
+
+  test "from_base64/1", %{tx_envelope_base64: tx_envelope_base64} do
+    %StellarBase.XDR.TransactionEnvelope{} = TransactionEnvelope.from_base64(tx_envelope_base64)
+  end
+
+  test "from_base64/1 error" do
+    assert_raise ArgumentError, fn -> TransactionEnvelope.from_base64("AAAAA==") end
+  end
+
+  test "add_signature/2", %{tx_envelope_base64: tx_envelope_base64} do
+    secret_seed = "SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3"
+
+    extra_signature =
+      secret_seed
+      |> KeyPair.from_secret_seed()
+      |> Signature.new()
+
+    xdr = XDRFixtures.transaction_envelope(extra_signatures: [secret_seed])
+
+    ^xdr = TransactionEnvelope.add_signature(tx_envelope_base64, extra_signature)
   end
 end

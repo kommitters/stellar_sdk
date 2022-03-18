@@ -3,7 +3,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   Mocks for XDR constructions.
   """
 
-  alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions}
+  alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions, TransactionEnvelope}
 
   # accounts
   defdelegate muxed_account(account_id), to: Accounts
@@ -12,4 +12,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   # transactions
   defdelegate transaction(account_id), to: Transactions
   defdelegate transaction_with_muxed_account(address), to: Transactions
+
+  # transactions envelope
+  defdelegate transaction_envelope(options \\ []), to: TransactionEnvelope
 end

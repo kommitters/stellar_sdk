@@ -139,6 +139,23 @@ defmodule Stellar.TxBuild.DefaultTest do
     %TxBuild{signatures: ^signatures} = TxBuild.sign(tx_build, signatures)
   end
 
+  test "sign_envelope/2", %{keypair: keypair, tx_envelope_base64: tx_envelope_base64} do
+    signature = Signature.new(keypair)
+
+    "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYOxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO" =
+      TxBuild.sign_envelope(tx_envelope_base64, signature)
+  end
+
+  test "sign_envelope/2 multiple", %{signature: signature, tx_envelope_base64: tx_envelope_base64} do
+    {pk, sk} =
+      KeyPair.from_secret_seed("SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3")
+
+    signatures = [signature, Signature.new({pk, sk})]
+
+    "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYOxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO8057hgAAAEC70Ava49XnFEQ6d9ed+IvfiMWL6do55bekG9LctPFnjTrRITSFs9cuHTfvbkSTCcFxw5IrZxqgeupuYb+ubU8H" =
+      TxBuild.sign_envelope(tx_envelope_base64, signatures)
+  end
+
   test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do
     %TxBuild{tx_envelope: ^tx_envelope} = TxBuild.build(tx_build)
   end
