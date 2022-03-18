@@ -42,8 +42,6 @@ defmodule Stellar.TxBuild.TransactionEnvelope do
          signatures <- TransactionSignature.sign_xdr(tx_envelope_xdr, signature) do
       %{tx_envelope_xdr | envelope: %{envelope | signatures: signatures}}
     end
-  rescue
-    ArgumentError -> {:error, :invalid_transaction_envelope}
   end
 
   @spec to_base64(tx_envelope_xdr :: TransactionEnvelope.t()) :: String.t()
