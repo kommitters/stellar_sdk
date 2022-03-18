@@ -66,6 +66,7 @@ defmodule Stellar.TxBuild.Spec do
   @callback sign(tx(), signatures()) :: tx()
   @callback build(tx()) :: tx()
   @callback envelope(tx()) :: tx_envelope()
+  @callback sign_envelope(tx_envelope(), signatures()) :: tx_envelope()
 
   @optional_callbacks add_memo: 2, set_base_fee: 2, set_time_bounds: 2, set_sequence_number: 2
 end
