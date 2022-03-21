@@ -111,4 +111,19 @@ defmodule Stellar.TxBuild.Default do
     |> TransactionEnvelope.to_xdr()
     |> TransactionEnvelope.to_base64()
   end
+
+  @impl true
+  def sign_envelope(tx_base64, []), do: tx_base64
+
+  def sign_envelope(tx_base64, [%Signature{} = signature | signatures]) do
+    tx_base64
+    |> sign_envelope(signature)
+    |> sign_envelope(signatures)
+  end
+
+  def sign_envelope(tx_base64, %Signature{} = signature) do
+    tx_base64
+    |> TransactionEnvelope.add_signature(signature)
+    |> TransactionEnvelope.to_base64()
+  end
 end

@@ -4,26 +4,55 @@ defmodule Stellar.TxBuild.TransactionSignature do
   """
   alias Stellar.Network
   alias Stellar.TxBuild.{Transaction, Signature}
-  alias StellarBase.XDR.{DecoratedSignatures, EnvelopeType, Hash, TransactionSignaturePayload}
+
+  alias StellarBase.XDR.{
+    DecoratedSignatures,
+    EnvelopeType,
+    Hash,
+    TransactionEnvelope,
+    TransactionSignaturePayload
+  }
+
+  alias StellarBase.XDR.Transaction, as: TransactionXDR
   alias StellarBase.XDR.TransactionSignaturePayloadTaggedTransaction, as: TaggedTransaction
 
   @type signatures :: list(Signature.t())
 
-  @spec sign(tx :: Transaction.t(), signatures :: signatures()) :: struct()
+  @spec sign(tx :: Transaction.t(), signatures :: signatures()) :: DecoratedSignatures.t()
   def sign(%Transaction{} = tx, signatures) do
-    base_signature = base_signature(tx)
+    base_signature =
+      tx
+      |> Transaction.to_xdr()
+      |> base_signature()
 
     signatures
     |> Enum.map(&Signature.to_xdr(&1, base_signature))
     |> DecoratedSignatures.new()
   end
 
-  @spec base_signature(tx :: Transaction.t()) :: binary()
-  defp base_signature(%Transaction{} = tx) do
+  @spec sign_xdr(tx_envelope :: TransactionEnvelope.t(), signature :: Signature.t()) ::
+          DecoratedSignatures.t()
+  def sign_xdr(
+        %TransactionEnvelope{
+          envelope: %{
+            tx: tx_xdr,
+            signatures: %DecoratedSignatures{signatures: current_signatures}
+          }
+        },
+        %Signature{} = signature
+      ) do
+    base_signature = base_signature(tx_xdr)
+
+    signature
+    |> Signature.to_xdr(base_signature)
+    |> (&DecoratedSignatures.new(current_signatures ++ [&1])).()
+  end
+
+  @spec base_signature(tx_xdr :: TransactionXDR.t()) :: binary()
+  defp base_signature(%TransactionXDR{} = tx_xdr) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
 
-    tx
-    |> Transaction.to_xdr()
+    tx_xdr
     |> TaggedTransaction.new(envelope_type)
     |> signature_payload()
   end

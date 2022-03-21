@@ -52,6 +52,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
+  def sign_envelope(_base64, _signatures) do
+    send(self(), {:sign_envelope, "ENVELOPE_SIGNED"})
+    :ok
+  end
+
+  @impl true
   def build(_tx) do
     send(self(), {:build, "TX_CREATED"})
     :ok
@@ -116,6 +122,11 @@ defmodule Stellar.TxBuildTest do
   test "sign/2" do
     Stellar.TxBuild.sign(%TxBuild{}, :signature)
     assert_receive({:sign, "TX_SIGNED"})
+  end
+
+  test "sign_envelope/2" do
+    Stellar.TxBuild.sign_envelope("AAAAA==", :signature)
+    assert_receive({:sign_envelope, "ENVELOPE_SIGNED"})
   end
 
   test "build/1" do
