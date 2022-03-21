@@ -50,7 +50,7 @@ defmodule Stellar.MixProject do
 
   defp description do
     """
-    Elixir library that provides a client for interfacing with Horizon server REST endpoints.
+    Elixir Library to build Stellar transactions, as well as to interact with the REST endpoints of the Horizon server.
     """
   end
 
