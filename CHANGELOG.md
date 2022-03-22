@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (21.03.2022)
+* Enable signatures for base64-encoded transaction envelopes.
+* Improve library docs.
+
 ## 0.4.0 (11.03.2022)
 * Compose functional Horizon requests.
 * Build structures for Horizon resources.

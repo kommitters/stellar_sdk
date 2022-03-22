@@ -37,7 +37,7 @@ defmodule Stellar.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.5.0"},
+      {:stellar_base, "~> 0.6.0"},
       {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17", optional: true},
       {:jason, "~> 1.0", optional: true},
@@ -50,7 +50,7 @@ defmodule Stellar.MixProject do
 
   defp description do
     """
-    Elixir library that provides a client for interfacing with Horizon server REST endpoints.
+    Elixir Library to build Stellar transactions, as well as to interact with the REST endpoints of the Horizon server.
     """
   end
 

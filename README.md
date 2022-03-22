@@ -5,14 +5,15 @@
 ![Downloads Badge](https://img.shields.io/hexpm/dt/stellar_sdk?style=for-the-badge)
 [![License badge](https://img.shields.io/hexpm/l/stellar_sdk.svg?style=for-the-badge)](https://github.com/kommitters/stellar_sdk/blob/main/LICENSE.md)
 
-**`stellar_sdk`** is an **Elixir library** that provides a client for interfacing with **Horizon** endpoints to retrieve ledger information, and to submit transactions. **`stelar_sdk`** uses the [**`stellar_base`**][base] library to enable the construction, signing and encoding of Stellar primitive XDR constructs.
+The **Stellar SDK** enables the construction, signing and encoding of Stellar [transactions][stellar-docs-tx] and [operations][stellar-docs-list-operations] in **Elixir**, as well as provides a client for interfacing with [Horizon][horizon-api] server REST endpoints to retrieve ledger information, and to submit transactions.
 
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
 ## Documentation
-* [**Building transactions**](#building-transactions)
-* [**Querying Horizon**](#querying-horizon)
-* [**Examples**](/docs/examples.md)
+The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
+* **`TxBuild`** - used for [**building transactions.**](#building-transactions)
+* **`Horizon`** - used for [**querying Horizon.**](#querying-horizon)
+* [**Examples.**](/docs/examples.md)
 
 ## Installation
 [**Available in Hex**][hex], add `stellar_sdk` to your list of dependencies in `mix.exs`:
@@ -20,7 +21,7 @@ This library is aimed at developers building Elixir applications that interact w
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.4.0"}
+    {:stellar_sdk, "~> 0.5.0"}
   ]
 end
 ```
@@ -90,7 +91,7 @@ Stellar relies on public key cryptography to ensure that transactions are secure
 {public_key, secret_seed} = Stellar.KeyPair.from_secret_seed("SA33J3ACZZCV35FNSS655WXLIPTQOJS6WPQCKKYJSREDQY7KRLECEZSZ")
 ```
 
-### Building transactions
+### Transactions
 [Transactions][stellar-docs-tx] are commands that modify the ledger state. They consist of a list of operations (up to 100) used to send payments, enter orders into the decentralized exchange, change settings on accounts, and authorize accounts to hold assets.
 
 ```elixir
@@ -656,6 +657,7 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [sdk-tests]: https://github.com/kommitters/stellar_sdk/blob/main/test/tx_build
 [hex]: https://hex.pm/packages/stellar_sdk
 [stellar]: https://www.stellar.org/
+[horizon-api]: https://developers.stellar.org/api/introduction
 [http_client_spec]: https://github.com/kommitters/stellar_sdk/blob/main/lib/horizon/client/spec.ex
 [stellar-docs-tx]: https://developers.stellar.org/docs/glossary/transactions
 [stellar-docs-sequence-number]: https://developers.stellar.org/docs/glossary/transactions/#sequence-number
