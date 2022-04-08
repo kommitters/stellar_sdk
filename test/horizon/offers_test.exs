@@ -28,6 +28,22 @@ defmodule Stellar.Horizon.Client.CannedOfferRequests do
     {:ok, 200, [], json_body}
   end
 
+  def request(:get, @base_url <> "/offers?cursor=164943216" <> _query, _headers, _body, _opts) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(:get, @base_url <> "/offers?cursor=164555927" <> _query, _headers, _body, _opts) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/offers" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("offers")
     {:ok, 200, [], json_body}
@@ -106,6 +122,20 @@ defmodule Stellar.Horizon.OffersTest do
          %Trade{base_offer_id: ^offer_id, base_amount: 748.5338945}
        ]
      }} = Offers.list_trades(offer_id)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Offers.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Offers.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

@@ -83,6 +83,38 @@ defmodule Stellar.Horizon.Client.CannedClaimableBalanceRequests do
     {:ok, 200, [], json_body}
   end
 
+  def request(
+        :get,
+        @base_url <>
+          "/claimable_balances?cursor=1268715-0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea" <>
+          _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <>
+          "/claimable_balances?cursor=1269595-00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f" <>
+          _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/claimable_balances" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("claimable_balances")
     {:ok, 200, [], json_body}
@@ -153,10 +185,6 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
   test "all/1" do
     {:ok,
      %Collection{
-       next:
-         "https://horizon-testnet.stellar.org/claimable_balances/?cursor=1268715-0000000032d73407ea08b122407e32833cc6f9f6dc72ee0dd01e482fa06fdfadc32d01ea&limit=3&order=desc",
-       prev:
-         "https://horizon-testnet.stellar.org/claimable_balances/?cursor=1269595-00000000d6575278b432b3ee4e07cc0b17721fafc32c3b5c1403be68d8309268e91e585f&limit=3&order=asc",
        records: [
          %ClaimableBalance{
            amount: 82.419084,
@@ -255,10 +283,6 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
   test "list_transactions/1", %{claimable_balance_id: claimable_balance_id} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/transactions?cursor=33736968114176\u0026limit=3\u0026order=asc",
-       prev:
-         "https://horizon.stellar.org/transactions?cursor=12884905984\u0026limit=3\u0026order=desc",
        records: [
          %Transaction{
            id: "3389e9f0f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889",
@@ -279,10 +303,6 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
   test "list_operations/1", %{claimable_balance_id: claimable_balance_id} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905985&limit=3&order=desc",
-       prev:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905987&limit=3&order=asc",
        records: [
          %Operation{
            body: %SetOptions{},
@@ -301,6 +321,20 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
          }
        ]
      }} = ClaimableBalances.list_operations(claimable_balance_id, limit: 3, order: :desc)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = ClaimableBalances.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = ClaimableBalances.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

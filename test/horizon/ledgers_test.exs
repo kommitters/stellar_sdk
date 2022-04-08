@@ -43,6 +43,34 @@ defmodule Stellar.Horizon.Client.CannedLedgerRequests do
     {:ok, 200, [], json_body}
   end
 
+  def request(
+        :get,
+        @base_url <> "/ledgers?cursor=5404056700846080" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <> "/ledgers?cursor=5404065290780672" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/ledgers" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("ledgers")
     {:ok, 200, [], json_body}
@@ -125,10 +153,6 @@ defmodule Stellar.Horizon.LedgersTest do
   test "list_transactions/1", %{ledger_sequence: ledger_sequence} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/transactions?cursor=33736968114176\u0026limit=3\u0026order=asc",
-       prev:
-         "https://horizon.stellar.org/transactions?cursor=12884905984\u0026limit=3\u0026order=desc",
        records: [
          %Transaction{
            id: "3389e9f0f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889",
@@ -149,10 +173,6 @@ defmodule Stellar.Horizon.LedgersTest do
   test "list_operations/1", %{ledger_sequence: ledger_sequence} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905985&limit=3&order=desc",
-       prev:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905987&limit=3&order=asc",
        records: [
          %Operation{
            body: %SetOptions{},
@@ -198,16 +218,26 @@ defmodule Stellar.Horizon.LedgersTest do
   test "list_effects/1", %{ledger_sequence: ledger_sequence} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/effects?cursor=12884905985-3\u0026limit=3\u0026order=asc",
-       prev:
-         "https://horizon.stellar.org/effects?cursor=12884905985-1\u0026limit=3\u0026order=desc",
        records: [
          %Effect{type: "account_created", created_at: ~U[2015-09-30 17:15:54Z]},
          %Effect{type: "account_debited", created_at: ~U[2015-09-30 17:16:54Z]},
          %Effect{type: "signer_created", created_at: ~U[2015-09-30 17:17:54Z]}
        ]
      }} = Ledgers.list_effects(ledger_sequence, limit: 3)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Ledgers.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Ledgers.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do
