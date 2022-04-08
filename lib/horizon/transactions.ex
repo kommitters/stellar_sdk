@@ -39,7 +39,7 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.add_headers([{"Content-Type", "application/x-www-form-urlencoded"}])
     |> Request.add_body(tx: base64_envelope)
     |> Request.perform()
-    |> Request.results(&Transaction.new(&1))
+    |> Request.results(as: Transaction)
   end
 
   @doc """
@@ -58,7 +58,7 @@ defmodule Stellar.Horizon.Transactions do
     :get
     |> Request.new(@endpoint, path: hash)
     |> Request.perform()
-    |> Request.results(&Transaction.new(&1))
+    |> Request.results(as: Transaction)
   end
 
   @doc """
@@ -86,7 +86,7 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(&Collection.new({Transaction, &1}))
+    |> Request.results(collection: {Transaction, &all/1})
   end
 
   @doc """
@@ -111,7 +111,7 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.new(@endpoint, path: hash, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Effect, &1}))
+    |> Request.results(collection: {Effect, &list_effects(hash, &1)})
   end
 
   @doc """
@@ -142,6 +142,6 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.new(@endpoint, path: hash, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_operations(hash, &1)})
   end
 end

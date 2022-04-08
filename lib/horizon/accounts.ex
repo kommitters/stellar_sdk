@@ -53,7 +53,7 @@ defmodule Stellar.Horizon.Accounts do
     :get
     |> Request.new(@endpoint, path: account_id)
     |> Request.perform()
-    |> Request.results(&Account.new(&1))
+    |> Request.results(as: Account)
   end
 
   @doc """
@@ -111,7 +111,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: [:sponsor, :asset, :signer, :liquidity_pool])
     |> Request.perform()
-    |> Request.results(&Collection.new({Account, &1}))
+    |> Request.results(collection: {Account, &all/1})
   end
 
   @doc """
@@ -137,7 +137,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "transactions")
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(&Collection.new({Transaction, &1}))
+    |> Request.results(collection: {Transaction, &list_transactions(account_id, &1)})
   end
 
   @doc """
@@ -168,7 +168,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_operations(account_id, &1)})
   end
 
   @doc """
@@ -199,7 +199,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "payments")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_payments(account_id, &1)})
   end
 
   @doc """
@@ -224,7 +224,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Effect, &1}))
+    |> Request.results(collection: {Effect, &list_effects(account_id, &1)})
   end
 
   @doc """
@@ -249,7 +249,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "offers")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Offer, &1}))
+    |> Request.results(collection: {Offer, &list_offers(account_id, &1)})
   end
 
   @doc """
@@ -274,7 +274,7 @@ defmodule Stellar.Horizon.Accounts do
     |> Request.new(@endpoint, path: account_id, segment: "trades")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Trade, &1}))
+    |> Request.results(collection: {Trade, &list_trades(account_id, &1)})
   end
 
   @doc """
@@ -294,6 +294,6 @@ defmodule Stellar.Horizon.Accounts do
     :get
     |> Request.new(@endpoint, path: account_id, segment: "data", segment_path: key)
     |> Request.perform()
-    |> Request.results(&Data.new(&1))
+    |> Request.results(as: Data)
   end
 end
