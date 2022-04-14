@@ -3,7 +3,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   Mocks for XDR constructions.
   """
 
-  alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions, TransactionEnvelope}
+  alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions, LiquidityPools, TransactionEnvelope}
 
   # accounts
   defdelegate muxed_account(account_id), to: Accounts
@@ -15,4 +15,10 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # transactions envelope
   defdelegate transaction_envelope(options \\ []), to: TransactionEnvelope
+
+  # liquidity_pools
+  defdelegate liquidity_pool_id(pool_id), to: LiquidityPools
+
+  defdelegate liquidity_pool_withdraw(pool_id, amount, min_amount_a, min_amount_b),
+    to: LiquidityPools
 end
