@@ -126,7 +126,7 @@ memo = Stellar.TxBuild.Memo.new(hash: "0859239b58d3f32972fc9124559cea7251225f2db
 memo = Stellar.TxBuild.Memo.new(return: "d83f67dc041e66085100859239b58d3f32924559cea72512272fc915f2dbc6f0")
 
 # add a memo for the transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.add_memo(memo)
@@ -146,7 +146,7 @@ source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQW
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # set the sequence number for the transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.set_sequence_number(sequence_number)
@@ -163,7 +163,7 @@ source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQW
 base_fee = Stellar.TxBuild.BaseFee.new(1_000)
 
 # set a fee for the transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.set_base_fee(base_fee)
@@ -195,7 +195,7 @@ time_bounds = Stellar.TxBuild.TimeBounds.new(
 time_bounds = Stellar.TxBuild.TimeBounds.set_timeout(1_643_990_815)
 
 # set the time bounds for the transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.set_time_bounds(time_bounds)
@@ -224,14 +224,14 @@ payment_op = Stellar.TxBuild.Payment.new(
   )
 
 # add a single operation to a transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.add_operation(create_account_op)
 
 
 # add multiple operations to a transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.add_operations([create_account_op, payment_op])
@@ -263,7 +263,7 @@ signature1 = Stellar.TxBuild.Signature.new(signer_key_pair)
 signature2 = Stellar.TxBuild.Signature.new(signer_key_pair2)
 
 # add a single signature to a transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.add_operation(operation)
@@ -271,7 +271,7 @@ tx =
 
 
 # add multiple signatures to a transaction
-tx =
+{:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
   |> Stellar.TxBuild.add_operation(operation)
@@ -299,14 +299,13 @@ signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSE
 signature = Stellar.TxBuild.Signature.new(signer_key_pair)
 
 # build a base64 transaction envelope
-tx =
-  source_account
-  |> Stellar.TxBuild.new()
-  |> Stellar.TxBuild.add_operation(operation)
-  |> Stellar.TxBuild.sign(signature)
-  |> Stellar.TxBuild.envelope()
+source_account
+|> Stellar.TxBuild.new()
+|> Stellar.TxBuild.add_operation(operation)
+|> Stellar.TxBuild.sign(signature)
+|> Stellar.TxBuild.envelope()
 
-"AAAAAgAAAACuy1AULv6LOdXRYjVYl9u0g62aLg/LPRx+KKAgsCUp2wAAAGQAAA+pAAAAFAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAL5xix0HYeCnnvADhMs2eqCLBfE+WT3Kh7axgdzPzWX0AAAAAAAAAAAC+vCAAAAAAAAAAAKwJSnbAAAAQMhnGfygZvau5bXFHnJ1rCLIiqiZiI+C4Xf4bWCrxTERPOM/nJKuDottj48bep8NlI42WIUgqZVeQAKykWE74AXPzWX0AAAAQHp0wWKyv80frbOkX3QgOFtflxExX9H46b8ws8fMznSt6/9Le567cqoPxLb/SYvw3Wh6j3B5Vl04CBWyKnLYUwg="
+{:ok, "AAAAAgAAAACuy1AULv6LOdXRYjVYl9u0g62aLg/LPRx+KKAgsCUp2wAAAGQAAA+pAAAAFAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAL5xix0HYeCnnvADhMs2eqCLBfE+WT3Kh7axgdzPzWX0AAAAAAAAAAAC+vCAAAAAAAAAAAKwJSnbAAAAQMhnGfygZvau5bXFHnJ1rCLIiqiZiI+C4Xf4bWCrxTERPOM/nJKuDottj48bep8NlI42WIUgqZVeQAKykWE74AXPzWX0AAAAQHp0wWKyv80frbOkX3QgOFtflxExX9H46b8ws8fMznSt6/9Le567cqoPxLb/SYvw3Wh6j3B5Vl04CBWyKnLYUwg="}
 ```
 
 #### Submitting a transaction
@@ -339,7 +338,7 @@ signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSE
 signature = Stellar.TxBuild.Signature.new(signer_key_pair)
 
 # build a base64 transaction envelope
-base64_envelope =
+{:ok, base64_envelope} =
   source_account
   |> Stellar.TxBuild.new(sequence_number: sequence_number)
   |> Stellar.TxBuild.add_memo(memo)
