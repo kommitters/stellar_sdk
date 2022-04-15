@@ -38,7 +38,7 @@ defmodule Stellar.Horizon.ClaimableBalances do
     :get
     |> Request.new(@endpoint, path: claimable_balance_id)
     |> Request.perform()
-    |> Request.results(&ClaimableBalance.new(&1))
+    |> Request.results(as: ClaimableBalance)
   end
 
   @doc """
@@ -76,7 +76,7 @@ defmodule Stellar.Horizon.ClaimableBalances do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: [:sponsor, :asset, :claimant])
     |> Request.perform()
-    |> Request.results(&Collection.new({ClaimableBalance, &1}))
+    |> Request.results(collection: {ClaimableBalance, &all/1})
   end
 
   @doc """
@@ -103,7 +103,7 @@ defmodule Stellar.Horizon.ClaimableBalances do
     |> Request.new(@endpoint, path: claimable_balance_id, segment: "transactions")
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(&Collection.new({Transaction, &1}))
+    |> Request.results(collection: {Transaction, &list_transactions(claimable_balance_id, &1)})
   end
 
   @doc """
@@ -135,7 +135,7 @@ defmodule Stellar.Horizon.ClaimableBalances do
     |> Request.new(@endpoint, path: claimable_balance_id, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_operations(claimable_balance_id, &1)})
   end
 
   @doc """

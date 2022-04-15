@@ -16,6 +16,7 @@ defmodule Stellar.TxBuild.Validations do
     OptionalWeight,
     OptionalSigner,
     OptionalString32,
+    PoolID,
     Price,
     Signer,
     String32,
@@ -116,6 +117,14 @@ defmodule Stellar.TxBuild.Validations do
   def validate_claimable_balance_id({field, balance_id}) do
     case ClaimableBalanceID.new(balance_id) do
       %ClaimableBalanceID{} = claimable_balance_id -> {:ok, claimable_balance_id}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
+  end
+
+  @spec validate_pool_id(component :: component()) :: validation()
+  def validate_pool_id({field, pool_id}) do
+    case PoolID.new(pool_id) do
+      %PoolID{} = pool_id -> {:ok, pool_id}
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end

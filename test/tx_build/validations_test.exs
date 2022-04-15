@@ -10,6 +10,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
     ClaimableBalanceID,
     Validations,
     OptionalAccountID,
+    PoolID,
     Price,
     TrustlineFlags
   }
@@ -17,7 +18,8 @@ defmodule Stellar.TxBuild.ValidationsTest do
   setup do
     %{
       account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS",
-      balance_id: "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+      balance_id: "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072",
+      pool_id: "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
     }
   end
 
@@ -124,6 +126,15 @@ defmodule Stellar.TxBuild.ValidationsTest do
   test "validate_claimable_balance_id/1 error" do
     {:error, [claimable_balance_id: :invalid_balance_id]} =
       Validations.validate_claimable_balance_id({:claimable_balance_id, "ABC"})
+  end
+
+  test "validate_pool_id/1", %{pool_id: pool_id} do
+    {:ok, %PoolID{}} = Validations.validate_pool_id({:liquidity_pool_id, pool_id})
+  end
+
+  test "validate_pool_id/1 error" do
+    {:error, [liquidity_pool_id: :invalid_pool_id]} =
+      Validations.validate_pool_id({:liquidity_pool_id, "ABC"})
   end
 
   test "validate_trustline_flags/1" do

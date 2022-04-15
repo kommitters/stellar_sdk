@@ -18,6 +18,34 @@ defmodule Stellar.Horizon.Client.CannedTradeRequests do
     {:ok, 400, [], json_error}
   end
 
+  def request(
+        :get,
+        @base_url <> "/trades?cursor=107449584845914113-0" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <> "/trades?cursor=107449468881756161-0" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/trades" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("trades")
     {:ok, 200, [], json_body}
@@ -41,10 +69,6 @@ defmodule Stellar.Horizon.TradesTest do
   test "all/1" do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/accounts/GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD/trades?cursor=107449584845914113-0&limit=3&order=asc",
-       prev:
-         "https://horizon.stellar.org/accounts/GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD/trades?cursor=107449468881756161-0&limit=3&order=desc",
        records: [
          %Trade{
            base_account: "GCO7OW5P2PP7WDN6YUDXUUOPAR4ZHJSDDCZTIAQRTRZHKQWV45WUPBWX",
@@ -114,6 +138,20 @@ defmodule Stellar.Horizon.TradesTest do
          }
        ]
      }} = Trades.all(limit: 3)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Trades.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Trades.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

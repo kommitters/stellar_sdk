@@ -46,12 +46,40 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
 
   def request(
         :get,
-        @base_url <> "/transactions?cursor=33736968114176&limit=" <> _limit,
+        @base_url <> "/transactions?limit=" <> _limit,
         _headers,
         _body,
         _opts
       ) do
     json_body = Horizon.fixture("transactions")
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <> "/transactions?cursor=12884905984&limit=3&order=desc",
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <> "/transactions?cursor=33736968114176&limit=3&order=asc",
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
     {:ok, 200, [], json_body}
   end
 
@@ -135,19 +163,13 @@ defmodule Stellar.Horizon.TransactionsTest do
          %Transaction{
            hash: "3ce2aca2fed36da2faea31352c76c5e412348887a4c119b1e90de8d1b937396a"
          }
-       ],
-       next:
-         "https://horizon.stellar.org/transactions?cursor=33736968114176\u0026limit=3\u0026order=asc"
-     }} = Transactions.all(cursor: "33736968114176", limit: 3)
+       ]
+     }} = Transactions.all(limit: 3)
   end
 
   test "list_effects/2", %{hash: hash} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/effects?cursor=12884905985-3\u0026limit=3\u0026order=asc",
-       prev:
-         "https://horizon.stellar.org/effects?cursor=12884905985-1\u0026limit=3\u0026order=desc",
        records: [
          %Effect{type: "account_created", created_at: ~U[2015-09-30 17:15:54Z]},
          %Effect{type: "account_debited", created_at: ~U[2015-09-30 17:16:54Z]},
@@ -159,10 +181,6 @@ defmodule Stellar.Horizon.TransactionsTest do
   test "list_operations/2", %{hash: hash, source_account: source_account} do
     {:ok,
      %Collection{
-       next:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905985&limit=3&order=desc",
-       prev:
-         "https://horizon.stellar.org/transactions/132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31/operations?cursor=12884905987&limit=3&order=asc",
        records: [
          %Operation{
            body: %SetOptions{},
@@ -184,6 +202,20 @@ defmodule Stellar.Horizon.TransactionsTest do
          }
        ]
      }} = Transactions.list_operations(hash, limit: 3, order: :desc)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Transactions.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Transactions.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

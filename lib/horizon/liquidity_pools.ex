@@ -47,7 +47,7 @@ defmodule Stellar.Horizon.LiquidityPools do
     :get
     |> Request.new(@endpoint, path: liquidity_pool_id)
     |> Request.perform()
-    |> Request.results(&LiquidityPool.new(&1))
+    |> Request.results(as: LiquidityPool)
   end
 
   @doc """
@@ -80,7 +80,7 @@ defmodule Stellar.Horizon.LiquidityPools do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_options: [:reserves, :account])
     |> Request.perform()
-    |> Request.results(&Collection.new({LiquidityPool, &1}))
+    |> Request.results(collection: {LiquidityPool, &all/1})
   end
 
   @doc """
@@ -105,7 +105,7 @@ defmodule Stellar.Horizon.LiquidityPools do
     |> Request.new(@endpoint, path: liquidity_pool_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Effect, &1}))
+    |> Request.results(collection: {Effect, &list_effects(liquidity_pool_id, &1)})
   end
 
   @doc """
@@ -130,7 +130,7 @@ defmodule Stellar.Horizon.LiquidityPools do
     |> Request.new(@endpoint, path: liquidity_pool_id, segment: "trades")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Trade, &1}))
+    |> Request.results(collection: {Trade, &list_trades(liquidity_pool_id, &1)})
   end
 
   @doc """
@@ -157,7 +157,7 @@ defmodule Stellar.Horizon.LiquidityPools do
     |> Request.new(@endpoint, path: liquidity_pool_id, segment: "transactions")
     |> Request.add_query(options, extra_options: [:include_failed])
     |> Request.perform()
-    |> Request.results(&Collection.new({Transaction, &1}))
+    |> Request.results(collection: {Transaction, &list_transactions(liquidity_pool_id, &1)})
   end
 
   @doc """
@@ -189,6 +189,6 @@ defmodule Stellar.Horizon.LiquidityPools do
     |> Request.new(@endpoint, path: liquidity_pool_id, segment: "operations")
     |> Request.add_query(options, extra_options: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_operations(liquidity_pool_id, &1)})
   end
 end

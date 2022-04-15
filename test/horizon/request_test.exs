@@ -136,7 +136,7 @@ defmodule Stellar.Horizon.RequestTest do
      %Transaction{
        hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31",
        ledger: 27_956_256
-     }} = Request.results({:ok, transaction}, &Transaction.new(&1))
+     }} = Request.results({:ok, transaction}, as: Transaction)
   end
 
   test "results/2 collection" do
@@ -149,16 +149,12 @@ defmodule Stellar.Horizon.RequestTest do
          %Transaction{hash: "3389e9f0f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889"},
          %Transaction{hash: "2db4b22ca018119c5027a80578813ffcf582cda4aa9e31cd92b43cf1bda4fc5a"},
          %Transaction{hash: "3ce2aca2fed36da2faea31352c76c5e412348887a4c119b1e90de8d1b937396a"}
-       ],
-       next:
-         "https://horizon.stellar.org/transactions?cursor=33736968114176\u0026limit=3\u0026order=asc",
-       prev:
-         "https://horizon.stellar.org/transactions?cursor=12884905984\u0026limit=3\u0026order=desc",
-       self: "https://horizon.stellar.org/transactions?cursor=\u0026limit=3\u0026order=asc"
-     }} = Request.results({:ok, transactions}, &Collection.new({Transaction, &1}))
+       ]
+     }} = Request.results({:ok, transactions}, collection: {Transaction, fn -> :ok end})
   end
 
   test "results/2 error" do
-    {:error, %Error{}} = Request.results({:error, %Error{}}, &Collection.new({Transaction, &1}))
+    {:error, %Error{}} =
+      Request.results({:error, %Error{}}, collection: {Transaction, fn -> :ok end})
   end
 end

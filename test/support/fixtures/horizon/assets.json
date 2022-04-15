@@ -4,10 +4,10 @@
       "href": "https://horizon-testnet.stellar.org/assets?cursor=&limit=3&order=desc"
     },
     "next": {
-      "href": "https://horizon-testnet.stellar.org/assets?cursor=MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4&limit=3&order=desc"
+      "href": "https://horizon-testnet.stellar.org/assets?cursor=MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4&limit=3&order=asc"
     },
     "prev": {
-      "href": "https://horizon-testnet.stellar.org/assets?cursor=BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12&limit=3&order=asc"
+      "href": "https://horizon-testnet.stellar.org/assets?cursor=BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12&limit=3&order=desc"
     }
   },
   "_embedded": {

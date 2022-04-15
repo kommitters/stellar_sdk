@@ -36,6 +36,6 @@ defmodule Stellar.Horizon.Effects do
     |> Request.new(@endpoint)
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Effect, &1}))
+    |> Request.results(collection: {Effect, &all/1})
   end
 end
