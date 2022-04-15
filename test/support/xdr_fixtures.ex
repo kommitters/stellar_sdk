@@ -69,8 +69,8 @@ defmodule Stellar.Test.XDRFixtures do
     Clawback,
     ClawbackClaimableBalance,
     CreateAccount,
-    ManageData,
     CreatePassiveSellOffer,
+    ManageData,
     ManageBuyOffer,
     ManageSellOffer,
     Payment,
@@ -442,10 +442,11 @@ defmodule Stellar.Test.XDRFixtures do
         home_domain,
         signer
       ) do
+    available_flags = [required: 0x1, revocable: 0x2, inmutable: 0x4, clawback_enabled: 0x8]
     op_type = OperationType.new(:SET_OPTIONS)
     inflation_destination = optional_account_id_xdr(inflation_destination)
-    clear_flags = clear_flags |> flags_bit_mask() |> optional_uint32_xdr()
-    set_flags = set_flags |> flags_bit_mask() |> optional_uint32_xdr()
+    clear_flags = clear_flags |> flags_bit_mask(available_flags) |> optional_uint32_xdr()
+    set_flags = set_flags |> flags_bit_mask(available_flags) |> optional_uint32_xdr()
     master_weight = optional_uint32_xdr(master_weight)
     low_threshold = optional_uint32_xdr(tresholds[:low])
     med_threshold = optional_uint32_xdr(tresholds[:med])
@@ -627,12 +628,10 @@ defmodule Stellar.Test.XDRFixtures do
     |> Hash.new()
   end
 
-  @spec flags_bit_mask(flags :: flags()) :: integer()
-  defp flags_bit_mask(nil), do: 0
+  @spec flags_bit_mask(flags :: flags(), flags :: flags()) :: integer()
+  defp flags_bit_mask(nil, nil), do: 0
 
-  defp flags_bit_mask(flags) do
-    available_flags = [required: 0x1, revocable: 0x2, inmutable: 0x4, clawback_enabled: 0x8]
-
+  defp flags_bit_mask(flags, available_flags) do
     flags
     |> Enum.filter(&is_atom(&1))
     |> Enum.map(&Keyword.get(available_flags, &1, 0x0))
