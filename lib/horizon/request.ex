@@ -11,7 +11,7 @@ defmodule Stellar.Horizon.Request do
   At a minimum, a request must have the endpoint and method specified to be valid.
   """
 
-  alias Stellar.Horizon.Error
+  alias Stellar.Horizon.{Collection, Error}
   alias Stellar.Horizon.Client, as: Horizon
 
   @type method :: :get | :post
@@ -103,9 +103,14 @@ defmodule Stellar.Horizon.Request do
     |> (&Horizon.request(method, &1, headers, encoded_body)).()
   end
 
-  @spec results(response :: response(), resource :: function()) :: parsed_response()
-  def results({:ok, results}, resource), do: {:ok, resource.(results)}
-  def results(error, _resource), do: error
+  @spec results(response :: response(), resource :: Keyword.t()) :: parsed_response()
+  def results({:ok, results}, collection: {resource, paginate_fun}) do
+    {:ok, Collection.new(results, {resource, paginate_fun})}
+  end
+
+  def results({:ok, results}, as: resource), do: {:ok, resource.new(results)}
+
+  def results({:error, error}, _resource), do: {:error, error}
 
   @spec build_request_url(request :: t()) :: binary()
   defp build_request_url(%__MODULE__{

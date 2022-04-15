@@ -28,6 +28,38 @@ defmodule Stellar.Horizon.Client.CannedAssetRequests do
     {:ok, 400, [], json_error}
   end
 
+  def request(
+        :get,
+        @base_url <>
+          "/assets?cursor=MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4" <>
+          _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <>
+          "/assets?cursor=BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12" <>
+          _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/assets" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("assets")
     {:ok, 200, [], json_body}
@@ -56,10 +88,6 @@ defmodule Stellar.Horizon.AssetsTest do
   test "all/1" do
     {:ok,
      %Collection{
-       next:
-         "https://horizon-testnet.stellar.org/assets?cursor=MTK_GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD_credit_alphanum4&limit=3&order=desc",
-       prev:
-         "https://horizon-testnet.stellar.org/assets?cursor=BTCNEW2022_GCEU4UKMCN6XDTXOKVR35HEMSNT5HRT36ZM6QCZPFEVSSP6M2NCYZOJW_credit_alphanum12&limit=3&order=asc",
        records: [
          %Asset{
            asset_type: "credit_alphanum12",
@@ -109,6 +137,20 @@ defmodule Stellar.Horizon.AssetsTest do
          }
        ]
      }} = Assets.list_by_asset_issuer(asset_issuer, limit: 3)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Assets.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Assets.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

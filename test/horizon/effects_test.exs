@@ -18,6 +18,34 @@ defmodule Stellar.Horizon.Client.CannedEffectRequests do
     {:ok, 400, [], json_error}
   end
 
+  def request(
+        :get,
+        @base_url <> "/effects?cursor=12884905985-3" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :next})
+    {:ok, 200, [], json_body}
+  end
+
+  def request(
+        :get,
+        @base_url <> "/effects?cursor=12884905985-1" <> _query,
+        _headers,
+        _body,
+        _opts
+      ) do
+    json_body =
+      ~s<{"_embedded": {"records": []}, "_links": {"prev": {"href": ""}, "next": {"href": ""}}}>
+
+    send(self(), {:paginated, :prev})
+    {:ok, 200, [], json_body}
+  end
+
   def request(:get, @base_url <> "/effects" <> _query, _headers, _body, _opts) do
     json_body = Horizon.fixture("effects")
     {:ok, 200, [], json_body}
@@ -41,8 +69,6 @@ defmodule Stellar.Horizon.EffectsTest do
   test "all/1" do
     {:ok,
      %Collection{
-       next: "https://horizon.stellar.org/effects?cursor=12884905985-3&limit=3&order=asc",
-       prev: "https://horizon.stellar.org/effects?cursor=12884905985-1&limit=3&order=desc",
        records: [
          %Effect{
            account: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
@@ -79,6 +105,20 @@ defmodule Stellar.Horizon.EffectsTest do
          }
        ]
      }} = Effects.all(limit: 3)
+  end
+
+  test "paginate_collection prev" do
+    {:ok, %Collection{prev: paginate_prev_fn}} = Effects.all(limit: 3)
+    paginate_prev_fn.()
+
+    assert_receive({:paginated, :prev})
+  end
+
+  test "paginate_collection next" do
+    {:ok, %Collection{next: paginate_next_fn}} = Effects.all(limit: 3)
+    paginate_next_fn.()
+
+    assert_receive({:paginated, :next})
   end
 
   test "error" do

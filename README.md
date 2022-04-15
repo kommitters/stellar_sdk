@@ -374,16 +374,46 @@ A group of records is called a **collection**, records are returned as a list in
 ```elixir
 {:ok,
  %Stellar.Horizon.Collection{
-   next:
-     "https://horizon.stellar.org/ledgers?cursor=33736968114176\u0026limit=3\u0026order=asc",
-   prev:
-     "https://horizon.stellar.org/ledgers?cursor=12884905984\u0026limit=3\u0026order=desc",
+   next: #Function<1.1390483/0 in Stellar.Horizon.Collection.paginate/1>,
+   prev: #Function<1.1390483/0 in Stellar.Horizon.Collection.paginate/1>,
    records: [
      %Stellar.Horizon.Ledger{...},
      %Stellar.Horizon.Ledger{...},
      %Stellar.Horizon.Ledger{...}
    ]
  }} = Stellar.Horizon.Ledgers.all()
+```
+
+### Pagination
+The [HAL format links](https://developers.stellar.org/api/introduction/response-format/) returned with the Horizon response are converted into functions you can call on the returned structure. This allows you to simply use `next.()` and `prev.()` to page through results.
+
+```elixir
+{:ok,
+ %Stellar.Horizon.Collection{
+   next: paginate_next_fn,
+   prev: paginate_prev_fn,
+   records: [...]
+ }} = Stellar.Horizon.Transactions.all()
+
+# next page records for the collection
+paginate_next_fn.()
+
+{:ok,
+ %Stellar.Horizon.Collection{
+   next: paginate_next_fn,
+   prev: paginate_prev_fn,
+   records: [...]
+ }}
+
+# prev page records for the collection
+paginate_prev_fn.()
+
+{:ok,
+ %Stellar.Horizon.Collection{
+   next: paginate_next_fn,
+   prev: paginate_prev_fn,
+   records: []
+ }}
 ```
 
 ### Accounts

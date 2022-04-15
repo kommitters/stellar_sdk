@@ -38,7 +38,7 @@ defmodule Stellar.Horizon.Operations do
     |> Request.new(@endpoint, path: operation_id)
     |> Request.add_query(options, extra_params: [:join])
     |> Request.perform()
-    |> Request.results(&Operation.new(&1))
+    |> Request.results(as: Operation)
   end
 
   @doc """
@@ -71,7 +71,7 @@ defmodule Stellar.Horizon.Operations do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &all/1})
   end
 
   @doc """
@@ -95,7 +95,7 @@ defmodule Stellar.Horizon.Operations do
     |> Request.new(@payments_endpoint)
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(&Collection.new({Operation, &1}))
+    |> Request.results(collection: {Operation, &list_payments/1})
   end
 
   @doc """
@@ -120,6 +120,6 @@ defmodule Stellar.Horizon.Operations do
     |> Request.new(@endpoint, path: operation_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Effect, &1}))
+    |> Request.results(collection: {Effect, &list_effects(operation_id, &1)})
   end
 end
