@@ -12,6 +12,7 @@ defmodule Stellar.TxBuild.Operation do
     CreateAccount,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
+    LiquidityPoolWithdraw,
     ManageData,
     ManageSellOffer,
     ManageBuyOffer,
@@ -36,6 +37,7 @@ defmodule Stellar.TxBuild.Operation do
           | CreateAccount.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
+          | LiquidityPoolWithdraw.t()
           | ManageData.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
@@ -79,6 +81,7 @@ defmodule Stellar.TxBuild.Operation do
       CreateAccount,
       CreatePassiveSellOffer,
       EndSponsoringFutureReserves,
+      LiquidityPoolWithdraw,
       ManageData,
       ManageBuyOffer,
       ManageSellOffer,
