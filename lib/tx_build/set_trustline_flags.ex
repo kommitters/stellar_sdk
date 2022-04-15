@@ -7,7 +7,6 @@ defmodule Stellar.TxBuild.SetTrustlineFlags do
     only: [
       validate_account_id: 1,
       validate_asset: 1,
-      validate_trustline_flags: 1,
       validate_optional_account: 1
     ]
 
@@ -17,6 +16,8 @@ defmodule Stellar.TxBuild.SetTrustlineFlags do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type error :: Keyword.t() | atom()
+  @type validation :: {:ok, any()} | {:error, error()}
   @type t :: %__MODULE__{
           trustor: AccountID.t(),
           asset: Asset.t(),
@@ -75,5 +76,15 @@ defmodule Stellar.TxBuild.SetTrustlineFlags do
       set_flags
     )
     |> OperationBody.new(op_type)
+  end
+
+  @spec validate_trustline_flags(number :: number()) :: validation()
+  defp validate_trustline_flags({_field, nil}), do: {:ok, TrustlineFlags.new()}
+
+  defp validate_trustline_flags({field, value}) do
+    case TrustlineFlags.new(value) do
+      %TrustlineFlags{} -> {:ok, TrustlineFlags.new(value)}
+      {:error, reason} -> {:error, [{field, reason}]}
+    end
   end
 end

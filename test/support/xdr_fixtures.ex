@@ -76,8 +76,7 @@ defmodule Stellar.Test.XDRFixtures do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
-    SetOptions,
-    SetTrustLineFlags
+    SetOptions
   }
 
   @type optional_account_id :: String.t() | nil
@@ -469,29 +468,6 @@ defmodule Stellar.Test.XDRFixtures do
       )
 
     OperationBody.new(set_options, op_type)
-  end
-
-  @spec set_trustline_flags_op_xdr(
-          trustor :: String.t(),
-          asset :: raw_asset(),
-          clear_flags :: flags(),
-          set_flags :: flags()
-        ) :: SetTrustLineFlags.t()
-  def set_trustline_flags_op_xdr(
-        trustor,
-        asset,
-        clear_flags,
-        set_flags
-      ) do
-    op_type = OperationType.new(:SET_TRUST_LINE_FLAGS)
-    available_flags = [authorized: 0x1, maintain_liabilities: 0x2]
-    trustor = account_id_xdr(trustor)
-    asset = asset |> build_asset_xdr()
-    clear_flags = clear_flags |> flags_bit_mask(available_flags) |> UInt32.new()
-    set_flags = set_flags |> flags_bit_mask(available_flags) |> UInt32.new()
-
-    SetTrustLineFlags.new(trustor, asset, clear_flags, set_flags)
-    |> OperationBody.new(op_type)
   end
 
   @spec change_trust_xdr(asset :: raw_asset(), amount :: non_neg_integer()) :: ChangeTrust.t()

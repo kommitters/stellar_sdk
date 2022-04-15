@@ -20,7 +20,6 @@ defmodule Stellar.TxBuild.Validations do
     Price,
     Signer,
     String32,
-    TrustlineFlags,
     Weight
   }
 
@@ -165,16 +164,6 @@ defmodule Stellar.TxBuild.Validations do
   def validate_optional_signer({field, value}) do
     case Signer.new(value) do
       %Signer{} = signer -> {:ok, OptionalSigner.new(signer)}
-      {:error, reason} -> {:error, [{field, reason}]}
-    end
-  end
-
-  @spec validate_trustline_flags(component :: component()) :: validation()
-  def validate_trustline_flags({_field, nil}), do: {:ok, TrustlineFlags.new()}
-
-  def validate_trustline_flags({field, value}) do
-    case TrustlineFlags.new(value) do
-      %TrustlineFlags{} -> {:ok, TrustlineFlags.new(value)}
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end

@@ -3,7 +3,13 @@ defmodule Stellar.Test.Fixtures.XDR do
   Mocks for XDR constructions.
   """
 
-  alias Stellar.Test.Fixtures.XDR.{Accounts, Transactions, LiquidityPools, TransactionEnvelope}
+  alias Stellar.Test.Fixtures.XDR.{
+    Accounts,
+    LiquidityPools,
+    Transactions,
+    TransactionEnvelope,
+    Trustline
+  }
 
   # accounts
   defdelegate muxed_account(account_id), to: Accounts
@@ -21,4 +27,7 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   defdelegate liquidity_pool_withdraw(pool_id, amount, min_amount_a, min_amount_b),
     to: LiquidityPools
+
+  # set_trustline
+  defdelegate set_trustline_flags(trustor, asset, clear_flags, set_flags), to: Trustline
 end

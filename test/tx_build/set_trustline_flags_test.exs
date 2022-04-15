@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.SetTrustlineFlagsTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [set_trustline_flags_op_xdr: 4]
+  alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
 
   alias Stellar.TxBuild.{AccountID, Asset, SetTrustlineFlags, TrustlineFlags}
 
@@ -17,7 +17,13 @@ defmodule Stellar.TxBuild.SetTrustlineFlagsTest do
       asset: {asset_code, asset_issuer},
       clear_flags: clear_flags,
       set_flags: set_flags,
-      xdr: set_trustline_flags_op_xdr(trustor, {asset_code, asset_issuer}, clear_flags, set_flags)
+      xdr:
+        XDRFixtures.set_trustline_flags(
+          trustor,
+          {asset_code, asset_issuer},
+          set_flags,
+          clear_flags
+        )
     }
   end
 

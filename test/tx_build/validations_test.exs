@@ -11,8 +11,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
     Validations,
     OptionalAccountID,
     PoolID,
-    Price,
-    TrustlineFlags
+    Price
   }
 
   setup do
@@ -135,14 +134,5 @@ defmodule Stellar.TxBuild.ValidationsTest do
   test "validate_pool_id/1 error" do
     {:error, [liquidity_pool_id: :invalid_pool_id]} =
       Validations.validate_pool_id({:liquidity_pool_id, "ABC"})
-  end
-
-  test "validate_trustline_flags/1" do
-    {:ok, %TrustlineFlags{}} = Validations.validate_trustline_flags({:set_flags, [:authorized]})
-  end
-
-  test "validate_trustline_flags/1 error" do
-    {:error, [set_flags: :invalid_flags]} =
-      Validations.validate_trustline_flags({:set_flags, "ABC"})
   end
 end
