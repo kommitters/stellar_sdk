@@ -19,7 +19,8 @@ defmodule Stellar.TxBuild.Operation do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
-    SetOptions
+    SetOptions,
+    SetTrustlineFlags
   }
 
   alias StellarBase.XDR.Operation
@@ -43,6 +44,7 @@ defmodule Stellar.TxBuild.Operation do
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
           | SetOptions.t()
+          | SetTrustlineFlags.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -84,7 +86,8 @@ defmodule Stellar.TxBuild.Operation do
       Payment,
       PathPaymentStrictReceive,
       PathPaymentStrictSend,
-      SetOptions
+      SetOptions,
+      SetTrustlineFlags
     ]
 
     if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}

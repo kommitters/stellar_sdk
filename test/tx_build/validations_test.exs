@@ -10,7 +10,8 @@ defmodule Stellar.TxBuild.ValidationsTest do
     ClaimableBalanceID,
     Validations,
     OptionalAccountID,
-    Price
+    Price,
+    TrustlineFlags
   }
 
   setup do
@@ -123,5 +124,14 @@ defmodule Stellar.TxBuild.ValidationsTest do
   test "validate_claimable_balance_id/1 error" do
     {:error, [claimable_balance_id: :invalid_balance_id]} =
       Validations.validate_claimable_balance_id({:claimable_balance_id, "ABC"})
+  end
+
+  test "validate_trustline_flags/1" do
+    {:ok, %TrustlineFlags{}} = Validations.validate_trustline_flags({:set_flags, [:authorized]})
+  end
+
+  test "validate_trustline_flags/1 error" do
+    {:error, [set_flags: :invalid_flags]} =
+      Validations.validate_trustline_flags({:set_flags, "ABC"})
   end
 end
