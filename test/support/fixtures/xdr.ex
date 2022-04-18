@@ -28,6 +28,9 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate liquidity_pool_withdraw(pool_id, amount, min_amount_a, min_amount_b),
     to: LiquidityPools
 
+  defdelegate liquidity_pool_deposit(pool_id, max_amount_a, max_amount_b, min_price, max_price),
+    to: LiquidityPools
+
   # set_trustline
   defdelegate set_trustline_flags(trustor, asset, clear_flags, set_flags), to: Trustline
 end
