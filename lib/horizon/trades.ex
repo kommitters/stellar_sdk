@@ -60,7 +60,7 @@ defmodule Stellar.Horizon.Trades do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: allowed_query_options())
     |> Request.perform()
-    |> Request.results(&Collection.new({Trade, &1}))
+    |> Request.results(collection: {Trade, &all/1})
   end
 
   @spec allowed_query_options() :: list()

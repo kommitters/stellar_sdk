@@ -35,7 +35,7 @@ defmodule Stellar.Horizon.Offers do
     :get
     |> Request.new(@endpoint, path: offer_id)
     |> Request.perform()
-    |> Request.results(&Offer.new(&1))
+    |> Request.results(as: Offer)
   end
 
   @doc """
@@ -82,7 +82,7 @@ defmodule Stellar.Horizon.Offers do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: allowed_query_options())
     |> Request.perform()
-    |> Request.results(&Collection.new({Offer, &1}))
+    |> Request.results(collection: {Offer, &all/1})
   end
 
   @doc """
@@ -107,7 +107,7 @@ defmodule Stellar.Horizon.Offers do
     |> Request.new(@endpoint, path: offer_id, segment: "trades")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(&Collection.new({Trade, &1}))
+    |> Request.results(collection: {Trade, &list_trades(offer_id, &1)})
   end
 
   @spec allowed_query_options() :: list()

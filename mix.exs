@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.5.0"
+  @version "0.6.0"
 
   def project do
     [
@@ -29,7 +29,7 @@ defmodule Stellar.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:hackney, :jason, :logger],
       mod: {Stellar.Application, []}
     ]
   end
@@ -39,8 +39,8 @@ defmodule Stellar.MixProject do
     [
       {:stellar_base, "~> 0.6.0"},
       {:ed25519, "~> 1.3"},
-      {:hackney, "~> 1.17", optional: true},
-      {:jason, "~> 1.0", optional: true},
+      {:hackney, "~> 1.17"},
+      {:jason, "~> 1.0"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
@@ -50,7 +50,7 @@ defmodule Stellar.MixProject do
 
   defp description do
     """
-    Elixir Library to build Stellar transactions, as well as to interact with the REST endpoints of the Horizon server.
+    Elixir SDK for the Stellar network.
     """
   end
 

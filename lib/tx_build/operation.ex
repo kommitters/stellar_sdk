@@ -12,6 +12,8 @@ defmodule Stellar.TxBuild.Operation do
     CreateAccount,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
+    LiquidityPoolDeposit,
+    LiquidityPoolWithdraw,
     ManageData,
     ManageSellOffer,
     ManageBuyOffer,
@@ -19,7 +21,8 @@ defmodule Stellar.TxBuild.Operation do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
-    SetOptions
+    SetOptions,
+    SetTrustlineFlags
   }
 
   alias StellarBase.XDR.Operation
@@ -36,6 +39,8 @@ defmodule Stellar.TxBuild.Operation do
           | CreateAccount.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
+          | LiquidityPoolDeposit.t()
+          | LiquidityPoolWithdraw.t()
           | ManageData.t()
           | ManageSellOffer.t()
           | ManageBuyOffer.t()
@@ -43,6 +48,7 @@ defmodule Stellar.TxBuild.Operation do
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
           | SetOptions.t()
+          | SetTrustlineFlags.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -52,8 +58,9 @@ defmodule Stellar.TxBuild.Operation do
   def new(body, opts \\ [])
 
   def new(body, _opts) do
-    with :ok <- validate_operation(body) do
-      %__MODULE__{body: body, source_account: body.source_account}
+    case validate_operation(body) do
+      :ok -> %__MODULE__{body: body, source_account: body.source_account}
+      error -> error
     end
   end
 
@@ -78,15 +85,20 @@ defmodule Stellar.TxBuild.Operation do
       CreateAccount,
       CreatePassiveSellOffer,
       EndSponsoringFutureReserves,
+      LiquidityPoolDeposit,
+      LiquidityPoolWithdraw,
       ManageData,
       ManageBuyOffer,
       ManageSellOffer,
       Payment,
       PathPaymentStrictReceive,
       PathPaymentStrictSend,
-      SetOptions
+      SetOptions,
+      SetTrustlineFlags
     ]
 
     if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}
   end
+
+  defp validate_operation(_operation), do: {:error, :invalid_operation}
 end

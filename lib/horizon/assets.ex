@@ -50,7 +50,7 @@ defmodule Stellar.Horizon.Assets do
     |> Request.new(@endpoint)
     |> Request.add_query(options, extra_params: [:asset_code, :asset_issuer])
     |> Request.perform()
-    |> Request.results(&Collection.new({Asset, &1}))
+    |> Request.results(collection: {Asset, &all/1})
   end
 
   @doc """
