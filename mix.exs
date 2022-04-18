@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.5.0"
+  @version "0.6.0"
 
   def project do
     [
@@ -50,7 +50,7 @@ defmodule Stellar.MixProject do
 
   defp description do
     """
-    Elixir Library to build Stellar transactions, as well as to interact with the REST endpoints of the Horizon server.
+    Elixir SDK for the Stellar network.
     """
   end
 
