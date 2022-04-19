@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 (18.04.2022)
+* Add SetTrustLineFlags operation.
+* Add LiquidityPoolWithdraw and LiquidityPoolDeposit operations.
+* Functional Horizon pagination feature.
+* Better error handling for the TxBuild module.
+* Ensure library dependencies are properly loaded on start.
+
 ## 0.5.0 (21.03.2022)
 * Enable signatures for base64-encoded transaction envelopes.
 * Improve library docs.

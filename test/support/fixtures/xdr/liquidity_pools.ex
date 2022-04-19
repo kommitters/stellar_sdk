@@ -4,12 +4,15 @@ defmodule Stellar.Test.Fixtures.XDR.LiquidityPools do
   """
 
   alias StellarBase.XDR.{
+    Int32,
     Int64,
     OperationBody,
-    Operations.LiquidityPoolWithdraw,
     OperationType,
-    PoolID
+    PoolID,
+    Price
   }
+
+  alias StellarBase.XDR.Operations.{LiquidityPoolDeposit, LiquidityPoolWithdraw}
 
   @type pool_id :: String.t()
   @type amount :: integer()
@@ -49,6 +52,42 @@ defmodule Stellar.Test.Fixtures.XDR.LiquidityPools do
         }
       },
       type: %OperationType{identifier: :LIQUIDITY_POOL_WITHDRAW}
+    }
+  end
+
+  @spec liquidity_pool_deposit(
+          pool_id :: pool_id(),
+          max_amount_a :: amount(),
+          max_amount_b :: amount(),
+          min_price :: price(),
+          max_price :: price()
+        ) :: xdr()
+  def liquidity_pool_deposit(
+        "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072",
+        20,
+        10,
+        1.5,
+        2.5
+      ) do
+    %OperationBody{
+      operation: %LiquidityPoolDeposit{
+        max_amount_a: %Int64{datum: 200_000_000},
+        max_amount_b: %Int64{datum: 100_000_000},
+        max_price: %Price{
+          denominator: %Int32{datum: 2},
+          numerator: %Int32{datum: 5}
+        },
+        min_price: %Price{
+          denominator: %Int32{datum: 2},
+          numerator: %Int32{datum: 3}
+        },
+        pool_id: %PoolID{
+          value:
+            <<48, 115, 234, 253, 12, 38, 185, 102, 73, 199, 191, 162, 150, 153, 210, 169, 215, 89,
+              64, 243, 203, 7, 208, 93, 18, 82, 69, 194, 170, 58, 64, 125>>
+        }
+      },
+      type: %OperationType{identifier: :LIQUIDITY_POOL_DEPOSIT}
     }
   end
 end
