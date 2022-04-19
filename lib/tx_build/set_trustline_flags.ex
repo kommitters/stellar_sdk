@@ -78,7 +78,7 @@ defmodule Stellar.TxBuild.SetTrustlineFlags do
     |> OperationBody.new(op_type)
   end
 
-  @spec validate_trustline_flags(number :: number()) :: validation()
+  @spec validate_trustline_flags(tuple :: tuple()) :: validation()
   defp validate_trustline_flags({_field, nil}), do: {:ok, TrustlineFlags.new()}
 
   defp validate_trustline_flags({field, value}) do
