@@ -24,7 +24,8 @@ defmodule Stellar.TxBuild.PoolID do
   @impl true
   def to_xdr(%__MODULE__{pool_id: pool_id}) do
     pool_id
-    |> (&:crypto.hash(:sha256, &1)).()
+    |> String.upcase()
+    |> Base.decode16!()
     |> PoolID.new()
   end
 end
