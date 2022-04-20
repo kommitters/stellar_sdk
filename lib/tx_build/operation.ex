@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.Operation do
     BumpSequence,
     BeginSponsoringFutureReserves,
     ChangeTrust,
+    ClaimClaimableBalance,
     Clawback,
     ClawbackClaimableBalance,
     CreateAccount,
@@ -34,6 +35,7 @@ defmodule Stellar.TxBuild.Operation do
           | BumpSequence.t()
           | BeginSponsoringFutureReserves.t()
           | ChangeTrust.t()
+          | ClaimClaimableBalance.t()
           | Clawback.t()
           | ClawbackClaimableBalance.t()
           | CreateAccount.t()
@@ -80,6 +82,7 @@ defmodule Stellar.TxBuild.Operation do
       BumpSequence,
       BeginSponsoringFutureReserves,
       ChangeTrust,
+      ClaimClaimableBalance,
       Clawback,
       ClawbackClaimableBalance,
       CreateAccount,
