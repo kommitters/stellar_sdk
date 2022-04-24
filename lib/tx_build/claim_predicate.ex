@@ -2,11 +2,6 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   @moduledoc """
   `ClaimPredicate` struct definition.
   """
-  import Stellar.TxBuild.Validations,
-    only: [
-      validate_predicate_list: 2
-    ]
-
   alias Stellar.TxBuild.{ClaimPredicates, OptionalClaimPredicate}
   alias StellarBase.XDR.{ClaimPredicate, ClaimPredicateType, Int64, Void}
 
@@ -100,7 +95,7 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   defp validate_predicate_value(value, type)
        when is_list(value) and length(value) == 2 and
               (type === :and or type === :or),
-       do: validate_predicate_list([], value)
+       do: ClaimPredicates.validate_predicate_list([], value)
 
   defp validate_predicate_value(_value, _type), do: {:error, :invalid_predicate_value}
 end
