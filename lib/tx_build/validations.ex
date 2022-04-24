@@ -8,6 +8,7 @@ defmodule Stellar.TxBuild.Validations do
     Amount,
     Asset,
     AssetsPath,
+    ClaimPredicate,
     Flags,
     ClaimableBalanceID,
     OptionalAccount,
@@ -29,6 +30,7 @@ defmodule Stellar.TxBuild.Validations do
   @type value :: account_id() | asset() | number()
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()
+  @type predicates :: list(ClaimPredicate.t())
   @type validation :: {:ok, any()} | {:error, error()}
 
   @spec validate_pos_integer(component :: component()) :: validation()
@@ -167,4 +169,14 @@ defmodule Stellar.TxBuild.Validations do
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
+
+  @spec validate_predicate_list(predicates :: predicates, predicates :: predicates()) ::
+          validation()
+  def validate_predicate_list(response, []), do: {:ok, response}
+
+  def validate_predicate_list(response, [%ClaimPredicate{} = h | t]),
+    do: validate_predicate_list(response ++ [h], t)
+
+  def validate_predicate_list(_response, _predicates),
+    do: {:error, :invalid_predicate_list_value}
 end
