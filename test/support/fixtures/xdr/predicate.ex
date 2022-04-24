@@ -239,4 +239,54 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
       }
     }
   end
+
+  @spec predicates(value :: value()) :: ClaimPredicates.t()
+  def predicates([
+        %TxClaimPredicate{
+          predicate: :unconditional,
+          time_type: nil,
+          type: nil,
+          value: nil
+        },
+        %TxClaimPredicate{
+          predicate: :conditional,
+          time_type: :absolute,
+          type: :time,
+          value: 1
+        }
+      ]) do
+    %ClaimPredicates{
+      predicates: [
+        %ClaimPredicate{
+          predicate: %Void{value: nil},
+          type: %ClaimPredicateType{
+            identifier: :CLAIM_PREDICATE_UNCONDITIONAL
+          }
+        },
+        %ClaimPredicate{
+          predicate: %Int64{datum: 1},
+          type: %ClaimPredicateType{
+            identifier: :CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
+          }
+        }
+      ]
+    }
+  end
+
+  @spec optional_predicate(value :: value()) :: OptionalClaimPredicate.t()
+  def optional_predicate(%TxClaimPredicate{
+        predicate: :unconditional,
+        time_type: nil,
+        type: nil,
+        value: nil
+      }) do
+    %OptionalClaimPredicate{
+      predicate: %ClaimPredicate{
+        predicate: %Void{value: nil},
+        type: %ClaimPredicateType{
+          identifier: :CLAIM_PREDICATE_UNCONDITIONAL
+        }
+      }
+    }
+  end
 end

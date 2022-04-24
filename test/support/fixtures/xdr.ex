@@ -39,4 +39,6 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate predicate_not(value, type), to: Predicate
   defdelegate predicate_time_absolute(value, type, time_type), to: Predicate
   defdelegate predicate_time_relative(value, type, time_type), to: Predicate
+  defdelegate predicates(value), to: Predicate
+  defdelegate optional_predicate(value), to: Predicate
 end

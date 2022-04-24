@@ -52,7 +52,8 @@ defmodule Stellar.TxBuild.ClaimPredicate do
 
   @impl true
   def to_xdr(%__MODULE__{predicate: :unconditional}) do
-    ClaimPredicate.new(Void.new(), ClaimPredicateType.new(:CLAIM_PREDICATE_UNCONDITIONAL))
+    Void.new()
+    |> ClaimPredicate.new(ClaimPredicateType.new(:CLAIM_PREDICATE_UNCONDITIONAL))
   end
 
   def to_xdr(%__MODULE__{value: value, type: :and}) do
