@@ -138,6 +138,34 @@ defmodule Stellar.TxBuild.DefaultTest do
       TxBuild.set_base_fee({:error, :invalid_sequence_number}, :base_fee)
   end
 
+  test "set_base_fee/2 before_adding_operations", %{
+    tx_build: tx_build,
+    keypair: {public_key, _secret}
+  } do
+    base_fee = BaseFee.new(500)
+    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
+    op2 = Payment.new(destination: public_key, asset: :native, amount: 150)
+
+    {:ok, %TxBuild{tx: %Transaction{base_fee: %BaseFee{fee: 500, multiplier: 2}}}} =
+      tx_build
+      |> TxBuild.set_base_fee(base_fee)
+      |> TxBuild.add_operations([op1, op2])
+  end
+
+  test "set_base_fee/2 after_adding_operations", %{
+    tx_build: tx_build,
+    keypair: {public_key, _secret}
+  } do
+    base_fee = BaseFee.new(200)
+    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
+    op2 = Payment.new(destination: public_key, asset: :native, amount: 150)
+
+    {:ok, %TxBuild{tx: %Transaction{base_fee: %BaseFee{fee: 200, multiplier: 2}}}} =
+      tx_build
+      |> TxBuild.add_operations([op1, op2])
+      |> TxBuild.set_base_fee(base_fee)
+  end
+
   test "add_operation/2", %{tx_build: tx_build, keypair: {public_key, _secret}} do
     op_body = CreateAccount.new(destination: public_key, starting_balance: 1.5)
     operation = Operation.new(op_body)
@@ -165,15 +193,6 @@ defmodule Stellar.TxBuild.DefaultTest do
     operations = [Operation.new(op1), Operation.new(op2)]
 
     {:ok, %TxBuild{tx: %Transaction{operations: %Operations{operations: ^operations}}}} =
-      TxBuild.add_operations(tx_build, [op1, op2])
-  end
-
-  test "add_operations/2 updated_base_fee", %{tx_build: tx_build, keypair: {public_key, _secret}} do
-    op1 = CreateAccount.new(destination: public_key, starting_balance: 1.5)
-    op2 = Payment.new(destination: public_key, asset: :native, amount: 100)
-
-    {:ok,
-     %TxBuild{tx: %Transaction{base_fee: %BaseFee{fee: 200}, operations: %Operations{count: 2}}}} =
       TxBuild.add_operations(tx_build, [op1, op2])
   end
 
