@@ -6,7 +6,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   alias Stellar.Test.Fixtures.XDR.{
     Accounts,
     LiquidityPools,
-    Predicate,
+    Predicates,
     Transactions,
     TransactionEnvelope,
     Trustline
@@ -33,12 +33,12 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate set_trustline_flags(trustor, asset, clear_flags, set_flags), to: Trustline
 
   # predicates
-  defdelegate predicate_unconditional(predicate), to: Predicate
-  defdelegate predicate_and(value, type), to: Predicate
-  defdelegate predicate_or(value, type), to: Predicate
-  defdelegate predicate_not(value, type), to: Predicate
-  defdelegate predicate_time_absolute(value, type, time_type), to: Predicate
-  defdelegate predicate_time_relative(value, type, time_type), to: Predicate
-  defdelegate predicates(value), to: Predicate
-  defdelegate optional_predicate(value), to: Predicate
+  defdelegate predicate_unconditional(predicate), to: Predicates
+  defdelegate predicate_and(value, type), to: Predicates
+  defdelegate predicate_or(value, type), to: Predicates
+  defdelegate predicate_not(value, type), to: Predicates
+  defdelegate predicate_time_absolute(value, type, time_type), to: Predicates
+  defdelegate predicate_time_relative(value, type, time_type), to: Predicates
+  defdelegate predicates(value), to: Predicates
+  defdelegate optional_predicate(value), to: Predicates
 end

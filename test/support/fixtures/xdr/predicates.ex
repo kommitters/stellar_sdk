@@ -1,4 +1,4 @@
-defmodule Stellar.Test.Fixtures.XDR.Predicate do
+defmodule Stellar.Test.Fixtures.XDR.Predicates do
   @moduledoc """
   XDR constructions for Predicate.
   """
@@ -12,8 +12,12 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
   }
 
   alias Stellar.TxBuild.ClaimPredicate, as: TxClaimPredicate
+  alias Stellar.TxBuild.ClaimPredicates, as: TxClaimPredicates
 
-  @type value :: list(TxClaimPredicate.t()) | TxClaimPredicate.t() | pos_integer()
+  @type value ::
+          TxClaimPredicate.t()
+          | pos_integer()
+          | TxClaimPredicates.t()
 
   @spec predicate_unconditional(predicate :: atom()) :: ClaimPredicate.t()
   def predicate_unconditional(:unconditional) do
@@ -27,38 +31,27 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
 
   @spec predicate_and(value :: value(), type :: atom()) :: ClaimPredicate.t()
   def predicate_and(
-        [
-          %TxClaimPredicate{
-            predicate: :conditional,
-            time_type: nil,
-            type: :not,
-            value: %TxClaimPredicate{
+        %TxClaimPredicates{
+          value: [
+            %TxClaimPredicate{
               predicate: :conditional,
-              time_type: :absolute,
-              type: :time,
-              value: 1
-            }
-          },
-          %TxClaimPredicate{
-            predicate: :conditional,
-            time_type: nil,
-            type: :or,
-            value: [
-              %TxClaimPredicate{
-                predicate: :unconditional,
-                time_type: nil,
-                type: nil,
-                value: nil
-              },
-              %TxClaimPredicate{
+              time_type: nil,
+              type: :not,
+              value: %TxClaimPredicate{
                 predicate: :conditional,
-                time_type: :relative,
+                time_type: :absolute,
                 type: :time,
-                value: 2
+                value: 1
               }
-            ]
-          }
-        ],
+            },
+            %TxClaimPredicate{
+              predicate: :conditional,
+              time_type: :relative,
+              type: :time,
+              value: 2
+            }
+          ]
+        },
         :and
       ) do
     %ClaimPredicate{
@@ -78,24 +71,9 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
             }
           },
           %ClaimPredicate{
-            predicate: %ClaimPredicates{
-              predicates: [
-                %ClaimPredicate{
-                  predicate: %Void{value: nil},
-                  type: %ClaimPredicateType{
-                    identifier: :CLAIM_PREDICATE_UNCONDITIONAL
-                  }
-                },
-                %ClaimPredicate{
-                  predicate: %Int64{datum: 2},
-                  type: %ClaimPredicateType{
-                    identifier: :CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-                  }
-                }
-              ]
-            },
+            predicate: %Int64{datum: 2},
             type: %ClaimPredicateType{
-              identifier: :CLAIM_PREDICATE_OR
+              identifier: :CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
             }
           }
         ]
@@ -106,38 +84,27 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
 
   @spec predicate_or(value :: value(), type :: atom()) :: ClaimPredicate.t()
   def predicate_or(
-        [
-          %TxClaimPredicate{
-            predicate: :conditional,
-            time_type: nil,
-            type: :not,
-            value: %TxClaimPredicate{
+        %TxClaimPredicates{
+          value: [
+            %TxClaimPredicate{
               predicate: :conditional,
-              time_type: :absolute,
-              type: :time,
-              value: 1
-            }
-          },
-          %TxClaimPredicate{
-            predicate: :conditional,
-            time_type: nil,
-            type: :or,
-            value: [
-              %TxClaimPredicate{
-                predicate: :unconditional,
-                time_type: nil,
-                type: nil,
-                value: nil
-              },
-              %TxClaimPredicate{
+              time_type: nil,
+              type: :not,
+              value: %TxClaimPredicate{
                 predicate: :conditional,
-                time_type: :relative,
+                time_type: :absolute,
                 type: :time,
-                value: 2
+                value: 1
               }
-            ]
-          }
-        ],
+            },
+            %TxClaimPredicate{
+              predicate: :conditional,
+              time_type: :relative,
+              type: :time,
+              value: 2
+            }
+          ]
+        },
         :or
       ) do
     %ClaimPredicate{
@@ -157,24 +124,9 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
             }
           },
           %ClaimPredicate{
-            predicate: %ClaimPredicates{
-              predicates: [
-                %ClaimPredicate{
-                  predicate: %Void{value: nil},
-                  type: %ClaimPredicateType{
-                    identifier: :CLAIM_PREDICATE_UNCONDITIONAL
-                  }
-                },
-                %ClaimPredicate{
-                  predicate: %Int64{datum: 2},
-                  type: %ClaimPredicateType{
-                    identifier: :CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
-                  }
-                }
-              ]
-            },
+            predicate: %Int64{datum: 2},
             type: %ClaimPredicateType{
-              identifier: :CLAIM_PREDICATE_OR
+              identifier: :CLAIM_PREDICATE_BEFORE_RELATIVE_TIME
             }
           }
         ]
@@ -186,31 +138,19 @@ defmodule Stellar.Test.Fixtures.XDR.Predicate do
   @spec predicate_not(value :: value(), type :: atom()) :: ClaimPredicate.t()
   def predicate_not(
         %TxClaimPredicate{
-          predicate: :conditional,
+          predicate: :unconditional,
           time_type: nil,
-          type: :not,
-          value: %TxClaimPredicate{
-            predicate: :conditional,
-            time_type: :absolute,
-            type: :time,
-            value: 1
-          }
+          type: nil,
+          value: nil
         },
         :not
       ) do
     %ClaimPredicate{
       predicate: %OptionalClaimPredicate{
         predicate: %ClaimPredicate{
-          predicate: %OptionalClaimPredicate{
-            predicate: %ClaimPredicate{
-              predicate: %Int64{datum: 1},
-              type: %ClaimPredicateType{
-                identifier: :CLAIM_PREDICATE_BEFORE_ABSOLUTE_TIME
-              }
-            }
-          },
+          predicate: %Void{value: nil},
           type: %ClaimPredicateType{
-            identifier: :CLAIM_PREDICATE_NOT
+            identifier: :CLAIM_PREDICATE_UNCONDITIONAL
           }
         }
       },

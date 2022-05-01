@@ -5,7 +5,7 @@ Code.require_file("test/support/fixtures/xdr/transactions.ex")
 Code.require_file("test/support/fixtures/xdr/transaction_envelope.ex")
 Code.require_file("test/support/fixtures/xdr/liquidity_pools.ex")
 Code.require_file("test/support/fixtures/xdr/trustline.ex")
-Code.require_file("test/support/fixtures/xdr/predicate.ex")
+Code.require_file("test/support/fixtures/xdr/predicates.ex")
 Code.require_file("test/support/fixtures/xdr.ex")
 
 ExUnit.start()

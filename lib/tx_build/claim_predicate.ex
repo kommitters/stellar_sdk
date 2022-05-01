@@ -11,7 +11,7 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   @type predicate :: :unconditional | :conditional
   @type type :: :time | :and | :or | :not
   @type time_type :: :relative | :absolute
-  @type value :: t() | list(t()) | pos_integer()
+  @type value :: t() | ClaimPredicates.t() | pos_integer()
 
   @type t :: %__MODULE__{
           predicate: predicate(),
@@ -31,21 +31,30 @@ defmodule Stellar.TxBuild.ClaimPredicate do
     do: new(value: value, type: type, time_type: time_type)
 
   def new([value: value, type: type], _opts)
-      when type === :and or type === :or or type === :not do
-    with {:ok, value} <- validate_predicate_value(value, type) do
-      %__MODULE__{predicate: :conditional, type: type, value: value, time_type: nil}
+      when type in ~w(and or not)a do
+    case validate_predicate_value(value, type) do
+      {:ok, value} ->
+        %__MODULE__{predicate: :conditional, type: type, value: value, time_type: nil}
+
+      {:error, value} ->
+        {:error, value}
     end
   end
 
   def new([value: value, type: type, time_type: time_type], _opts) do
-    with {:ok, value} <- validate_predicate_value(value, type) do
-      %__MODULE__{predicate: :conditional, type: :time, value: value, time_type: time_type}
+    case validate_predicate_value(value, type) do
+      {:ok, value} ->
+        %__MODULE__{predicate: :conditional, type: :time, value: value, time_type: time_type}
+
+      {:error, value} ->
+        {:error, value}
     end
   end
 
   def new(_args, _opts), do: {:error, :invalid_claim_predicate}
 
   @impl true
+  @spec to_xdr(Stellar.TxBuild.ClaimPredicate.t()) :: StellarBase.XDR.ClaimPredicate.t()
   def to_xdr(%__MODULE__{predicate: :unconditional}) do
     Void.new()
     |> ClaimPredicate.new(ClaimPredicateType.new(:CLAIM_PREDICATE_UNCONDITIONAL))
@@ -53,14 +62,12 @@ defmodule Stellar.TxBuild.ClaimPredicate do
 
   def to_xdr(%__MODULE__{value: value, type: :and}) do
     value
-    |> ClaimPredicates.new()
     |> ClaimPredicates.to_xdr()
     |> ClaimPredicate.new(ClaimPredicateType.new(:CLAIM_PREDICATE_AND))
   end
 
   def to_xdr(%__MODULE__{value: value, type: :or}) do
     value
-    |> ClaimPredicates.new()
     |> ClaimPredicates.to_xdr()
     |> ClaimPredicate.new(ClaimPredicateType.new(:CLAIM_PREDICATE_OR))
   end
@@ -92,9 +99,9 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   defp validate_predicate_value(value, type) when is_integer(value) and type == :time,
     do: {:ok, value}
 
-  defp validate_predicate_value(value, type)
+  defp validate_predicate_value(%ClaimPredicates{value: value}, type)
        when is_list(value) and length(value) == 2 and
-              (type === :and or type === :or),
+              type in ~w(and or)a,
        do: ClaimPredicates.validate_predicate_list([], value)
 
   defp validate_predicate_value(_value, _type), do: {:error, :invalid_predicate_value}

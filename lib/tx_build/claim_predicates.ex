@@ -7,10 +7,9 @@ defmodule Stellar.TxBuild.ClaimPredicates do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type validation :: {:ok, any()} | {:error, error()}
-  @type predicates :: ClaimPredicate.t() | list(ClaimPredicate.t())
+  @type predicates :: list(ClaimPredicate.t())
   @type error :: {:error, atom()}
-  @type t :: %__MODULE__{value: list(ClaimPredicate.t())}
+  @type validation :: {:ok, any()} | error()
 
   defstruct [:value]
 
@@ -18,8 +17,9 @@ defmodule Stellar.TxBuild.ClaimPredicates do
   def new(predicates \\ [], opts \\ [])
 
   def new(predicates, _opts) do
-    with {:ok, value} <- validate_predicate_list([], predicates) do
-      %__MODULE__{value: value}
+    case validate_predicate_list([], predicates) do
+      {:ok, value} -> value
+      {:error, value} -> {:error, value}
     end
   end
 
@@ -32,7 +32,7 @@ defmodule Stellar.TxBuild.ClaimPredicates do
 
   @spec validate_predicate_list(predicates :: predicates, predicates :: predicates()) ::
           validation()
-  def validate_predicate_list(response, []), do: {:ok, response}
+  def validate_predicate_list(response, []), do: {:ok, %__MODULE__{value: response}}
 
   def validate_predicate_list(response, [%ClaimPredicate{} = h | t]),
     do: validate_predicate_list(response ++ [h], t)

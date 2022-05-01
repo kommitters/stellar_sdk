@@ -17,7 +17,7 @@ defmodule Stellar.TxBuild.OptionalClaimPredicateTest do
     %OptionalClaimPredicate{value: ^predicate} = OptionalClaimPredicate.new(predicate)
   end
 
-  test "new/2 invalid_predicate_list" do
+  test "new/2 invalid_optional_claim_predicate" do
     {:error, :invalid_optional_claim_predicate} = OptionalClaimPredicate.new(1)
   end
 

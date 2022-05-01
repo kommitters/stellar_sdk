@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
 
   alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
 
-  alias Stellar.TxBuild.ClaimPredicate
+  alias Stellar.TxBuild.{ClaimPredicate, ClaimPredicates}
 
   setup do
     value_time = 1
@@ -17,22 +17,17 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
         type: :not
       )
 
-    predicate2 =
-      ClaimPredicate.new(
-        value: [predicate_unconditional, predicate_relative],
-        type: :or
-      )
-
-    predicates = [predicate1, predicate2]
+    predicates = [predicate1, predicate_relative]
+    claim_predicates = ClaimPredicates.new(predicates)
 
     %{
       value_time: value_time,
-      predicates: predicates,
-      predicate: predicate1,
+      predicates: claim_predicates,
+      predicate: predicate_unconditional,
       xdr_unconditional: XDRFixtures.predicate_unconditional(:unconditional),
-      xdr_and: XDRFixtures.predicate_and(predicates, :and),
-      xdr_or: XDRFixtures.predicate_or(predicates, :or),
-      xdr_not: XDRFixtures.predicate_not(predicate1, :not),
+      xdr_and: XDRFixtures.predicate_and(claim_predicates, :and),
+      xdr_or: XDRFixtures.predicate_or(claim_predicates, :or),
+      xdr_not: XDRFixtures.predicate_not(predicate_unconditional, :not),
       xdr_time_absolute: XDRFixtures.predicate_time_absolute(value_time, :time, :absolute),
       xdr_time_relative: XDRFixtures.predicate_time_relative(value_time, :time, :relative)
     }
@@ -61,7 +56,7 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
   end
 
   test "new/2 invalid_predicate_value", %{predicate: predicate} do
-    {:error, :invalid_predicate_list_value} = ClaimPredicate.new(value: [predicate, 1], type: :or)
+    {:error, :invalid_predicate_list_value} = ClaimPredicates.new([predicate, 1])
   end
 
   test "new/2 not_type", %{predicate: predicate} do
