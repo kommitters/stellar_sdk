@@ -54,7 +54,6 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   def new(_args, _opts), do: {:error, :invalid_claim_predicate}
 
   @impl true
-  @spec to_xdr(Stellar.TxBuild.ClaimPredicate.t()) :: StellarBase.XDR.ClaimPredicate.t()
   def to_xdr(%__MODULE__{predicate: :unconditional}) do
     Void.new()
     |> ClaimPredicate.new(ClaimPredicateType.new(:CLAIM_PREDICATE_UNCONDITIONAL))
@@ -96,7 +95,7 @@ defmodule Stellar.TxBuild.ClaimPredicate do
        when type != :time,
        do: {:ok, value}
 
-  defp validate_predicate_value(value, type) when is_integer(value) and type == :time,
+  defp validate_predicate_value(value, :time) when is_integer(value),
     do: {:ok, value}
 
   defp validate_predicate_value(%ClaimPredicates{value: value}, type)

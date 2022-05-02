@@ -12,7 +12,7 @@ defmodule Stellar.TxBuild.ClaimPredicatesTest do
 
     %{
       predicates: predicates,
-      xdr: XDRFixtures.predicates(predicates)
+      xdr: XDRFixtures.claim_predicates(predicates)
     }
   end
 

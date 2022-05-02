@@ -19,8 +19,8 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
           | pos_integer()
           | TxClaimPredicates.t()
 
-  @spec predicate_unconditional(predicate :: atom()) :: ClaimPredicate.t()
-  def predicate_unconditional(:unconditional) do
+  @spec claim_predicate_unconditional(predicate :: atom()) :: ClaimPredicate.t()
+  def claim_predicate_unconditional(:unconditional) do
     %ClaimPredicate{
       predicate: %Void{value: nil},
       type: %ClaimPredicateType{
@@ -29,8 +29,8 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicate_and(value :: value(), type :: atom()) :: ClaimPredicate.t()
-  def predicate_and(
+  @spec claim_predicate_and(value :: value(), type :: atom()) :: ClaimPredicate.t()
+  def claim_predicate_and(
         %TxClaimPredicates{
           value: [
             %TxClaimPredicate{
@@ -82,8 +82,8 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicate_or(value :: value(), type :: atom()) :: ClaimPredicate.t()
-  def predicate_or(
+  @spec claim_predicate_or(value :: value(), type :: atom()) :: ClaimPredicate.t()
+  def claim_predicate_or(
         %TxClaimPredicates{
           value: [
             %TxClaimPredicate{
@@ -135,8 +135,8 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicate_not(value :: value(), type :: atom()) :: ClaimPredicate.t()
-  def predicate_not(
+  @spec claim_predicate_not(value :: value(), type :: atom()) :: ClaimPredicate.t()
+  def claim_predicate_not(
         %TxClaimPredicate{
           predicate: :unconditional,
           time_type: nil,
@@ -158,9 +158,9 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicate_time_absolute(value :: value(), type :: atom(), time_type :: atom()) ::
+  @spec claim_predicate_time_absolute(value :: value(), type :: atom(), time_type :: atom()) ::
           ClaimPredicate.t()
-  def predicate_time_absolute(1, :time, :absolute) do
+  def claim_predicate_time_absolute(1, :time, :absolute) do
     %ClaimPredicate{
       predicate: %Int64{datum: 1},
       type: %ClaimPredicateType{
@@ -169,9 +169,9 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicate_time_relative(value :: value(), type :: atom(), time_type :: atom()) ::
+  @spec claim_predicate_time_relative(value :: value(), type :: atom(), time_type :: atom()) ::
           ClaimPredicate.t()
-  def predicate_time_relative(1, :time, :relative) do
+  def claim_predicate_time_relative(1, :time, :relative) do
     %ClaimPredicate{
       predicate: %Int64{datum: 1},
       type: %ClaimPredicateType{
@@ -180,8 +180,8 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     }
   end
 
-  @spec predicates(value :: value()) :: ClaimPredicates.t()
-  def predicates([
+  @spec claim_predicates(value :: value()) :: ClaimPredicates.t()
+  def claim_predicates([
         %TxClaimPredicate{
           predicate: :unconditional,
           time_type: nil,

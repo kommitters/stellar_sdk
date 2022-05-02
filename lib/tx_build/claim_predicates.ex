@@ -30,7 +30,7 @@ defmodule Stellar.TxBuild.ClaimPredicates do
     |> ClaimPredicates.new()
   end
 
-  @spec validate_predicate_list(predicates :: predicates, predicates :: predicates()) ::
+  @spec validate_predicate_list(predicates :: predicates(), predicates :: predicates()) ::
           validation()
   def validate_predicate_list(response, []), do: {:ok, %__MODULE__{value: response}}
 

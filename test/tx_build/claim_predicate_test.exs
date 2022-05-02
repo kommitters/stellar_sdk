@@ -24,12 +24,12 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
       value_time: value_time,
       predicates: claim_predicates,
       predicate: predicate_unconditional,
-      xdr_unconditional: XDRFixtures.predicate_unconditional(:unconditional),
-      xdr_and: XDRFixtures.predicate_and(claim_predicates, :and),
-      xdr_or: XDRFixtures.predicate_or(claim_predicates, :or),
-      xdr_not: XDRFixtures.predicate_not(predicate_unconditional, :not),
-      xdr_time_absolute: XDRFixtures.predicate_time_absolute(value_time, :time, :absolute),
-      xdr_time_relative: XDRFixtures.predicate_time_relative(value_time, :time, :relative)
+      xdr_unconditional: XDRFixtures.claim_predicate_unconditional(:unconditional),
+      xdr_and: XDRFixtures.claim_predicate_and(claim_predicates, :and),
+      xdr_or: XDRFixtures.claim_predicate_or(claim_predicates, :or),
+      xdr_not: XDRFixtures.claim_predicate_not(predicate_unconditional, :not),
+      xdr_time_absolute: XDRFixtures.claim_predicate_time_absolute(value_time, :time, :absolute),
+      xdr_time_relative: XDRFixtures.claim_predicate_time_relative(value_time, :time, :relative)
     }
   end
 
