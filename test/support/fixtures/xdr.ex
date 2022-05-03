@@ -7,6 +7,7 @@ defmodule Stellar.Test.Fixtures.XDR do
     Accounts,
     ClaimableBalances,
     LiquidityPools,
+    Predicates,
     Transactions,
     TransactionEnvelope,
     Trustline
@@ -39,4 +40,14 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # set_trustline
   defdelegate set_trustline_flags(trustor, asset, clear_flags, set_flags), to: Trustline
+
+  # predicates
+  defdelegate claim_predicate_unconditional(predicate), to: Predicates
+  defdelegate claim_predicate_and(value, type), to: Predicates
+  defdelegate claim_predicate_or(value, type), to: Predicates
+  defdelegate claim_predicate_not(value, type), to: Predicates
+  defdelegate claim_predicate_time_absolute(value, type, time_type), to: Predicates
+  defdelegate claim_predicate_time_relative(value, type, time_type), to: Predicates
+  defdelegate claim_predicates(value), to: Predicates
+  defdelegate optional_predicate(value), to: Predicates
 end
