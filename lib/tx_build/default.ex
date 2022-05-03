@@ -65,7 +65,9 @@ defmodule Stellar.TxBuild.Default do
 
   @impl true
   def set_base_fee({:ok, %TxBuild{tx: tx} = tx_build}, %BaseFee{} = base_fee) do
-    transaction = %{tx | base_fee: base_fee}
+    %Transaction{operations: %Operations{count: ops_count}} = tx
+    transaction = %{tx | base_fee: BaseFee.increment(base_fee, ops_count)}
+
     {:ok, %{tx_build | tx: transaction}}
   end
 
@@ -96,8 +98,8 @@ defmodule Stellar.TxBuild.Default do
   @impl true
   def add_operation({:ok, %TxBuild{tx: tx} = tx_build}, operation_body) do
     with %Operation{} = operation <- Operation.new(operation_body),
-         %Operations{count: op_count} = operations <- Operations.add(tx.operations, operation) do
-      transaction = %{tx | operations: operations, base_fee: BaseFee.new(op_count)}
+         %Operations{} = operations <- Operations.add(tx.operations, operation) do
+      transaction = %{tx | operations: operations, base_fee: BaseFee.increment(tx.base_fee)}
       {:ok, %{tx_build | tx: transaction}}
     end
   end
