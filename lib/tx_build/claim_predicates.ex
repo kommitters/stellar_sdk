@@ -11,6 +11,8 @@ defmodule Stellar.TxBuild.ClaimPredicates do
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
 
+  @type t :: %__MODULE__{value: predicates()}
+
   defstruct [:value]
 
   @impl true
