@@ -7,11 +7,13 @@ defmodule Stellar.TxBuild.Operation do
     BumpSequence,
     BeginSponsoringFutureReserves,
     ChangeTrust,
+    ClaimClaimableBalance,
     Clawback,
     ClawbackClaimableBalance,
     CreateAccount,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
+    LiquidityPoolDeposit,
     LiquidityPoolWithdraw,
     ManageData,
     ManageSellOffer,
@@ -33,11 +35,13 @@ defmodule Stellar.TxBuild.Operation do
           | BumpSequence.t()
           | BeginSponsoringFutureReserves.t()
           | ChangeTrust.t()
+          | ClaimClaimableBalance.t()
           | Clawback.t()
           | ClawbackClaimableBalance.t()
           | CreateAccount.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
+          | LiquidityPoolDeposit.t()
           | LiquidityPoolWithdraw.t()
           | ManageData.t()
           | ManageSellOffer.t()
@@ -78,11 +82,13 @@ defmodule Stellar.TxBuild.Operation do
       BumpSequence,
       BeginSponsoringFutureReserves,
       ChangeTrust,
+      ClaimClaimableBalance,
       Clawback,
       ClawbackClaimableBalance,
       CreateAccount,
       CreatePassiveSellOffer,
       EndSponsoringFutureReserves,
+      LiquidityPoolDeposit,
       LiquidityPoolWithdraw,
       ManageData,
       ManageBuyOffer,

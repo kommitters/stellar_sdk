@@ -48,7 +48,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
       tx_envelope: TransactionEnvelope.new(tx, signatures),
       tx_envelope_xdr: XDRFixtures.transaction_envelope(),
       tx_envelope_base64:
-        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAw1AAAAAAAAHiQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAP+vE9o3jcA09johM/VtYWpdEhIl0TD4eRCmqtPEhGJNAAAAAADk4cAAAAAAAAAAAcSEYk0AAABA/ZXTNzCemP6Mwb/SGIUGhFKk/w4VVurCsJf7td7LrConewwxkrQGNuaYODTVlqQFHNp8RhZQtI/i5lDQ5Z5qAQ=="
+        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAfQAAAAAAAHiQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAP+vE9o3jcA09johM/VtYWpdEhIl0TD4eRCmqtPEhGJNAAAAAADk4cAAAAAAAAAAAcSEYk0AAABA4XBteCIyqJn86GK0xMYA6h2lweeWfo0DNRY+rwiVGlAQyZkV+tYUbR0KmJMzScPRqMX7eEyDdOIMd7IkuEpNAQ=="
     }
   end
 

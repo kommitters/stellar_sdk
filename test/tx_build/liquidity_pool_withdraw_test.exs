@@ -84,7 +84,7 @@ defmodule Stellar.TxBuild.LiquidityPoolWithdrawTest do
         liquidity_pool_id: liquidity_pool_id,
         amount: amount,
         min_amount_a: "ABC",
-        min_amount_a: min_amount_b
+        min_amount_b: min_amount_b
       )
   end
 

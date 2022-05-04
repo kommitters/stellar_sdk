@@ -5,6 +5,7 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   alias Stellar.Test.Fixtures.XDR.{
     Accounts,
+    ClaimableBalances,
     LiquidityPools,
     Predicates,
     Transactions,
@@ -23,10 +24,18 @@ defmodule Stellar.Test.Fixtures.XDR do
   # transactions envelope
   defdelegate transaction_envelope(options \\ []), to: TransactionEnvelope
 
-  # liquidity_pools
+  # liquidity pools
   defdelegate liquidity_pool_id(pool_id), to: LiquidityPools
 
+  # claimable balances
+  defdelegate claimable_balance_id(balance_id), to: ClaimableBalances
+  defdelegate clawback_claimable_balance(balance_id), to: ClaimableBalances
+  defdelegate claim_claimable_balance(balance_id), to: ClaimableBalances
+
   defdelegate liquidity_pool_withdraw(pool_id, amount, min_amount_a, min_amount_b),
+    to: LiquidityPools
+
+  defdelegate liquidity_pool_deposit(pool_id, max_amount_a, max_amount_b, min_price, max_price),
     to: LiquidityPools
 
   # set_trustline

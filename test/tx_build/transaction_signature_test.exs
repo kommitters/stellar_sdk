@@ -46,8 +46,8 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
       )
 
     base_signature =
-      <<171, 129, 177, 226, 243, 56, 134, 94, 61, 134, 123, 97, 244, 110, 78, 17, 231, 96, 32,
-        172, 108, 36, 151, 24, 114, 216, 254, 26, 43, 36, 241, 118>>
+      <<221, 149, 123, 171, 23, 103, 0, 36, 251, 93, 218, 51, 151, 37, 43, 98, 224, 206, 210, 221,
+        3, 94, 94, 67, 103, 51, 109, 194, 187, 158, 45, 212>>
 
     signature = Signature.new(keypair1)
     signature2 = Signature.new(keypair2)
