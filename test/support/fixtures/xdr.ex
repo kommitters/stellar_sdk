@@ -6,6 +6,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   alias Stellar.Test.Fixtures.XDR.{
     Accounts,
     ClaimableBalances,
+    Ledger,
     LiquidityPools,
     Predicates,
     Transactions,
@@ -40,6 +41,7 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # set_trustline
   defdelegate set_trustline_flags(trustor, asset, clear_flags, set_flags), to: Trustline
+  defdelegate trustline_asset(asset), to: Trustline
 
   # predicates
   defdelegate claim_predicate_unconditional(predicate), to: Predicates
@@ -50,4 +52,12 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate claim_predicate_time_relative(value, type, time_type), to: Predicates
   defdelegate claim_predicates(value), to: Predicates
   defdelegate optional_predicate(value), to: Predicates
+
+  # ledger entries
+  defdelegate ledger_account(account_id), to: Ledger
+  defdelegate ledger_claimable_balance(claimable_balance_id), to: Ledger
+  defdelegate ledger_liquidity_pool(liquidity_pool_id), to: Ledger
+  defdelegate ledger_offer(seller_id, offer_id), to: Ledger
+  defdelegate ledger_data(account_id, data_name), to: Ledger
+  defdelegate ledger_trustline(account_id, asset), to: Ledger
 end

@@ -7,6 +7,7 @@ Code.require_file("test/support/fixtures/xdr/liquidity_pools.ex")
 Code.require_file("test/support/fixtures/xdr/claimable_balances.ex")
 Code.require_file("test/support/fixtures/xdr/trustline.ex")
 Code.require_file("test/support/fixtures/xdr/predicates.ex")
+Code.require_file("test/support/fixtures/xdr/ledger.ex")
 Code.require_file("test/support/fixtures/xdr.ex")
 
 ExUnit.start()
