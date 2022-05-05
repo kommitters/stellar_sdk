@@ -229,4 +229,9 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
       }
     }
   end
+
+  @spec optional_predicate_with_nil_value(value :: nil) :: OptionalClaimPredicate.t()
+  def optional_predicate_with_nil_value(nil) do
+    %OptionalClaimPredicate{predicate: nil}
+  end
 end
