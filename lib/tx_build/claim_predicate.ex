@@ -27,8 +27,8 @@ defmodule Stellar.TxBuild.ClaimPredicate do
 
   def new(:unconditional, _opts), do: %__MODULE__{predicate: :unconditional}
 
-  def new({value, type, time_type}, _opts),
-    do: new(value: value, type: type, time_type: time_type)
+  def new({value, type}, _opts),
+    do: new(value: value, type: type)
 
   def new([value: value, type: type], _opts)
       when type in ~w(and or not)a do
@@ -40,6 +40,9 @@ defmodule Stellar.TxBuild.ClaimPredicate do
         {:error, value}
     end
   end
+
+  def new({value, type, time_type}, _opts),
+    do: new(value: value, type: type, time_type: time_type)
 
   def new([value: value, type: type, time_type: time_type], _opts) do
     case validate_predicate_value(value, type) do
