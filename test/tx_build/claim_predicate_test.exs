@@ -37,6 +37,11 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
     %ClaimPredicate{predicate: :unconditional} = ClaimPredicate.new(:unconditional)
   end
 
+  test "new/2 tuple_with_2_arguments", %{predicates: value} do
+    %ClaimPredicate{predicate: :conditional, value: ^value, type: :and} =
+      ClaimPredicate.new({value, :and})
+  end
+
   test "new/2 and_type", %{predicates: predicates} do
     %ClaimPredicate{predicate: :conditional, value: ^predicates, type: :and} =
       ClaimPredicate.new(value: predicates, type: :and)
@@ -78,6 +83,15 @@ defmodule Stellar.TxBuild.ClaimPredicateTest do
       type: :time,
       time_type: :absolute
     } = ClaimPredicate.new(value: value, type: :time, time_type: :absolute)
+  end
+
+  test "new/2 tuple_with_3_arguments", %{value_time: value} do
+    %ClaimPredicate{
+      predicate: :conditional,
+      value: ^value,
+      type: :time,
+      time_type: :absolute
+    } = ClaimPredicate.new({value, :time, :absolute})
   end
 
   test "new/2 time_type_absolute_invalid", %{predicate: predicate} do

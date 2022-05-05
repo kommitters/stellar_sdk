@@ -48,6 +48,18 @@ defmodule Stellar.TxBuild.SetTrustlineFlagsTest do
       )
   end
 
+  test "new/2 invalid_flags", %{
+    trustor: trustor,
+    asset: asset
+  } do
+    {:error, [set_flags: :invalid_flags]} =
+      SetTrustlineFlags.new(
+        trustor: trustor,
+        asset: asset,
+        set_flags: :test
+      )
+  end
+
   test "new/2 with_invalid_trustor" do
     {:error, [trustor: :invalid_ed25519_public_key]} =
       SetTrustlineFlags.new(

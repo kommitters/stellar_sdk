@@ -18,13 +18,9 @@ defmodule Stellar.TxBuild.OptionalClaimPredicate do
     %__MODULE__{value: predicate}
   end
 
-  def new(nil, _opts), do: %__MODULE__{value: nil}
-
   def new(_args, _opts), do: {:error, :invalid_optional_claim_predicate}
 
   @impl true
-  def to_xdr(%__MODULE__{value: nil}), do: OptionalClaimPredicate.new()
-
   def to_xdr(%__MODULE__{value: predicate}) do
     predicate
     |> ClaimPredicate.to_xdr()
