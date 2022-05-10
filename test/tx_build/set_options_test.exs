@@ -118,7 +118,7 @@ defmodule Stellar.TxBuild.SetOptionsTest do
   end
 
   test "new/2 with_invalid_signer" do
-    {:error, [signer: :invalid_signer_type]} = SetOptions.new(signer: [hash: "HASH", weight: 2])
+    {:error, [signer: :invalid_signer_key]} = SetOptions.new(signer: [hash: "HASH", weight: 2])
   end
 
   test "new/2 with_invalid_attributes" do
