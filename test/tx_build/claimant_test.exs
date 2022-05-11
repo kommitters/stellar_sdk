@@ -15,10 +15,13 @@ defmodule Stellar.TxBuild.ClaimantTest do
         type: :not
       )
 
+    predicate3 = ClaimPredicate.new(value: 1, type: :time, time_type: :absolute)
+
     %{
       destination: destination,
       predicate_unconditional: predicate1,
       predicate: predicate2,
+      predicate_time: predicate3,
       xdr_claimant: XDRFixtures.claimant(destination, predicate2)
     }
   end
@@ -40,6 +43,16 @@ defmodule Stellar.TxBuild.ClaimantTest do
   test "new/2 unconditional_predicate", %{
     destination: destination,
     predicate_unconditional: predicate
+  } do
+    destination_str = AccountID.new(destination)
+
+    %Claimant{destination: ^destination_str, predicate: ^predicate} =
+      Claimant.new(destination: destination, predicate: predicate)
+  end
+
+  test "new/2 time_predicate", %{
+    destination: destination,
+    predicate_time: predicate
   } do
     destination_str = AccountID.new(destination)
 

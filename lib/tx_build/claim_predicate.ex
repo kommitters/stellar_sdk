@@ -107,4 +107,30 @@ defmodule Stellar.TxBuild.ClaimPredicate do
       do: ClaimPredicates.validate_predicate_list([], value)
 
   def validate_predicate_value(_value, _type), do: {:error, :invalid_predicate_value}
+
+  @spec validate_predicate(issuer :: t()) :: validation()
+  def validate_predicate(%__MODULE__{predicate: :unconditional} = predicate),
+    do: {:ok, predicate}
+
+  def validate_predicate(%__MODULE__{value: value, type: :time, time_type: time_type}) do
+    case new({value, :time, time_type}) do
+      {:error, _value} ->
+        {:error, :invalid_claim_predicate}
+
+      predicate ->
+        {:ok, predicate}
+    end
+  end
+
+  def validate_predicate(%__MODULE__{value: value, type: type}) do
+    case new({value, type}) do
+      {:error, _value} ->
+        {:error, :invalid_claim_predicate}
+
+      predicate ->
+        {:ok, predicate}
+    end
+  end
+
+  def validate_predicate(_predicate), do: {:error, :invalid_claim_predicate}
 end
