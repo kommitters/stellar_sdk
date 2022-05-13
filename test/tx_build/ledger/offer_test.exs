@@ -16,26 +16,26 @@ defmodule Stellar.TxBuild.Ledger.OfferTest do
   end
 
   test "new/2", %{seller_id: seller_id, offer_id: offer_id} do
-    %Offer{seller: %AccountID{account_id: ^seller_id}, offer_id: ^offer_id} =
-      Offer.new(seller: seller_id, offer_id: offer_id)
+    %Offer{seller_id: %AccountID{account_id: ^seller_id}, offer_id: ^offer_id} =
+      Offer.new(seller_id: seller_id, offer_id: offer_id)
   end
 
   test "new/2 invalid_seller", %{offer_id: offer_id} do
-    {:error, :invalid_seller} = Offer.new(seller: "ABCD", offer_id: offer_id)
+    {:error, :invalid_seller} = Offer.new(seller_id: "ABCD", offer_id: offer_id)
   end
 
   test "new/2 invalid_offer_id", %{seller_id: seller_id} do
-    {:error, :invalid_offer_id} = Offer.new(seller: seller_id, offer_id: "ABCD")
+    {:error, :invalid_offer_id} = Offer.new(seller_id: seller_id, offer_id: "ABCD")
   end
 
   test "new/2 offer_id_exceeds_value", %{seller_id: seller_id} do
     {:error, :invalid_offer_id} =
-      Offer.new(seller: seller_id, offer_id: 9_223_372_036_854_775_808)
+      Offer.new(seller_id: seller_id, offer_id: 9_223_372_036_854_775_808)
   end
 
   test "to_xdr/1", %{xdr: xdr, seller_id: seller_id, offer_id: offer_id} do
     ^xdr =
-      [seller: seller_id, offer_id: offer_id]
+      [seller_id: seller_id, offer_id: offer_id]
       |> Offer.new()
       |> Offer.to_xdr()
   end

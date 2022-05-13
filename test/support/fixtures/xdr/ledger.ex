@@ -16,6 +16,8 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
     Data,
     Hash,
     Int64,
+    LedgerEntryType,
+    LedgerKey,
     LiquidityPool,
     Offer,
     PoolID,
@@ -222,6 +224,124 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
         },
         type: %AssetType{identifier: :ASSET_TYPE_POOL_SHARE}
       }
+    }
+  end
+
+  @spec ledger_key_account(account_id :: account_id()) :: LedgerKey.t()
+  def ledger_key_account("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS") do
+    %LedgerKey{
+      entry: %Account{
+        account_id: %AccountID{
+          account_id: %PublicKey{
+            public_key: %UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            },
+            type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+          }
+        }
+      },
+      type: %LedgerEntryType{identifier: :ACCOUNT}
+    }
+  end
+
+  @spec ledger_key_trustline(account_id :: account_id(), asset :: asset()) :: LedgerKey.t()
+  def ledger_key_trustline("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS", :native) do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.TrustLine{
+        account_id: %StellarBase.XDR.AccountID{
+          account_id: %StellarBase.XDR.PublicKey{
+            public_key: %StellarBase.XDR.UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            },
+            type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+          }
+        },
+        asset: %StellarBase.XDR.TrustLineAsset{
+          asset: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.AssetType{identifier: :ASSET_TYPE_NATIVE}
+        }
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :TRUSTLINE}
+    }
+  end
+
+  @spec ledger_key_offer(seller_id :: account_id(), offer_id :: offer_id()) :: LedgerKey.t()
+  def ledger_key_offer("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS", 123) do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.Offer{
+        offer_id: %StellarBase.XDR.Int64{datum: 123},
+        seller_id: %StellarBase.XDR.AccountID{
+          account_id: %StellarBase.XDR.PublicKey{
+            public_key: %StellarBase.XDR.UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            },
+            type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+          }
+        }
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :OFFER}
+    }
+  end
+
+  @spec ledger_key_data(account_id :: account_id(), data :: String.t()) :: LedgerKey.t()
+  def ledger_key_data("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS", "test") do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.Data{
+        account_id: %StellarBase.XDR.AccountID{
+          account_id: %StellarBase.XDR.PublicKey{
+            public_key: %StellarBase.XDR.UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            },
+            type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+          }
+        },
+        data_name: %StellarBase.XDR.String64{value: "test"}
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :DATA}
+    }
+  end
+
+  @spec ledger_key_claimable_balance(claimable_balance_id :: claimable_balance_id()) ::
+          LedgerKey.t()
+  def ledger_key_claimable_balance(
+        "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+      ) do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.ClaimableBalance{
+        balance_id: %StellarBase.XDR.ClaimableBalanceID{
+          claimable_balance_id: %StellarBase.XDR.Hash{
+            value:
+              <<146, 155, 32, 183, 46, 88, 144, 171, 81, 194, 79, 28, 196, 111, 160, 28, 79, 49,
+                141, 141, 51, 54, 125, 36, 221, 97, 76, 253, 245, 73, 16, 114>>
+          },
+          type: %StellarBase.XDR.ClaimableBalanceIDType{identifier: :CLAIMABLE_BALANCE_ID_TYPE_V0}
+        }
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :CLAIMABLE_BALANCE}
+    }
+  end
+
+  @spec ledger_key_liquidity_pool(liquidity_pool_id :: liquidity_pool_id()) :: LedgerKey.t()
+  def ledger_key_liquidity_pool(
+        "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
+      ) do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.LiquidityPool{
+        liquidity_pool_id: %StellarBase.XDR.PoolID{
+          value:
+            <<146, 155, 32, 183, 46, 88, 144, 171, 81, 194, 79, 28, 196, 111, 160, 28, 79, 49,
+              141, 141, 51, 54, 125, 36, 221, 97, 76, 253, 245, 73, 16, 114>>
+        }
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :LIQUIDITY_POOL}
     }
   end
 end

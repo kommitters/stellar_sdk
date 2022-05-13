@@ -68,9 +68,16 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # ledger entries
   defdelegate ledger_account(account_id), to: Ledger
-  defdelegate ledger_claimable_balance(claimable_balance_id), to: Ledger
-  defdelegate ledger_liquidity_pool(liquidity_pool_id), to: Ledger
+  defdelegate ledger_trustline(account_id, asset), to: Ledger
   defdelegate ledger_offer(seller_id, offer_id), to: Ledger
   defdelegate ledger_data(account_id, data_name), to: Ledger
-  defdelegate ledger_trustline(account_id, asset), to: Ledger
+  defdelegate ledger_claimable_balance(claimable_balance_id), to: Ledger
+  defdelegate ledger_liquidity_pool(liquidity_pool_id), to: Ledger
+
+  defdelegate ledger_key_account(account_id), to: Ledger
+  defdelegate ledger_key_trustline(account_id, asset), to: Ledger
+  defdelegate ledger_key_offer(seller_id, offer_id), to: Ledger
+  defdelegate ledger_key_data(account_id, data_name), to: Ledger
+  defdelegate ledger_key_claimable_balance(claimable_balance_id), to: Ledger
+  defdelegate ledger_key_liquidity_pool(liquidity_pool_id), to: Ledger
 end

@@ -11,28 +11,28 @@ defmodule Stellar.TxBuild.Ledger.Trustline do
   @type asset :: atom() | Keyword.t()
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type t :: %__MODULE__{account: AccountID.t(), asset: TrustlineAsset.t()}
+  @type t :: %__MODULE__{account_id: AccountID.t(), asset: TrustlineAsset.t()}
 
-  defstruct [:account, :asset]
+  defstruct [:account_id, :asset]
 
   @impl true
   def new(args, opts \\ [])
 
   def new(args, _opts) do
-    account = Keyword.get(args, :account)
+    account_id = Keyword.get(args, :account_id)
     asset = Keyword.get(args, :asset)
 
-    with {:ok, account} <- validate_account(account),
+    with {:ok, account_id} <- validate_account(account_id),
          {:ok, asset} <- validate_trustline_asset(asset) do
-      %__MODULE__{account: account, asset: asset}
+      %__MODULE__{account_id: account_id, asset: asset}
     end
   end
 
   @impl true
-  def to_xdr(%__MODULE__{account: account, asset: asset}) do
+  def to_xdr(%__MODULE__{account_id: account_id, asset: asset}) do
     trustline = TrustlineAsset.to_xdr(asset)
 
-    account
+    account_id
     |> AccountID.to_xdr()
     |> TrustLine.new(trustline)
   end
@@ -40,7 +40,7 @@ defmodule Stellar.TxBuild.Ledger.Trustline do
   @spec validate_account(account_id :: account_id()) :: validation()
   defp validate_account(account_id) do
     case AccountID.new(account_id) do
-      %AccountID{} = account -> {:ok, account}
+      %AccountID{} = account_id -> {:ok, account_id}
       _error -> {:error, :invalid_account}
     end
   end
