@@ -27,16 +27,16 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
 
   test "new/2", %{account_id: account_id, native_asset: native_asset} do
     %Trustline{
-      account: %AccountID{account_id: ^account_id},
+      account_id: %AccountID{account_id: ^account_id},
       asset: %TrustlineAsset{type: :native}
-    } = Trustline.new(account: account_id, asset: native_asset)
+    } = Trustline.new(account_id: account_id, asset: native_asset)
   end
 
   test "new/2 with_alphanum4_asset", %{account_id: account_id, alphanum4_asset: alphanum4_asset} do
     %Trustline{
-      account: %AccountID{account_id: ^account_id},
+      account_id: %AccountID{account_id: ^account_id},
       asset: %TrustlineAsset{type: :alpha_num4}
-    } = Trustline.new(account: account_id, asset: alphanum4_asset)
+    } = Trustline.new(account_id: account_id, asset: alphanum4_asset)
   end
 
   test "new/2 with_alphanum12_asset", %{
@@ -44,9 +44,9 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
     alphanum12_asset: alphanum12_asset
   } do
     %Trustline{
-      account: %AccountID{account_id: ^account_id},
+      account_id: %AccountID{account_id: ^account_id},
       asset: %TrustlineAsset{type: :alpha_num12}
-    } = Trustline.new(account: account_id, asset: alphanum12_asset)
+    } = Trustline.new(account_id: account_id, asset: alphanum12_asset)
   end
 
   test "new/2 with_pool_share_asset", %{
@@ -54,22 +54,22 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
     pool_share_asset: pool_share_asset
   } do
     %Trustline{
-      account: %AccountID{account_id: ^account_id},
+      account_id: %AccountID{account_id: ^account_id},
       asset: %TrustlineAsset{type: :pool_share}
-    } = Trustline.new(account: account_id, asset: pool_share_asset)
+    } = Trustline.new(account_id: account_id, asset: pool_share_asset)
   end
 
   test "new/2 with_invalid_account", %{alphanum4_asset: alphanum4_asset} do
-    {:error, :invalid_account} = Trustline.new(account: "ABCD", asset: alphanum4_asset)
+    {:error, :invalid_account} = Trustline.new(account_id: "ABCD", asset: alphanum4_asset)
   end
 
   test "new/2 with_invalid_asset", %{account_id: account_id} do
-    {:error, :invalid_asset} = Trustline.new(account: account_id, asset: "ABCD")
+    {:error, :invalid_asset} = Trustline.new(account_id: account_id, asset: "ABCD")
   end
 
   test "to_xdr/1", %{native_trustline_xdr: xdr, native_asset: asset, account_id: account_id} do
     ^xdr =
-      [account: account_id, asset: asset]
+      [account_id: account_id, asset: asset]
       |> Trustline.new()
       |> Trustline.to_xdr()
   end
@@ -80,7 +80,7 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
     account_id: account_id
   } do
     ^xdr =
-      [account: account_id, asset: asset]
+      [account_id: account_id, asset: asset]
       |> Trustline.new()
       |> Trustline.to_xdr()
   end
@@ -91,7 +91,7 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
     account_id: account_id
   } do
     ^xdr =
-      [account: account_id, asset: asset]
+      [account_id: account_id, asset: asset]
       |> Trustline.new()
       |> Trustline.to_xdr()
   end
@@ -102,7 +102,7 @@ defmodule Stellar.TxBuild.Ledger.TrustlineTest do
     account_id: account_id
   } do
     ^xdr =
-      [account: account_id, asset: asset]
+      [account_id: account_id, asset: asset]
       |> Trustline.new()
       |> Trustline.to_xdr()
   end

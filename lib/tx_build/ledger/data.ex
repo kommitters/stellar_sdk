@@ -11,36 +11,36 @@ defmodule Stellar.TxBuild.Ledger.Data do
   @type data_name :: String.t()
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type t :: %__MODULE__{account: AccountID.t(), data_name: data_name()}
+  @type t :: %__MODULE__{account_id: AccountID.t(), data_name: data_name()}
 
-  defstruct [:account, :data_name]
+  defstruct [:account_id, :data_name]
 
   @impl true
   def new(args, opts \\ [])
 
   def new(args, _opts) do
-    account_id = Keyword.get(args, :account)
+    account_id = Keyword.get(args, :account_id)
     data_name = Keyword.get(args, :data_name)
 
-    with {:ok, account} <- validate_account(account_id),
+    with {:ok, account_id} <- validate_account_id(account_id),
          {:ok, data_name} <- validate_data_name(data_name) do
-      %__MODULE__{account: account, data_name: data_name}
+      %__MODULE__{account_id: account_id, data_name: data_name}
     end
   end
 
   @impl true
-  def to_xdr(%__MODULE__{account: account, data_name: data_name}) do
+  def to_xdr(%__MODULE__{account_id: account_id, data_name: data_name}) do
     data_name = String64.new(data_name)
 
-    account
+    account_id
     |> AccountID.to_xdr()
     |> Data.new(data_name)
   end
 
-  @spec validate_account(account_id :: account_id()) :: validation()
-  defp validate_account(account_id) do
+  @spec validate_account_id(account_id :: account_id()) :: validation()
+  defp validate_account_id(account_id) do
     case AccountID.new(account_id) do
-      %AccountID{} = account -> {:ok, account}
+      %AccountID{} = account_id -> {:ok, account_id}
       _error -> {:error, :invalid_account}
     end
   end

@@ -11,9 +11,9 @@ defmodule Stellar.TxBuild.Ledger.Offer do
   @type offer_id :: non_neg_integer()
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type t :: %__MODULE__{seller: AccountID.t(), offer_id: offer_id()}
+  @type t :: %__MODULE__{seller_id: AccountID.t(), offer_id: offer_id()}
 
-  defstruct [:seller, :offer_id]
+  defstruct [:seller_id, :offer_id]
 
   @max_offer_id 9_223_372_036_854_775_807
 
@@ -21,20 +21,20 @@ defmodule Stellar.TxBuild.Ledger.Offer do
   def new(args, opts \\ [])
 
   def new(args, _opts) do
-    seller_id = Keyword.get(args, :seller)
+    seller_id = Keyword.get(args, :seller_id)
     offer_id = Keyword.get(args, :offer_id)
 
-    with {:ok, seller} <- validate_seller(seller_id),
+    with {:ok, seller_id} <- validate_seller(seller_id),
          {:ok, offer_id} <- validate_offer_id(offer_id) do
-      %__MODULE__{seller: seller, offer_id: offer_id}
+      %__MODULE__{seller_id: seller_id, offer_id: offer_id}
     end
   end
 
   @impl true
-  def to_xdr(%__MODULE__{seller: seller, offer_id: offer_id}) do
+  def to_xdr(%__MODULE__{seller_id: seller_id, offer_id: offer_id}) do
     offer = Int64.new(offer_id)
 
-    seller
+    seller_id
     |> AccountID.to_xdr()
     |> Offer.new(offer)
   end
@@ -42,7 +42,7 @@ defmodule Stellar.TxBuild.Ledger.Offer do
   @spec validate_seller(seller_id :: seller_id()) :: validation()
   defp validate_seller(seller_id) do
     case AccountID.new(seller_id) do
-      %AccountID{} = seller -> {:ok, seller}
+      %AccountID{} = seller_id -> {:ok, seller_id}
       _error -> {:error, :invalid_seller}
     end
   end
