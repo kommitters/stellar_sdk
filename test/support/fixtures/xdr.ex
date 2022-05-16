@@ -80,4 +80,6 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate ledger_key_data(account_id, data_name), to: Ledger
   defdelegate ledger_key_claimable_balance(claimable_balance_id), to: Ledger
   defdelegate ledger_key_liquidity_pool(liquidity_pool_id), to: Ledger
+
+  defdelegate revoke_sponsorship(type, attrs), to: Ledger
 end

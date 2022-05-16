@@ -22,6 +22,7 @@ defmodule Stellar.TxBuild.Operation do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
+    RevokeSponsorship,
     SetOptions,
     SetTrustlineFlags
   }
@@ -49,6 +50,7 @@ defmodule Stellar.TxBuild.Operation do
           | Payment.t()
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
+          | RevokeSponsorship.t()
           | SetOptions.t()
           | SetTrustlineFlags.t()
 
@@ -96,6 +98,7 @@ defmodule Stellar.TxBuild.Operation do
       Payment,
       PathPaymentStrictReceive,
       PathPaymentStrictSend,
+      RevokeSponsorship,
       SetOptions,
       SetTrustlineFlags
     ]
