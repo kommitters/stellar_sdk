@@ -65,12 +65,7 @@ defmodule Stellar.TxBuild.ClaimantTest do
   end
 
   test "new/2 invalid_ed25519_public_key", %{predicate: predicate} do
-    {:error, [destination: :invalid_ed25519_public_key]} =
-      Claimant.new(destination: "ABC", predicate: predicate)
-  end
-
-  test "new/2 invalid_claim_predicate", %{destination: destination} do
-    {:error, :invalid_claim_predicate} = Claimant.new(destination: destination, predicate: "ABC")
+    {:error, :invalid_account_id} = Claimant.new(destination: "ABC", predicate: predicate)
   end
 
   test "to_xdr/1 time_absolute", %{
