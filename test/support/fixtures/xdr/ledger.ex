@@ -23,6 +23,8 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
     PoolID,
     PublicKey,
     PublicKeyType,
+    RevokeSponsorship,
+    RevokeSponsorshipType,
     String64,
     TrustLine,
     TrustLineAsset,
@@ -342,6 +344,65 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
         }
       },
       type: %StellarBase.XDR.LedgerEntryType{identifier: :LIQUIDITY_POOL}
+    }
+  end
+
+  @spec revoke_sponsorship(type :: atom(), args :: Keyword.t()) :: RevokeSponsorship.t()
+  def revoke_sponsorship(:account,
+        account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
+      ) do
+    %StellarBase.XDR.OperationBody{
+      operation: %StellarBase.XDR.Operations.RevokeSponsorship{
+        sponsorship: %StellarBase.XDR.LedgerKey{
+          entry: %StellarBase.XDR.Account{
+            account_id: %StellarBase.XDR.AccountID{
+              account_id: %StellarBase.XDR.PublicKey{
+                public_key: %StellarBase.XDR.UInt256{
+                  datum:
+                    <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93,
+                      18, 18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+                },
+                type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+              }
+            }
+          },
+          type: %StellarBase.XDR.LedgerEntryType{identifier: :ACCOUNT}
+        },
+        type: %StellarBase.XDR.RevokeSponsorshipType{identifier: :REVOKE_SPONSORSHIP_LEDGER_ENTRY}
+      },
+      type: %StellarBase.XDR.OperationType{identifier: :REVOKE_SPONSORSHIP}
+    }
+  end
+
+  def revoke_sponsorship(:signer,
+        account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS",
+        ed25519: "GDAE7O3YJMC7COEZLPJY6OY3P6WGHSHA3QZH2B456JXV4VDEJRAUSA35"
+      ) do
+    %StellarBase.XDR.OperationBody{
+      operation: %StellarBase.XDR.Operations.RevokeSponsorship{
+        sponsorship: %StellarBase.XDR.RevokeSponsorshipSigner{
+          account_id: %StellarBase.XDR.AccountID{
+            account_id: %StellarBase.XDR.PublicKey{
+              public_key: %StellarBase.XDR.UInt256{
+                datum:
+                  <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93,
+                    18, 18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+              },
+              type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+            }
+          },
+          signer_key: %StellarBase.XDR.SignerKey{
+            signer_key: %StellarBase.XDR.UInt256{
+              datum:
+                <<192, 79, 187, 120, 75, 5, 241, 56, 153, 91, 211, 143, 59, 27, 127, 172, 99, 200,
+                  224, 220, 50, 125, 7, 157, 242, 111, 94, 84, 100, 76, 65, 73>>
+            },
+            type: %StellarBase.XDR.SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519}
+          }
+        },
+        type: %RevokeSponsorshipType{identifier: :REVOKE_SPONSORSHIP_SIGNER}
+      },
+      type: %StellarBase.XDR.OperationType{identifier: :REVOKE_SPONSORSHIP}
     }
   end
 end
