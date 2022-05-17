@@ -94,17 +94,17 @@ defmodule Stellar.TxBuild.ClaimPredicate do
   end
 
   @spec validate_predicate_value(value :: value(), type :: atom()) :: validation()
-  def validate_predicate_value(%__MODULE__{} = value, type)
-      when type != :time,
-      do: {:ok, value}
+  defp validate_predicate_value(%__MODULE__{} = value, type)
+       when type != :time,
+       do: {:ok, value}
 
-  def validate_predicate_value(value, :time) when is_integer(value),
+  defp validate_predicate_value(value, :time) when is_integer(value),
     do: {:ok, value}
 
-  def validate_predicate_value(%ClaimPredicates{value: value}, type)
-      when is_list(value) and length(value) == 2 and
-             type in ~w(and or)a,
-      do: ClaimPredicates.validate_predicate_list([], value)
+  defp validate_predicate_value(%ClaimPredicates{value: value}, type)
+       when is_list(value) and length(value) == 2 and
+              type in ~w(and or)a,
+       do: ClaimPredicates.validate_predicate_list([], value)
 
-  def validate_predicate_value(_value, _type), do: {:error, :invalid_predicate_value}
+  defp validate_predicate_value(_value, _type), do: {:error, :invalid_predicate_value}
 end
