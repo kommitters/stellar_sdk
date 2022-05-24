@@ -7,10 +7,10 @@ defmodule Stellar.TxBuild.Claimants do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type t :: %__MODULE__{claimants: list(Claimant.t())}
+  @type validation :: t() | {:error, atom()}
   @type claimants :: Claimant.t() | list(Claimant.t())
   @type error :: {:error, atom()}
-
-  @type t :: %__MODULE__{claimants: list(Claimant.t())}
 
   defstruct [:claimants]
 
@@ -18,7 +18,7 @@ defmodule Stellar.TxBuild.Claimants do
   def new(claimants \\ [], opts \\ [])
 
   def new(claimants, _opts) do
-    build_path(%__MODULE__{claimants: []}, claimants)
+    validate_claimants(%__MODULE__{claimants: []}, claimants)
   end
 
   @impl true
@@ -28,21 +28,22 @@ defmodule Stellar.TxBuild.Claimants do
     |> Claimants.new()
   end
 
-  defp build_path(%__MODULE__{} = path, []), do: path
+  @spec validate_claimants(claimants :: t(), list :: claimants()) :: validation()
+  defp validate_claimants(%__MODULE__{} = path, []), do: path
 
-  defp build_path(%__MODULE__{} = path, [claimant | claimants]) do
+  defp validate_claimants(%__MODULE__{} = path, [claimant | claimants]) do
     case claimant do
       %Claimant{} = claimant ->
         path
-        |> build_path(claimant)
-        |> build_path(claimants)
+        |> validate_claimants(claimant)
+        |> validate_claimants(claimants)
 
       _error ->
         {:error, :invalid_claimant}
     end
   end
 
-  defp build_path(%__MODULE__{claimants: claimants} = path, %Claimant{} = claimant) do
+  defp validate_claimants(%__MODULE__{claimants: claimants} = path, %Claimant{} = claimant) do
     %{path | claimants: claimants ++ [claimant]}
   end
 end

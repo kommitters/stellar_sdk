@@ -8,7 +8,7 @@ defmodule Stellar.TxBuild.CreateClaimableBalance do
   alias Stellar.TxBuild.{Amount, Asset, Claimants, OptionalAccount}
   alias StellarBase.XDR.{OperationBody, OperationType, Operations.CreateClaimableBalance}
 
-  @type validation :: {:ok, any()} | {:error, String.t()}
+  @type validation :: {:ok, any()} | {:error, atom()}
 
   @behaviour Stellar.TxBuild.XDR
 
