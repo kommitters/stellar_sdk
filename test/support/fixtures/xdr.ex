@@ -67,6 +67,7 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate optional_predicate_with_nil_value(value), to: Predicates
   defdelegate claimant(destination, predicate), to: Predicates
   defdelegate claimants(claimants), to: Predicates
+  defdelegate create_claimable_balance(asset, amount, claimants), to: Predicates
 
   # ledger entries
   defdelegate ledger_account(account_id), to: Ledger

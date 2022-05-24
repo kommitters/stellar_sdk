@@ -16,13 +16,21 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
     PublicKey,
     UInt256,
     PublicKeyType,
-    ClaimantType
+    ClaimantType,
+    Asset,
+    AssetType,
+    AlphaNum4,
+    AssetCode4,
+    OperationBody,
+    OperationType,
+    Operations.CreateClaimableBalance
   }
 
   alias Stellar.TxBuild.ClaimPredicate, as: TxClaimPredicate
   alias Stellar.TxBuild.ClaimPredicates, as: TxClaimPredicates
   alias Stellar.TxBuild.AccountID, as: TxAccountID
   alias Stellar.TxBuild.Claimant, as: TxClaimant
+  alias Stellar.TxBuild.Claimants, as: TxClaimants
 
   @type value ::
           TxClaimPredicate.t()
@@ -379,6 +387,130 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
           type: %ClaimantType{identifier: :CLAIMANT_TYPE_V0}
         }
       ]
+    }
+  end
+
+  @spec create_claimable_balance(
+          asset :: String.t(),
+          amount :: pos_integer(),
+          claimants :: claimants()
+        ) ::
+          OperationBody.t()
+  def create_claimable_balance(
+        {"BTCN", "GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V"},
+        100,
+        %TxClaimants{
+          claimants: [
+            %TxClaimant{
+              destination: %TxAccountID{
+                account_id: "GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V"
+              },
+              predicate: %TxClaimPredicate{
+                predicate: :unconditional,
+                time_type: nil,
+                type: nil,
+                value: nil
+              }
+            },
+            %TxClaimant{
+              destination: %TxAccountID{
+                account_id: "GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V"
+              },
+              predicate: %TxClaimPredicate{
+                predicate: :conditional,
+                time_type: nil,
+                type: :not,
+                value: %TxClaimPredicate{
+                  predicate: :unconditional,
+                  time_type: nil,
+                  type: nil,
+                  value: nil
+                }
+              }
+            }
+          ]
+        }
+      ) do
+    %OperationBody{
+      operation: %CreateClaimableBalance{
+        amount: %Int64{datum: 1_000_000_000},
+        asset: %Asset{
+          asset: %AlphaNum4{
+            asset_code: %AssetCode4{code: "BTCN", length: 4},
+            issuer: %AccountID{
+              account_id: %PublicKey{
+                public_key: %UInt256{
+                  datum:
+                    <<102, 109, 61, 201, 173, 101, 16, 194, 89, 168, 54, 140, 36, 153, 76, 22,
+                      249, 162, 181, 195, 177, 21, 207, 36, 1, 10, 22, 85, 255, 214, 103, 12>>
+                },
+                type: %PublicKeyType{
+                  identifier: :PUBLIC_KEY_TYPE_ED25519
+                }
+              }
+            }
+          },
+          type: %AssetType{identifier: :ASSET_TYPE_CREDIT_ALPHANUM4}
+        },
+        claimants: %Claimants{
+          claimants: [
+            %Claimant{
+              claimant: %ClaimantV0{
+                destination: %AccountID{
+                  account_id: %PublicKey{
+                    public_key: %UInt256{
+                      datum:
+                        <<102, 109, 61, 201, 173, 101, 16, 194, 89, 168, 54, 140, 36, 153, 76, 22,
+                          249, 162, 181, 195, 177, 21, 207, 36, 1, 10, 22, 85, 255, 214, 103, 12>>
+                    },
+                    type: %PublicKeyType{
+                      identifier: :PUBLIC_KEY_TYPE_ED25519
+                    }
+                  }
+                },
+                predicate: %ClaimPredicate{
+                  predicate: %Void{value: nil},
+                  type: %ClaimPredicateType{
+                    identifier: :CLAIM_PREDICATE_UNCONDITIONAL
+                  }
+                }
+              },
+              type: %ClaimantType{identifier: :CLAIMANT_TYPE_V0}
+            },
+            %Claimant{
+              claimant: %ClaimantV0{
+                destination: %AccountID{
+                  account_id: %PublicKey{
+                    public_key: %UInt256{
+                      datum:
+                        <<102, 109, 61, 201, 173, 101, 16, 194, 89, 168, 54, 140, 36, 153, 76, 22,
+                          249, 162, 181, 195, 177, 21, 207, 36, 1, 10, 22, 85, 255, 214, 103, 12>>
+                    },
+                    type: %PublicKeyType{
+                      identifier: :PUBLIC_KEY_TYPE_ED25519
+                    }
+                  }
+                },
+                predicate: %ClaimPredicate{
+                  predicate: %OptionalClaimPredicate{
+                    predicate: %ClaimPredicate{
+                      predicate: %Void{value: nil},
+                      type: %ClaimPredicateType{
+                        identifier: :CLAIM_PREDICATE_UNCONDITIONAL
+                      }
+                    }
+                  },
+                  type: %ClaimPredicateType{
+                    identifier: :CLAIM_PREDICATE_NOT
+                  }
+                }
+              },
+              type: %ClaimantType{identifier: :CLAIMANT_TYPE_V0}
+            }
+          ]
+        }
+      },
+      type: %OperationType{identifier: :CREATE_CLAIMABLE_BALANCE}
     }
   end
 end
