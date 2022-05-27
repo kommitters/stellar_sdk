@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0 (27.05.2022)
+* Add CreateClaimableBalance, ClaimClaimableBalance, RevokeSponsorship operations.
+* Fix PoolID hashing bug.
+* Fix base_fee calculation bug.
+* Code abstractions for Signer and SignerKey.
+
 ## 0.6.0 (18.04.2022)
 * Add SetTrustLineFlags operation.
 * Add LiquidityPoolWithdraw and LiquidityPoolDeposit operations.
