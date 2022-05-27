@@ -1,8 +1,7 @@
 defmodule Stellar.TxBuild.ClawbackClaimableBalanceTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [clawback_claimable_balance_op_xdr: 1]
-
+  alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
   alias Stellar.TxBuild.{ClaimableBalanceID, ClawbackClaimableBalance}
 
   setup do
@@ -11,7 +10,7 @@ defmodule Stellar.TxBuild.ClawbackClaimableBalanceTest do
     %{
       balance_id: balance_id,
       claimable_balance_id: ClaimableBalanceID.new(balance_id),
-      xdr: clawback_claimable_balance_op_xdr(balance_id)
+      xdr: XDRFixtures.clawback_claimable_balance(balance_id)
     }
   end
 
