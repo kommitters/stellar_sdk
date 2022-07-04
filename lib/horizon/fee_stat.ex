@@ -8,8 +8,8 @@ defmodule Stellar.Horizon.FeeStat do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          last_ledger: String.t(),
-          last_ledger_base_fee: String.t(),
+          last_ledger: non_neg_integer(),
+          last_ledger_base_fee: non_neg_integer(),
           ledger_capacity_usage: float(),
           fee_charged: map(),
           max_fee: map()
@@ -24,6 +24,8 @@ defmodule Stellar.Horizon.FeeStat do
   ]
 
   @mapping [
+    last_ledger: :integer,
+    last_ledger_base_fee: :integer,
     ledger_capacity_usage: :float
   ]
 
