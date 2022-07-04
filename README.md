@@ -655,6 +655,14 @@ Stellar.Horizon.Effects.all(limit: 10, order: :asc)
 
 See [**Stellar.Horizon.Effects**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Effects.html#content) for more details.
 
+### FeeStats
+```elixir
+# retrieve fee stats
+Stellar.Horizon.FeeStats.retrieve()
+```
+
+See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregations/fee-stats/single/) for more details.
+
 ---
 
 ## Development
