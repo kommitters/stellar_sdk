@@ -663,6 +663,17 @@ Stellar.Horizon.FeeStats.retrieve()
 
 See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregations/fee-stats/single/) for more details.
 
+### Paths
+```elixir
+# list strict receive payment paths
+Stellar.Horizon.Paths.strict_receive_paths(source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO", destination_asset_type: "native", destination_amount: 5)
+
+# list strict send payment paths
+Stellar.Horizon.Paths.strict_send_paths(destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ", source_asset_type: "native", source_amount: 5)
+```
+
+See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
+
 ---
 
 ## Development
