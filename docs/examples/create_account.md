@@ -19,11 +19,12 @@ signer_key_pair = Stellar.KeyPair.from_secret_seed("SECRET_SEED")
 signature = Stellar.TxBuild.Signature.new(signer_key_pair)
 
 # 5. submit the transaction to Horizon
-{:ok, tx} =
+{:ok, base64_envelope} =
   source_account
   |> Stellar.TxBuild.new(sequence_number: sequence_number)
   |> Stellar.TxBuild.add_operation(operation)
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
-  |> Stellar.Horizon.Transactions.create()
+
+{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(base64_envelope)
 ```
