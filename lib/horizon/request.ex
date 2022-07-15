@@ -108,11 +108,6 @@ defmodule Stellar.Horizon.Request do
     {:ok, Collection.new(results, {resource, paginate_fun})}
   end
 
-  def results({:ok, results}, collection: {resource}) do
-    %{_embedded: %{records: records}} = results
-    {:ok, Enum.map(records, &resource.new/1)}
-  end
-
   def results({:ok, results}, as: resource), do: {:ok, resource.new(results)}
 
   def results({:error, error}, _resource), do: {:error, error}

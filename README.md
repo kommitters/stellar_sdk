@@ -665,11 +665,14 @@ See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregatio
 
 ### Paths
 ```elixir
+# list paths
+Stellar.Horizon.PaymentPaths.list_paths("GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", "native", 5)
+
 # list strict receive payment paths
-Stellar.Horizon.Paths.strict_receive_paths(source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO", destination_asset_type: "native", destination_amount: 5)
+Stellar.Horizon.PaymentPaths.list_strict_receive_paths("native", 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
 
 # list strict send payment paths
-Stellar.Horizon.Paths.strict_send_paths(destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ", source_asset_type: "native", source_amount: 5)
+Stellar.Horizon.PaymentPaths.list_strict_send_paths("native", 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
 ```
 
 See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
