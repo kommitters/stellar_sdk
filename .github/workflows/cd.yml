@@ -1,22 +1,20 @@
-name: StellarSDK CI
+name: StellarSDK CD
 
 on:
   push:
     branches:
       - main
-      - 'v*.[0-9]'
-  pull_request:
 
 jobs:
-  tests:
-    name: Run tests
+  publish:
+    name: Publish Release to HEX PM
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ['22.3', '23.3']
-        elixir: ['1.10', '1.11']
+        otp: ['23.3']
+        elixir: ['1.11']
     env:
-      MIX_ENV: test
+      HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-elixir@v1
@@ -33,13 +31,5 @@ jobs:
         run: |
           rm -rf deps _build
           mix deps.get
-      - name: Check Formatting
-        run: mix format --check-formatted
-      - name: Run Tests
-        run: mix test
-      - name: Run Credo
-        run: mix credo --strict
-      # - name: Run Excoveralls
-      #   run: mix coveralls.github
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish
+        run: HEX_API_KEY=$HEX_API_KEY mix hex.publish --yes
