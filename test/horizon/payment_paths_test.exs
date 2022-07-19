@@ -79,10 +79,10 @@ defmodule Stellar.Horizon.PaymentPathsTest do
 
     %{
       source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO",
-      destination_asset_type: "native",
+      destination_asset_type: :native,
       destination_amount: 5,
       destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ",
-      source_asset_type: "native",
+      source_asset_type: :native,
       source_amount: 5
     }
   end

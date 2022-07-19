@@ -675,7 +675,7 @@ This will return information about potential path payments:
 - [Optional] destination_asset_code. The code for the destination asset.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset_type: "native", destination_amount: 5)
+Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset_type: :native, destination_amount: 5)
 ```
 #### List strict receive payment paths
 - [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
@@ -686,7 +686,7 @@ Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5
 - [Optional] destination_asset_code. The code for the destination asset. Required if the **destination_asset_type** is not **native**.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset_type: "native", destination_amount: 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
+Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset_type: :native, destination_amount: 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
 ```
 
 #### List strict send payment paths
@@ -698,7 +698,7 @@ Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset_type: "native"
 - [Optional] destination_assets. A comma-separated list of assets that the recipient can receive.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_send_paths(source_asset_type: "native", source_amount: 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
+Stellar.Horizon.PaymentPaths.list_send_paths(source_asset_type: :native, source_amount: 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
 ```
 
 See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
