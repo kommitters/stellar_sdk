@@ -14,7 +14,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths/?source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_asset_type=native&destination_amount=5",
+          "/paths?source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_asset_type=native&destination_amount=5",
         _headers,
         _body,
         _opts
@@ -26,7 +26,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths/strict-receive?source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_asset_type=native&destination_amount=5",
+          "/paths/strict-receive?destination_asset_type=native&destination_amount=5&source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO",
         _headers,
         _body,
         _opts
@@ -38,7 +38,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths/strict-send?destination_assets=TEST%3AGA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ&source_asset_type=native&source_amount=5",
+          "/paths/strict-send?source_asset_type=native&source_amount=5&destination_assets=TEST%3AGA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ",
         _headers,
         _body,
         _opts
@@ -49,7 +49,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
 
   def request(
         :get,
-        @base_url <> "/paths/strict-receive?destination_amount=5",
+        @base_url <> "/paths/strict-receive?destination_amount=error",
         _headers,
         _body,
         _opts
@@ -58,7 +58,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
     {:ok, 400, [], json_error}
   end
 
-  def request(:get, @base_url <> "/paths/strict-send?source_amount=5", _headers, _body, _opts) do
+  def request(:get, @base_url <> "/paths/strict-send?source_amount=error", _headers, _body, _opts) do
     json_error = Horizon.fixture("400_invalid_send_path")
     {:ok, 400, [], json_error}
   end
@@ -87,7 +87,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
     }
   end
 
-  test "list_paths/3", %{
+  test "list_paths/1", %{
     source_account: source_account,
     destination_asset_type: destination_asset_type,
     destination_amount: destination_amount
@@ -106,10 +106,15 @@ defmodule Stellar.Horizon.PaymentPathsTest do
            source_amount: 29.0722784
          }
        ]
-     }} = PaymentPaths.list_paths(source_account, destination_asset_type, destination_amount)
+     }} =
+      PaymentPaths.list_paths(
+        source_account: source_account,
+        destination_asset_type: destination_asset_type,
+        destination_amount: destination_amount
+      )
   end
 
-  test "list_strict_receive_paths/2", %{
+  test "list_receive_paths/1", %{
     source_account: source_account,
     destination_asset_type: destination_asset_type,
     destination_amount: destination_amount
@@ -129,12 +134,14 @@ defmodule Stellar.Horizon.PaymentPathsTest do
          }
        ]
      }} =
-      PaymentPaths.list_strict_receive_paths(destination_asset_type, destination_amount,
+      PaymentPaths.list_receive_paths(
+        destination_asset_type: destination_asset_type,
+        destination_amount: destination_amount,
         source_account: source_account
       )
   end
 
-  test "list_strict_send_paths/2", %{
+  test "list_send_paths/1", %{
     source_asset_type: source_asset_type,
     source_amount: source_amount,
     destination_assets: destination_assets
@@ -166,7 +173,9 @@ defmodule Stellar.Horizon.PaymentPathsTest do
          }
        ]
      }} =
-      PaymentPaths.list_strict_send_paths(source_asset_type, source_amount,
+      PaymentPaths.list_send_paths(
+        source_asset_type: source_asset_type,
+        source_amount: source_amount,
         destination_assets: destination_assets
       )
   end
@@ -178,7 +187,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        extras: %{invalid_field: "destination_asset_type", reason: "Missing required field"},
        status_code: 400,
        title: "Bad Request"
-     }} = PaymentPaths.list_strict_receive_paths(nil, 5)
+     }} = PaymentPaths.list_receive_paths(destination_amount: "error")
   end
 
   test "list strict send error" do
@@ -188,6 +197,6 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        extras: %{invalid_field: "source_asset_type", reason: "Missing required field"},
        status_code: 400,
        title: "Bad Request"
-     }} = PaymentPaths.list_strict_send_paths(nil, 5)
+     }} = PaymentPaths.list_send_paths(source_amount: "error")
   end
 end

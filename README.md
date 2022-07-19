@@ -664,15 +664,41 @@ Stellar.Horizon.FeeStats.retrieve()
 See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregations/fee-stats/single/) for more details.
 
 ### Paths
+
+#### List paths
+This will return information about potential path payments:
+- [Required] source_account. The Stellar address of the sender.
+- [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] destination_amount. The destination amount specified in the search that found this path.
+- [Optional] destination_account. The Stellar address of the reciever.
+- [Optional] destination_asset_issuer. The Stellar address of the issuer of the destination asset. Required if the destination_asset_type is not **native**.
+- [Optional] destination_asset_code. The code for the destination asset.
+
 ```elixir
-# list paths
-Stellar.Horizon.PaymentPaths.list_paths("GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", "native", 5)
+Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset_type: "native", destination_amount: 5)
+```
+#### List strict receive payment paths
+- [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] destination_amount. The amount of the destination asset that should be received.
+- [Optional] source_account. The Stellar address of the sender.
+- [Optional] source_assets. A comma-separated list of assets available to the sender.
+- [Optional] destination_asset_issuer. The Stellar address of the issuer of the destination asset. Required if the **destination_asset_type** is not **native**
+- [Optional] destination_asset_code. The code for the destination asset. Required if the **destination_asset_type** is not **native**.
 
-# list strict receive payment paths
-Stellar.Horizon.PaymentPaths.list_strict_receive_paths("native", 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
+```elixir
+Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset_type: "native", destination_amount: 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
+```
 
-# list strict send payment paths
-Stellar.Horizon.PaymentPaths.list_strict_send_paths("native", 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
+#### List strict send payment paths
+- [Required] source_asset_type. The type for the source asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] source_amount. The amount of the source asset that should be sent.
+- [Optional] source_asset_issuer. The Stellar address of the issuer of the source asset. Required if the **source_asset_type** is not native.
+- [Optional] source_asset_code. The code for the source asset. Required if the **source_asset_type** is not **native**.
+- [Optional] destination_account. The Stellar address of the reciever.
+- [Optional] destination_assets. A comma-separated list of assets that the recipient can receive.
+
+```elixir
+Stellar.Horizon.PaymentPaths.list_send_paths(source_asset_type: "native", source_amount: 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
 ```
 
 See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.

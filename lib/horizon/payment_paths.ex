@@ -11,13 +11,9 @@ defmodule Stellar.Horizon.PaymentPaths do
 
   alias Stellar.Horizon.{Error, Paths, Request}
 
+  @type args :: Keyword.t()
+  @type opt :: atom()
   @type path :: String.t()
-  @type destination_asset_type :: String.t()
-  @type destination_amount :: String.t()
-  @type source_asset_type :: String.t()
-  @type source_account :: String.t()
-  @type source_amount :: String.t()
-  @type options :: Keyword.t()
   @type resource :: Paths.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
 
@@ -38,42 +34,38 @@ defmodule Stellar.Horizon.PaymentPaths do
 
   ## Examples
 
-    iex> PaymentPaths.list_paths("GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", "native", 5)
+    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                 destination_asset_type: "native",
+                                 destination_amount: 5
+                                )
     {:ok, %Paths{records: [%Path{}, ...]}}
 
     # list with `destination_account`
-    iex> PaymentPaths.list_paths("GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                  "native",
-                                  5,
-                                  destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
+    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                 destination_asset_type: "native",
+                                 destination_amount: 5,
+                                 destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
                                 )
     {:ok, %Paths{records: [%Path{}, ...]}}
 
     # list with more options
-    iex> PaymentPaths.list_paths("GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                  "credit_alphanum4",
-                                  5,
-                                  destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                  destination_asset_code: "TEST",
-                                  destination_asset_issuer: "GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
+    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                 destination_asset_type: "credit_alphanum4",
+                                 destination_amount: 5,
+                                 destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                 destination_asset_code: "TEST",
+                                 destination_asset_issuer: "GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
                                 )
     {:ok, %Paths{records: [%Path{}, ...]}}
   """
 
-  @spec list_paths(
-          source_account :: source_account(),
-          destination_asset_type :: destination_asset_type(),
-          destination_amount :: destination_amount(),
-          options :: options()
-        ) :: response()
-  def list_paths(source_account, destination_asset_type, destination_amount, options \\ []) do
-    options
-    |> Keyword.merge(
-      source_account: source_account,
-      destination_asset_type: destination_asset_type,
-      destination_amount: destination_amount
-    )
-    |> (&build_request("", &1)).()
+  @spec list_paths(args :: args()) :: response()
+  def list_paths(args \\ []) do
+    :get
+    |> Request.new(@endpoint)
+    |> Request.add_query(args, extra_params: allowed_query_options(:opt1))
+    |> Request.perform()
+    |> Request.results(as: Paths)
   end
 
   @doc """
@@ -95,42 +87,37 @@ defmodule Stellar.Horizon.PaymentPaths do
   ## Examples
 
       # list with `source_account`
-      iex> PaymentPaths.list_strict_receive_paths("native",
-                                                  5,
+      iex> PaymentPaths.list_receive_paths(destination_asset_type: "native",
+                                                  destination_amount: 5,
                                                   source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO"
                                                 )
       {:ok, %Paths{records: [%Path{}, ...]}}
 
 
       # list with `source_assets`
-      iex> PaymentPaths.list_strict_receive_paths("native",
-                                                    5,
-                                                    source_assets: "native"
-                                                  )
+      iex> PaymentPaths.list_receive_paths(destination_asset_type: "native",
+                                                  destination_amount: 5,
+                                                  source_assets: "native"
+                                                )
       {:ok, %Paths{records: [%Path{}, ...]}}
 
       # list with more options
-      iex> PaymentPaths.list_strict_receive_paths("credit_alphanum4",
-                                                  5,
+      iex> PaymentPaths.list_receive_paths(destination_asset_type: "credit_alphanum4",
+                                                  destination_amount: 5,
                                                   destination_asset_code: "BB1",
                                                   destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
-                                                  source_assets: "CNY:GAREELUB43IRHWEASCFBLKHURCGMHE5IF6XSE7EXDLACYHGRHM43RFOX",
+                                                  source_assets: "CNY:GAREELUB43IRHWEASCFBLKHURCGMHE5IF6XSE7EXDLACYHGRHM43RFOX"
                                                 )
       {:ok, %Paths{records: [%Path{}, ...]}}
   """
 
-  @spec list_strict_receive_paths(
-          destination_asset_type :: destination_asset_type(),
-          destination_amount :: destination_amount(),
-          options :: options()
-        ) :: response()
-  def list_strict_receive_paths(destination_asset_type, destination_amount, options \\ []) do
-    options
-    |> Keyword.merge(
-      destination_asset_type: destination_asset_type,
-      destination_amount: destination_amount
-    )
-    |> (&build_request("strict-receive", &1)).()
+  @spec list_receive_paths(args :: args()) :: response()
+  def list_receive_paths(args \\ []) do
+    :get
+    |> Request.new(@endpoint, path: "strict-receive")
+    |> Request.add_query(args, extra_params: allowed_query_options(:opt2))
+    |> Request.perform()
+    |> Request.results(as: Paths)
   end
 
   @doc """
@@ -150,63 +137,68 @@ defmodule Stellar.Horizon.PaymentPaths do
   ## Examples
 
       * list with `destination_account`
-      iex> PaymentPaths.list_strict_send_paths("native",
-                                                5,
-                                                destination_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO"
+      iex> PaymentPaths.list_send_paths(source_asset_type: "native",
+                                               source_amount: 5,
+                                               destination_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO"
                                               )
       {:ok, %Paths{records: [%Path{}, ...]}}
 
       * list with `destination_assets`
-      iex> PaymentPaths.list_strict_send_paths("native",
-                                                5,
-                                               destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
-                                              )
+      iex> PaymentPaths.list_send_paths(source_asset_type: "native",
+                                        source_amount: 5,
+                                        destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
+                                      )
       {:ok, %Paths{records: [%Path{}, ...]}}
 
       # list with more options
-      iex> PaymentPaths.list_strict_send_paths("credit_alphanum4",
-                                                400,
-                                                destination_account: "GAYOLLLUIZE4DZMBB2ZBKGBUBZLIOYU6XFLW37GBP2VZD3ABNXCW4BVA",
-                                                source_asset_issuer: "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
-                                                source_asset_code: "BRL"
+      iex> PaymentPaths.list_send_paths(source_asset_type: "credit_alphanum4",
+                                               source_amount: 400,
+                                               destination_account: "GAYOLLLUIZE4DZMBB2ZBKGBUBZLIOYU6XFLW37GBP2VZD3ABNXCW4BVA",
+                                               source_asset_issuer: "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
+                                               source_asset_code: "BRL"
                                               )
       {:ok, %Paths{records: [%Path{}, ...]}}
   """
 
-  @spec list_strict_send_paths(
-          source_asset_type :: source_asset_type(),
-          source_amount :: source_amount(),
-          options :: options()
-        ) :: response()
-  def list_strict_send_paths(source_asset_type, source_amount, options \\ []) do
-    options
-    |> Keyword.merge(source_asset_type: source_asset_type, source_amount: source_amount)
-    |> (&build_request("strict-send", &1)).()
-  end
-
-  @spec build_request(path :: path(), options :: options()) :: response()
-  defp build_request(path, options) do
+  @spec list_send_paths(args :: args()) :: response()
+  def list_send_paths(args \\ []) do
     :get
-    |> Request.new(@endpoint, path: path)
-    |> Request.add_query(options, extra_params: allowed_query_options())
+    |> Request.new(@endpoint, path: "strict-send")
+    |> Request.add_query(args, extra_params: allowed_query_options(:opt3))
     |> Request.perform()
     |> Request.results(as: Paths)
   end
 
-  @spec allowed_query_options() :: list()
-  defp allowed_query_options do
+  @spec allowed_query_options(opt :: opt()) :: list()
+  defp allowed_query_options(:opt1) do
     [
       :source_account,
-      :destination_account,
-      :destination_amount,
       :destination_asset_type,
+      :destination_amount,
+      :destination_account,
       :destination_asset_issuer,
-      :destination_asset_code,
+      :destination_asset_code
+    ]
+  end
+
+  defp allowed_query_options(:opt2) do
+    [
+      :destination_asset_type,
+      :destination_amount,
+      :source_account,
       :source_assets,
+      :destination_asset_issuer,
+      :destination_asset_code
+    ]
+  end
+
+  defp allowed_query_options(:opt3) do
+    [
       :source_asset_type,
       :source_amount,
       :source_asset_issuer,
       :source_asset_code,
+      :destination_account,
       :destination_assets
     ]
   end

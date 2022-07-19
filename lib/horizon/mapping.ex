@@ -5,8 +5,6 @@ defmodule Stellar.Horizon.Mapping do
   """
 
   @type attr_value :: any()
-  @type response :: map()
-  @type resource :: resource()
   @type attr_type ::
           :integer
           | :float
@@ -37,13 +35,6 @@ defmodule Stellar.Horizon.Mapping do
     |> Map.put(attr, parsed_value)
     |> parse(attrs)
   end
-
-  @spec parse(module :: struct(), response :: response(), resource :: resource()) :: struct()
-  def parse(module, %{_embedded: %{records: records}}, resource) when is_list(records) do
-    Map.put(module, :records, Enum.map(records, &resource.new/1))
-  end
-
-  def parse(module, %{}, _resource), do: module
 
   @spec do_parse(type :: attr_type(), value :: attr_value()) :: attr_value()
   defp do_parse(:integer, value) when is_bitstring(value), do: String.to_integer(value)

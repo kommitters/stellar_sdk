@@ -121,15 +121,4 @@ defmodule Stellar.Horizon.MappingTest do
       |> Mapping.build(%{operation: raw_operations})
       |> Mapping.parse(operation: {:list, :struct, FakeOperation})
   end
-
-  test "parse/3 list_of_structs", %{id: id, resource: resource} do
-    raw_data = %{
-      _embedded: %{
-        records: [%{id: id, hash: id, balance: 100}, %{id: id, hash: id, balance: 200}]
-      }
-    }
-
-    %{records: [%FakeOperation{balance: 100}, %FakeOperation{balance: 200}]} =
-      Mapping.parse(resource, raw_data, FakeOperation)
-  end
 end

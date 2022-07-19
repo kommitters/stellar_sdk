@@ -12,10 +12,14 @@ defmodule Stellar.Horizon.Paths do
 
   defstruct [:records]
 
+  @mapping [records: {:list, :struct, Path}]
+
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    Mapping.parse(%__MODULE__{}, attrs, Path)
+    %__MODULE__{}
+    |> Mapping.build(attrs)
+    |> Mapping.parse(@mapping)
   end
 end

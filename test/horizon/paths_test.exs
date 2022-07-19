@@ -51,7 +51,7 @@ defmodule Stellar.Horizon.PathsTest do
           source_asset_type: "credit_alphanum4"
         }
       ]
-    } = Paths.new(attrs)
+    } = Paths.new(attrs[:_embedded])
   end
 
   test "new/2 empty_attrs" do
