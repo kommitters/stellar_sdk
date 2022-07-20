@@ -1,0 +1,10 @@
+{
+  "type": "https://stellar.org/horizon-errors/bad_request",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "The request you sent was invalid in some way.",
+  "extras": {
+    "invalid_field": "destination_asset_type",
+    "reason": "Missing required field"
+  }
+}
