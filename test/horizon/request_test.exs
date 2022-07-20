@@ -15,7 +15,7 @@ defmodule Stellar.Horizon.RequestTest do
 
   alias Stellar.Test.Fixtures.Horizon
   alias Stellar.Horizon.Client.CannedRequestImpl
-  alias Stellar.Horizon.{Collection, Error, Request, Transaction}
+  alias Stellar.Horizon.{Collection, Error, Request, Transaction, Paths, Path}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client_impl, CannedRequestImpl)
@@ -151,6 +151,19 @@ defmodule Stellar.Horizon.RequestTest do
          %Transaction{hash: "3ce2aca2fed36da2faea31352c76c5e412348887a4c119b1e90de8d1b937396a"}
        ]
      }} = Request.results({:ok, transactions}, collection: {Transaction, fn -> :ok end})
+  end
+
+  test "results/2 with _embedded attribute" do
+    body = Horizon.fixture("paths")
+    paths = Jason.decode!(body, keys: :atoms)
+
+    {:ok,
+     %Paths{
+       records: [
+         %Path{source_amount: 28.9871131},
+         %Path{source_amount: 29.0722784}
+       ]
+     }} = Request.results({:ok, paths}, as: Paths)
   end
 
   test "results/2 error" do
