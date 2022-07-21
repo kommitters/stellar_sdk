@@ -677,6 +677,7 @@ This will return information about potential path payments:
 ```elixir
 Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset_type: :native, destination_amount: 5)
 ```
+
 #### List strict receive payment paths
 - [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
 - [Required] destination_amount. The amount of the destination asset that should be received.
@@ -702,6 +703,24 @@ Stellar.Horizon.PaymentPaths.list_send_paths(source_asset_type: :native, source_
 ```
 
 See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
+
+### Order Books
+
+#### Retrieve order Books
+Provides an order book’s bids and asks:
+- [Required] selling_asset_type. The type for the asset being sold (base asset), **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] buying_asset_type. The type for the asset being bought (counter asset), **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Optional] selling_asset_issuer. The Stellar address of the issuer of the asset being sold (base asset). Required if the selling_asset_type is not native
+- [Optional] selling_asset_code. The code for the asset being sold (base asset). Required if the selling_asset_type is not native.
+- [Optional] buying_asset_issuer. The Stellar address of the issuer of the asset being bought (counter asset). Required if the **buying_asset_type** is not **native**.
+- [Optional] buying_asset_code. The code for the asset being bought (counter asset). Required if the **buying_asset_type** is not **native**.
+- [Optional] limit. The maximum number of records returned
+
+```elixir
+Stellar.Horizon.OrderBooks.retrieve(selling_asset_type: :native, buying_asset_type: :native)
+```
+
+See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/order-books/) for more details.
 
 ---
 
