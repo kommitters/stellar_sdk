@@ -61,8 +61,10 @@ defmodule Stellar.KeyPair.Default do
 
   @impl true
   def valid_signature?(<<signature::binary>>, <<payload::binary>>, <<secret::binary>>) do
-    raw_secret = raw_secret_seed(secret)
-    Ed25519.valid_signature?(signature, payload, raw_secret)
+    {public_key, _secret} = from_secret_seed(secret)
+    raw_public_key = raw_public_key(public_key)
+
+    Ed25519.valid_signature?(signature, payload, raw_public_key)
   end
 
   @impl true

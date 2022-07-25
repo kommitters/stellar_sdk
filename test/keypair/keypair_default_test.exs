@@ -62,8 +62,8 @@ defmodule Stellar.KeyPair.DefaultTest do
     true = Default.valid_signature?(signature, <<0, 0, 0, 0>>, secret)
   end
 
-  test "valid_signature?/3 with invalid signature", %{} do
-    false
+  test "valid_signature?/3 with invalid signature", %{secret: secret, signature: signature} do
+    false = Default.valid_signature?(signature, <<0, 0, 0, 1>>, secret)
   end
 
   test "validate_public_key/1", %{public_key: public_key} do
