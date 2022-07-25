@@ -60,6 +60,12 @@ defmodule Stellar.KeyPair.Default do
   def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
 
   @impl true
+  def valid_signature?(<<signature::binary>>, <<payload::binary>>, <<secret::binary>>) do
+    raw_secret = raw_secret_seed(secret)
+    Ed25519.valid_signature?(signature, payload, raw_secret)
+  end
+
+  @impl true
   def validate_public_key(public_key) do
     case StrKey.decode(public_key, :ed25519_public_key) do
       {:ok, _key} -> :ok
