@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1 (25.07.2022)
+
+- Add security policy to the repository
+
 ## 0.7.0 (27.05.2022)
 * Add CreateClaimableBalance, ClaimClaimableBalance, RevokeSponsorship operations.
 * Fix PoolID hashing bug.
