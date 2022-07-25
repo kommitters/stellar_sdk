@@ -67,6 +67,8 @@ defmodule Stellar.KeyPair.Default do
     Ed25519.valid_signature?(signature, payload, raw_public_key)
   end
 
+  def valid_signature?(_signature, _payload, _secret), do: false
+
   @impl true
   def validate_public_key(public_key) do
     case StrKey.decode(public_key, :ed25519_public_key) do
