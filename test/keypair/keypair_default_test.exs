@@ -58,7 +58,10 @@ defmodule Stellar.KeyPair.DefaultTest do
     {:error, :invalid_signature_payload} = Default.sign(nil, secret)
   end
 
-  test "valid_signature?/3 with valid signature", %{public_key: public_key, signature: signed_payload} do
+  test "valid_signature?/3 with valid signature", %{
+    public_key: public_key,
+    signature: signed_payload
+  } do
     true = Default.valid_signature?(<<0, 0, 0, 0>>, signed_payload, public_key)
   end
 
