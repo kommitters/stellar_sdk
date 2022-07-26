@@ -19,13 +19,7 @@ defmodule Stellar.Horizon.OrderBook.Price do
     :amount
   ]
 
-  @price_r_mapping [
-    n: :integer,
-    d: :integer
-  ]
-
   @mapping [
-    price_r: {:map, @price_r_mapping},
     price: :float,
     amount: :float
   ]

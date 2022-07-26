@@ -8,7 +8,7 @@ defmodule Stellar.Horizon.OrderBooks do
   Horizon API reference: https://developers.stellar.org/api/aggregations/order-books/object/
   """
 
-  alias Stellar.Horizon.{Error, OrderBook, Request}
+  alias Stellar.Horizon.{Error, OrderBook, Request, RequestParams}
 
   @type args :: Keyword.t()
   @type resource :: OrderBook.t()
@@ -33,15 +33,16 @@ defmodule Stellar.Horizon.OrderBooks do
   ## Examples
 
     # Retrieve order books
-    iex> OrderBooks.retrieve(selling_asset_type: :native, buying_asset_type: :native)
+    iex> OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
 
     {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
 
     # Retrieve with more options
-    iex> OrderBooks.retrieve(selling_asset_type: :native,
-                             buying_asset_type: :credit_alphanum4,
-                             buying_asset_code: "BB1",
-                             buying_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
+    iex> OrderBooks.retrieve(selling_asset: :native,
+                             buying_asset: [
+                                code: "BB1",
+                                issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+                              ],
                              limit: 2
                             )
     {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
@@ -49,13 +50,23 @@ defmodule Stellar.Horizon.OrderBooks do
 
   @spec retrieve(args :: args()) :: response()
   def retrieve(args \\ []) do
+    selling_asset = RequestParams.build_assets_params(args, :selling_asset)
+    buying_asset = RequestParams.build_assets_params(args, :buying_asset)
+
+    params =
+      args
+      |> Keyword.take([:limit])
+      |> Keyword.merge(selling_asset)
+      |> Keyword.merge(buying_asset)
+
     :get
     |> Request.new(@endpoint)
-    |> Request.add_query(args, extra_params: allowed_query_options())
+    |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
     |> Request.results(as: OrderBook)
   end
 
+  @spec allowed_query_options() :: list()
   defp allowed_query_options do
     [
       :selling_asset_type,

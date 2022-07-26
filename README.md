@@ -708,16 +708,19 @@ See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/
 
 #### Retrieve order Books
 Provides an order book’s bids and asks:
-- [Required] selling_asset_type. The type for the asset being sold (base asset), **native**, **credit_alphanum4**, or **credit_alphanum12**.
-- [Required] buying_asset_type. The type for the asset being bought (counter asset), **native**, **credit_alphanum4**, or **credit_alphanum12**.
-- [Optional] selling_asset_issuer. The Stellar address of the issuer of the asset being sold (base asset). Required if the selling_asset_type is not native
-- [Optional] selling_asset_code. The code for the asset being sold (base asset). Required if the selling_asset_type is not native.
-- [Optional] buying_asset_issuer. The Stellar address of the issuer of the asset being bought (counter asset). Required if the **buying_asset_type** is not **native**.
-- [Optional] buying_asset_code. The code for the asset being bought (counter asset). Required if the **buying_asset_type** is not **native**.
+- [Required] selling_asset. **:native** or **[code: "SELLING_ASSET_CODE",  issuer: "SELLING_ASSET_ISSUER" ]**.
+- [Required] buying_asset. **:native** or **[code: "BUYING_ASSET_CODE",  issuer: "BUYING_ASSET_ISSUER" ]**.
 - [Optional] limit. The maximum number of records returned
 
 ```elixir
-Stellar.Horizon.OrderBooks.retrieve(selling_asset_type: :native, buying_asset_type: :native)
+Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
+Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native,
+                                    buying_asset: [
+                                      code: "BB1",
+                                      issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+                                    ],
+                                    limit: 2
+                                    )
 ```
 
 See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/order-books/) for more details.

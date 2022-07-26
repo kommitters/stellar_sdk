@@ -14,7 +14,7 @@ defmodule Stellar.Horizon.Client.CannedOrderBooksRequests do
   def request(
         :get,
         @base_url <>
-          "/order_book?selling_asset_type=native&buying_asset_type=credit_alphanum4&buying_asset_code=USD&buying_asset_issuer=GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX&limit=2",
+          "/order_book?limit=2&selling_asset_type=native&buying_asset_type=credit_alphanum4&buying_asset_code=USD&buying_asset_issuer=GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
         _headers,
         _body,
         _opts
@@ -23,7 +23,7 @@ defmodule Stellar.Horizon.Client.CannedOrderBooksRequests do
     {:ok, 200, [], json_body}
   end
 
-  def request(:get, @base_url <> "/order_book?buying_asset_type=error", _headers, _body, _opts) do
+  def request(:get, @base_url <> "/order_book", _headers, _body, _opts) do
     json_error = Horizon.fixture("400_invalid_order_book")
     {:ok, 400, [], json_error}
   end
@@ -44,19 +44,18 @@ defmodule Stellar.Horizon.OrderBooksTest do
     end)
 
     %{
-      selling_asset_type: :native,
-      buying_asset_type: :credit_alphanum4,
-      buying_asset_code: "USD",
-      buying_asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
+      selling_asset: :native,
+      buying_asset: [
+        code: "USD",
+        issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX"
+      ],
       limit: 2
     }
   end
 
   test "retrieve/1", %{
-    selling_asset_type: selling_asset_type,
-    buying_asset_type: buying_asset_type,
-    buying_asset_code: buying_asset_code,
-    buying_asset_issuer: buying_asset_issuer,
+    selling_asset: selling_asset,
+    buying_asset: buying_asset,
     limit: limit
   } do
     {:ok,
@@ -93,10 +92,8 @@ defmodule Stellar.Horizon.OrderBooksTest do
        }
      }} =
       OrderBooks.retrieve(
-        selling_asset_type: selling_asset_type,
-        buying_asset_type: buying_asset_type,
-        buying_asset_code: buying_asset_code,
-        buying_asset_issuer: buying_asset_issuer,
+        selling_asset: selling_asset,
+        buying_asset: buying_asset,
         limit: limit
       )
   end
@@ -107,6 +104,6 @@ defmodule Stellar.Horizon.OrderBooksTest do
        status_code: 400,
        title: "Invalid Order Book Parameters",
        type: "https://stellar.org/horizon-errors/invalid_order_book"
-     }} = OrderBooks.retrieve(buying_asset_type: :error)
+     }} = OrderBooks.retrieve(buying_asset: :error)
   end
 end
