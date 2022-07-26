@@ -46,6 +46,12 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
+  def valid_signature?(_signature, _payload, _secret) do
+    send(self(), {:valid_signature, "VALID_SIGNATURE"})
+    :ok
+  end
+
+  @impl true
   def validate_public_key(_public_key) do
     send(self(), {:ok, "PUBLIC_KEY"})
     :ok
@@ -110,6 +116,11 @@ defmodule Stellar.KeyPairTest do
   test "sign/2" do
     Stellar.KeyPair.sign(<<0, 0, 0, 0>>, "SECRET")
     assert_receive({:signature, "SIGNATURE"})
+  end
+
+  test "valid_signature?/3" do
+    Stellar.KeyPair.valid_signature?("SIGNATURE", <<0, 0, 0, 0>>, "SECRET")
+    assert_receive({:valid_signature, "VALID_SIGNATURE"})
   end
 
   test "validate_public_key/1" do
