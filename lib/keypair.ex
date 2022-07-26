@@ -33,6 +33,10 @@ defmodule Stellar.KeyPair do
   def sign(payload, secret), do: impl().sign(payload, secret)
 
   @impl true
+  def valid_signature?(signature, payload, secret),
+    do: impl().valid_signature?(signature, payload, secret)
+
+  @impl true
   def validate_public_key(public_key), do: impl().validate_public_key(public_key)
 
   @impl true
