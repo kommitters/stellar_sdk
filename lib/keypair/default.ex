@@ -60,12 +60,12 @@ defmodule Stellar.KeyPair.Default do
   def sign(_payload, _secret), do: {:error, :invalid_signature_payload}
 
   @impl true
-  def valid_signature?(<<payload::binary>>, <<signature::binary>>, <<public_key::binary>>) do
+  def valid_signature?(<<payload::binary>>, <<signed_payload::binary>>, <<public_key::binary>>) do
     raw_public_key = raw_public_key(public_key)
-    Ed25519.valid_signature?(signature, payload, raw_public_key)
+    Ed25519.valid_signature?(signed_payload, payload, raw_public_key)
   end
 
-  def valid_signature?(_signature, _payload, _secret), do: false
+  def valid_signature?(_payload, _signed_payload, _public_key), do: false
 
   @impl true
   def validate_public_key(public_key) do
