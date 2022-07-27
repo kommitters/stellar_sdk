@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0 (27.07.2022)
+* Add Fee Stats, Paths, and Order Books endpoints.
+* Add `Keypair.valid_signature?/3` function.
+* Fix documentation examples to create accounts and payments.
+* Automate publishing of new releases to Hex.pm using CD.
+
 ## 0.7.0 (27.05.2022)
 * Add CreateClaimableBalance, ClaimClaimableBalance, RevokeSponsorship operations.
 * Fix PoolID hashing bug.
