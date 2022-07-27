@@ -108,6 +108,10 @@ defmodule Stellar.Horizon.Request do
     {:ok, Collection.new(results, {resource, paginate_fun})}
   end
 
+  def results({:ok, %{_embedded: embedded}}, as: resource) when not is_nil(embedded) do
+    {:ok, resource.new(embedded)}
+  end
+
   def results({:ok, results}, as: resource), do: {:ok, resource.new(results)}
 
   def results({:error, error}, _resource), do: {:error, error}

@@ -22,6 +22,7 @@ defmodule Stellar.KeyPair.Spec do
   @callback validate_muxed_account(public_key()) :: validation()
   @callback validate_secret_seed(public_key()) :: validation()
   @callback sign(binary(), secret_seed()) :: binary() | error()
+  @callback valid_signature?(binary(), binary(), public_key()) :: boolean()
 
   @optional_callbacks from_raw_public_key: 1,
                       from_raw_muxed_account: 1,

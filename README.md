@@ -21,7 +21,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.7.1"}
+    {:stellar_sdk, "~> 0.8.0"}
   ]
 end
 ```
@@ -654,6 +654,76 @@ Stellar.Horizon.Effects.all(limit: 10, order: :asc)
 ```
 
 See [**Stellar.Horizon.Effects**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Effects.html#content) for more details.
+
+### FeeStats
+```elixir
+# retrieve fee stats
+Stellar.Horizon.FeeStats.retrieve()
+```
+
+See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregations/fee-stats/single/) for more details.
+
+### Paths
+
+#### List paths
+This will return information about potential path payments:
+- [Required] source_account. The Stellar address of the sender.
+- [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] destination_amount. The destination amount specified in the search that found this path.
+- [Optional] destination_account. The Stellar address of the reciever.
+- [Optional] destination_asset_issuer. The Stellar address of the issuer of the destination asset. Required if the destination_asset_type is not **native**.
+- [Optional] destination_asset_code. The code for the destination asset.
+
+```elixir
+Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset_type: :native, destination_amount: 5)
+```
+
+#### List strict receive payment paths
+- [Required] destination_asset_type. The type for the destination asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] destination_amount. The amount of the destination asset that should be received.
+- [Optional] source_account. The Stellar address of the sender.
+- [Optional] source_assets. A comma-separated list of assets available to the sender.
+- [Optional] destination_asset_issuer. The Stellar address of the issuer of the destination asset. Required if the **destination_asset_type** is not **native**
+- [Optional] destination_asset_code. The code for the destination asset. Required if the **destination_asset_type** is not **native**.
+
+```elixir
+Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset_type: :native, destination_amount: 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
+```
+
+#### List strict send payment paths
+- [Required] source_asset_type. The type for the source asset, **native**, **credit_alphanum4**, or **credit_alphanum12**.
+- [Required] source_amount. The amount of the source asset that should be sent.
+- [Optional] source_asset_issuer. The Stellar address of the issuer of the source asset. Required if the **source_asset_type** is not native.
+- [Optional] source_asset_code. The code for the source asset. Required if the **source_asset_type** is not **native**.
+- [Optional] destination_account. The Stellar address of the reciever.
+- [Optional] destination_assets. A comma-separated list of assets that the recipient can receive.
+
+```elixir
+Stellar.Horizon.PaymentPaths.list_send_paths(source_asset_type: :native, source_amount: 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
+```
+
+See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
+
+### Order Books
+
+#### Retrieve order Books
+Provides an order book’s bids and asks:
+- [Required] selling_asset. **:native** or **[code: "SELLING_ASSET_CODE", issuer: "SELLING_ASSET_ISSUER" ]**.
+- [Required] buying_asset. **:native** or **[code: "BUYING_ASSET_CODE", issuer: "BUYING_ASSET_ISSUER" ]**.
+- [Optional] limit. The maximum number of records returned
+
+```elixir
+Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
+Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native,
+                                    buying_asset: [
+                                      code: "BB1",
+                                      issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+                                    ],
+                                    limit: 2
+                                    )
+```
+
+See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/order-books/) for more details.
 
 ---
 
