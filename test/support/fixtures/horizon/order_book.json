@@ -1,0 +1,46 @@
+{
+  "bids": [
+    {
+      "price_r": {
+        "n": 6014600,
+        "d": 102275119
+      },
+      "price": "0.0588080",
+      "amount": "0.1722469"
+    },
+    {
+      "price_r": {
+        "n": 1250000,
+        "d": 21831117
+      },
+      "price": "0.0572577",
+      "amount": "0.2991796"
+    }
+  ],
+  "asks": [
+    {
+      "price_r": {
+        "n": 118163,
+        "d": 2000000
+      },
+      "price": "0.0590815",
+      "amount": "8057.2710223"
+    },
+    {
+      "price_r": {
+        "n": 60627,
+        "d": 1000000
+      },
+      "price": "0.0606270",
+      "amount": "10000.0000000"
+    }
+  ],
+  "base": {
+    "asset_type": "native"
+  },
+  "counter": {
+    "asset_type": "credit_alphanum4",
+    "asset_code": "USD",
+    "asset_issuer": "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX"
+  }
+}
