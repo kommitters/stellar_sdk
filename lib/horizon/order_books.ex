@@ -20,21 +20,16 @@ defmodule Stellar.Horizon.OrderBooks do
     Retrieve order books
 
   ## Parameters
-    * `selling_asset_type`: The type for the asset being sold (base asset), native, credit_alphanum4, or credit_alphanum12
-    * `buying_asset_type`: The type for the asset being bought (counter asset), native, credit_alphanum4, or credit_alphanum12
+    * `selling_asset`: :native or [code: `selling_asset_code`, issuer: `selling_asset_issuer` ]
+    * `buying_asset`: :native or [code: `buying_asset_code`, issuer: `buying_asset_issuer` ]
 
   ## Options
-    * `selling_asset_issuer`: The Stellar address of the issuer of the asset being sold (base asset). Required if the selling_asset_type is not native
-    * `selling_asset_code`: The code for the asset being sold (base asset). Required if the selling_asset_type is not native.
-    * `buying_asset_issuer`: The Stellar address of the issuer of the asset being bought (counter asset). Required if the buying_asset_type is not native.
-    * `buying_asset_code`: The code for the asset being bought (counter asset). Required if the buying_asset_type is not native.
     * `limit`: The maximum number of records returned
 
   ## Examples
 
     # Retrieve order books
     iex> OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
-
     {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
 
     # Retrieve with more options

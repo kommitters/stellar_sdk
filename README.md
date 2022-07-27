@@ -708,8 +708,8 @@ See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/
 
 #### Retrieve order Books
 Provides an order book’s bids and asks:
-- [Required] selling_asset. **:native** or **[code: "SELLING_ASSET_CODE",  issuer: "SELLING_ASSET_ISSUER" ]**.
-- [Required] buying_asset. **:native** or **[code: "BUYING_ASSET_CODE",  issuer: "BUYING_ASSET_ISSUER" ]**.
+- [Required] selling_asset. **:native** or **[code: "SELLING_ASSET_CODE", issuer: "SELLING_ASSET_ISSUER" ]**.
+- [Required] buying_asset. **:native** or **[code: "BUYING_ASSET_CODE", issuer: "BUYING_ASSET_ISSUER" ]**.
 - [Optional] limit. The maximum number of records returned
 
 ```elixir
