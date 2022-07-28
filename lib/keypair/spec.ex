@@ -27,6 +27,7 @@ defmodule Stellar.KeyPair.Spec do
   @callback validate_sha256_hash(public_key()) :: validation()
   @callback sign(binary(), secret_seed()) :: binary() | error()
   @callback valid_signature?(binary(), binary(), public_key()) :: boolean()
+  @callback signature_hint_for_signed_payload(binary(), binary()) :: binary()
 
   @optional_callbacks from_raw_public_key: 1,
                       from_raw_muxed_account: 1,

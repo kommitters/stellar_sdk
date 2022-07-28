@@ -3,12 +3,19 @@ defmodule Stellar.TxBuild.SignerKey do
   `SignerKey` struct definition.
   """
   alias Stellar.KeyPair
-  alias StellarBase.XDR.{SignerKey, SignerKeyType, UInt256}
+
+  alias StellarBase.XDR.{
+    SignerKey,
+    SignerKeyType,
+    UInt256,
+    SignerKeyEd25519SignedPayload,
+    VariableOpaque64
+  }
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :ed25519 | :sha256_hash | :pre_auth_tx
-  @type key :: String.t()
+  @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :ed25519_signed_payload
+  @type key :: String.t() | tuple()
   @type signer :: {type(), key()}
   @type validation :: {:ok, any()} | {:error, atom()}
 

@@ -77,23 +77,6 @@ defmodule Stellar.KeyPair.Default do
 
   def valid_signature?(_payload, _signed_payload, _public_key), do: false
 
-  def ed25519_signed_payload_signature_hint(
-        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
-        <<last_payload_bytes::binary-size(4), _payload::binary>>
-      ) do
-    :crypto.exor(last_public_key_bytes, last_payload_bytes)
-  end
-
-  def ed25519_signed_payload_signature_hint(
-        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
-        raw_payload
-      ) do
-    raw_payload
-    |> byte_size()
-    |> (&(:binary.copy(<<0>>, 4 - &1) <> raw_payload)).()
-    |> (&:crypto.exor(last_public_key_bytes, &1)).()
-  end
-
   @impl true
   def validate_public_key(public_key) do
     case StrKey.decode(public_key, :ed25519_public_key) do
@@ -132,5 +115,22 @@ defmodule Stellar.KeyPair.Default do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_sha256_hash}
     end
+
+  @impl true
+  def signature_hint_for_signed_payload(
+        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
+        <<last_payload_bytes::binary-size(4), _payload::binary>>
+      ) do
+    :crypto.exor(last_public_key_bytes, last_payload_bytes)
+  end
+
+  def signature_hint_for_signed_payload(
+        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
+        raw_payload
+      ) do
+    raw_payload
+    |> byte_size()
+    |> (&(:binary.copy(<<0>>, 4 - &1) <> raw_payload)).()
+    |> (&:crypto.exor(last_public_key_bytes, &1)).()
   end
 end

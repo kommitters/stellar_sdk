@@ -17,7 +17,8 @@ defmodule Stellar.KeyPair.DefaultTest do
         <<215, 199, 186, 220, 150, 210, 229, 108, 54, 13, 160, 26, 38, 184, 120, 233, 253, 170,
           252, 68, 235, 166, 205, 2, 115, 76, 254, 20, 85, 1, 224, 106, 84, 196, 217, 38, 248,
           147, 151, 69, 212, 28, 97, 216, 105, 170, 173, 9, 38, 94, 9, 97, 78, 145, 138, 94, 245,
-          145, 255, 26, 28, 9, 110, 10>>
+          145, 255, 26, 28, 9, 110, 10>>,
+      payload: <<1, 2, 3, 4>>
     }
   end
 
@@ -86,5 +87,20 @@ defmodule Stellar.KeyPair.DefaultTest do
 
   test "validate_secret_seed/1 invalid_secret" do
     {:error, :invalid_ed25519_secret_seed} = Default.validate_secret_seed("ABC")
+  end
+
+  test "signature_hint_for_signed_payload/2 payload with 4 bytes", %{
+    encoded_public_key: encoded_public_key,
+    payload: payload
+  } do
+    <<193, 237, 145, 123>> =
+      Default.signature_hint_for_signed_payload(encoded_public_key, payload)
+  end
+
+  test "signature_hint_for_signed_payload/2 payload with less than 4 bytes", %{
+    encoded_public_key: encoded_public_key
+  } do
+    <<192, 239, 147, 125>> =
+      Default.signature_hint_for_signed_payload(encoded_public_key, <<1, 2>>)
   end
 end

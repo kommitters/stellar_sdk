@@ -57,6 +57,10 @@ defmodule Stellar.KeyPair do
   @impl true
   def validate_sha256_hash(sha256_hash), do: impl().validate_sha256_hash(sha256_hash)
 
+  @impl true
+  def signature_hint_for_signed_payload(public_key, payload),
+    do: impl().signature_hint_for_signed_payload(public_key, payload)
+
   @spec impl() :: atom()
   defp impl do
     Application.get_env(:stellar_sdk, :keypair_impl, Stellar.KeyPair.Default)
