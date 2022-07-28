@@ -6,6 +6,7 @@ defmodule Stellar.Horizon.Transaction do
   @behaviour Stellar.Horizon.Resource
 
   alias Stellar.Horizon.Mapping
+  alias Stellar.Horizon.Transaction.Preconditions
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -27,7 +28,8 @@ defmodule Stellar.Horizon.Transaction do
           memo_type: String.t(),
           signatures: list(),
           valid_after: DateTime.t(),
-          valid_before: DateTime.t()
+          valid_before: DateTime.t(),
+          preconditions: Preconditions.t()
         }
 
   defstruct [
@@ -50,7 +52,8 @@ defmodule Stellar.Horizon.Transaction do
     :memo_type,
     :signatures,
     :valid_after,
-    :valid_before
+    :valid_before,
+    :preconditions
   ]
 
   @mapping [
@@ -59,7 +62,8 @@ defmodule Stellar.Horizon.Transaction do
     fee_charged: :integer,
     created_at: :date_time,
     valid_after: :date_time,
-    valid_before: :date_time
+    valid_before: :date_time,
+    preconditions: {:struct, Preconditions}
   ]
 
   @impl true
