@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1 (28.07.2022)
+* Refactor Paths endpoint to improve UX.
+
 ## 0.8.0 (27.07.2022)
 * Add Fee Stats, Paths, and Order Books endpoints.
 * Add `Keypair.valid_signature?/3` function.

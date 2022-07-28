@@ -14,7 +14,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths?source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_asset_type=native&destination_amount=5",
+          "/paths?source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_amount=5&destination_asset_type=native",
         _headers,
         _body,
         _opts
@@ -26,7 +26,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths/strict-receive?destination_asset_type=native&destination_amount=5&source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO",
+          "/paths/strict-receive?destination_amount=5&source_account=GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO&destination_asset_type=native",
         _headers,
         _body,
         _opts
@@ -38,7 +38,7 @@ defmodule Stellar.Horizon.Client.CannedPathRequests do
   def request(
         :get,
         @base_url <>
-          "/paths/strict-send?source_asset_type=native&source_amount=5&destination_assets=TEST%3AGA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ",
+          "/paths/strict-send?source_amount=5&destination_assets=TEST%3AGA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ&source_asset_type=credit_alphanum4&source_asset_code=BRL&source_asset_issuer=GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
         _headers,
         _body,
         _opts
@@ -79,17 +79,20 @@ defmodule Stellar.Horizon.PaymentPathsTest do
 
     %{
       source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO",
-      destination_asset_type: :native,
+      destination_asset: :native,
       destination_amount: 5,
       destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ",
-      source_asset_type: :native,
+      source_asset: [
+        code: "BRL",
+        issuer: "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP"
+      ],
       source_amount: 5
     }
   end
 
   test "list_paths/1", %{
     source_account: source_account,
-    destination_asset_type: destination_asset_type,
+    destination_asset: destination_asset,
     destination_amount: destination_amount
   } do
     {:ok,
@@ -109,14 +112,14 @@ defmodule Stellar.Horizon.PaymentPathsTest do
      }} =
       PaymentPaths.list_paths(
         source_account: source_account,
-        destination_asset_type: destination_asset_type,
+        destination_asset: destination_asset,
         destination_amount: destination_amount
       )
   end
 
   test "list_receive_paths/1", %{
     source_account: source_account,
-    destination_asset_type: destination_asset_type,
+    destination_asset: destination_asset,
     destination_amount: destination_amount
   } do
     {:ok,
@@ -135,14 +138,14 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        ]
      }} =
       PaymentPaths.list_receive_paths(
-        destination_asset_type: destination_asset_type,
+        destination_asset: destination_asset,
         destination_amount: destination_amount,
         source_account: source_account
       )
   end
 
   test "list_send_paths/1", %{
-    source_asset_type: source_asset_type,
+    source_asset: source_asset,
     source_amount: source_amount,
     destination_assets: destination_assets
   } do
@@ -174,7 +177,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        ]
      }} =
       PaymentPaths.list_send_paths(
-        source_asset_type: source_asset_type,
+        source_asset: source_asset,
         source_amount: source_amount,
         destination_assets: destination_assets
       )
