@@ -35,6 +35,8 @@
   "id": "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
   "account_id": "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
   "sequence": "17218523889680",
+  "sequence_ledger": 581889,
+  "sequence_time": "1658962934",
   "subentry_count": 4,
   "last_modified_ledger": 600051,
   "last_modified_time": "2022-01-20T21:21:44Z",
@@ -62,7 +64,7 @@
       "asset_code": "EURT",
       "asset_issuer": "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
     },
-      {
+    {
       "balance": "100.9998300",
       "buying_liabilities": "0.0000000",
       "selling_liabilities": "0.0000000",

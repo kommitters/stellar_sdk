@@ -210,6 +210,8 @@ defmodule Stellar.Horizon.AccountsTest do
        last_modified_time: ~U[2022-01-20 21:21:44Z],
        paging_token: ^account_id,
        sequence: 17_218_523_889_680,
+       sequence_ledger: 581_889,
+       sequence_time: 1_658_962_934,
        signers: [
          _signer1,
          _signer2,
