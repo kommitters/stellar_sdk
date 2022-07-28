@@ -13,7 +13,7 @@ defmodule Stellar.Horizon.Account do
           account_id: String.t(),
           sequence: non_neg_integer(),
           sequence_ledger: non_neg_integer(),
-          sequence_time: String.t(),
+          sequence_time: non_neg_integer(),
           subentry_count: non_neg_integer(),
           inflation_destination: String.t() | nil,
           home_domain: String.t() | nil,
@@ -52,6 +52,7 @@ defmodule Stellar.Horizon.Account do
 
   @mapping [
     sequence: :integer,
+    sequence_time: :integer,
     last_modified_time: :date_time,
     thresholds: {:struct, Thresholds},
     flags: {:struct, Flags},

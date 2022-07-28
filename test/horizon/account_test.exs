@@ -18,7 +18,7 @@ defmodule Stellar.Horizon.AccountTest do
       account_id: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
       sequence: 17_218_523_889_680,
       sequence_ledger: 581_889,
-      sequence_time: "1658962934",
+      sequence_time: 1_658_962_934,
       subentry_count: 4,
       inflation_destination: nil,
       home_domain: nil,
