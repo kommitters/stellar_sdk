@@ -5,8 +5,7 @@ defmodule Stellar.Horizon.Transaction.Preconditions do
 
   @behaviour Stellar.Horizon.Resource
 
-  alias Stellar.Horizon.Mapping
-  alias Stellar.Horizon.Transaction.{LedgerBounds, TimeBounds}
+  alias Stellar.Horizon.{Mapping, Transaction.LedgerBounds, Transaction.TimeBounds}
 
   @type t :: %__MODULE__{
           time_bounds: TimeBounds.t(),

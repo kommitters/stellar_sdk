@@ -5,8 +5,7 @@ defmodule Stellar.Horizon.Transaction do
 
   @behaviour Stellar.Horizon.Resource
 
-  alias Stellar.Horizon.Mapping
-  alias Stellar.Horizon.Transaction.Preconditions
+  alias Stellar.Horizon.{Mapping, Transaction.Preconditions}
 
   @type t :: %__MODULE__{
           id: String.t(),
