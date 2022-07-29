@@ -115,22 +115,32 @@ defmodule Stellar.KeyPair.Default do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_sha256_hash}
     end
-
-  @impl true
-  def signature_hint_for_signed_payload(
-        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
-        <<last_payload_bytes::binary-size(4), _payload::binary>>
-      ) do
-    :crypto.exor(last_public_key_bytes, last_payload_bytes)
   end
 
-  def signature_hint_for_signed_payload(
-        <<last_public_key_bytes::binary-size(4), _public_key::binary>>,
-        raw_payload
-      ) do
-    raw_payload
+  @impl true
+  def signature_hint_for_signed_payload(public_key, payload)
+      when byte_size(payload) > 4 do
+    last_payload_bytes =
+      payload
+      |> byte_size()
+      |> (&Kernel.binary_part(payload, &1, -4)).()
+
+    public_key
     |> byte_size()
-    |> (&(:binary.copy(<<0>>, 4 - &1) <> raw_payload)).()
-    |> (&:crypto.exor(last_public_key_bytes, &1)).()
+    |> (&Kernel.binary_part(public_key, &1, -4)).()
+    |> :crypto.exor(last_payload_bytes)
+  end
+
+  def signature_hint_for_signed_payload(public_key, payload) do
+    last_payload_bytes =
+      payload
+      |> byte_size()
+      # Append zeros as needed
+      |> (&(payload <> :binary.copy(<<0>>, 4 - &1))).()
+
+    public_key
+    |> byte_size()
+    |> (&Kernel.binary_part(public_key, &1, -4)).()
+    |> :crypto.exor(last_payload_bytes)
   end
 end
