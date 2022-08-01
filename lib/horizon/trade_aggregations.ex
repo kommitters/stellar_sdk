@@ -1,9 +1,9 @@
 defmodule Stellar.Horizon.TradeAggregations do
   @moduledoc """
-  Exposes functions to interact with Trade Aggregations in Horizon.
+  Exposes functions to interact with TradeAggregations in Horizon.
 
   You can:
-  * List trade aggreation data based on filters set in the arguments
+  * List trade aggregation data based on filters set in the arguments
 
   Horizon API reference: https://developers.stellar.org/api/aggregations/trade-aggregations/
   """
@@ -17,12 +17,12 @@ defmodule Stellar.Horizon.TradeAggregations do
   @endpoint "trade_aggregations"
 
   @doc """
-    List trade aggreation data based on filters set in the arguments.
+    List trade aggregation data based on filters set in the arguments.
 
     ## Parameters
 
-      * `base_asset`: :native or [code: `selling_asset_code`, issuer: `selling_asset_issuer`]
-      * `counter_asset`: :native or [code: `selling_asset_code`, issuer: `selling_asset_issuer`]
+      * `base_asset`: :native or [code: `base_asset_code`, issuer: `base_asset_issuer`]
+      * `counter_asset`: :native or [code: `counter_asset_code`, issuer: `counter_asset_issuer`]
       * `resolution`: The segment duration represented as milliseconds.
 
     ## Options
@@ -35,10 +35,10 @@ defmodule Stellar.Horizon.TradeAggregations do
 
     ## Examples
 
-      iex> TradeAggregations.list_trade_aggreations(base_asset: :native, counter_asset: :native, resolution: "60000")
+      iex> TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
       {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
 
-      iex> TradeAggregations.list_trade_aggreations(base_asset: :native,
+      iex> TradeAggregations.list_trade_aggregations(base_asset: :native,
                                                     counter_asset: [
                                                       code: "EURT",
                                                       issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
@@ -50,15 +50,15 @@ defmodule Stellar.Horizon.TradeAggregations do
       {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
   """
 
-  @spec list_trade_aggreations(args :: args()) :: response()
-  def list_trade_aggreations(args \\ []) do
+  @spec list_trade_aggregations(args :: args()) :: response()
+  def list_trade_aggregations(args \\ []) do
     params = resolve_params(args)
 
     :get
     |> Request.new(@endpoint)
     |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
-    |> Request.results(collection: {TradeAggregation, &list_trade_aggreations/1})
+    |> Request.results(collection: {TradeAggregation, &list_trade_aggregations/1})
   end
 
   @spec resolve_params(args :: args()) :: Keyword.t()

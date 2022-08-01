@@ -733,8 +733,8 @@ Displays trade data based on filters set in the arguments:
 - [Optional] limit. The maximum number of records returned.
 
 ```elixir
-Stellar.Horizon.TradeAggregations.list_trade_aggreations(base_asset: :native, counter_asset: :native, resolution: "60000")
-Stellar.Horizon.TradeAggregations.list_trade_aggreations(base_asset: :native,
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native,
                                                          counter_asset: [
                                                            code: "EURT",
                                                            issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
@@ -746,7 +746,7 @@ Stellar.Horizon.TradeAggregations.list_trade_aggreations(base_asset: :native,
 
 ```
 
-See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/trade-aggregations/) for more details.
+See [**Stellar.Horizon.TradeAggregations**](https://developers.stellar.org/api/aggregations/trade-aggregations/) for more details.
 ---
 
 ## Development

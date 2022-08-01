@@ -40,6 +40,8 @@ defmodule Stellar.Horizon.TradeAggregation do
   ]
 
   @mapping [
+    timestamp: :integer,
+    trade_count: :integer,
     base_volume: :float,
     counter_volume: :float,
     avg: :float,

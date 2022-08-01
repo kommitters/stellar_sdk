@@ -1,7 +1,6 @@
 defmodule Stellar.Horizon.Client.CannedTradeAggregationRequests do
   @moduledoc false
 
-  alias Stellar.Horizon.Error
   alias Stellar.Test.Fixtures.Horizon
 
   @base_url "https://horizon-testnet.stellar.org"
@@ -69,8 +68,6 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedTradeAggregationRequests
-
-  alias Stellar.Test.Fixtures.Horizon
   alias Stellar.Horizon.{Collection, TradeAggregation, TradeAggregations, Error}
 
   setup do
@@ -93,7 +90,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
     }
   end
 
-  test "list_trade_aggreations/1", %{
+  test "list_trade_aggregations/1", %{
     base_asset: base_asset,
     counter_asset: counter_asset,
     resolution: resolution,
@@ -104,39 +101,39 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
     {:ok,
      %Collection{
        records: [
-         %Stellar.Horizon.TradeAggregation{
+         %TradeAggregation{
            avg: 25.4268566,
            base_volume: 3487.4699458,
            close: 25.7090558,
-           close_r: %{D: 48_621, N: 1_250_000},
+           close_r: %{d: "48621", n: "1250000"},
            counter_volume: 88_675.3982178,
            high: 25.7603393,
-           high_r: %{D: 10_000_000, N: 257_603_393},
+           high_r: %{d: "10000000", n: "257603393"},
            low: 25.380453,
-           low_r: %{D: 1_000_000, N: 25_380_453},
+           low_r: %{d: "1000000", n: "25380453"},
            open: 25.3990186,
-           open_r: %{D: 98_429, N: 2_500_000},
+           open_r: %{d: "98429", n: "2500000"},
            timestamp: 1_582_156_800_000,
            trade_count: 9
          },
-         %Stellar.Horizon.TradeAggregation{
+         %TradeAggregation{
            avg: 25.6476024,
            base_volume: 0.1058787,
            close: 25.6476019,
-           close_r: %{D: 3899, N: 100_000},
+           close_r: %{d: "3899", n: "100000"},
            counter_volume: 2.7155348,
            high: 25.6476019,
-           high_r: %{D: 3899, N: 100_000},
+           high_r: %{d: "3899", n: "100000"},
            low: 25.6476019,
-           low_r: %{D: 3899, N: 100_000},
+           low_r: %{d: "3899", n: "100000"},
            open: 25.6476019,
-           open_r: %{D: 3899, N: 100_000},
+           open_r: %{d: "3899", n: "100000"},
            timestamp: 1_582_160_400_000,
            trade_count: 1
          }
        ]
      }} =
-      TradeAggregations.list_trade_aggreations(
+      TradeAggregations.list_trade_aggregations(
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -155,7 +152,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
     limit: limit
   } do
     {:ok, %Collection{prev: paginate_prev_fn}} =
-      TradeAggregations.list_trade_aggreations(
+      TradeAggregations.list_trade_aggregations(
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -178,7 +175,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
     limit: limit
   } do
     {:ok, %Collection{next: paginate_next_fn}} =
-      TradeAggregations.list_trade_aggreations(
+      TradeAggregations.list_trade_aggregations(
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -194,12 +191,12 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
 
   test "error" do
     {:error,
-     %Stellar.Horizon.Error{
+     %Error{
        detail: "The request you sent was invalid in some way.",
        extras: %{invalid_field: "counter_asset_type", reason: "Missing required field"},
        status_code: 400,
        title: "Bad Request",
        type: "https://stellar.org/horizon-errors/bad_request"
-     }} = TradeAggregations.list_trade_aggreations(base_asset: :error)
+     }} = TradeAggregations.list_trade_aggregations(base_asset: :error)
   end
 end
