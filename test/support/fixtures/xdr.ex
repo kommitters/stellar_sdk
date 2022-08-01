@@ -21,6 +21,7 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # signatures
   defdelegate ed25519_signer_key(key), to: Signatures
+  defdelegate ed25519_signed_payload(key, payload), to: Signatures
   defdelegate sha256_hash_signer_key(key), to: Signatures
   defdelegate pre_auth_signer_key(key), to: Signatures
   defdelegate ed25519_signer(key, weight), to: Signatures

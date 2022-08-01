@@ -10,11 +10,14 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
     Signer,
     SignerKey,
     SignerKeyType,
+    SignerKeyEd25519SignedPayload,
     UInt32,
-    UInt256
+    UInt256,
+    VariableOpaque64
   }
 
   @type key :: String.t()
+  @type payload :: binary()
   @type account_id :: String.t()
   @type weight :: non_neg_integer()
 
@@ -27,6 +30,26 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
             181, 195, 177, 21, 207, 36, 1, 10, 22, 85, 255, 214, 103, 12>>
       },
       type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519}
+    }
+  end
+
+  @spec ed25519_signed_payload(key :: key(), payload :: payload()) :: SignerKey.t()
+  def ed25519_signed_payload(
+        "GBTG2POJVVSRBQSZVA3IYJEZJQLPTIVVYOYRLTZEAEFBMVP72ZTQYA2V",
+        "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
+      ) do
+    %SignerKey{
+      signer_key: %SignerKeyEd25519SignedPayload{
+        ed25519: %UInt256{
+          datum:
+            <<102, 109, 61, 201, 173, 101, 16, 194, 89, 168, 54, 140, 36, 153, 76, 22, 249, 162,
+              181, 195, 177, 21, 207, 36, 1, 10, 22, 85, 255, 214, 103, 12>>
+        },
+        payload: %VariableOpaque64{
+          opaque: "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
+        }
+      },
+      type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD}
     }
   end
 

@@ -88,6 +88,11 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   @impl true
   def validate_sha256_hash(_sha256_hash) do
     send(self(), {:validate_sha256_hash, "SHA256_HASH"})
+  end
+
+  @impl true
+  def signature_hint_for_signed_payload(_public_key, _payload) do
+    send(self(), {:signature_hint, "SIGNED_PAYLOAD"})
     :ok
   end
 end
@@ -178,5 +183,10 @@ defmodule Stellar.KeyPairTest do
   test "validate_sha256_hash/2" do
     Stellar.KeyPair.validate_sha256_hash("SHA256_HASH")
     assert_receive({:validate_sha256_hash, "SHA256_HASH"})
+  end
+
+  test "signature_hint_for_signed_payload/2" do
+    Stellar.KeyPair.signature_hint_for_signed_payload("SIGNED_PAYLOAD", "PAYLOAD")
+    assert_receive({:signature_hint, "SIGNED_PAYLOAD"})
   end
 end
