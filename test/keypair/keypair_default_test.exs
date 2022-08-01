@@ -18,7 +18,9 @@ defmodule Stellar.KeyPair.DefaultTest do
           252, 68, 235, 166, 205, 2, 115, 76, 254, 20, 85, 1, 224, 106, 84, 196, 217, 38, 248,
           147, 151, 69, 212, 28, 97, 216, 105, 170, 173, 9, 38, 94, 9, 97, 78, 145, 138, 94, 245,
           145, 255, 26, 28, 9, 110, 10>>,
-      payload: <<1, 2, 3, 4>>
+      payload:
+        <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+          25, 26, 27, 28, 29, 30, 31, 32>>
     }
   end
 
@@ -101,6 +103,6 @@ defmodule Stellar.KeyPair.DefaultTest do
     encoded_public_key: encoded_public_key
   } do
     <<192, 239, 147, 125>> =
-      Default.signature_hint_for_signed_payload(encoded_public_key, <<1, 2>>)
+      Default.signature_hint_for_signed_payload(encoded_public_key, <<30, 31, 32>>)
   end
 end

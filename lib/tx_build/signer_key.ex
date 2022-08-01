@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.SignerKey do
   @behaviour Stellar.TxBuild.XDR
 
   @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :ed25519_signed_payload
-  @type key :: String.t() | tuple()
+  @type key :: String.t() | {String.t(), binary()}
   @type signer :: {type(), key()}
   @type validation :: {:ok, any()} | {:error, atom()}
 
