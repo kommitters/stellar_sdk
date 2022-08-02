@@ -747,6 +747,7 @@ Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native,
 ```
 
 See [**Stellar.Horizon.TradeAggregations**](https://developers.stellar.org/api/aggregations/trade-aggregations/) for more details.
+
 ---
 
 ## Development

@@ -35,19 +35,19 @@ defmodule Stellar.Horizon.TradeAggregations do
 
     ## Examples
 
-      iex> TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
-      {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
+        iex> TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
+        {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
 
-      iex> TradeAggregations.list_trade_aggregations(base_asset: :native,
-                                                    counter_asset: [
-                                                      code: "EURT",
-                                                      issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
-                                                    ],
-                                                    resolution: "3600000",
-                                                    start_time: "1582156800000",
-                                                    end_time: "1582178400000"
-                                                    )
-      {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
+        iex> TradeAggregations.list_trade_aggregations(base_asset: :native,
+                                                      counter_asset: [
+                                                        code: "EURT",
+                                                        issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
+                                                      ],
+                                                      resolution: "3600000",
+                                                      start_time: "1582156800000",
+                                                      end_time: "1582178400000"
+                                                      )
+        {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
   """
 
   @spec list_trade_aggregations(args :: args()) :: response()

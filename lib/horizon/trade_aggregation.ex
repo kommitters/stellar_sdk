@@ -39,6 +39,11 @@ defmodule Stellar.Horizon.TradeAggregation do
     :close_r
   ]
 
+  @rational_mapping [
+    n: :integer,
+    d: :integer
+  ]
+
   @mapping [
     timestamp: :integer,
     trade_count: :integer,
@@ -48,7 +53,11 @@ defmodule Stellar.Horizon.TradeAggregation do
     high: :float,
     low: :float,
     open: :float,
-    close: :float
+    close: :float,
+    high_r: {:map, @rational_mapping},
+    low_r: {:map, @rational_mapping},
+    open_r: {:map, @rational_mapping},
+    close_r: {:map, @rational_mapping}
   ]
 
   @impl true

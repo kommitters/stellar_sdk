@@ -16,14 +16,14 @@ defmodule Stellar.Horizon.TradeAggregationTest do
       avg: 25.4268566,
       base_volume: 3487.4699458,
       close: 25.7090558,
-      close_r: %{d: "48621", n: "1250000"},
+      close_r: %{d: 48_621, n: 1_250_000},
       counter_volume: 88_675.3982178,
       high: 25.7603393,
-      high_r: %{d: "10000000", n: "257603393"},
+      high_r: %{d: 10_000_000, n: 257_603_393},
       low: 25.380453,
-      low_r: %{d: "1000000", n: "25380453"},
+      low_r: %{d: 1_000_000, n: 25_380_453},
       open: 25.3990186,
-      open_r: %{d: "98429", n: "2500000"},
+      open_r: %{d: 98_429, n: 2_500_000},
       timestamp: 1_582_156_800_000,
       trade_count: 9
     } = TradeAggregation.new(attrs)
