@@ -1,0 +1,71 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon.stellar.org/trade_aggregations?base_asset_type=native\u0026counter_asset_code=NGNT\u0026counter_asset_issuer=GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD\u0026counter_asset_type=credit_alphanum4\u0026limit=200\u0026order=asc\u0026resolution=3600000\u0026start_time=1582156800000\u0026end_time=1582178400000"
+    },
+    "next": {
+      "href": "https://horizon.stellar.org/trade_aggregations?base_asset_type=native\u0026counter_asset_code=NGNT\u0026counter_asset_issuer=GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD\u0026counter_asset_type=credit_alphanum4\u0026end_time=1582178400000\u0026limit=200\u0026order=asc\u0026resolution=3600000\u0026start_time=1582178400000"
+    },
+    "prev": {
+      "href": "https://horizon.stellar.org/trade_aggregations?base_asset_type=native\u0026counter_asset_code=NGNT\u0026counter_asset_issuer=GAWODAROMJ33V5YDFY3NPYTHVYQG7MJXVJ2ND3AOGIHYRWINES6ACCPD\u0026counter_asset_type=credit_alphanum4\u0026limit=200\u0026order=asc\u0026resolution=3600000\u0026start_time=1582156800000\u0026end_time=1582178400000"
+    }
+  },
+  "_embedded": {
+    "records": [
+      {
+        "timestamp": "1582156800000",
+        "trade_count": "9",
+        "base_volume": "3487.4699458",
+        "counter_volume": "88675.3982178",
+        "avg": "25.4268566",
+        "high": "25.7603393",
+        "high_r": {
+          "n": "257603393",
+          "d": "10000000"
+        },
+        "low": "25.3804530",
+        "low_r": {
+          "n": "25380453",
+          "d": "1000000"
+        },
+        "open": "25.3990186",
+        "open_r": {
+          "n": "2500000",
+          "d": "98429"
+        },
+        "close": "25.7090558",
+        "close_r": {
+          "n": "1250000",
+          "d": "48621"
+        }
+      },
+      {
+        "timestamp": "1582160400000",
+        "trade_count": 1,
+        "base_volume": "0.1058787",
+        "counter_volume": "2.7155348",
+        "avg": "25.6476024",
+        "high": "25.6476019",
+        "high_r": {
+          "n": "100000",
+          "d": "3899"
+        },
+        "low": "25.6476019",
+        "low_r": {
+          "n": "100000",
+          "d": "3899"
+        },
+        "open": "25.6476019",
+        "open_r": {
+          "n": "100000",
+          "d": "3899"
+        },
+        "close": "25.6476019",
+        "close_r": {
+          "n": "100000",
+          "d": "3899"
+        }
+      }
+    ]
+  }
+}
