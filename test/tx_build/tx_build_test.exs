@@ -16,8 +16,8 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
-  def set_time_bounds(_tx, _time_bounds) do
-    send(self(), {:set_time_bounds, "TIME_BOUNDS_SET"})
+  def set_preconditions(_tx, _preconditions) do
+    send(self(), {:set_preconditions, "PRECONDITIONS_SET"})
     :ok
   end
 
@@ -94,9 +94,9 @@ defmodule Stellar.TxBuildTest do
     assert_receive({:add_memo, "MEMO_ADDED"})
   end
 
-  test "set_time_bounds/2" do
-    Stellar.TxBuild.set_time_bounds(%TxBuild{}, :time_bounds)
-    assert_receive({:set_time_bounds, "TIME_BOUNDS_SET"})
+  test "set_preconditions/2" do
+    Stellar.TxBuild.set_preconditions(%TxBuild{}, :preconditions)
+    assert_receive({:set_preconditions, "PRECONDITIONS_SET"})
   end
 
   test "set_base_fee/2" do

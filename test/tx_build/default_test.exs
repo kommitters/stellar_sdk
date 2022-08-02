@@ -11,11 +11,11 @@ defmodule Stellar.TxBuild.DefaultTest do
     Operation,
     Operations,
     Payment,
+    Preconditions,
     SequenceNumber,
     Signature,
     Transaction,
-    TransactionEnvelope,
-    TimeBounds
+    TransactionEnvelope
   }
 
   setup do
@@ -72,7 +72,7 @@ defmodule Stellar.TxBuild.DefaultTest do
   end
 
   test "new/2 with_bad_options", %{source_account: source_account} do
-    {:error, :invalid_time_bounds} = TxBuild.new(source_account, time_bounds: nil)
+    {:error, :invalid_preconditions} = TxBuild.new(source_account, preconditions: [])
   end
 
   test "new/2 invalid_source_account" do
@@ -92,19 +92,19 @@ defmodule Stellar.TxBuild.DefaultTest do
     {:error, :invalid_source_account} = TxBuild.add_memo({:error, :invalid_source_account}, :memo)
   end
 
-  test "set_time_bounds/2", %{tx_build: tx_build} do
-    time_bounds = TimeBounds.new(min_time: 0, max_time: 123_456_789)
+  test "set_preconditions/2", %{tx_build: tx_build} do
+    preconditions = Preconditions.new()
 
-    {:ok, %TxBuild{tx: %Transaction{time_bounds: ^time_bounds}}} =
-      TxBuild.set_time_bounds(tx_build, time_bounds)
+    {:ok, %TxBuild{tx: %Transaction{preconditions: ^preconditions}}} =
+      TxBuild.set_preconditions(tx_build, preconditions)
   end
 
-  test "set_time_bounds/2 invalid_time_bounds", %{tx_build: tx_build} do
-    {:error, :invalid_time_bounds} = TxBuild.set_time_bounds(tx_build, "12-10-2022")
+  test "set_preconditions/2 invalid_preconditions", %{tx_build: tx_build} do
+    {:error, :invalid_preconditions} = TxBuild.set_preconditions(tx_build, [])
   end
 
-  test "set_time_bounds/2 piping_error" do
-    {:error, :invalid_memo} = TxBuild.set_time_bounds({:error, :invalid_memo}, :time_bounds)
+  test "set_preconditions/2 piping_error" do
+    {:error, :invalid_memo} = TxBuild.set_preconditions({:error, :invalid_memo}, :preconditions)
   end
 
   test "set_sequence_number/2", %{tx_build: tx_build} do
@@ -119,7 +119,7 @@ defmodule Stellar.TxBuild.DefaultTest do
   end
 
   test "set_sequence_number/2 piping_error" do
-    {:error, :invalid_memo} = TxBuild.set_sequence_number({:error, :invalid_memo}, :time_bounds)
+    {:error, :invalid_memo} = TxBuild.set_sequence_number({:error, :invalid_memo}, :preconditions)
   end
 
   test "set_base_fee/2", %{tx_build: tx_build} do

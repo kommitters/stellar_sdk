@@ -14,6 +14,12 @@ defmodule Stellar.TxBuild.SignerKey do
 
   @type t :: %__MODULE__{type: type(), key: key()}
 
+  @version_bytes %{
+    48 => :ed25519,
+    152 => :pre_auth_tx,
+    184 => :sha256_hash
+  }
+
   defstruct [:type, :key]
 
   @impl true
@@ -55,6 +61,18 @@ defmodule Stellar.TxBuild.SignerKey do
     |> UInt256.new()
     |> SignerKey.new(signer_type)
   end
+
+  @spec decode_key(key :: binary()) :: t() | {:error, :invalid_signer_key | :invalid_signer_type}
+  def decode_key(<<version_bytes::size(8), _rest::binary>> = key)
+      when version_bytes in [48, 152, 184] do
+    signer_key_version = Map.get(@version_bytes, version_bytes, :ed25519)
+
+    key
+    |> Base.encode32()
+    |> (&new({signer_key_version, &1})).()
+  end
+
+  def decode_key(_key), do: {:error, :invalid_signer_key}
 
   @spec validate_signer_type(type :: type()) :: validation()
   defp validate_signer_type(type) when type in ~w(ed25519 sha256_hash pre_auth_tx)a,
