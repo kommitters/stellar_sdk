@@ -34,30 +34,30 @@ defmodule Stellar.Horizon.PaymentPaths do
 
   ## Examples
 
-    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                 destination_asset: :native,
-                                 destination_amount: 5
-                                )
-    {:ok, %Paths{records: [%Path{}, ...]}}
+      iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                   destination_asset: :native,
+                                   destination_amount: 5
+                                  )
+      {:ok, %Paths{records: [%Path{}, ...]}}
 
-    # list with `destination_account`
-    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                 destination_asset: :native,
-                                 destination_amount: 5,
-                                 destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
-                                )
-    {:ok, %Paths{records: [%Path{}, ...]}}
+      # list with `destination_account`
+      iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                   destination_asset: :native,
+                                   destination_amount: 5,
+                                   destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
+                                  )
+      {:ok, %Paths{records: [%Path{}, ...]}}
 
-    # list with more options
-    iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
-                                 destination_asset: [
-                                   code: "TEST",
-                                   issuer: "GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
-                                 ],
-                                 destination_amount: 5,
-                                 destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
-                                )
-    {:ok, %Paths{records: [%Path{}, ...]}}
+      # list with more options
+      iex> PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+                                   destination_asset: [
+                                     code: "TEST",
+                                     issuer: "GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
+                                   ],
+                                   destination_amount: 5,
+                                   destination_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C"
+                                  )
+      {:ok, %Paths{records: [%Path{}, ...]}}
   """
 
   @spec list_paths(args :: args()) :: response()
