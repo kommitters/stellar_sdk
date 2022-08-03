@@ -28,19 +28,19 @@ defmodule Stellar.Horizon.OrderBooks do
 
   ## Examples
 
-    # Retrieve order books
-    iex> OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
-    {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
+      # Retrieve order books
+      iex> OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
+      {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
 
-    # Retrieve with more options
-    iex> OrderBooks.retrieve(selling_asset: :native,
-                             buying_asset: [
-                                code: "BB1",
-                                issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
-                              ],
-                             limit: 2
-                            )
-    {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
+      # Retrieve with more options
+      iex> OrderBooks.retrieve(selling_asset: :native,
+                               buying_asset: [
+                                  code: "BB1",
+                                  issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+                                ],
+                               limit: 2
+                              )
+      {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
   """
 
   @spec retrieve(args :: args()) :: response()
