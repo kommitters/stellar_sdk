@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.PreconditionsTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{Preconditions, TimeBounds, LedgerBounds, OptionalSequenceNumber}
+  alias Stellar.TxBuild.{Preconditions, TimeBounds, LedgerBounds, SequenceNumber, SignerKey}
 
   alias StellarBase.XDR.{
     PreconditionsV2,
@@ -10,8 +10,6 @@ defmodule Stellar.TxBuild.PreconditionsTest do
     TimePoint,
     OptionalTimeBounds,
     OptionalLedgerBounds,
-    SequenceNumber,
-    SignerKey,
     SignerKeyList,
     SignerKeyType,
     UInt32,
@@ -19,21 +17,28 @@ defmodule Stellar.TxBuild.PreconditionsTest do
     Void
   }
 
+  alias StellarBase.XDR.SignerKey, as: SignerKeyXDR
+  alias StellarBase.XDR.SequenceNumber, as: SequenceNumberXDR
   alias StellarBase.XDR.Preconditions, as: PreconditionsXDR
   alias StellarBase.XDR.TimeBounds, as: TimeBoundsXDR
   alias StellarBase.XDR.OptionalSequenceNumber, as: OptionalSequenceNumberXDR
 
   setup do
+    extra_signers = [
+      "GBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMQQH",
+      "XCTP2Y5GZ7TTGHLM3JJKDIPR36A7QFFW4VYJVU6QN4MNIFFIAG4JC6CC"
+    ]
+
+    extra_signers_sdk = extra_signers |> Enum.map(&SignerKey.new(&1))
+
     %{
-      time_bounds: TimeBounds.new(),
-      ledger_bounds: LedgerBounds.new(),
-      min_seq_num: OptionalSequenceNumber.new(),
+      time_bounds: TimeBounds.new(:none),
+      ledger_bounds: LedgerBounds.new(:none),
+      min_seq_num: SequenceNumber.new(),
       min_seq_age: 1500,
       min_seq_ledger_gap: 2500,
-      extra_signers: [
-        "GBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMQQH",
-        "MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ"
-      ]
+      extra_signers_sdk: extra_signers_sdk,
+      extra_signers: extra_signers
     }
   end
 
@@ -163,7 +168,8 @@ defmodule Stellar.TxBuild.PreconditionsTest do
       min_seq_num: min_seq_num,
       min_seq_age: min_seq_age,
       min_seq_ledger_gap: min_seq_ledger_gap,
-      extra_signers: extra_signers
+      extra_signers: extra_signers,
+      extra_signers_sdk: extra_signers_sdk
     } do
       %Preconditions{
         type: :precond_v2,
@@ -173,7 +179,7 @@ defmodule Stellar.TxBuild.PreconditionsTest do
           min_seq_num: ^min_seq_num,
           min_seq_age: ^min_seq_age,
           min_seq_ledger_gap: ^min_seq_ledger_gap,
-          extra_signers: ^extra_signers
+          extra_signers: ^extra_signers_sdk
         }
       } =
         Preconditions.new(
@@ -215,7 +221,7 @@ defmodule Stellar.TxBuild.PreconditionsTest do
       min_seq_num: min_seq_num,
       min_seq_age: min_seq_age,
       min_seq_ledger_gap: min_seq_ledger_gap,
-      extra_signers: extra_signers
+      extra_signers_sdk: extra_signers_sdk
     } do
       %PreconditionsXDR{
         type: %PreconditionType{identifier: :PRECOND_V2},
@@ -223,13 +229,13 @@ defmodule Stellar.TxBuild.PreconditionsTest do
           time_bounds: %OptionalTimeBounds{time_bounds: nil},
           ledger_bounds: %OptionalLedgerBounds{ledger_bounds: nil},
           min_seq_num: %OptionalSequenceNumberXDR{
-            sequence_number: %SequenceNumber{sequence_number: 0}
+            sequence_number: %SequenceNumberXDR{sequence_number: 0}
           },
           min_seq_age: %Duration{value: 1500},
           min_seq_ledger_gap: %UInt32{datum: 2500},
           extra_signers: %SignerKeyList{
             signer_keys: [
-              %SignerKey{
+              %SignerKeyXDR{
                 signer_key: %UInt256{
                   datum:
                     <<111, 94, 211, 67, 247, 211, 243, 210, 220, 210, 84, 19, 15, 150, 110, 92,
@@ -238,6 +244,14 @@ defmodule Stellar.TxBuild.PreconditionsTest do
                 type: %SignerKeyType{
                   identifier: :SIGNER_KEY_TYPE_ED25519
                 }
+              },
+              %StellarBase.XDR.SignerKey{
+                signer_key: %StellarBase.XDR.UInt256{
+                  datum:
+                    <<166, 253, 99, 166, 207, 231, 51, 29, 108, 218, 82, 161, 161, 241, 223, 129,
+                      248, 20, 182, 229, 112, 154, 211, 208, 111, 24, 212, 20, 168, 1, 184, 145>>
+                },
+                type: %StellarBase.XDR.SignerKeyType{identifier: :SIGNER_KEY_TYPE_HASH_X}
               }
             ]
           }
@@ -251,7 +265,7 @@ defmodule Stellar.TxBuild.PreconditionsTest do
             min_seq_num: min_seq_num,
             min_seq_age: min_seq_age,
             min_seq_ledger_gap: min_seq_ledger_gap,
-            extra_signers: extra_signers
+            extra_signers: extra_signers_sdk
           }
         })
     end

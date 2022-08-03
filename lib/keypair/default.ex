@@ -52,6 +52,16 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def raw_pre_auth_tx(pre_auth_tx) do
+    StrKey.decode!(pre_auth_tx, :pre_auth_tx)
+  end
+
+  @impl true
+  def raw_sha256_hash(sha256_hash) do
+    StrKey.decode!(sha256_hash, :sha256_hash)
+  end
+
+  @impl true
   def sign(<<payload::binary>>, <<secret::binary>>) do
     raw_secret = raw_secret_seed(secret)
     Ed25519.signature(payload, raw_secret)
@@ -88,6 +98,22 @@ defmodule Stellar.KeyPair.Default do
     case StrKey.decode(secret, :ed25519_secret_seed) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
+    end
+  end
+
+  @impl true
+  def validate_pre_auth_tx(pre_auth_tx) do
+    case StrKey.decode(pre_auth_tx, :pre_auth_tx) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_pre_auth_tx}
+    end
+  end
+
+  @impl true
+  def validate_sha256_hash(sha256_hash) do
+    case StrKey.decode(sha256_hash, :sha256_hash) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_sha256_hash}
     end
   end
 end

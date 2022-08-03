@@ -44,24 +44,23 @@ defmodule Stellar.TxBuild.RevokeSponsorshipTest do
       %{
         account_id: account_id,
         ed25519_key: ed25519_key,
-        signer: RevokeSponsorshipSigner.new(account_id: account_id, ed25519: ed25519_key),
+        signer: RevokeSponsorshipSigner.new({account_id, ed25519_key}),
         xdr: XDRFixtures.revoke_sponsorship(:signer, account_id: account_id, ed25519: ed25519_key)
       }
     end
 
     test "new/2", %{account_id: account_id, ed25519_key: ed25519_key, signer: signer} do
       %RevokeSponsorship{sponsorship: ^signer, type: :signer} =
-        RevokeSponsorship.new(signer: [account_id: account_id, ed25519: ed25519_key])
+        RevokeSponsorship.new(signer: {account_id, ed25519_key})
     end
 
     test "new/2 with_invalid_signer", %{account_id: account_id} do
-      {:error, :invalid_signer} =
-        RevokeSponsorship.new(signer: [account_id: account_id, ed25519: "ABC"])
+      {:error, :invalid_signer} = RevokeSponsorship.new(signer: [{account_id, "ABC"}])
     end
 
     test "to_xdr/1", %{account_id: account_id, ed25519_key: ed25519_key, xdr: xdr} do
       ^xdr =
-        [signer: [account_id: account_id, ed25519: ed25519_key]]
+        [signer: {account_id, ed25519_key}]
         |> RevokeSponsorship.new()
         |> RevokeSponsorship.to_xdr()
     end

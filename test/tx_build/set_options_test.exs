@@ -24,10 +24,7 @@ defmodule Stellar.TxBuild.SetOptionsTest do
     tresholds = [low: 1, med: 2, high: 3]
     home_domain = "stellar.org"
 
-    signer = [
-      pre_auth_tx: "f798b14cca436cb215073fec67219f1d13d051c4eff8adeed094a7ea807e66e4",
-      weight: 1
-    ]
+    signer = {"TD3ZRMKMZJBWZMQVA476YZZBT4ORHUCRYTX7RLPO2CKKP2UAPZTOJVEP", 1}
 
     %{
       inflation_destination: inflation_destination,
@@ -118,7 +115,7 @@ defmodule Stellar.TxBuild.SetOptionsTest do
   end
 
   test "new/2 with_invalid_signer" do
-    {:error, [signer: :invalid_signer_key]} = SetOptions.new(signer: [hash: "HASH", weight: 2])
+    {:error, [signer: :invalid_signer_key]} = SetOptions.new(signer: {"HASH", 2})
   end
 
   test "new/2 with_invalid_attributes" do
