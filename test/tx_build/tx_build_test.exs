@@ -34,6 +34,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
+  def set_time_bounds(_tx, _time_bounds) do
+    send(self(), {:set_time_bounds, "TIME BOUNDS"})
+    :ok
+  end
+
+  @impl true
   def add_operation(_tx, _operations) do
     send(self(), {:add_operation, "OP_ADDED"})
     :ok
@@ -107,6 +113,11 @@ defmodule Stellar.TxBuildTest do
   test "set_sequence_number/2" do
     Stellar.TxBuild.set_sequence_number(%TxBuild{}, :seq_number)
     assert_receive({:set_sequence_number, "SEQ_NUMBER"})
+  end
+
+  test "set_time_bounds/2" do
+    Stellar.TxBuild.set_time_bounds(%TxBuild{}, :time_bounds)
+    assert_receive({:set_time_bounds, "TIME BOUNDS"})
   end
 
   test "add_operation/2" do

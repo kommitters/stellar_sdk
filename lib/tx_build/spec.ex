@@ -27,6 +27,7 @@ defmodule Stellar.TxBuild.Spec do
     SequenceNumber,
     SetOptions,
     Signature,
+    TimeBounds,
     Preconditions
   }
 
@@ -35,6 +36,7 @@ defmodule Stellar.TxBuild.Spec do
   @type sequence_number :: SequenceNumber.t()
   @type memo :: Memo.t()
   @type base_fee :: BaseFee.t()
+  @type time_bounds :: TimeBounds.t()
   @type preconditions :: Preconditions.t()
   @type signatures :: Signature.t() | list(Signature.t())
   @type operation ::
@@ -61,6 +63,7 @@ defmodule Stellar.TxBuild.Spec do
 
   @callback new(account(), opts()) :: tx_build()
   @callback add_memo(tx_build(), memo()) :: tx_build()
+  @callback set_time_bounds(tx_build(), time_bounds()) :: tx_build()
   @callback set_preconditions(tx_build(), preconditions()) :: tx_build()
   @callback set_base_fee(tx_build(), base_fee()) :: tx_build()
   @callback set_sequence_number(tx_build(), sequence_number()) :: tx_build()
@@ -71,5 +74,9 @@ defmodule Stellar.TxBuild.Spec do
   @callback envelope(tx_build()) :: tx_envelope()
   @callback sign_envelope(envelope(), signatures()) :: tx_envelope()
 
-  @optional_callbacks add_memo: 2, set_base_fee: 2, set_preconditions: 2, set_sequence_number: 2
+  @optional_callbacks add_memo: 2,
+                      set_base_fee: 2,
+                      set_time_bounds: 2,
+                      set_preconditions: 2,
+                      set_sequence_number: 2
 end

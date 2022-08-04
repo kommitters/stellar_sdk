@@ -54,7 +54,7 @@ defmodule Stellar.TxBuild.SignerKey do
     |> SignerKey.new(signer_type)
   end
 
-  @spec get_signer_type(key :: String.t()) :: validation()
+  @spec get_signer_type(key :: key()) :: validation()
   defp get_signer_type(key) do
     case String.first(key) do
       "G" -> {:ok, :ed25519}

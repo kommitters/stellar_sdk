@@ -7,6 +7,7 @@ defmodule Stellar.TxBuild.DefaultTest do
     Account,
     BaseFee,
     CreateAccount,
+    LedgerBounds,
     Memo,
     Operation,
     Operations,
@@ -14,6 +15,7 @@ defmodule Stellar.TxBuild.DefaultTest do
     Preconditions,
     SequenceNumber,
     Signature,
+    TimeBounds,
     Transaction,
     TransactionEnvelope
   }
@@ -23,7 +25,30 @@ defmodule Stellar.TxBuild.DefaultTest do
     signature = Signature.new(keypair)
     source_account = Account.new("GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS")
 
+    time_bounds = TimeBounds.new(min_time: 0, max_time: 123_456_789)
+    ledger_bounds = LedgerBounds.new(min_ledger: 1000, max_ledger: 100_000)
+    min_seq_num = SequenceNumber.new()
+    min_seq_age = 1
+    min_seq_ledger_gap = 1
+    extra_signers = ["GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"]
+
+    # tx_build with empty preconditions
     {:ok, %TxBuild{tx: tx}} = tx_build = TxBuild.new(source_account)
+
+    # tx_build with only time_bounds as preconditions
+    tx_build_precond_time = TxBuild.set_time_bounds(tx_build, time_bounds)
+
+    # tx_build with all the preconditions
+    tx_build_precond_v2 =
+      Preconditions.new(
+        time_bounds: time_bounds,
+        ledger_bounds: ledger_bounds,
+        min_seq_num: min_seq_num,
+        min_seq_age: min_seq_age,
+        min_seq_ledger_gap: min_seq_ledger_gap,
+        extra_signers: extra_signers
+      )
+      |> (&TxBuild.set_preconditions(tx_build, &1)).()
 
     %{
       source_account: source_account,
@@ -31,6 +56,8 @@ defmodule Stellar.TxBuild.DefaultTest do
       signature: signature,
       tx: tx,
       tx_build: tx_build,
+      tx_build_precond_time: tx_build_precond_time,
+      tx_build_precond_v2: tx_build_precond_v2,
       tx_envelope: TransactionEnvelope.new(tx, []),
       tx_envelope_base64:
         "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO"
@@ -90,6 +117,57 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "add_memo/2 piping_error" do
     {:error, :invalid_source_account} = TxBuild.add_memo({:error, :invalid_source_account}, :memo)
+  end
+
+  test "set_time_bounds/2 with type :none preconditions", %{tx_build: tx_build} do
+    time_bounds = TimeBounds.new(min_time: 0, max_time: 123_456_789)
+
+    {:ok,
+     %TxBuild{
+       tx: %Transaction{
+         preconditions: %Preconditions{type: :precond_time, preconditions: ^time_bounds}
+       }
+     }} = TxBuild.set_time_bounds(tx_build, time_bounds)
+  end
+
+  test "set_time_bounds/2 with type :precond_time preconditions", %{
+    tx_build_precond_time: tx_build_precond_time
+  } do
+    time_bounds = TimeBounds.new(min_time: 1000, max_time: 100_000)
+
+    {:ok,
+     %TxBuild{
+       tx: %Transaction{
+         preconditions: %Preconditions{type: :precond_time, preconditions: ^time_bounds}
+       }
+     }} = TxBuild.set_time_bounds(tx_build_precond_time, time_bounds)
+  end
+
+  test "set_time_bounds/2 with type :precond_v2 preconditions", %{
+    tx_build_precond_v2: tx_build_precond_v2
+  } do
+    time_bounds = TimeBounds.new(min_time: 1000, max_time: 100_000)
+
+    {:ok,
+     %TxBuild{
+       tx: %Transaction{
+         preconditions: %Preconditions{
+           type: :precond_v2,
+           preconditions: preconditions
+         }
+       }
+     }} = TxBuild.set_time_bounds(tx_build_precond_v2, time_bounds)
+
+    assert Keyword.get(preconditions, :time_bounds) == time_bounds
+  end
+
+  test "set_time_bounds/2 invalid_time_bounds", %{tx_build: tx_build} do
+    {:error, :invalid_time_bounds} = TxBuild.set_time_bounds(tx_build, [])
+  end
+
+  test "set_time_bounds/2 piping_error" do
+    {:error, :invalid_time_bounds} =
+      TxBuild.set_time_bounds({:error, :invalid_time_bounds}, :invalid_time_bounds)
   end
 
   test "set_preconditions/2", %{tx_build: tx_build} do

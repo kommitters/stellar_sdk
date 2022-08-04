@@ -173,14 +173,14 @@ defmodule Stellar.TxBuild.PreconditionsTest do
     } do
       %Preconditions{
         type: :precond_v2,
-        preconditions: %{
+        preconditions: [
           time_bounds: ^time_bounds,
           ledger_bounds: ^ledger_bounds,
           min_seq_num: ^min_seq_num,
           min_seq_age: ^min_seq_age,
           min_seq_ledger_gap: ^min_seq_ledger_gap,
           extra_signers: ^extra_signers_sdk
-        }
+        ]
       } =
         Preconditions.new(
           time_bounds: time_bounds,
@@ -259,14 +259,14 @@ defmodule Stellar.TxBuild.PreconditionsTest do
       } =
         Preconditions.to_xdr(%Preconditions{
           type: :precond_v2,
-          preconditions: %{
+          preconditions: [
             time_bounds: time_bounds,
             ledger_bounds: ledger_bounds,
             min_seq_num: min_seq_num,
             min_seq_age: min_seq_age,
             min_seq_ledger_gap: min_seq_ledger_gap,
             extra_signers: extra_signers_sdk
-          }
+          ]
         })
     end
   end

@@ -25,16 +25,16 @@ defmodule Stellar.TxBuild.Preconditions do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type precond_v2 :: %{
+  @type precond_v2 :: [
           time_bounds: TimeBounds.t(),
           ledger_bounds: LedgerBounds.t(),
           min_seq_num: SequenceNumber.t(),
           min_seq_age: non_neg_integer(),
           min_seq_ledger_gap: non_neg_integer(),
           extra_signers: list(SignerKey.t())
-        }
-  @type validation ::
-          {:ok, non_neg_integer()} | {:ok, struct()} | {:ok, list(struct())} | {:error, atom()}
+        ]
+  @type valid :: non_neg_integer() | struct() | list(struct())
+  @type validation :: {:ok, valid()} | {:error, atom()}
   @type type :: :precond_v2 | :precond_time | :none
   @type preconditions :: precond_v2() | TimeBounds.t() | nil
 
@@ -69,14 +69,14 @@ defmodule Stellar.TxBuild.Preconditions do
          {:ok, extra_signers} <- validate_extra_signers([], extra_signers) do
       %__MODULE__{
         type: :precond_v2,
-        preconditions: %{
+        preconditions: [
           time_bounds: time_bounds,
           ledger_bounds: ledger_bounds,
           min_seq_num: min_seq_num,
           min_seq_age: min_seq_age,
           min_seq_ledger_gap: min_seq_ledger_gap,
           extra_signers: extra_signers
-        }
+        ]
       }
     end
   end
@@ -104,14 +104,14 @@ defmodule Stellar.TxBuild.Preconditions do
 
   def to_xdr(%__MODULE__{
         type: :precond_v2,
-        preconditions: %{
+        preconditions: [
           time_bounds: time_bounds,
           ledger_bounds: ledger_bounds,
           min_seq_num: min_seq_num,
           min_seq_age: min_seq_age,
           min_seq_ledger_gap: min_seq_ledger_gap,
           extra_signers: extra_signers
-        }
+        ]
       }) do
     preconditions_type = PreconditionType.new(:PRECOND_V2)
 
@@ -120,11 +120,7 @@ defmodule Stellar.TxBuild.Preconditions do
     min_seq_num = min_seq_num |> SequenceNumber.to_xdr() |> OptionalSequenceNumber.new()
     min_seq_age = Duration.new(min_seq_age)
     min_seq_ledger_gap = UInt32.new(min_seq_ledger_gap)
-
-    extra_signers =
-      extra_signers
-      |> Enum.map(&SignerKey.to_xdr(&1))
-      |> SignerKeyList.new()
+    extra_signers_list = get_extra_signers_list(extra_signers)
 
     time_bounds
     |> PreconditionsV2.new(
@@ -132,9 +128,16 @@ defmodule Stellar.TxBuild.Preconditions do
       min_seq_num,
       min_seq_age,
       min_seq_ledger_gap,
-      extra_signers
+      extra_signers_list
     )
     |> Preconditions.new(preconditions_type)
+  end
+
+  @spec get_extra_signers_list(extra_signers :: list(SignerKey.t())) :: SignerKeyList.t()
+  defp get_extra_signers_list(extra_signers) do
+    extra_signers
+    |> Enum.map(&SignerKey.to_xdr(&1))
+    |> SignerKeyList.new()
   end
 
   @spec validate_time_bounds(time_bounds :: TimeBounds.t()) :: validation()

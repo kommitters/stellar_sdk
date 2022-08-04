@@ -13,6 +13,7 @@ defmodule Stellar.TxBuild.Default do
     SequenceNumber,
     Signature,
     Preconditions,
+    TimeBounds,
     Transaction,
     TransactionEnvelope
   }
@@ -53,6 +54,46 @@ defmodule Stellar.TxBuild.Default do
 
   def add_memo({:ok, %TxBuild{}}, _memo), do: {:error, :invalid_memo}
   def add_memo(error, _memo), do: error
+
+  @impl true
+  def set_time_bounds(
+        {:ok, %TxBuild{tx: %{preconditions: %{type: :none} = preconditions} = tx} = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    preconditions = %{preconditions | type: :precond_time, preconditions: time_bounds}
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_time_bounds(
+        {:ok,
+         %TxBuild{tx: %{preconditions: %{type: :precond_time} = preconditions} = tx} = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    preconditions = %{preconditions | preconditions: time_bounds}
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_time_bounds(
+        {:ok,
+         %TxBuild{
+           tx:
+             %{
+               preconditions:
+                 %{type: :precond_v2, preconditions: inner_preconditions} = preconditions
+             } = tx
+         } = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    inner_preconditions = Keyword.put(inner_preconditions, :time_bounds, time_bounds)
+    preconditions = %{preconditions | preconditions: inner_preconditions}
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_time_bounds({:ok, %TxBuild{}}, _time_bounds), do: {:error, :invalid_time_bounds}
+  def set_time_bounds(error, _time_bounds), do: error
 
   @impl true
   def set_preconditions({:ok, %TxBuild{tx: tx} = tx_build}, %Preconditions{} = preconditions) do
