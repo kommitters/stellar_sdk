@@ -26,6 +26,9 @@ defmodule Stellar.TxBuild do
   def add_memo(tx, memo), do: impl().add_memo(tx, memo)
 
   @impl true
+  def set_time_bounds(tx, time_bounds), do: impl().set_time_bounds(tx, time_bounds)
+
+  @impl true
   def set_preconditions(tx, preconditions), do: impl().set_preconditions(tx, preconditions)
 
   @impl true
