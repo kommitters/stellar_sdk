@@ -62,6 +62,11 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def raw_signed_payload(signed_payload) do
+    StrKey.decode!(signed_payload, :signed_payload)
+  end
+
+  @impl true
   def sign(<<payload::binary>>, <<secret::binary>>) do
     raw_secret = raw_secret_seed(secret)
     Ed25519.signature(payload, raw_secret)
@@ -90,6 +95,14 @@ defmodule Stellar.KeyPair.Default do
     case StrKey.decode(muxed_account, :muxed_account) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_muxed_account}
+    end
+  end
+
+  @impl true
+  def validate_signed_payload(signed_payload) do
+    case StrKey.decode(signed_payload, :signed_payload) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_signed_payload}
     end
   end
 

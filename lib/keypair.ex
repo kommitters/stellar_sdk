@@ -27,6 +27,9 @@ defmodule Stellar.KeyPair do
   def raw_muxed_account(public_key), do: impl().raw_muxed_account(public_key)
 
   @impl true
+  def raw_signed_payload(signed_payload), do: impl().raw_signed_payload(signed_payload)
+
+  @impl true
   def raw_secret_seed(secret), do: impl().raw_secret_seed(secret)
 
   @impl true
@@ -47,6 +50,9 @@ defmodule Stellar.KeyPair do
 
   @impl true
   def validate_muxed_account(public_key), do: impl().validate_muxed_account(public_key)
+
+  @impl true
+  def validate_signed_payload(signed_payload), do: impl().validate_signed_payload(signed_payload)
 
   @impl true
   def validate_secret_seed(secret), do: impl().validate_secret_seed(secret)
