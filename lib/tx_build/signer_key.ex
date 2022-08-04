@@ -3,7 +3,6 @@ defmodule Stellar.TxBuild.SignerKey do
   `SignerKey` struct definition.
   """
   alias Stellar.KeyPair
-  alias StellarBase.StrKey
 
   alias StellarBase.XDR.{
     SignerKey,
@@ -66,7 +65,7 @@ defmodule Stellar.TxBuild.SignerKey do
     signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD)
 
     <<key::binary-size(32), _payload_size::binary-size(4), payload::binary>> =
-      StrKey.decode!(key, :signed_payload)
+      KeyPair.raw_signed_payload(key)
 
     payload = VariableOpaque64.new(payload)
 

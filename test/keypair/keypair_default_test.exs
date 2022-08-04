@@ -7,12 +7,27 @@ defmodule Stellar.KeyPair.DefaultTest do
     %{
       public_key: "GDAO7ET7LDTO5UCMMRYPE2M7YRRK3LQQD425L64WWTKRERVF3AMOOIWG",
       secret: "SDP6MYCODMMYJXWWLY5GSQJUZOGDV672LFCKNGJYLSYVXTGWVJGJHBJT",
+      pre_auth_tx: "TCVFGJWNBF7LNCX4HNETQH7GXYUXUIZCUTCZ5PXUSZ3KJWESVXNCYN3B",
+      sha256_hash: "XCTP2Y5GZ7TTGHLM3JJKDIPR36A7QFFW4VYJVU6QN4MNIFFIAG4JC6CC",
+      signed_payload:
+        "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM",
       encoded_public_key:
         <<192, 239, 146, 127, 88, 230, 238, 208, 76, 100, 112, 242, 105, 159, 196, 98, 173, 174,
           16, 31, 53, 213, 251, 150, 180, 213, 18, 70, 165, 216, 24, 231>>,
       encoded_secret:
         <<223, 230, 96, 78, 27, 25, 132, 222, 214, 94, 58, 105, 65, 52, 203, 140, 58, 251, 250,
           89, 68, 166, 153, 56, 92, 177, 91, 204, 214, 170, 76, 147>>,
+      encoded_pre_auth_tx:
+        <<170, 83, 38, 205, 9, 126, 182, 138, 252, 59, 73, 56, 31, 230, 190, 41, 122, 35, 34, 164,
+          197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>,
+      encoded_sha256_hash:
+        <<166, 253, 99, 166, 207, 231, 51, 29, 108, 218, 82, 161, 161, 241, 223, 129, 248, 20,
+          182, 229, 112, 154, 211, 208, 111, 24, 212, 20, 168, 1, 184, 145>>,
+      encoded_signed_payload:
+        <<63, 12, 52, 191, 147, 173, 13, 153, 113, 208, 76, 204, 144, 247, 5, 81, 28, 131, 138,
+          173, 151, 52, 164, 162, 251, 13, 122, 3, 252, 127, 232, 154, 0, 0, 0, 32, 1, 2, 3, 4, 5,
+          6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+          29, 30, 31, 32>>,
       signature:
         <<215, 199, 186, 220, 150, 210, 229, 108, 54, 13, 160, 26, 38, 184, 120, 233, 253, 170,
           252, 68, 235, 166, 205, 2, 115, 76, 254, 20, 85, 1, 224, 106, 84, 196, 217, 38, 248,
@@ -53,6 +68,21 @@ defmodule Stellar.KeyPair.DefaultTest do
     ^encoded_secret = Default.raw_secret_seed(secret)
   end
 
+  test "raw_pre_auth_tx/1", %{pre_auth_tx: pre_auth_tx, encoded_pre_auth_tx: encoded_pre_auth_tx} do
+    ^encoded_pre_auth_tx = Default.raw_pre_auth_tx(pre_auth_tx)
+  end
+
+  test "raw_sha256_hash/1", %{sha256_hash: sha256_hash, encoded_sha256_hash: encoded_sha256_hash} do
+    ^encoded_sha256_hash = Default.raw_sha256_hash(sha256_hash)
+  end
+
+  test "raw_signed_payload/1", %{
+    signed_payload: signed_payload,
+    encoded_signed_payload: encoded_signed_payload
+  } do
+    ^encoded_signed_payload = Default.raw_signed_payload(signed_payload)
+  end
+
   test "sign/2", %{secret: secret, signature: signature} do
     ^signature = Default.sign(<<0, 0, 0, 0>>, secret)
   end
@@ -91,18 +121,41 @@ defmodule Stellar.KeyPair.DefaultTest do
     {:error, :invalid_ed25519_secret_seed} = Default.validate_secret_seed("ABC")
   end
 
+  test "validate_pre_auth_tx/1", %{pre_auth_tx: pre_auth_tx} do
+    :ok = Default.validate_pre_auth_tx(pre_auth_tx)
+  end
+
+  test "validate_pre_auth_tx/1 invalid_pre_auth_tx" do
+    {:error, :invalid_pre_auth_tx} = Default.validate_pre_auth_tx("GCA")
+  end
+
+  test "validate_sha256_hash/1", %{sha256_hash: sha256_hash} do
+    :ok = Default.validate_sha256_hash(sha256_hash)
+  end
+
+  test "validate_sha256_hash/1 invalid_sha256_hash" do
+    {:error, :invalid_sha256_hash} = Default.validate_sha256_hash("GCA")
+  end
+
+  test "validate_signed_payload/1", %{signed_payload: signed_payload} do
+    :ok = Default.validate_signed_payload(signed_payload)
+  end
+
+  test "validate_signed_payload/1 invalid_signed_payload" do
+    {:error, :invalid_signed_payload} = Default.validate_signed_payload("GCA")
+  end
+
   test "signature_hint_for_signed_payload/2 payload with 4 bytes", %{
     encoded_public_key: encoded_public_key,
     payload: payload
   } do
-    <<193, 237, 145, 123>> =
-      Default.signature_hint_for_signed_payload(encoded_public_key, payload)
+    <<184, 198, 7, 199>> = Default.signature_hint_for_signed_payload(encoded_public_key, payload)
   end
 
   test "signature_hint_for_signed_payload/2 payload with less than 4 bytes", %{
     encoded_public_key: encoded_public_key
   } do
-    <<192, 239, 147, 125>> =
+    <<187, 199, 56, 231>> =
       Default.signature_hint_for_signed_payload(encoded_public_key, <<30, 31, 32>>)
   end
 end

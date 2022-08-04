@@ -21,15 +21,19 @@ defmodule Stellar.Test.Fixtures.XDR do
 
   # signatures
   defdelegate ed25519_signer_key(key), to: Signatures
-  defdelegate ed25519_signed_payload(key, payload), to: Signatures
   defdelegate sha256_hash_signer_key(key), to: Signatures
   defdelegate pre_auth_signer_key(key), to: Signatures
+  defdelegate ed25519_signed_payload_signer_key(key), to: Signatures
   defdelegate ed25519_signer(key, weight), to: Signatures
   defdelegate sha256_hash_signer(key, weight), to: Signatures
   defdelegate pre_auth_signer(key, weight), to: Signatures
+  defdelegate ed25519_signed_payload_signer(key, weight), to: Signatures
   defdelegate ed25519_revoke_sponsorship_signer(account_id, key), to: Signatures
   defdelegate sha256_hash_revoke_sponsorship_signer(account_id, key), to: Signatures
   defdelegate pre_auth_revoke_sponsorship_signer(account_id, key), to: Signatures
+
+  defdelegate ed25519_signed_payload_revoke_sponsorship_signer(account_id, key),
+    to: Signatures
 
   # transactions
   defdelegate transaction(account_id), to: Transactions
