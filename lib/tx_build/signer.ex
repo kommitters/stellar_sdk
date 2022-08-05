@@ -16,8 +16,8 @@ defmodule Stellar.TxBuild.Signer do
   @impl true
   def new(args, opts \\ [])
 
-  def new([{signer_type, signer_key}, {:weight, weight}], _opts) do
-    with {:ok, signer_key} <- validate_signer_key({signer_type, signer_key}),
+  def new({signer_key, weight}, _opts) do
+    with {:ok, signer_key} <- validate_signer_key(signer_key),
          {:ok, weight} <- validate_signer_weight(weight) do
       %__MODULE__{signer_key: signer_key, weight: weight}
     end
@@ -42,7 +42,7 @@ defmodule Stellar.TxBuild.Signer do
     end
   end
 
-  @spec validate_signer_key(signer_key :: tuple()) :: validation()
+  @spec validate_signer_key(signer_key :: String.t()) :: validation()
   defp validate_signer_key(signer_key) do
     case SignerKey.new(signer_key) do
       %SignerKey{} = signer_key -> {:ok, signer_key}

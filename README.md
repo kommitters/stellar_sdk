@@ -21,7 +21,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.8.1"}
+    {:stellar_sdk, "~> 0.9.0"}
   ]
 end
 ```
@@ -718,6 +718,35 @@ Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native,
 ```
 
 See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/order-books/) for more details.
+
+### Trade Aggregations
+
+#### List trade aggregations
+Displays trade data based on filters set in the arguments:
+- [Required] base_asset. **:native** or **[code: "BASE_ASSET_CODE", issuer: "BASE_ASSET_ISSUER"]**.
+- [Required] counter_asset. **:native** or **[code: "COUNTER_ASSET_CODE", issuer: "COUNTER_ASSET_ISSUER"]**.
+- [Required] resolution. The segment duration represented as milliseconds.
+- [Optional] start_time. The lower time boundary represented as milliseconds since epoch.
+- [Optional] end_time. The upper time boundary represented as milliseconds since epoch.
+- [Optional] offset. Segments can be offset using this parameter. Expressed in milliseconds.
+- [Optional] order. A designation of the order in which records should appear.
+- [Optional] limit. The maximum number of records returned.
+
+```elixir
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native,
+                                                         counter_asset: [
+                                                           code: "EURT",
+                                                           issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
+                                                         ],
+                                                         resolution: "3600000",
+                                                         start_time: "1582156800000",
+                                                         end_time: "1582178400000"
+                                                        )
+
+```
+
+See [**Stellar.Horizon.TradeAggregations**](https://developers.stellar.org/api/aggregations/trade-aggregations/) for more details.
 
 ---
 

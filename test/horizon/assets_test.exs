@@ -1,7 +1,6 @@
 defmodule Stellar.Horizon.Client.CannedAssetRequests do
   @moduledoc false
 
-  alias Stellar.Horizon.Error
   alias Stellar.Test.Fixtures.Horizon
 
   @base_url "https://horizon-testnet.stellar.org"

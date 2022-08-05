@@ -18,15 +18,25 @@ defmodule Stellar.KeyPair.Spec do
   @callback raw_public_key(public_key()) :: binary()
   @callback raw_muxed_account(public_key()) :: binary()
   @callback raw_secret_seed(public_key()) :: binary()
+  @callback raw_pre_auth_tx(public_key()) :: binary()
+  @callback raw_sha256_hash(public_key()) :: binary()
+  @callback raw_signed_payload(public_key()) :: binary()
   @callback validate_public_key(public_key()) :: validation()
   @callback validate_muxed_account(public_key()) :: validation()
   @callback validate_secret_seed(public_key()) :: validation()
+  @callback validate_pre_auth_tx(public_key()) :: validation()
+  @callback validate_sha256_hash(public_key()) :: validation()
+  @callback validate_signed_payload(public_key()) :: validation()
   @callback sign(binary(), secret_seed()) :: binary() | error()
   @callback valid_signature?(binary(), binary(), public_key()) :: boolean()
+  @callback signature_hint_for_signed_payload(binary(), binary()) :: binary()
 
   @optional_callbacks from_raw_public_key: 1,
                       from_raw_muxed_account: 1,
                       validate_public_key: 1,
                       validate_muxed_account: 1,
-                      validate_secret_seed: 1
+                      validate_secret_seed: 1,
+                      validate_pre_auth_tx: 1,
+                      validate_sha256_hash: 1,
+                      validate_signed_payload: 1
 end

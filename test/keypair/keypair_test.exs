@@ -40,6 +40,21 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
+  def raw_pre_auth_tx(_pre_auth_tx) do
+    send(self(), {:raw_pre_auth_tx, "RAW_PRE_AUTH_TX"})
+  end
+
+  @impl true
+  def raw_sha256_hash(_sha256_hash) do
+    send(self(), {:raw_sha256_hash, "RAW_SHA256_HASH"})
+  end
+
+  @impl true
+  def raw_signed_payload(_signed_payload) do
+    send(self(), {:raw_signed_payload, "RAW_SIGNED_PAYLOAD"})
+  end
+
+  @impl true
   def sign(_payload, _secret) do
     send(self(), {:signature, "SIGNATURE"})
     :ok
@@ -66,6 +81,28 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   @impl true
   def validate_muxed_account(_muxed_account) do
     send(self(), {:validate_muxed_account, "MUXED_ACCOUNT"})
+    :ok
+  end
+
+  @impl true
+  def validate_pre_auth_tx(_pre_auth_tx) do
+    send(self(), {:validate_pre_auth_tx, "PRE_AUTH_TX"})
+    :ok
+  end
+
+  @impl true
+  def validate_sha256_hash(_sha256_hash) do
+    send(self(), {:validate_sha256_hash, "SHA256_HASH"})
+  end
+
+  @impl true
+  def validate_signed_payload(_signed_payload) do
+    send(self(), {:validate_signed_payload, "SIGNED_PAYLOAD"})
+  end
+
+  @impl true
+  def signature_hint_for_signed_payload(_public_key, _payload) do
+    send(self(), {:signature_hint, "SIGNED_PAYLOAD"})
     :ok
   end
 end
@@ -113,6 +150,21 @@ defmodule Stellar.KeyPairTest do
     assert_receive({:raw_muxed_account, "RAW_MUXED_ACCOUNT"})
   end
 
+  test "raw_pre_auth_tx/1" do
+    Stellar.KeyPair.raw_pre_auth_tx("PRE_AUTH_TX")
+    assert_receive({:raw_pre_auth_tx, "RAW_PRE_AUTH_TX"})
+  end
+
+  test "raw_sha256_hash/1" do
+    Stellar.KeyPair.raw_sha256_hash("SHA256_HASH")
+    assert_receive({:raw_sha256_hash, "RAW_SHA256_HASH"})
+  end
+
+  test "raw_signed_payload/1" do
+    Stellar.KeyPair.raw_signed_payload("SIGNED_PAYLOAD")
+    assert_receive({:raw_signed_payload, "RAW_SIGNED_PAYLOAD"})
+  end
+
   test "sign/2" do
     Stellar.KeyPair.sign(<<0, 0, 0, 0>>, "SECRET")
     assert_receive({:signature, "SIGNATURE"})
@@ -136,5 +188,25 @@ defmodule Stellar.KeyPairTest do
   test "validate_muxed_account/2" do
     Stellar.KeyPair.validate_muxed_account("MUXED_ACCOUNT")
     assert_receive({:validate_muxed_account, "MUXED_ACCOUNT"})
+  end
+
+  test "validate_pre_auth_tx/1" do
+    Stellar.KeyPair.validate_pre_auth_tx("PRE_AUTH_TX")
+    assert_receive({:validate_pre_auth_tx, "PRE_AUTH_TX"})
+  end
+
+  test "validate_sha256_hash/2" do
+    Stellar.KeyPair.validate_sha256_hash("SHA256_HASH")
+    assert_receive({:validate_sha256_hash, "SHA256_HASH"})
+  end
+
+  test "validate_signed_payload/2" do
+    Stellar.KeyPair.validate_signed_payload("SIGNED_PAYLOAD")
+    assert_receive({:validate_signed_payload, "SIGNED_PAYLOAD"})
+  end
+
+  test "signature_hint_for_signed_payload/2" do
+    Stellar.KeyPair.signature_hint_for_signed_payload("SIGNED_PAYLOAD", "PAYLOAD")
+    assert_receive({:signature_hint, "SIGNED_PAYLOAD"})
   end
 end

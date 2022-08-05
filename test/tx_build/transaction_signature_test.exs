@@ -10,9 +10,9 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
     Memo,
     Operation,
     Operations,
+    Preconditions,
     SequenceNumber,
     Signature,
-    TimeBounds,
     Transaction,
     TransactionEnvelope,
     TransactionSignature
@@ -40,7 +40,7 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
         source_account: source_account,
         sequence_number: SequenceNumber.new(123_456),
         base_fee: BaseFee.new(500),
-        time_bounds: TimeBounds.new(:none),
+        preconditions: Preconditions.new([]),
         memo: Memo.new(:none),
         operations: Operations.new([op])
       )

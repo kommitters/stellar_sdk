@@ -9,7 +9,7 @@ defmodule Stellar.TxBuild.Transaction do
     Operations,
     SequenceNumber,
     Memo,
-    TimeBounds
+    Preconditions
   }
 
   alias StellarBase.XDR.{Ext, Transaction}
@@ -23,11 +23,11 @@ defmodule Stellar.TxBuild.Transaction do
           sequence_number: SequenceNumber.t(),
           base_fee: BaseFee.t(),
           memo: Memo.t(),
-          time_bounds: TimeBounds.t(),
+          preconditions: Preconditions.t(),
           operations: Operations.t()
         }
 
-  defstruct [:source_account, :sequence_number, :base_fee, :memo, :time_bounds, :operations]
+  defstruct [:source_account, :sequence_number, :base_fee, :memo, :preconditions, :operations]
 
   @impl true
   def new(args, opts \\ [])
@@ -36,21 +36,21 @@ defmodule Stellar.TxBuild.Transaction do
     source_account = Keyword.get(args, :source_account)
     sequence_number = Keyword.get(args, :sequence_number)
     base_fee = Keyword.get(args, :base_fee)
-    time_bounds = Keyword.get(args, :time_bounds)
+    preconditions = Keyword.get(args, :preconditions)
     memo = Keyword.get(args, :memo)
     operations = Keyword.get(args, :operations)
 
     with {:ok, source_account} <- validate_source_account(source_account),
          {:ok, sequence_number} <- validate_sequence_number(sequence_number),
          {:ok, base_fee} <- validate_base_fee(base_fee),
-         {:ok, time_bounds} <- validate_time_bounds(time_bounds),
+         {:ok, preconditions} <- validate_preconditions(preconditions),
          {:ok, memo} <- validate_memo(memo),
          {:ok, operations} <- validate_operations(operations) do
       %__MODULE__{
         source_account: source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       }
@@ -62,7 +62,7 @@ defmodule Stellar.TxBuild.Transaction do
         source_account: source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       }) do
@@ -70,7 +70,7 @@ defmodule Stellar.TxBuild.Transaction do
       Account.to_xdr(source_account),
       BaseFee.to_xdr(base_fee),
       SequenceNumber.to_xdr(sequence_number),
-      TimeBounds.to_xdr(time_bounds),
+      Preconditions.to_xdr(preconditions),
       Memo.to_xdr(memo),
       Operations.to_xdr(operations),
       Ext.new()
@@ -89,9 +89,9 @@ defmodule Stellar.TxBuild.Transaction do
   defp validate_base_fee(%BaseFee{} = base_fee), do: {:ok, base_fee}
   defp validate_base_fee(_base_fee), do: {:error, :invalid_base_fee}
 
-  @spec validate_time_bounds(time_bounds :: TimeBounds.t()) :: validation()
-  defp validate_time_bounds(%TimeBounds{} = time_bounds), do: {:ok, time_bounds}
-  defp validate_time_bounds(_time_bounds), do: {:error, :invalid_time_bounds}
+  @spec validate_operations(preconditions :: Preconditions.t()) :: validation()
+  defp validate_preconditions(%Preconditions{} = preconditions), do: {:ok, preconditions}
+  defp validate_preconditions(_preconditions), do: {:error, :invalid_preconditions}
 
   @spec validate_memo(memo :: Memo.t()) :: validation()
   defp validate_memo(%Memo{} = memo), do: {:ok, memo}

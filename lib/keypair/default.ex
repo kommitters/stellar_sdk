@@ -52,6 +52,21 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def raw_pre_auth_tx(pre_auth_tx) do
+    StrKey.decode!(pre_auth_tx, :pre_auth_tx)
+  end
+
+  @impl true
+  def raw_sha256_hash(sha256_hash) do
+    StrKey.decode!(sha256_hash, :sha256_hash)
+  end
+
+  @impl true
+  def raw_signed_payload(signed_payload) do
+    StrKey.decode!(signed_payload, :signed_payload)
+  end
+
+  @impl true
   def sign(<<payload::binary>>, <<secret::binary>>) do
     raw_secret = raw_secret_seed(secret)
     Ed25519.signature(payload, raw_secret)
@@ -84,10 +99,57 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def validate_signed_payload(signed_payload) do
+    case StrKey.decode(signed_payload, :signed_payload) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_signed_payload}
+    end
+  end
+
+  @impl true
   def validate_secret_seed(secret) do
     case StrKey.decode(secret, :ed25519_secret_seed) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_ed25519_secret_seed}
     end
+  end
+
+  @impl true
+  def validate_pre_auth_tx(pre_auth_tx) do
+    case StrKey.decode(pre_auth_tx, :pre_auth_tx) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_pre_auth_tx}
+    end
+  end
+
+  @impl true
+  def validate_sha256_hash(sha256_hash) do
+    case StrKey.decode(sha256_hash, :sha256_hash) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_sha256_hash}
+    end
+  end
+
+  @impl true
+  def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) == 4 do
+    public_key
+    |> byte_size()
+    |> (&binary_part(public_key, &1, -4)).()
+    |> :crypto.exor(payload)
+  end
+
+  def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) > 4 do
+    payload
+    |> byte_size()
+    |> (&binary_part(payload, &1, -4)).()
+    |> (&signature_hint_for_signed_payload(public_key, &1)).()
+  end
+
+  def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) < 4 do
+    payload
+    |> byte_size()
+    # Append zeros as needed
+    |> (&(payload <> :binary.copy(<<0>>, 4 - &1))).()
+    |> (&signature_hint_for_signed_payload(public_key, &1)).()
   end
 end

@@ -8,7 +8,7 @@ defmodule Stellar.Horizon.RequestParams do
 
   @spec build_assets_params(args :: args(), type :: type()) :: Keyword.t()
   def build_assets_params(args, type)
-      when type in ~w(selling_asset buying_asset destination_asset source_asset)a do
+      when type in ~w(selling_asset buying_asset destination_asset source_asset base_asset counter_asset)a do
     args
     |> Keyword.get(type)
     |> resolve_asset_params(type)

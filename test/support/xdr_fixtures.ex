@@ -3,7 +3,7 @@ defmodule Stellar.Test.XDRFixtures do
   Stellar's XDR data for test constructions.
   """
   alias Stellar.KeyPair
-  alias Stellar.TxBuild.TransactionSignature
+  alias Stellar.TxBuild.{TransactionSignature, SignerKey}
   alias Stellar.TxBuild.Transaction, as: Tx
 
   alias StellarBase.XDR.{
@@ -50,8 +50,6 @@ defmodule Stellar.Test.XDRFixtures do
     String32,
     String64,
     Signer,
-    SignerKey,
-    SignerKeyType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -84,7 +82,7 @@ defmodule Stellar.Test.XDRFixtures do
   @type signer_type :: :ed25519 | :sha256_hash | :pre_auth_tx
   @type weight :: pos_integer() | nil
   @type flags :: list(atom()) | nil
-  @type optional_signer :: Keyword.t() | nil
+  @type optional_signer :: tuple() | nil
   @type optional_string32 :: String.t() | nil
 
   @unit 10_000_000
@@ -110,37 +108,13 @@ defmodule Stellar.Test.XDRFixtures do
     |> AccountID.new()
   end
 
-  @spec signer_xdr(signer :: Keyword.t()) :: Signer.t()
-  def signer_xdr(ed25519: key, weight: weight) do
-    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_ED25519)
+  @spec signer_xdr(key :: String.t(), weight :: non_neg_integer()) :: Signer.t()
+  def signer_xdr(key, weight) do
     weight = UInt32.new(weight)
 
     key
-    |> KeyPair.raw_public_key()
-    |> UInt256.new()
-    |> SignerKey.new(signer_type)
-    |> Signer.new(weight)
-  end
-
-  def signer_xdr(sha256_hash: key, weight: weight) do
-    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_HASH_X)
-    weight = UInt32.new(weight)
-
-    key
-    |> (&:crypto.hash(:sha256, &1)).()
-    |> UInt256.new()
-    |> SignerKey.new(signer_type)
-    |> Signer.new(weight)
-  end
-
-  def signer_xdr(pre_auth_tx: key, weight: weight) do
-    signer_type = SignerKeyType.new(:SIGNER_KEY_TYPE_PRE_AUTH_TX)
-    weight = UInt32.new(weight)
-
-    key
-    |> (&:crypto.hash(:sha256, &1)).()
-    |> UInt256.new()
-    |> SignerKey.new(signer_type)
+    |> SignerKey.new()
+    |> SignerKey.to_xdr()
     |> Signer.new(weight)
   end
 
@@ -584,9 +558,9 @@ defmodule Stellar.Test.XDRFixtures do
   @spec optional_signer_xdr(signer :: optional_signer()) :: OptionalSigner.t()
   def optional_signer_xdr(nil), do: OptionalSigner.new()
 
-  def optional_signer_xdr(signer) do
-    signer
-    |> signer_xdr()
+  def optional_signer_xdr({key, weight}) do
+    key
+    |> signer_xdr(weight)
     |> OptionalSigner.new()
   end
 

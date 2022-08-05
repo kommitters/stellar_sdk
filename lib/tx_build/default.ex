@@ -12,6 +12,7 @@ defmodule Stellar.TxBuild.Default do
     Operations,
     SequenceNumber,
     Signature,
+    Preconditions,
     TimeBounds,
     Transaction,
     TransactionEnvelope
@@ -23,7 +24,7 @@ defmodule Stellar.TxBuild.Default do
   def new(%Account{} = source_account, opts) do
     sequence_number = Keyword.get(opts, :sequence_number, SequenceNumber.new())
     base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
-    time_bounds = Keyword.get(opts, :time_bounds, TimeBounds.new())
+    preconditions = Keyword.get(opts, :preconditions, Preconditions.new())
     memo = Keyword.get(opts, :memo, Memo.new())
     operations = Keyword.get(opts, :operations, Operations.new())
 
@@ -31,7 +32,7 @@ defmodule Stellar.TxBuild.Default do
            source_account: source_account,
            sequence_number: sequence_number,
            base_fee: base_fee,
-           time_bounds: time_bounds,
+           preconditions: preconditions,
            memo: memo,
            operations: operations
          ) do
@@ -55,13 +56,53 @@ defmodule Stellar.TxBuild.Default do
   def add_memo(error, _memo), do: error
 
   @impl true
-  def set_time_bounds({:ok, %TxBuild{tx: tx} = tx_build}, %TimeBounds{} = time_bounds) do
-    transaction = %{tx | time_bounds: time_bounds}
+  def set_time_bounds(
+        {:ok, %TxBuild{tx: %{preconditions: %{type: :none} = preconditions} = tx} = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    preconditions = %{preconditions | type: :precond_time, preconditions: time_bounds}
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_time_bounds(
+        {:ok,
+         %TxBuild{tx: %{preconditions: %{type: :precond_time} = preconditions} = tx} = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    preconditions = %{preconditions | preconditions: time_bounds}
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_time_bounds(
+        {:ok,
+         %TxBuild{
+           tx:
+             %{
+               preconditions:
+                 %{type: :precond_v2, preconditions: inner_preconditions} = preconditions
+             } = tx
+         } = tx_build},
+        %TimeBounds{} = time_bounds
+      ) do
+    inner_preconditions = Keyword.put(inner_preconditions, :time_bounds, time_bounds)
+    preconditions = %{preconditions | preconditions: inner_preconditions}
+    transaction = %{tx | preconditions: preconditions}
     {:ok, %{tx_build | tx: transaction}}
   end
 
   def set_time_bounds({:ok, %TxBuild{}}, _time_bounds), do: {:error, :invalid_time_bounds}
   def set_time_bounds(error, _time_bounds), do: error
+
+  @impl true
+  def set_preconditions({:ok, %TxBuild{tx: tx} = tx_build}, %Preconditions{} = preconditions) do
+    transaction = %{tx | preconditions: preconditions}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_preconditions({:ok, %TxBuild{}}, _preconditions), do: {:error, :invalid_preconditions}
+  def set_preconditions(error, _preconditions), do: error
 
   @impl true
   def set_base_fee({:ok, %TxBuild{tx: tx} = tx_build}, %BaseFee{} = base_fee) do
