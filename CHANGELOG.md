@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0 (05.08.2022)
+* Stellar protocol-19 support implementation.
+* Add optional fields for account records.
+* Add CAP-21 preconditions for transaction attributes.
+* Add CAP-40 decorate signature hint and support for signed payload signature.
+* Refactor signer key signatures implementation.
+* Remove unused alias in tests and fix documentation examples. 
+* Add Trade Agreggations endpoint.
+
 ## 0.8.1 (28.07.2022)
 * Refactor Paths endpoint to improve UX.
 
