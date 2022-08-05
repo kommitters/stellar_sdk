@@ -19,9 +19,10 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
     OperationBody,
     OperationType,
     OptionalMuxedAccount,
-    OptionalTimeBounds,
     PublicKey,
     PublicKeyType,
+    Preconditions,
+    PreconditionType,
     SequenceNumber,
     SignatureHint,
     Signature,
@@ -114,7 +115,10 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
             },
             type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519}
           },
-          time_bounds: %OptionalTimeBounds{time_bounds: nil}
+          preconditions: %Preconditions{
+            type: %PreconditionType{identifier: :PRECOND_NONE},
+            preconditions: %Void{value: nil}
+          }
         }
       },
       type: %EnvelopeType{identifier: :ENVELOPE_TYPE_TX}
@@ -185,7 +189,10 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
             },
             type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519}
           },
-          time_bounds: %OptionalTimeBounds{time_bounds: nil}
+          preconditions: %Preconditions{
+            type: %PreconditionType{identifier: :PRECOND_NONE},
+            preconditions: %Void{value: nil}
+          }
         }
       },
       type: %EnvelopeType{identifier: :ENVELOPE_TYPE_TX}

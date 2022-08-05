@@ -30,6 +30,12 @@ defmodule Stellar.KeyPair do
   def raw_secret_seed(secret), do: impl().raw_secret_seed(secret)
 
   @impl true
+  def raw_pre_auth_tx(pre_auth_tx), do: impl().raw_pre_auth_tx(pre_auth_tx)
+
+  @impl true
+  def raw_sha256_hash(sha256_hash), do: impl().raw_sha256_hash(sha256_hash)
+
+  @impl true
   def sign(payload, secret), do: impl().sign(payload, secret)
 
   @impl true
@@ -44,6 +50,12 @@ defmodule Stellar.KeyPair do
 
   @impl true
   def validate_secret_seed(secret), do: impl().validate_secret_seed(secret)
+
+  @impl true
+  def validate_pre_auth_tx(pre_auth_tx), do: impl().validate_pre_auth_tx(pre_auth_tx)
+
+  @impl true
+  def validate_sha256_hash(sha256_hash), do: impl().validate_sha256_hash(sha256_hash)
 
   @spec impl() :: atom()
   defp impl do

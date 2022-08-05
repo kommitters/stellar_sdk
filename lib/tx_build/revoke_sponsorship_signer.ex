@@ -17,7 +17,7 @@ defmodule Stellar.TxBuild.RevokeSponsorshipSigner do
   @impl true
   def new(args, opts \\ [])
 
-  def new([{:account_id, account_id}, signer_key], _opts) do
+  def new({account_id, signer_key}, _opts) do
     with {:ok, signer_key} <- validate_signer_key(signer_key),
          {:ok, account_id} <- validate_account_id(account_id) do
       %__MODULE__{account_id: account_id, signer_key: signer_key}

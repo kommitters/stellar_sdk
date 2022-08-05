@@ -16,8 +16,9 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
     UInt256,
     UInt64,
     CryptoKeyType,
-    OptionalTimeBounds,
-    Void
+    Void,
+    Preconditions,
+    PreconditionType
   }
 
   @type account_id :: String.t()
@@ -43,7 +44,10 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
         },
         type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519}
       },
-      time_bounds: %OptionalTimeBounds{time_bounds: nil}
+      preconditions: %Preconditions{
+        type: %PreconditionType{identifier: :PRECOND_NONE},
+        preconditions: %Void{value: nil}
+      }
     }
   end
 
@@ -73,7 +77,10 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
         },
         type: %CryptoKeyType{identifier: :KEY_TYPE_MUXED_ED25519}
       },
-      time_bounds: %OptionalTimeBounds{time_bounds: nil}
+      preconditions: %Preconditions{
+        type: %PreconditionType{identifier: :PRECOND_NONE},
+        preconditions: %Void{value: nil}
+      }
     }
   end
 

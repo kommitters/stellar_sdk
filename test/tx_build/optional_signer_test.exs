@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.OptionalSignerTest do
   use ExUnit.Case
 
-  import Stellar.Test.XDRFixtures, only: [signer_xdr: 1]
+  import Stellar.Test.XDRFixtures, only: [signer_xdr: 2]
 
   alias Stellar.TxBuild.{Signer, OptionalSigner}
   alias StellarBase.XDR.OptionalSigner, as: OptionalSignerXDR
@@ -10,8 +10,8 @@ defmodule Stellar.TxBuild.OptionalSignerTest do
     account_id = "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
 
     %{
-      signer: Signer.new(ed25519: account_id, weight: 2),
-      signer_xdr: signer_xdr(ed25519: account_id, weight: 2)
+      signer: Signer.new({account_id, 2}),
+      signer_xdr: signer_xdr(account_id, 2)
     }
   end
 

@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.TransactionTest do
     Memo,
     Operations,
     SequenceNumber,
-    TimeBounds
+    Preconditions
   }
 
   setup do
@@ -24,7 +24,7 @@ defmodule Stellar.TxBuild.TransactionTest do
       muxed_source_account: Account.new(muxed_address),
       sequence_number: SequenceNumber.new(),
       memo: Memo.new(),
-      time_bounds: TimeBounds.new(),
+      preconditions: Preconditions.new(),
       base_fee: BaseFee.new(),
       operations: Operations.new()
     }
@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild.TransactionTest do
       sequence_number: sequence_number,
       memo: memo,
       base_fee: base_fee,
-      time_bounds: time_bounds,
+      preconditions: preconditions,
       operations: operations
     } do
       {:error, :invalid_source_account} =
@@ -43,7 +43,7 @@ defmodule Stellar.TxBuild.TransactionTest do
           source_account: nil,
           sequence_number: sequence_number,
           base_fee: base_fee,
-          time_bounds: time_bounds,
+          preconditions: preconditions,
           memo: memo,
           operations: operations
         )
@@ -53,7 +53,7 @@ defmodule Stellar.TxBuild.TransactionTest do
       source_account: source_account,
       memo: memo,
       base_fee: base_fee,
-      time_bounds: time_bounds,
+      preconditions: preconditions,
       operations: operations
     } do
       {:error, :invalid_sequence_number} =
@@ -61,7 +61,7 @@ defmodule Stellar.TxBuild.TransactionTest do
           source_account: source_account,
           sequence_number: -123_456,
           base_fee: base_fee,
-          time_bounds: time_bounds,
+          preconditions: preconditions,
           memo: memo,
           operations: operations
         )
@@ -71,7 +71,7 @@ defmodule Stellar.TxBuild.TransactionTest do
       source_account: source_account,
       sequence_number: sequence_number,
       memo: memo,
-      time_bounds: time_bounds,
+      preconditions: preconditions,
       operations: operations
     } do
       {:error, :invalid_base_fee} =
@@ -79,25 +79,25 @@ defmodule Stellar.TxBuild.TransactionTest do
           source_account: source_account,
           sequence_number: sequence_number,
           base_fee: -100,
-          time_bounds: time_bounds,
+          preconditions: preconditions,
           memo: memo,
           operations: operations
         )
     end
 
-    test "validate_time_bounds", %{
+    test "validate_preconditions", %{
       source_account: source_account,
       sequence_number: sequence_number,
       memo: memo,
       base_fee: base_fee,
       operations: operations
     } do
-      {:error, :invalid_time_bounds} =
+      {:error, :invalid_preconditions} =
         Transaction.new(
           source_account: source_account,
           sequence_number: sequence_number,
           base_fee: base_fee,
-          time_bounds: [],
+          preconditions: [],
           memo: memo,
           operations: operations
         )
@@ -107,7 +107,7 @@ defmodule Stellar.TxBuild.TransactionTest do
       source_account: source_account,
       sequence_number: sequence_number,
       base_fee: base_fee,
-      time_bounds: time_bounds,
+      preconditions: preconditions,
       operations: operations
     } do
       {:error, :invalid_memo} =
@@ -115,7 +115,7 @@ defmodule Stellar.TxBuild.TransactionTest do
           source_account: source_account,
           sequence_number: sequence_number,
           base_fee: base_fee,
-          time_bounds: time_bounds,
+          preconditions: preconditions,
           memo: "TEST",
           operations: operations
         )
@@ -126,14 +126,14 @@ defmodule Stellar.TxBuild.TransactionTest do
       sequence_number: sequence_number,
       memo: memo,
       base_fee: base_fee,
-      time_bounds: time_bounds
+      preconditions: preconditions
     } do
       {:error, :invalid_operations} =
         Transaction.new(
           source_account: source_account,
           sequence_number: sequence_number,
           base_fee: base_fee,
-          time_bounds: time_bounds,
+          preconditions: preconditions,
           memo: memo,
           operations: []
         )
@@ -145,13 +145,13 @@ defmodule Stellar.TxBuild.TransactionTest do
     sequence_number: sequence_number,
     base_fee: base_fee,
     memo: memo,
-    time_bounds: time_bounds,
+    preconditions: preconditions,
     operations: operations
   } do
     %Transaction{
       source_account: ^source_account,
       sequence_number: ^sequence_number,
-      time_bounds: ^time_bounds,
+      preconditions: ^preconditions,
       base_fee: ^base_fee,
       memo: ^memo
     } =
@@ -159,7 +159,7 @@ defmodule Stellar.TxBuild.TransactionTest do
         source_account: source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       )
@@ -170,13 +170,13 @@ defmodule Stellar.TxBuild.TransactionTest do
     sequence_number: sequence_number,
     base_fee: base_fee,
     memo: memo,
-    time_bounds: time_bounds,
+    preconditions: preconditions,
     operations: operations
   } do
     %Transaction{
       source_account: ^muxed_source_account,
       sequence_number: ^sequence_number,
-      time_bounds: ^time_bounds,
+      preconditions: ^preconditions,
       base_fee: ^base_fee,
       memo: ^memo
     } =
@@ -184,7 +184,7 @@ defmodule Stellar.TxBuild.TransactionTest do
         source_account: muxed_source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       )
@@ -195,7 +195,7 @@ defmodule Stellar.TxBuild.TransactionTest do
     source_account: source_account,
     base_fee: base_fee,
     memo: memo,
-    time_bounds: time_bounds,
+    preconditions: preconditions,
     operations: operations
   } do
     sequence_number = SequenceNumber.new(4_130_487_228_432_385)
@@ -206,7 +206,7 @@ defmodule Stellar.TxBuild.TransactionTest do
         source_account: source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       )
@@ -218,7 +218,7 @@ defmodule Stellar.TxBuild.TransactionTest do
     muxed_source_account: muxed_source_account,
     base_fee: base_fee,
     memo: memo,
-    time_bounds: time_bounds,
+    preconditions: preconditions,
     operations: operations
   } do
     sequence_number = SequenceNumber.new(4_130_487_228_432_385)
@@ -229,7 +229,7 @@ defmodule Stellar.TxBuild.TransactionTest do
         source_account: muxed_source_account,
         sequence_number: sequence_number,
         base_fee: base_fee,
-        time_bounds: time_bounds,
+        preconditions: preconditions,
         memo: memo,
         operations: operations
       )

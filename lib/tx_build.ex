@@ -29,6 +29,9 @@ defmodule Stellar.TxBuild do
   def set_time_bounds(tx, time_bounds), do: impl().set_time_bounds(tx, time_bounds)
 
   @impl true
+  def set_preconditions(tx, preconditions), do: impl().set_preconditions(tx, preconditions)
+
+  @impl true
   def set_base_fee(tx, timeout), do: impl().set_base_fee(tx, timeout)
 
   @impl true
