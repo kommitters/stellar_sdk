@@ -36,6 +36,9 @@ defmodule Stellar.KeyPair do
   def raw_sha256_hash(sha256_hash), do: impl().raw_sha256_hash(sha256_hash)
 
   @impl true
+  def raw_signed_payload(signed_payload), do: impl().raw_signed_payload(signed_payload)
+
+  @impl true
   def sign(payload, secret), do: impl().sign(payload, secret)
 
   @impl true
@@ -56,6 +59,13 @@ defmodule Stellar.KeyPair do
 
   @impl true
   def validate_sha256_hash(sha256_hash), do: impl().validate_sha256_hash(sha256_hash)
+
+  @impl true
+  def validate_signed_payload(signed_payload), do: impl().validate_signed_payload(signed_payload)
+
+  @impl true
+  def signature_hint_for_signed_payload(public_key, payload),
+    do: impl().signature_hint_for_signed_payload(public_key, payload)
 
   @spec impl() :: atom()
   defp impl do

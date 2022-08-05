@@ -10,11 +10,14 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
     Signer,
     SignerKey,
     SignerKeyType,
+    SignerKeyEd25519SignedPayload,
     UInt32,
-    UInt256
+    UInt256,
+    VariableOpaque64
   }
 
   @type key :: String.t()
+  @type payload :: binary()
   @type account_id :: String.t()
   @type weight :: non_neg_integer()
 
@@ -51,6 +54,27 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
             164, 197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>
       },
       type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_PRE_AUTH_TX}
+    }
+  end
+
+  @spec ed25519_signed_payload_signer_key(key :: key()) :: SignerKey.t()
+  def ed25519_signed_payload_signer_key(
+        "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+      ) do
+    %SignerKey{
+      signer_key: %SignerKeyEd25519SignedPayload{
+        ed25519: %UInt256{
+          datum:
+            <<63, 12, 52, 191, 147, 173, 13, 153, 113, 208, 76, 204, 144, 247, 5, 81, 28, 131,
+              138, 173, 151, 52, 164, 162, 251, 13, 122, 3, 252, 127, 232, 154>>
+        },
+        payload: %VariableOpaque64{
+          opaque:
+            <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+              24, 25, 26, 27, 28, 29, 30, 31, 32>>
+        }
+      },
+      type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD}
     }
   end
 
@@ -94,6 +118,32 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
               164, 197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>
         },
         type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_PRE_AUTH_TX}
+      },
+      weight: %UInt32{datum: 2}
+    }
+  end
+
+  @spec ed25519_signed_payload_signer(key :: key(), weight :: weight()) ::
+          SignerKey.t()
+  def ed25519_signed_payload_signer(
+        "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM",
+        2
+      ) do
+    %Signer{
+      key: %SignerKey{
+        signer_key: %SignerKeyEd25519SignedPayload{
+          ed25519: %UInt256{
+            datum:
+              <<63, 12, 52, 191, 147, 173, 13, 153, 113, 208, 76, 204, 144, 247, 5, 81, 28, 131,
+                138, 173, 151, 52, 164, 162, 251, 13, 122, 3, 252, 127, 232, 154>>
+          },
+          payload: %VariableOpaque64{
+            opaque:
+              <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                24, 25, 26, 27, 28, 29, 30, 31, 32>>
+          }
+        },
+        type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD}
       },
       weight: %UInt32{datum: 2}
     }
@@ -177,6 +227,43 @@ defmodule Stellar.Test.Fixtures.XDR.Signatures do
               164, 197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>
         },
         type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_PRE_AUTH_TX}
+      }
+    }
+  end
+
+  @spec ed25519_signed_payload_revoke_sponsorship_signer(
+          account_id :: account_id(),
+          key :: key()
+        ) :: Signer.t()
+  def ed25519_signed_payload_revoke_sponsorship_signer(
+        "GDAE7O3YJMC7COEZLPJY6OY3P6WGHSHA3QZH2B456JXV4VDEJRAUSA35",
+        "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM"
+      ) do
+    %RevokeSponsorshipSigner{
+      account_id: %AccountID{
+        account_id: %PublicKey{
+          public_key: %UInt256{
+            datum:
+              <<192, 79, 187, 120, 75, 5, 241, 56, 153, 91, 211, 143, 59, 27, 127, 172, 99, 200,
+                224, 220, 50, 125, 7, 157, 242, 111, 94, 84, 100, 76, 65, 73>>
+          },
+          type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+        }
+      },
+      signer_key: %SignerKey{
+        signer_key: %SignerKeyEd25519SignedPayload{
+          ed25519: %UInt256{
+            datum:
+              <<63, 12, 52, 191, 147, 173, 13, 153, 113, 208, 76, 204, 144, 247, 5, 81, 28, 131,
+                138, 173, 151, 52, 164, 162, 251, 13, 122, 3, 252, 127, 232, 154>>
+          },
+          payload: %VariableOpaque64{
+            opaque:
+              <<1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                24, 25, 26, 27, 28, 29, 30, 31, 32>>
+          }
+        },
+        type: %SignerKeyType{identifier: :SIGNER_KEY_TYPE_ED25519_SIGNED_PAYLOAD}
       }
     }
   end

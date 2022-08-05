@@ -82,7 +82,7 @@ defmodule Stellar.Test.XDRFixtures do
   @type signer_type :: :ed25519 | :sha256_hash | :pre_auth_tx
   @type weight :: pos_integer() | nil
   @type flags :: list(atom()) | nil
-  @type optional_signer :: list() | nil
+  @type optional_signer :: tuple() | nil
   @type optional_string32 :: String.t() | nil
 
   @unit 10_000_000
