@@ -145,7 +145,7 @@ defmodule Stellar.KeyPair.DefaultTest do
     {:error, :invalid_signed_payload} = Default.validate_signed_payload("GCA")
   end
 
-  test "signature_hint_for_signed_payload/2 payload with 4 bytes", %{
+  test "signature_hint_for_signed_payload/2 payload with more than 4 bytes", %{
     encoded_public_key: encoded_public_key,
     payload: payload
   } do
@@ -157,5 +157,12 @@ defmodule Stellar.KeyPair.DefaultTest do
   } do
     <<187, 199, 56, 231>> =
       Default.signature_hint_for_signed_payload(encoded_public_key, <<30, 31, 32>>)
+  end
+
+  test "signature_hint_for_signed_payload/2 payload equal to 4 bytes", %{
+    encoded_public_key: encoded_public_key
+  } do
+    <<184, 198, 7, 199>> =
+      Default.signature_hint_for_signed_payload(encoded_public_key, <<29, 30, 31, 32>>)
   end
 end
