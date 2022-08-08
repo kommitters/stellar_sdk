@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.1 (08.08.2022)
+* Add scorecards actions
+
 ## 0.9.0 (05.08.2022)
 * Stellar protocol-19 support implementation.
 * Add optional fields for account records.
