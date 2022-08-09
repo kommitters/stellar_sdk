@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2 (09.08.2022)
+* Fix preconditions to allow minimum sequence number field to be optional.
+* Add stellar protocol 19 documentation.
+
 ## 0.9.1 (08.08.2022)
 * Add scorecards actions
 
