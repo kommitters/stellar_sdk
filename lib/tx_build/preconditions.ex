@@ -6,7 +6,8 @@ defmodule Stellar.TxBuild.Preconditions do
     TimeBounds,
     LedgerBounds,
     SequenceNumber,
-    SignerKey
+    SignerKey,
+    OptionalSequenceNumber
   }
 
   alias StellarBase.XDR.TimeBounds, as: TimeBoundsXDR
@@ -16,7 +17,6 @@ defmodule Stellar.TxBuild.Preconditions do
     PreconditionsV2,
     PreconditionType,
     Duration,
-    OptionalSequenceNumber,
     SignerKeyList,
     TimePoint,
     UInt32,
@@ -28,7 +28,7 @@ defmodule Stellar.TxBuild.Preconditions do
   @type precond_v2 :: [
           time_bounds: TimeBounds.t(),
           ledger_bounds: LedgerBounds.t(),
-          min_seq_num: SequenceNumber.t(),
+          min_seq_num: OptionalSequenceNumber.t(),
           min_seq_age: non_neg_integer(),
           min_seq_ledger_gap: non_neg_integer(),
           extra_signers: list(SignerKey.t())
@@ -63,7 +63,7 @@ defmodule Stellar.TxBuild.Preconditions do
 
     with {:ok, time_bounds} <- validate_time_bounds(time_bounds),
          {:ok, ledger_bounds} <- validate_ledger_bounds(ledger_bounds),
-         {:ok, min_seq_num} <- validate_min_seq_num(min_seq_num),
+         {:ok, min_seq_num} <- validate_optional_min_seq_num(min_seq_num),
          {:ok, min_seq_age} <- validate_min_seq_age(min_seq_age),
          {:ok, min_seq_ledger_gap} <- validate_min_seq_ledger_gap(min_seq_ledger_gap),
          {:ok, extra_signers} <- validate_extra_signers([], extra_signers) do
@@ -117,7 +117,7 @@ defmodule Stellar.TxBuild.Preconditions do
 
     time_bounds = TimeBounds.to_xdr(time_bounds)
     ledger_bounds = LedgerBounds.to_xdr(ledger_bounds)
-    min_seq_num = min_seq_num |> SequenceNumber.to_xdr() |> OptionalSequenceNumber.new()
+    min_seq_num = OptionalSequenceNumber.to_xdr(min_seq_num)
     min_seq_age = Duration.new(min_seq_age)
     min_seq_ledger_gap = UInt32.new(min_seq_ledger_gap)
     extra_signers_list = get_extra_signers_list(extra_signers)
@@ -150,11 +150,17 @@ defmodule Stellar.TxBuild.Preconditions do
 
   defp validate_ledger_bounds(_ledger_bounds), do: {:error, :invalid_ledger_bounds}
 
-  @spec validate_min_seq_num(min_seq_num :: SequenceNumber.t()) :: validation()
-  defp validate_min_seq_num(%SequenceNumber{} = min_seq_num),
-    do: {:ok, min_seq_num}
+  @spec validate_optional_min_seq_num(min_seq_num :: SequenceNumber.t() | nil) :: validation()
+  defp validate_optional_min_seq_num(nil),
+    do: {:ok, OptionalSequenceNumber.new()}
 
-  defp validate_min_seq_num(_min_seq_num), do: {:error, :invalid_min_seq_num}
+  defp validate_optional_min_seq_num(%SequenceNumber{} = min_seq_num),
+    do:
+      min_seq_num
+      |> OptionalSequenceNumber.new()
+      |> (&{:ok, &1}).()
+
+  defp validate_optional_min_seq_num(_min_seq_num), do: {:error, :invalid_min_seq_num}
 
   @spec validate_min_seq_age(min_seq_age :: non_neg_integer()) :: validation()
   defp validate_min_seq_age(min_seq_age)
