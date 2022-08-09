@@ -9,6 +9,12 @@ The **Stellar SDK** enables the construction, signing and encoding of Stellar [t
 
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
+#### Protocol Version Support
+| Protocol  | Version      | 
+| --------- | ------------ |
+| 18        | >= v0.8      |
+| 19        | >= v0.9      |
+
 ## Documentation
 The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
 * **`TxBuild`** - used for [**building transactions.**](#building-transactions)
@@ -102,7 +108,7 @@ source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQW
 Stellar.TxBuild.new(source_account)
 
 # initialize a transaction with options
-# allowed options: memo, sequence_number, base_fee, time_bounds
+# allowed options: memo, sequence_number, base_fee, preconditions
 Stellar.TxBuild.new(source_account, memo: memo, sequence_number: sequence_number)
 ```
 
@@ -169,12 +175,26 @@ base_fee = Stellar.TxBuild.BaseFee.new(1_000)
   |> Stellar.TxBuild.set_base_fee(base_fee)
 ```
 
-#### Time bounds
-[TimeBounds][stellar-docs-time-bounds] are optional UNIX timestamps (in seconds), determined by ledger time. A lower and upper bound of when this transaction will be valid.
+#### Preconditions
+Proposed on the [Stellar protocol-19][stellar-protocol-19] implementation, [Preconditions][stellar-docs-preconditions] are conditions that determines if a transaction is valid or not, and implements the following conditions:
+
+- **Time bounds**: [TimeBounds][stellar-docs-time-bounds] are optional UNIX timestamps (in seconds), determined by ledger time. A lower and upper bound of when this transaction will be valid.
+
+- **Ledger bounds**: [LedgerBounds][stellar-docs-ledger-bounds] are like Time Bounds, except they apply to ledger numbers. With them set, a transaction will only be valid for ledger numbers that fall into the range you set.
+
+- **Minimum Sequence Number**: [Minimum sequence number][stellar-docs-min-seq-num] if is set, the transaction will only be valid when `S` (the minimum sequence number) satisfies `minSeqNum <= S < tx.seqNum`. If is not set, the default behavior applies (the transaction’s sequence number must be exactly one greater than the account’s sequence number)
+
+- **Minimum Sequence Age**: [Minimum sequence age][stellar-docs-min-seq-age] is based on the account's [sequence number age][stellar-docs-account-seq-num-age]. When is set, the transaction is only valid after a particular duration (in seconds) elapses since the account’s sequence number age.
+
+- **Minimum Sequence Ledger Gap**: [Minimum sequence ledger gap][stellar-docs-min-seq-ledger-gap] is based on the account's [sequence number age][stellar-docs-account-seq-num-age], this is similar to the minimum sequence age, except it’s expressed as a number of ledgers rather than a duration of time.
+
+- **Extra Signers**: A transaction can specify up to two [Extra signers][stellar-docs-extra-signers] (of any type) even if those signatures would not otherwise be required to authorize the transaction.
 
 ```elixir
 # set the source account (this accound should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
+
+# TimeBounds ---------------------------------------------------------------------------
 
 # no time bounds for a transaction
 time_bounds = Stellar.TxBuild.TimeBounds.new(:none)
@@ -194,11 +214,43 @@ time_bounds = Stellar.TxBuild.TimeBounds.new(
 # timeout
 time_bounds = Stellar.TxBuild.TimeBounds.set_timeout(1_643_990_815)
 
-# set the time bounds for the transaction
+# LedgerBounds -------------------------------------------------------------------------
+
+# no ledger bounds for a transaction
+ledger_bounds = Stellar.TxBuild.LedgerBounds.new(:none)
+
+# ledger bounds with ledger numbers
+ledger_bounds = Stellar.TxBuild.LedgerBounds.new(min_ledger: 0, max_ledger: 1_234_567_890)
+
+# SequenceNumber -----------------------------------------------------------------------
+
+# minimum sequence number for a transaction with value 0
+min_seq_num = Stellar.TxBuild.SequenceNumber.new()
+
+# minimum sequence number
+min_seq_num = Stellar.TxBuild.SequenceNumber.new(1_000_000)
+
+# ExtraSigners
+
+extra_signers = ["GA2YG3YULNTUEMMLN4HUQVL7B37GJTYSRZYH6HZUFLXFDCCGKLXIXMDT"]
+
+# Preconditions ------------------------------------------------------------------------
+
+preconditions =
+  Stellar.TxBuild.Preconditions.new(
+    time_bounds: time_bounds,
+    ledger_bounds: ledger_bounds,
+    min_seq_num: min_seq_num,
+    min_seq_age: 30,
+    min_seq_ledger_gap: 5,
+    extra_signers: extra_signers
+  )
+
+# set the preconditions for the transaction
 {:ok, tx_build} =
   source_account
   |> Stellar.TxBuild.new()
-  |> Stellar.TxBuild.set_time_bounds(time_bounds)
+  |> Stellar.TxBuild.set_preconditions(preconditions)
 ```
 
 #### Operations
@@ -785,8 +837,16 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [stellar-docs-sequence-number]: https://developers.stellar.org/docs/glossary/transactions/#sequence-number
 [stellar-docs-fee]: https://developers.stellar.org/docs/glossary/transactions/#fee
 [stellar-docs-memo]: https://developers.stellar.org/docs/glossary/transactions/#memo
+[stellar-docs-preconditions]: https://developers.stellar.org/docs/glossary/transactions/#validity-conditions
 [stellar-docs-time-bounds]: https://developers.stellar.org/docs/glossary/transactions/#time-bounds
+[stellar-docs-ledger-bounds]: https://developers.stellar.org/docs/glossary/transactions/#ledger-bounds
+[stellar-docs-min-seq-num]: https://developers.stellar.org/docs/glossary/transactions/#minimum-sequence-number
+[stellar-docs-min-seq-age]: https://developers.stellar.org/docs/glossary/transactions/#minimum-sequence-age
+[stellar-docs-min-seq-ledger-gap]: https://developers.stellar.org/docs/glossary/transactions/#minimum-sequence-ledger-gap
+[stellar-docs-extra-signers]: https://developers.stellar.org/docs/glossary/transactions/#extra-signers
 [stellar-docs-tx-envelope]: https://developers.stellar.org/docs/glossary/transactions/#transaction-envelopes
 [stellar-docs-list-operations]: https://developers.stellar.org/docs/start/list-of-operations
 [stellar-docs-tx-signatures]: https://developers.stellar.org/docs/glossary/multisig/#transaction-signatures
 [stellar-cap-27]: https://stellar.org/protocol/cap-27
+[stellar-protocol-19]: https://stellar.org/blog/announcing-protocol-19
+[stellar-docs-account-seq-num-age]: https://developers.stellar.org/docs/glossary/accounts/#sequence-time-and-ledger
