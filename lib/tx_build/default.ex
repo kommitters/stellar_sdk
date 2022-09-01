@@ -20,13 +20,26 @@ defmodule Stellar.TxBuild.Default do
 
   @behaviour Stellar.TxBuild.Spec
 
+  @preconditions_keys [
+    :time_bounds,
+    :ledger_bounds,
+    :min_seq_num,
+    :min_seq_age,
+    :min_seq_ledger_gap,
+    :extra_signers
+  ]
+
   @impl true
   def new(%Account{} = source_account, opts) do
     sequence_number = Keyword.get(opts, :sequence_number, SequenceNumber.new())
     base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
-    preconditions = Keyword.get(opts, :preconditions, Preconditions.new())
     memo = Keyword.get(opts, :memo, Memo.new())
     operations = Keyword.get(opts, :operations, Operations.new())
+
+    preconditions =
+      opts
+      |> Enum.filter(fn {key, _value} -> key in @preconditions_keys end)
+      |> Preconditions.new()
 
     case Transaction.new(
            source_account: source_account,

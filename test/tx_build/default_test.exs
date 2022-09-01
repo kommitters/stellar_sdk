@@ -17,7 +17,8 @@ defmodule Stellar.TxBuild.DefaultTest do
     Signature,
     TimeBounds,
     Transaction,
-    TransactionEnvelope
+    TransactionEnvelope,
+    OptionalSequenceNumber
   }
 
   setup do
@@ -98,8 +99,45 @@ defmodule Stellar.TxBuild.DefaultTest do
       )
   end
 
+  test "new/2 with preconditions with only time_bounds for precond_time", %{
+    source_account: source_account
+  } do
+    time_bounds = TimeBounds.new(min_time: 123, max_time: 321)
+
+    {:ok,
+     %TxBuild{
+       tx: %Transaction{
+         preconditions: %{type: :precond_time, preconditions: ^time_bounds}
+       }
+     }} = TxBuild.new(source_account, time_bounds: time_bounds)
+  end
+
+  test "new/2 with preconditions with ledger_bounds and time_bounds for precond_v2", %{
+    source_account: source_account
+  } do
+    time_bounds = TimeBounds.new(min_time: 123, max_time: 321)
+    ledger_bounds = LedgerBounds.new(min_ledger: 123, max_ledger: 456)
+
+    {:ok,
+     %TxBuild{
+       tx: %Transaction{
+         preconditions: %{
+           type: :precond_v2,
+           preconditions: [
+             time_bounds: ^time_bounds,
+             ledger_bounds: ^ledger_bounds,
+             min_seq_num: %OptionalSequenceNumber{sequence_number: nil},
+             min_seq_age: 0,
+             min_seq_ledger_gap: 0,
+             extra_signers: []
+           ]
+         }
+       }
+     }} = TxBuild.new(source_account, time_bounds: time_bounds, ledger_bounds: ledger_bounds)
+  end
+
   test "new/2 with_bad_options", %{source_account: source_account} do
-    {:error, :invalid_preconditions} = TxBuild.new(source_account, preconditions: [])
+    {:error, :invalid_preconditions} = TxBuild.new(source_account, time_bounds: [])
   end
 
   test "new/2 invalid_source_account" do
