@@ -59,7 +59,7 @@ defmodule Stellar.TxBuild.Preconditions do
     min_seq_num = Keyword.get(preconditions, :min_seq_num)
     min_seq_age = Keyword.get(preconditions, :min_seq_age, 0)
     min_seq_ledger_gap = Keyword.get(preconditions, :min_seq_ledger_gap, 0)
-    extra_signers = Keyword.get(preconditions, :extra_signers)
+    extra_signers = Keyword.get(preconditions, :extra_signers, [])
 
     with {:ok, time_bounds} <- validate_time_bounds(time_bounds),
          {:ok, ledger_bounds} <- validate_ledger_bounds(ledger_bounds),
