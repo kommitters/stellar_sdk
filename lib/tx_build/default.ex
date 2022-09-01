@@ -38,7 +38,7 @@ defmodule Stellar.TxBuild.Default do
 
     preconditions =
       opts
-      |> Enum.filter(fn {key, _value} -> key in @preconditions_keys end)
+      |> Keyword.take(@preconditions_keys)
       |> Preconditions.new()
 
     case Transaction.new(
