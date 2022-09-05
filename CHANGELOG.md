@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3 (05.09.2022)
+* Fix bug in `SetOptions` when setting a signer.
+* Fix bug in `TimeBounds` to allow backward compatibility (merged with preconditions).
+
 ## 0.9.2 (09.08.2022)
 * Fix preconditions to allow minimum sequence number field to be optional.
 * Add stellar protocol 19 documentation.
@@ -13,7 +17,7 @@
 * Add CAP-21 preconditions for transaction attributes.
 * Add CAP-40 decorate signature hint and support for signed payload signature.
 * Refactor signer key signatures implementation.
-* Remove unused alias in tests and fix documentation examples. 
+* Remove unused alias in tests and fix documentation examples.
 * Add Trade Agreggations endpoint.
 
 ## 0.8.1 (28.07.2022)

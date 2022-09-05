@@ -10,7 +10,7 @@ The **Stellar SDK** enables the construction, signing and encoding of Stellar [t
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
 #### Protocol Version Support
-| Protocol  | Version      | 
+| Protocol  | Version      |
 | --------- | ------------ |
 | 18        | >= v0.8      |
 | 19        | >= v0.9      |
@@ -27,7 +27,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.9.2"}
+    {:stellar_sdk, "~> 0.9.3"}
   ]
 end
 ```
