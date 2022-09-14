@@ -13,8 +13,10 @@ defmodule Stellar.Horizon.Operation.CreateAccountTest do
     }
   end
 
-  test "new/2", %{attrs: %{account: account, funder: funder} = attrs} do
-    %CreateAccount{starting_balance: 2.0, account: ^account, funder: ^funder} =
+  test "new/2", %{
+    attrs: %{starting_balance: starting_balance, account: account, funder: funder} = attrs
+  } do
+    %CreateAccount{starting_balance: ^starting_balance, account: ^account, funder: ^funder} =
       CreateAccount.new(attrs)
   end
 

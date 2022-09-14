@@ -29,8 +29,7 @@ defmodule Stellar.Horizon.Effect do
 
   @mapping [
     type_i: :integer,
-    created_at: :date_time,
-    attributes: {:map, [amount: :float, starting_balance: :float]}
+    created_at: :date_time
   ]
 
   @impl true

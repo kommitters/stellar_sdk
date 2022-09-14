@@ -8,12 +8,12 @@ defmodule Stellar.Horizon.Operation.PathPaymentStrictReceive do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          asset_type: float(),
+          asset_type: String.t(),
           asset_code: String.t(),
           asset_issuer: String.t(),
           from: String.t(),
           to: String.t(),
-          amount: float(),
+          amount: String.t(),
           path: list(map()),
           source_amount: String.t(),
           source_max: String.t(),
@@ -37,14 +37,10 @@ defmodule Stellar.Horizon.Operation.PathPaymentStrictReceive do
     :source_asset_issuer
   ]
 
-  @mapping [amount: :float, source_amount: :float, source_max: :float]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

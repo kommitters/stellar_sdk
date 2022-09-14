@@ -110,7 +110,7 @@ defmodule Stellar.Horizon.LedgersTest do
        base_reserve_in_stroops: 100_000_000,
        closed_at: ~U[2015-09-30 17:16:29Z],
        failed_transaction_count: 0,
-       fee_pool: 3.0e-5,
+       fee_pool: "0.0000300",
        hash: "31c33314a9d6f1d1e07040029f56403fc410829a45dfe9cc662c6b2dce8f53b3",
        header_xdr: "AAAAAdofgbAA===",
        id: "31c33314a9d6f1d1e07040029f56403fc410829a45dfe9cc662c6b2dce8f53b3",
@@ -121,7 +121,7 @@ defmodule Stellar.Horizon.LedgersTest do
        protocol_version: 1,
        sequence: 10,
        successful_transaction_count: 0,
-       total_coins: 1.0e11,
+       total_coins: "100000000000.0000000",
        tx_set_operation_count: 0
      }} = Ledgers.retrieve(ledger_sequence)
   end
@@ -197,16 +197,16 @@ defmodule Stellar.Horizon.LedgersTest do
      %Collection{
        records: [
          %Operation{
-           body: %Payment{amount: 0.0000001},
+           body: %Payment{amount: "0.0000001"},
            type: "payment"
          },
          %Operation{
-           body: %Payment{amount: 1.0},
+           body: %Payment{amount: "1.0000000"},
            type: "payment",
            type_i: 1
          },
          %Operation{
-           body: %Payment{amount: 1.0},
+           body: %Payment{amount: "1.0000000"},
            type: "payment",
            type_i: 1
          }

@@ -18,8 +18,8 @@ defmodule Stellar.Horizon.Ledger do
           operation_count: non_neg_integer(),
           tx_set_operation_count: non_neg_integer(),
           closed_at: DateTime.t(),
-          total_coins: float(),
-          fee_pool: float(),
+          total_coins: String.t(),
+          fee_pool: String.t(),
           base_fee_in_stroops: non_neg_integer(),
           base_reserve_in_stroops: non_neg_integer(),
           max_tx_set_size: non_neg_integer(),
@@ -49,8 +49,6 @@ defmodule Stellar.Horizon.Ledger do
 
   @mapping [
     closed_at: :date_time,
-    total_coins: :float,
-    fee_pool: :float,
     sequence: :integer,
     successful_transaction_count: :integer,
     failed_transaction_count: :integer,

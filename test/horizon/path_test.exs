@@ -13,7 +13,7 @@ defmodule Stellar.Horizon.PathTest do
 
   test "new/2", %{attrs: attrs} do
     %Path{
-      destination_amount: 5.0,
+      destination_amount: "5.0000000",
       destination_asset_code: "BB1",
       destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
       destination_asset_type: "credit_alphanum4",
@@ -25,7 +25,7 @@ defmodule Stellar.Horizon.PathTest do
         },
         %{asset_type: "native"}
       ],
-      source_amount: 4.1900246,
+      source_amount: "4.1900246",
       source_asset_code: "USD",
       source_asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
       source_asset_type: "credit_alphanum4"

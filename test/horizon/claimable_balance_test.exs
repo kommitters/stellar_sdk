@@ -15,7 +15,7 @@ defmodule Stellar.Horizon.ClaimableBalanceTest do
     %ClaimableBalance{
       id: "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072",
       asset: "native",
-      amount: 10.0000000,
+      amount: "10.0000000",
       claimants: [
         %{
           destination: "GC3C4AKRBQLHOJ45U4XG35ESVWRDECWO5XLDGYADO6DPR3L7KIDVUMML",

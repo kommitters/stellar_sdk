@@ -8,8 +8,8 @@ defmodule Stellar.Horizon.Operation.CreatePassiveSellOffer do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          amount: float(),
-          price: float(),
+          amount: String.t(),
+          price: String.t(),
           price_r: map(),
           buying_asset_type: String.t(),
           buying_asset_issuer: String.t(),
@@ -33,14 +33,10 @@ defmodule Stellar.Horizon.Operation.CreatePassiveSellOffer do
     :offer_id
   ]
 
-  @mapping [amount: :float, price: :float]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

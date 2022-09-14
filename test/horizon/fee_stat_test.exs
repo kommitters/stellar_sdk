@@ -31,7 +31,7 @@ defmodule Stellar.Horizon.FeeStatTest do
       },
       last_ledger: 155_545,
       last_ledger_base_fee: 100,
-      ledger_capacity_usage: 0.01,
+      ledger_capacity_usage: "0.01",
       max_fee: %{
         max: "100",
         min: "100",

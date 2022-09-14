@@ -11,7 +11,7 @@ defmodule Stellar.Horizon.ClaimableBalance do
           id: String.t(),
           paging_token: String.t(),
           asset: String.t(),
-          amount: float(),
+          amount: String.t(),
           sponsor: String.t() | nil,
           last_modified_ledger: non_neg_integer(),
           last_modified_time: DateTime.t(),
@@ -30,7 +30,6 @@ defmodule Stellar.Horizon.ClaimableBalance do
   ]
 
   @mapping [
-    amount: :float,
     last_modified_ledger: :integer,
     last_modified_time: :date_time
   ]

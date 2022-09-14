@@ -11,11 +11,11 @@ defmodule Stellar.Horizon.Path do
           source_asset_type: String.t(),
           source_asset_code: String.t(),
           source_asset_issuer: String.t(),
-          source_amount: float(),
+          source_amount: String.t(),
           destination_asset_type: String.t(),
           destination_asset_code: String.t(),
           destination_asset_issuer: String.t(),
-          destination_amount: float(),
+          destination_amount: String.t(),
           path: list(map())
         }
 
@@ -31,17 +31,10 @@ defmodule Stellar.Horizon.Path do
     :path
   ]
 
-  @mapping [
-    source_amount: :float,
-    destination_amount: :float
-  ]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

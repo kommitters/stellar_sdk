@@ -195,7 +195,7 @@ defmodule Stellar.Horizon.AccountsTest do
            asset_code: nil,
            asset_issuer: nil,
            asset_type: "native",
-           balance: 100.99983
+           balance: "100.9998300"
          }
        ],
        data: %{NFT: "QkdFR0ZFVEVHRUhIRUVI"},
@@ -265,7 +265,7 @@ defmodule Stellar.Horizon.AccountsTest do
              asset_code: "BTCN",
              asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
            },
-           amount: 214.9999939
+           amount: "214.9999939"
          },
          %Offer{
            seller: ^account_id,
@@ -274,7 +274,7 @@ defmodule Stellar.Horizon.AccountsTest do
              asset_code: "BTCN",
              asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
            },
-           amount: 24.9999990
+           amount: "24.9999990"
          }
        ]
      }} = Accounts.list_offers(account_id)
@@ -287,17 +287,17 @@ defmodule Stellar.Horizon.AccountsTest do
          %Trade{
            base_offer_id: 165_561_423,
            counter_account: ^account_id,
-           base_amount: 4433.20
+           base_amount: "4433.2000000"
          },
          %Trade{
            base_offer_id: 165_561_423,
            counter_account: ^account_id,
-           base_amount: 10.0
+           base_amount: "10.0000000"
          },
          %Trade{
            base_offer_id: 165_561_423,
            counter_account: ^account_id,
-           base_amount: 748.5338945
+           base_amount: "748.5338945"
          }
        ]
      }} = Accounts.list_trades(account_id)
@@ -358,16 +358,16 @@ defmodule Stellar.Horizon.AccountsTest do
        records: [
          %Operation{
            source_account: ^account_id,
-           body: %Payment{from: ^account_id, amount: 0.0000001},
+           body: %Payment{from: ^account_id, amount: "0.0000001"},
            type: "payment"
          },
          %Operation{
-           body: %Payment{to: ^account_id, amount: 1.0},
+           body: %Payment{to: ^account_id, amount: "1.0000000"},
            type: "payment",
            type_i: 1
          },
          %Operation{
-           body: %Payment{to: ^account_id, amount: 1.0},
+           body: %Payment{to: ^account_id, amount: "1.0000000"},
            type: "payment",
            type_i: 1
          }

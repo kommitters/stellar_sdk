@@ -68,13 +68,13 @@ defmodule Stellar.Horizon.OffersTest do
   test "retrieve/1", %{offer_id: offer_id} do
     {:ok,
      %Offer{
-       amount: 18_421.4486092,
+       amount: "18421.4486092",
        buying: %{asset_type: "native"},
        id: 165_561_423,
        last_modified_ledger: 28_411_995,
        last_modified_time: ~U[2020-02-26 19:29:16Z],
        paging_token: "165561423",
-       price: 0.0479171,
+       price: "0.0479171",
        price_r: %{d: 941_460_545, n: 45_112_058},
        seller: "GCK4WSNF3F6ZNCMK6BU77ZCZ3NMF3JGU2U3ZAPKXYBKYYCJA72FDBY7K",
        selling: %{
@@ -97,7 +97,7 @@ defmodule Stellar.Horizon.OffersTest do
              asset_code: "BTCN",
              asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
            },
-           price: 0.1162791
+           price: "0.1162791"
          },
          %Offer{
            id: 164_943_216,
@@ -106,7 +106,7 @@ defmodule Stellar.Horizon.OffersTest do
              asset_code: "BTCN",
              asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
            },
-           price: 12.8899964
+           price: "12.8899964"
          }
        ]
      }} = Offers.all()
@@ -116,9 +116,9 @@ defmodule Stellar.Horizon.OffersTest do
     {:ok,
      %Collection{
        records: [
-         %Trade{base_offer_id: ^offer_id, base_amount: 4433.20},
-         %Trade{base_offer_id: ^offer_id, base_amount: 10.0},
-         %Trade{base_offer_id: ^offer_id, base_amount: 748.5338945}
+         %Trade{base_offer_id: ^offer_id, base_amount: "4433.2000000"},
+         %Trade{base_offer_id: ^offer_id, base_amount: "10.0000000"},
+         %Trade{base_offer_id: ^offer_id, base_amount: "748.5338945"}
        ]
      }} = Offers.list_trades(offer_id)
   end

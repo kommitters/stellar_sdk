@@ -101,13 +101,13 @@ defmodule Stellar.Horizon.OperationsTest do
     {:ok,
      %Operation{
        body: %PathPaymentStrictSend{
-         amount: 26.5544244,
+         amount: "26.5544244",
          asset_code: "BRL",
          asset_issuer: "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
          asset_type: "credit_alphanum4",
-         destination_min: 26.5544244,
+         destination_min: "26.5544244",
          from: "GBZH7S5NC57XNHKHJ75C5DGMI3SP6ZFJLIKW74K6OSMA5E5DFMYBDD2Z",
-         source_amount: 5.0,
+         source_amount: "5.0000000",
          source_asset_code: "USD",
          source_asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
          source_asset_type: "credit_alphanum4",
@@ -143,7 +143,7 @@ defmodule Stellar.Horizon.OperationsTest do
          },
          %Operation{
            body: %Payment{
-             amount: 99_999_999_959.99997,
+             amount: "99999999959.9999700",
              asset_code: nil,
              asset_issuer: nil,
              asset_type: "native",
@@ -164,7 +164,7 @@ defmodule Stellar.Horizon.OperationsTest do
            body: %CreateAccount{
              account: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
              funder: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
-             starting_balance: 20.0
+             starting_balance: "20.0000000"
            },
            created_at: ~U[2015-09-30 17:15:54Z],
            id: 12_884_905_985,
@@ -197,18 +197,18 @@ defmodule Stellar.Horizon.OperationsTest do
        records: [
          %Operation{
            id: 165_248_737_866_100_737,
-           body: %Payment{amount: 0.0000001},
+           body: %Payment{amount: "0.0000001"},
            type: "payment"
          },
          %Operation{
            id: 164_316_377_777_254_401,
-           body: %Payment{amount: 1.0},
+           body: %Payment{amount: "1.0000000"},
            type: "payment",
            type_i: 1
          },
          %Operation{
            id: 163_385_576_757_178_369,
-           body: %Payment{amount: 1.0},
+           body: %Payment{amount: "1.0000000"},
            type: "payment",
            type_i: 1
          }

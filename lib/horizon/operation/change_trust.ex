@@ -11,7 +11,7 @@ defmodule Stellar.Horizon.Operation.ChangeTrust do
           asset_type: String.t(),
           asset_code: String.t(),
           asset_issuer: String.t(),
-          limit: float(),
+          limit: String.t(),
           trustee: String.t(),
           trustor: String.t(),
           liquidity_pool_id: String.t()
@@ -27,14 +27,10 @@ defmodule Stellar.Horizon.Operation.ChangeTrust do
     :liquidity_pool_id
   ]
 
-  @mapping [limit: :float]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

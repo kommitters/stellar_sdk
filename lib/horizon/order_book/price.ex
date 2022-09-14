@@ -9,8 +9,8 @@ defmodule Stellar.Horizon.OrderBook.Price do
 
   @type t :: %__MODULE__{
           price_r: map(),
-          price: float(),
-          amount: float()
+          price: String.t(),
+          amount: String.t()
         }
 
   defstruct [
@@ -19,17 +19,10 @@ defmodule Stellar.Horizon.OrderBook.Price do
     :amount
   ]
 
-  @mapping [
-    price: :float,
-    amount: :float
-  ]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

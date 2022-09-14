@@ -15,14 +15,14 @@ defmodule Stellar.Horizon.Trade do
           base_account: String.t() | nil,
           base_offer_id: String.t() | nil,
           base_liquidity_pool_id: String.t() | nil,
-          base_amount: float(),
+          base_amount: String.t(),
           base_asset_type: String.t(),
           base_asset_code: String.t(),
           base_asset_issuer: String.t(),
           counter_account: String.t() | nil,
           counter_offer_id: String.t() | nil,
           counter_liquidity_pool_id: String.t() | nil,
-          counter_amount: float(),
+          counter_amount: String.t(),
           counter_asset_type: String.t(),
           counter_asset_code: String.t(),
           counter_asset_issuer: String.t(),
@@ -55,9 +55,7 @@ defmodule Stellar.Horizon.Trade do
 
   @mapping [
     base_offer_id: :integer,
-    ledger_close_time: :date_time,
-    base_amount: :float,
-    counter_amount: :float
+    ledger_close_time: :date_time
   ]
 
   @impl true

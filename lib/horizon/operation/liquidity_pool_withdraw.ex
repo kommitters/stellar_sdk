@@ -16,11 +16,7 @@ defmodule Stellar.Horizon.Operation.LiquidityPoolWithdraw do
 
   defstruct [:liquidity_pool_id, :reserves_min, :shares, :reserves_received]
 
-  @mapping [
-    shares: :integer,
-    reserves_received: {:list, :map, [amount: :float]},
-    reserves_min: {:list, :map, [amount: :float]}
-  ]
+  @mapping [shares: :integer]
 
   @impl true
   def new(attrs, opts \\ [])

@@ -17,14 +17,16 @@ defmodule Stellar.Horizon.Operation.PaymentTest do
   end
 
   test "new/2", %{
-    attrs: %{asset_type: asset_type, asset_code: asset_code, from: from, to: to} = attrs
+    attrs:
+      %{asset_type: asset_type, asset_code: asset_code, from: from, to: to, amount: amount} =
+        attrs
   } do
     %Payment{
       asset_type: ^asset_type,
       asset_code: ^asset_code,
       from: ^from,
       to: ^to,
-      amount: 5.02675
+      amount: ^amount
     } = Payment.new(attrs)
   end
 

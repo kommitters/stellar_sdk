@@ -15,8 +15,6 @@ defmodule Stellar.Horizon.Transaction.LedgerBounds do
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse([])
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end
