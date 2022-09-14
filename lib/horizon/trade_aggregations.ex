@@ -21,8 +21,8 @@ defmodule Stellar.Horizon.TradeAggregations do
 
     ## Parameters
 
-      * `base_asset`: :native or [code: `base_asset_code`, issuer: `base_asset_issuer`]
-      * `counter_asset`: :native or [code: `counter_asset_code`, issuer: `counter_asset_issuer`]
+      * `base_asset`: `:native` or `[code: "base_asset_code", issuer: "base_asset_issuer"]`
+      * `counter_asset`: `:native` or `[code: "counter_asset_code", issuer: "counter_asset_issuer"]`
       * `resolution`: The segment duration represented as milliseconds.
 
     ## Options

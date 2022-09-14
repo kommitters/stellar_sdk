@@ -45,12 +45,8 @@ defmodule Stellar.Horizon.Offers do
 
     * `sponsor`: The account ID of the sponsor who is paying the reserves for all the offers included in the response.
     * `seller`: The account ID of the offer creator.
-    * `selling_asset_type`: The type for the selling asset. Either `native`, `credit_alphanum4`, or `credit_alphanum12`.
-    * `selling_asset_issuer`: The account ID of the selling asset’s issuer.
-    * `selling_asset_code`: The code for the selling asset.
-    * `buying_asset_type`: The type for the buying asset. Either `native`, `credit_alphanum4`, or `credit_alphanum12`.
-    * `buying_asset_issuer`: The account ID of the buying asset’s issuer.
-    * `buying_asset_code`: The code for the buying asset.
+    * `selling_asset`: `:native` or [code: "selling_asset_code", issuer: "selling_asset_issuer"]`.
+    * `buying_asset`: `:native` or [code: "buying_asset_code", issuer: "buying_asset_issuer"]`.
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
     * `order`: A designation of the order in which records should appear. Options include `asc` (ascending) or `desc` (descending).
     * `limit`: The maximum number of records returned. The limit can range from 1 to 200. Defaults to 10.
@@ -68,12 +64,24 @@ defmodule Stellar.Horizon.Offers do
       iex> Offers.all(seller: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
       {:ok, %Collection{records: [%Offer{}, ...]}}
 
-      # list by selling_asset_issuer
-      iex> Offers.all(selling_asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      # list by selling_asset
+      iex> Offers.all(
+        selling_asset: [
+          code: "TEST",
+          issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+        ],
+        limit: 20
+      )
       {:ok, %Collection{records: [%Offer{}, ...]}}
 
-      # list by buying_asset_type and buying_asset_code
-      iex> Offers.all(buying_asset_type: "credit_alphanum4", buying_asset_code: "TEST")
+      # list by buying_asset
+      iex> Offers.all(
+        buying_asset: [
+          code: "TEST",
+          issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+        ],
+        limit: 20
+      )
       {:ok, %Collection{records: [%Offer{}, ...]}}
   """
   @spec all(options :: options()) :: response()
@@ -83,7 +91,6 @@ defmodule Stellar.Horizon.Offers do
 
     params =
       options
-      |> Keyword.take([:limit])
       |> Keyword.merge(selling_asset)
       |> Keyword.merge(buying_asset)
 
