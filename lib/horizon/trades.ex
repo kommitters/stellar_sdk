@@ -8,7 +8,7 @@ defmodule Stellar.Horizon.Trades do
   Horizon API reference: https://developers.stellar.org/api/resources/trades/
   """
 
-  alias Stellar.Horizon.{Collection, Error, Request, Trade}
+  alias Stellar.Horizon.{Collection, Error, Request, Trade, RequestParams}
 
   @type options :: Keyword.t()
   @type resource :: Trade.t() | Collection.t()
@@ -56,9 +56,18 @@ defmodule Stellar.Horizon.Trades do
   """
   @spec all(options :: options()) :: response()
   def all(options \\ []) do
+    base_asset = RequestParams.build_assets_params(options, :base_asset)
+    counter_asset = RequestParams.build_assets_params(options, :counter_asset)
+
+    params =
+      options
+      |> Keyword.take([:limit])
+      |> Keyword.merge(base_asset)
+      |> Keyword.merge(counter_asset)
+
     :get
     |> Request.new(@endpoint)
-    |> Request.add_query(options, extra_params: allowed_query_options())
+    |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
     |> Request.results(collection: {Trade, &all/1})
   end

@@ -10,7 +10,7 @@ defmodule Stellar.Horizon.Offers do
   Horizon API reference: https://developers.stellar.org/api/resources/offers/
   """
 
-  alias Stellar.Horizon.{Collection, Error, Offer, Request, Trade}
+  alias Stellar.Horizon.{Collection, Error, Offer, Request, Trade, RequestParams}
 
   @type offer_id :: String.t()
   @type options :: Keyword.t()
@@ -78,9 +78,18 @@ defmodule Stellar.Horizon.Offers do
   """
   @spec all(options :: options()) :: response()
   def all(options \\ []) do
+    selling_asset = RequestParams.build_assets_params(options, :selling_asset)
+    buying_asset = RequestParams.build_assets_params(options, :buying_asset)
+
+    params =
+      options
+      |> Keyword.take([:limit])
+      |> Keyword.merge(selling_asset)
+      |> Keyword.merge(buying_asset)
+
     :get
     |> Request.new(@endpoint)
-    |> Request.add_query(options, extra_params: allowed_query_options())
+    |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
     |> Request.results(collection: {Offer, &all/1})
   end
