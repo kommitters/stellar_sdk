@@ -38,22 +38,13 @@ defmodule Stellar.Horizon.Trades do
       iex> Trades.all(offer_id: 165563085)
       {:ok, %Collection{records: [%Trade{}, ...]}}
 
-      # list by base_asset
+      # list by specific orderbook
       iex> Trades.all(
         base_asset: [
           code: "TEST",
           issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
         ],
-        limit: 20
-      )
-      {:ok, %Collection{records: [%Trade{}, ...]}}
-
-      # list by counter_asset
-      iex> Trades.all(
-        counter_asset: [
-          code: "TEST",
-          issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
-        ],
+        counter_asset: :native,
         limit: 20
       )
       {:ok, %Collection{records: [%Trade{}, ...]}}
