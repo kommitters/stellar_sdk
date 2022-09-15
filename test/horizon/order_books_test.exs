@@ -62,26 +62,26 @@ defmodule Stellar.Horizon.OrderBooksTest do
      %OrderBook{
        asks: [
          %Price{
-           amount: 8057.2710223,
-           price: 0.0590815,
+           amount: "8057.2710223",
+           price: "0.0590815",
            price_r: %{d: 2_000_000, n: 118_163}
          },
          %Price{
-           amount: 1.0e4,
-           price: 0.060627,
+           amount: "10000.0000000",
+           price: "0.0606270",
            price_r: %{d: 1_000_000, n: 60_627}
          }
        ],
        base: %{asset_type: "native"},
        bids: [
          %Price{
-           amount: 0.1722469,
-           price: 0.058808,
+           amount: "0.1722469",
+           price: "0.0588080",
            price_r: %{d: 102_275_119, n: 6_014_600}
          },
          %Price{
-           amount: 0.2991796,
-           price: 0.0572577,
+           amount: "0.2991796",
+           price: "0.0572577",
            price_r: %{d: 21_831_117, n: 1_250_000}
          }
        ],

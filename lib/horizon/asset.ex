@@ -15,8 +15,8 @@ defmodule Stellar.Horizon.Asset do
           accounts: map(),
           num_claimable_balances: non_neg_integer(),
           balances: map(),
-          claimable_balances_amount: float(),
-          amount: float(),
+          claimable_balances_amount: String.t(),
+          amount: String.t(),
           num_accounts: non_neg_integer(),
           flags: map()
         }
@@ -35,18 +35,9 @@ defmodule Stellar.Horizon.Asset do
     :flags
   ]
 
-  @balances_mapping [
-    authorized: :float,
-    authorized_to_maintain_liabilities: :float,
-    unauthorized: :float
-  ]
-
   @mapping [
     num_claimable_balances: :integer,
-    claimable_balances_amount: :float,
-    amount: :float,
-    num_accounts: :integer,
-    balances: {:map, @balances_mapping}
+    num_accounts: :integer
   ]
 
   @impl true

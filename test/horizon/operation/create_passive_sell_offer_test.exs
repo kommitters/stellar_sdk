@@ -25,6 +25,8 @@ defmodule Stellar.Horizon.Operation.CreatePassiveSellOfferTest do
   test "new/2", %{
     attrs:
       %{
+        amount: amount,
+        price: price,
         price_r: price_r,
         buying_asset_type: buying_asset_type,
         buying_asset_code: buying_asset_code,
@@ -35,8 +37,8 @@ defmodule Stellar.Horizon.Operation.CreatePassiveSellOfferTest do
       } = attrs
   } do
     %CreatePassiveSellOffer{
-      amount: 1.0,
-      price: 1.0,
+      amount: ^amount,
+      price: ^price,
       price_r: ^price_r,
       buying_asset_type: ^buying_asset_type,
       buying_asset_code: ^buying_asset_code,

@@ -15,7 +15,7 @@ defmodule Stellar.Horizon.PathsTest do
     %Paths{
       records: [
         %Path{
-          destination_amount: 5.0,
+          destination_amount: "5.0000000",
           destination_asset_code: "BB1",
           destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
           destination_asset_type: "credit_alphanum4",
@@ -27,13 +27,13 @@ defmodule Stellar.Horizon.PathsTest do
             },
             %{asset_type: "native"}
           ],
-          source_amount: 28.9871131,
+          source_amount: "28.9871131",
           source_asset_code: "CNY",
           source_asset_issuer: "GAREELUB43IRHWEASCFBLKHURCGMHE5IF6XSE7EXDLACYHGRHM43RFOX",
           source_asset_type: "credit_alphanum4"
         },
         %Path{
-          destination_amount: 5.0,
+          destination_amount: "5.0000000",
           destination_asset_code: "BB1",
           destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
           destination_asset_type: "credit_alphanum4",
@@ -45,7 +45,7 @@ defmodule Stellar.Horizon.PathsTest do
             },
             %{asset_type: "native"}
           ],
-          source_amount: 29.0722784,
+          source_amount: "29.0722784",
           source_asset_code: "CNY",
           source_asset_issuer: "GAREELUB43IRHWEASCFBLKHURCGMHE5IF6XSE7EXDLACYHGRHM43RFOX",
           source_asset_type: "credit_alphanum4"

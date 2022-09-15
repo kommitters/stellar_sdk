@@ -71,7 +71,7 @@ defmodule Stellar.Horizon.TradesTest do
        records: [
          %Trade{
            base_account: "GCO7OW5P2PP7WDN6YUDXUUOPAR4ZHJSDDCZTIAQRTRZHKQWV45WUPBWX",
-           base_amount: 4433.2,
+           base_amount: "4433.2000000",
            base_asset_code: nil,
            base_asset_issuer: nil,
            base_asset_type: "native",
@@ -79,7 +79,7 @@ defmodule Stellar.Horizon.TradesTest do
            base_liquidity_pool_id: nil,
            base_offer_id: 165_561_423,
            counter_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
-           counter_amount: 443.32,
+           counter_amount: "443.3200000",
            counter_asset_code: "BB1",
            counter_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
            counter_asset_type: "credit_alphanum4",
@@ -93,7 +93,7 @@ defmodule Stellar.Horizon.TradesTest do
          },
          %Trade{
            base_account: "GCQDOTIILRG634IRWAODTUS6H6Q7VUUNKZINBDJOXGJFR7YZ57FGYV7B",
-           base_amount: 10.0,
+           base_amount: "10.0000000",
            base_asset_code: nil,
            base_asset_issuer: nil,
            base_asset_type: "native",
@@ -101,7 +101,7 @@ defmodule Stellar.Horizon.TradesTest do
            base_liquidity_pool_id: nil,
            base_offer_id: 165_561_423,
            counter_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
-           counter_amount: 1.0,
+           counter_amount: "1.0000000",
            counter_asset_code: "BB1",
            counter_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
            counter_asset_type: "credit_alphanum4",
@@ -115,7 +115,7 @@ defmodule Stellar.Horizon.TradesTest do
          },
          %Trade{
            base_account: "GAMU5TQFUMDGVKYQPPDCD2MKKUUWELSQAEKNNU4RFQCWFSRBPJA2MAGQ",
-           base_amount: 748.5338945,
+           base_amount: "748.5338945",
            base_asset_code: nil,
            base_asset_issuer: nil,
            base_asset_type: "native",
@@ -123,7 +123,7 @@ defmodule Stellar.Horizon.TradesTest do
            base_liquidity_pool_id: nil,
            base_offer_id: 165_561_423,
            counter_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
-           counter_amount: 74.8533887,
+           counter_amount: "74.8533887",
            counter_asset_code: "BB1",
            counter_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
            counter_asset_type: "credit_alphanum4",

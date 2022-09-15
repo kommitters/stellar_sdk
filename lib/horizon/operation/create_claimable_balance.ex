@@ -9,20 +9,16 @@ defmodule Stellar.Horizon.Operation.CreateClaimableBalance do
 
   @type t :: %__MODULE__{
           asset: String.t(),
-          amount: float(),
+          amount: String.t(),
           claimants: list(map())
         }
 
   defstruct [:asset, :amount, :claimants]
 
-  @mapping [amount: :float]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

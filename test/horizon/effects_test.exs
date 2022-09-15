@@ -71,7 +71,7 @@ defmodule Stellar.Horizon.EffectsTest do
        records: [
          %Effect{
            account: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
-           attributes: %{amount: nil, starting_balance: 20.0},
+           attributes: %{starting_balance: "20.0000000"},
            created_at: ~U[2015-09-30 17:15:54Z],
            id: "0000000012884905985-0000000001",
            paging_token: "12884905985-1",
@@ -80,7 +80,7 @@ defmodule Stellar.Horizon.EffectsTest do
          },
          %Effect{
            account: "GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN7",
-           attributes: %{amount: 20.0, asset_type: "native", starting_balance: nil},
+           attributes: %{amount: "20.0000000", asset_type: "native"},
            created_at: ~U[2015-09-30 17:16:54Z],
            id: "0000000012884905985-0000000002",
            paging_token: "12884905985-2",
@@ -90,10 +90,8 @@ defmodule Stellar.Horizon.EffectsTest do
          %Effect{
            account: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
            attributes: %{
-             amount: nil,
              key: "",
              public_key: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
-             starting_balance: nil,
              weight: 1
            },
            created_at: ~U[2015-09-30 17:17:54Z],

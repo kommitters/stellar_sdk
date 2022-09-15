@@ -35,8 +35,8 @@ defmodule Stellar.Horizon.Operation.CreateClaimableBalanceTest do
     }
   end
 
-  test "new/2", %{attrs: %{asset: asset, claimants: claimants} = attrs} do
-    %CreateClaimableBalance{asset: ^asset, amount: 200.0, claimants: ^claimants} =
+  test "new/2", %{attrs: %{asset: asset, amount: amount, claimants: claimants} = attrs} do
+    %CreateClaimableBalance{asset: ^asset, amount: ^amount, claimants: ^claimants} =
       CreateClaimableBalance.new(attrs)
   end
 

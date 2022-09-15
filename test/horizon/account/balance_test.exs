@@ -22,10 +22,10 @@ defmodule Stellar.Horizon.Account.BalanceTest do
 
   test "new/2", %{attrs: attrs} do
     %Balance{
-      balance: 100.1,
+      balance: "100.1",
       asset_type: "native",
-      buying_liabilities: 10.2,
-      selling_liabilities: 5.0,
+      buying_liabilities: "10.2",
+      selling_liabilities: "5.0",
       limit: 0,
       last_modified_ledger: 39_154_245,
       is_authorized: false,

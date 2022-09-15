@@ -152,7 +152,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
   test "retrieve/1", %{claimable_balance_id: claimable_balance_id} do
     {:ok,
      %ClaimableBalance{
-       amount: 10.0,
+       amount: "10.0000000",
        asset: "native",
        claimants: [
          %{
@@ -186,7 +186,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
      %Collection{
        records: [
          %ClaimableBalance{
-           amount: 82.419084,
+           amount: "82.4190840",
            asset: "BTCN:GDGHQTCJ3SGFBWBHJGVRUFBRLZGS5VS52HEDH4GVPX5GZRJQAOW7ZM37",
            claimants: [
              %{
@@ -203,7 +203,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
            sponsor: "GBXISGJYYKE6RUO6L6KXBUJ7FJU4CWF647FLQAT3TZ2Q47IZHXFNYKYH"
          },
          %ClaimableBalance{
-           amount: 912.5569285,
+           amount: "912.5569285",
            asset: "y00XLM:GDGHQTCJ3SGFBWBHJGVRUFBRLZGS5VS52HEDH4GVPX5GZRJQAOW7ZM37",
            claimants: [
              %{
@@ -217,7 +217,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
            sponsor: "GBXISGJYYKE6RUO6L6KXBUJ7FJU4CWF647FLQAT3TZ2Q47IZHXFNYKYH"
          },
          %ClaimableBalance{
-           amount: 1.0e-7,
+           amount: "0.0000001",
            asset: "OxCBQksBk:GB3A3CK64CZDZ63FZTVI3OKK7ZCD75YQCPA2EKHPDFD6ABKEQ3ESTWVV",
            claimants: [
              %{

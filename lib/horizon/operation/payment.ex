@@ -8,24 +8,20 @@ defmodule Stellar.Horizon.Operation.Payment do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          asset_type: float(),
+          asset_type: String.t(),
           asset_code: String.t(),
           asset_issuer: String.t(),
           from: String.t(),
           to: String.t(),
-          amount: float()
+          amount: String.t()
         }
 
   defstruct [:asset_type, :asset_code, :asset_issuer, :from, :to, :amount]
-
-  @mapping [amount: :float]
 
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

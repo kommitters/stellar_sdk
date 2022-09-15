@@ -157,15 +157,15 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
        paging_token: "0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434",
        reserves: [
          %{
-           amount: 522_256_061.074394,
+           amount: "522256061.0743940",
            asset: "XAU:GB3OE4IBQTYQFZZS5RXQHE4IPQL7ONOFOSAIS2NFRNMJKZEAI3AAUT2A"
          },
          %{
-           amount: 533_666_459.4045717,
+           amount: "533666459.4045717",
            asset: "ERRES:GA6ZAQGLDUEODDUUD3UD6PUFJYABWQA26SG5RK6E6CZ6OMD6AZKK5QNF"
          }
        ],
-       total_shares: 5.0e8,
+       total_shares: "500000000.0000000",
        total_trustlines: 1,
        type: "constant_product"
      }} = LiquidityPools.retrieve(liquidity_pool_id)
@@ -182,12 +182,12 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            last_modified_time: ~U[2022-02-22 13:30:09Z],
            reserves: [
              %{
-               amount: 228.685116,
+               amount: "228.6851160",
                asset: "BTCN:GDGUZCQFXCLZ775VZH3YGWRUIBKD6XKDJEW3E7CE5COT4EO7A3W22YUX"
              }
              | _reserves1
            ],
-           total_shares: 1.98,
+           total_shares: "1.9800000",
            total_trustlines: 1,
            type: "constant_product"
          },
@@ -198,12 +198,12 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            last_modified_time: ~U[2022-01-07 18:19:08Z],
            reserves: [
              %{
-               amount: 100_005.015296,
+               amount: "100005.0152960",
                asset: "DOLLAR:GCO7B6KEDWOBM5X642ZOTPYTYTTBZIGVGUED4ZSBILJOAU4XB7ISJBFF"
              }
              | _reserves2
            ],
-           total_shares: 1.0e5,
+           total_shares: "100000.0000000",
            total_trustlines: 1,
            type: "constant_product"
          },
@@ -213,10 +213,10 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            last_modified_ledger: 973_360,
            last_modified_time: ~U[2022-02-12 14:16:51Z],
            reserves: [
-             %{amount: 130.8900524, asset: "native"}
+             %{amount: "130.8900524", asset: "native"}
              | _reserves3
            ],
-           total_shares: 180.893651,
+           total_shares: "180.8936510",
            total_trustlines: 4,
            type: "constant_product"
          }
@@ -282,9 +282,9 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
     {:ok,
      %Collection{
        records: [
-         %Trade{base_amount: 4433.20},
-         %Trade{base_amount: 10.0},
-         %Trade{base_amount: 748.5338945}
+         %Trade{base_amount: "4433.2000000"},
+         %Trade{base_amount: "10.0000000"},
+         %Trade{base_amount: "748.5338945"}
        ]
      }} = LiquidityPools.list_trades(liquidity_pool_id)
   end

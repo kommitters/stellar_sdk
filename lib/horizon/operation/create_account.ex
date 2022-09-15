@@ -8,21 +8,17 @@ defmodule Stellar.Horizon.Operation.CreateAccount do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          starting_balance: float(),
+          starting_balance: String.t(),
           funder: String.t(),
           account: String.t()
         }
 
   defstruct [:starting_balance, :funder, :account]
 
-  @mapping [starting_balance: :float]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end
