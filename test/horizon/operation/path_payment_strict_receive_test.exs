@@ -34,12 +34,15 @@ defmodule Stellar.Horizon.Operation.PathPaymentStrictReceiveTest do
   test "new/2", %{
     attrs:
       %{
+        amount: amount,
         asset_type: asset_type,
         asset_code: asset_code,
         asset_issuer: asset_issuer,
         from: from,
         to: to,
         path: path,
+        source_amount: source_amount,
+        source_max: source_max,
         source_asset_type: source_asset_type,
         source_asset_code: source_asset_code,
         source_asset_issuer: source_asset_issuer
@@ -51,10 +54,10 @@ defmodule Stellar.Horizon.Operation.PathPaymentStrictReceiveTest do
       asset_issuer: ^asset_issuer,
       from: ^from,
       to: ^to,
-      amount: 0.1,
+      amount: ^amount,
       path: ^path,
-      source_amount: 0.0198773,
-      source_max: 0.0198774,
+      source_amount: ^source_amount,
+      source_max: ^source_max,
       source_asset_type: ^source_asset_type,
       source_asset_code: ^source_asset_code,
       source_asset_issuer: ^source_asset_issuer

@@ -99,14 +99,14 @@ defmodule Stellar.Horizon.PaymentPathsTest do
      %Paths{
        records: [
          %Path{
-           destination_amount: 5.0,
+           destination_amount: "5.0000000",
            destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
-           source_amount: 28.9871131
+           source_amount: "28.9871131"
          },
          %Path{
-           destination_amount: 5.0,
+           destination_amount: "5.0000000",
            destination_asset_issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN",
-           source_amount: 29.0722784
+           source_amount: "29.0722784"
          }
        ]
      }} =
@@ -153,7 +153,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
      %Paths{
        records: [
          %Stellar.Horizon.Path{
-           destination_amount: 5.0,
+           destination_amount: "5.0000000",
            path: [
              %{
                asset_code: "XCN",
@@ -164,7 +164,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
            ]
          },
          %Stellar.Horizon.Path{
-           destination_amount: 5.0,
+           destination_amount: "5.0000000",
            path: [
              %{
                asset_code: "ULT",

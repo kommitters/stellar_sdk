@@ -160,8 +160,8 @@ defmodule Stellar.Horizon.RequestTest do
     {:ok,
      %Paths{
        records: [
-         %Path{source_amount: 28.9871131},
-         %Path{source_amount: 29.0722784}
+         %Path{source_amount: "28.9871131"},
+         %Path{source_amount: "29.0722784"}
        ]
      }} = Request.results({:ok, paths}, as: Paths)
   end

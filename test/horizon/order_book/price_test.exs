@@ -13,11 +13,18 @@ defmodule Stellar.Horizon.OrderBook.PriceTest do
     }
   end
 
-  test "new/2", %{attrs: attrs} do
+  test "new/2", %{
+    attrs:
+      %{
+        price_r: price_r,
+        price: price,
+        amount: amount
+      } = attrs
+  } do
     %Price{
-      price_r: %{n: 6_014_600, d: 102_275_119},
-      price: 0.0588080,
-      amount: 0.1722469
+      price_r: ^price_r,
+      price: ^price,
+      amount: ^amount
     } = Price.new(attrs)
   end
 

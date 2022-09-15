@@ -8,11 +8,11 @@ defmodule Stellar.Horizon.Account.Balance do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          balance: float(),
+          balance: String.t(),
           asset_type: String.t(),
-          buying_liabilities: float(),
-          selling_liabilities: float(),
-          limit: float() | nil,
+          buying_liabilities: String.t(),
+          selling_liabilities: String.t(),
+          limit: String.t() | nil,
           last_modified_ledger: non_neg_integer() | nil,
           is_authorized: boolean() | nil,
           is_authorized_to_maintain_liabilities: boolean() | nil,
@@ -33,19 +33,10 @@ defmodule Stellar.Horizon.Account.Balance do
     :asset_issuer
   ]
 
-  @mapping [
-    {:balance, :float},
-    {:limit, :float},
-    {:buying_liabilities, :float},
-    {:selling_liabilities, :float}
-  ]
-
   @impl true
   def new(attrs, opts \\ [])
 
   def new(attrs, _opts) do
-    %__MODULE__{}
-    |> Mapping.build(attrs)
-    |> Mapping.parse(@mapping)
+    Mapping.build(%__MODULE__{}, attrs)
   end
 end

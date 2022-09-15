@@ -23,12 +23,12 @@ defmodule Stellar.Horizon.OfferTest do
       buying: %{
         asset_type: "native"
       },
-      amount: 18_421.4486092,
+      amount: "18421.4486092",
       price_r: %{
         n: 45_112_058,
         d: 941_460_545
       },
-      price: 0.0479171,
+      price: "0.0479171",
       last_modified_ledger: 28_411_995,
       last_modified_time: ~U[2020-02-26 19:29:16Z]
     } = Offer.new(attrs)

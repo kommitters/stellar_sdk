@@ -13,7 +13,7 @@ defmodule Stellar.Horizon.LiquidityPool do
           fee_bp: non_neg_integer(),
           type: String.t(),
           total_trustlines: non_neg_integer(),
-          total_shares: float(),
+          total_shares: String.t(),
           reserves: list(map()),
           last_modified_ledger: non_neg_integer(),
           last_modified_time: DateTime.t()
@@ -34,10 +34,8 @@ defmodule Stellar.Horizon.LiquidityPool do
   @mapping [
     fee_bp: :integer,
     total_trustlines: :integer,
-    total_shares: :float,
     last_modified_ledger: :integer,
-    last_modified_time: :date_time,
-    reserves: {:list, :map, [amount: :float]}
+    last_modified_time: :date_time
   ]
 
   @impl true

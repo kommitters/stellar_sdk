@@ -17,15 +17,15 @@ defmodule Stellar.Horizon.LiquidityPoolTest do
       fee_bp: 30,
       type: "constant_product",
       total_trustlines: 1,
-      total_shares: 500_000_000.0,
+      total_shares: "500000000.0000000",
       reserves: [
         %{
           asset: "XAU:GB3OE4IBQTYQFZZS5RXQHE4IPQL7ONOFOSAIS2NFRNMJKZEAI3AAUT2A",
-          amount: 522_256_061.0743940
+          amount: "522256061.0743940"
         },
         %{
           asset: "ERRES:GA6ZAQGLDUEODDUUD3UD6PUFJYABWQA26SG5RK6E6CZ6OMD6AZKK5QNF",
-          amount: 533_666_459.4045717
+          amount: "533666459.4045717"
         }
       ],
       last_modified_ledger: 39_767_560,

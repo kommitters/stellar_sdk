@@ -24,6 +24,8 @@ defmodule Stellar.Horizon.Operation.ManageSellOfferTest do
   test "new/2", %{
     attrs:
       %{
+        amount: amount,
+        price: price,
         price_r: price_r,
         buying_asset_type: buying_asset_type,
         buying_asset_code: buying_asset_code,
@@ -33,8 +35,8 @@ defmodule Stellar.Horizon.Operation.ManageSellOfferTest do
       } = attrs
   } do
     %ManageSellOffer{
-      amount: 1336.0326986,
-      price: 0.0559999,
+      amount: ^amount,
+      price: ^price,
       price_r: ^price_r,
       buying_asset_type: ^buying_asset_type,
       buying_asset_code: ^buying_asset_code,

@@ -37,11 +37,11 @@ defmodule Stellar.Horizon.OperationTest do
   test "new/2", %{attrs: attrs} do
     %Operation{
       body: %PathPaymentStrictSend{
-        amount: 26.5544244,
+        amount: "26.5544244",
         asset_code: "BRL",
         asset_issuer: "GDVKY2GU2DRXWTBEYJJWSFXIGBZV6AZNBVVSUHEPZI54LIS6BA7DVVSP",
         asset_type: "credit_alphanum4",
-        destination_min: 26.5544244,
+        destination_min: "26.5544244",
         from: "GBZH7S5NC57XNHKHJ75C5DGMI3SP6ZFJLIKW74K6OSMA5E5DFMYBDD2Z",
         path: [
           %{
@@ -51,7 +51,7 @@ defmodule Stellar.Horizon.OperationTest do
           },
           %{asset_type: "native"}
         ],
-        source_amount: 5.0,
+        source_amount: "5.0000000",
         source_asset_code: "USD",
         source_asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
         source_asset_type: "credit_alphanum4",

@@ -10,16 +10,16 @@ defmodule Stellar.Horizon.TradeAggregation do
   @type t :: %__MODULE__{
           timestamp: non_neg_integer(),
           trade_count: non_neg_integer(),
-          base_volume: float(),
-          counter_volume: float(),
-          avg: float(),
-          high: float(),
+          base_volume: String.t(),
+          counter_volume: String.t(),
+          avg: String.t(),
+          high: String.t(),
           high_r: map(),
-          low: float(),
+          low: String.t(),
           low_r: map(),
-          open: float(),
+          open: String.t(),
           open_r: map(),
-          close: float(),
+          close: String.t(),
           close_r: map()
         }
 
@@ -47,13 +47,6 @@ defmodule Stellar.Horizon.TradeAggregation do
   @mapping [
     timestamp: :integer,
     trade_count: :integer,
-    base_volume: :float,
-    counter_volume: :float,
-    avg: :float,
-    high: :float,
-    low: :float,
-    open: :float,
-    close: :float,
     high_r: {:map, @rational_mapping},
     low_r: {:map, @rational_mapping},
     open_r: {:map, @rational_mapping},

@@ -13,8 +13,8 @@ defmodule Stellar.Horizon.Offer do
           seller: String.t(),
           selling: map(),
           buying: map(),
-          amount: float(),
-          price: float(),
+          amount: String.t(),
+          price: String.t(),
           price_r: map(),
           last_modified_ledger: non_neg_integer(),
           last_modified_time: DateTime.t(),
@@ -36,8 +36,6 @@ defmodule Stellar.Horizon.Offer do
   ]
 
   @mapping [
-    amount: :float,
-    price: :float,
     last_modified_ledger: :integer,
     last_modified_time: :date_time
   ]
