@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.0 (15.09.2022)
+* Avoid parsing string amount fields to float in Horizon API responses.
+
 ## 0.9.3 (05.09.2022)
 * Fix bug in `SetOptions` when setting a signer.
 * Fix bug in `TimeBounds` to allow backward compatibility (merged with preconditions).
