@@ -49,6 +49,7 @@ defmodule Stellar.TxBuild.Signature do
 
   # preimage: random 32 bytes (256 bits) in binary
   # NOTE: preimage is received, instead of hash(preimage).
+  # TODO: preimage should be in string, not in raw binary
   def new([preimage: preimage], _opts) do
     with :ok <- validate_preimage(preimage),
          do: build_signature(preimage: preimage)
@@ -97,12 +98,13 @@ defmodule Stellar.TxBuild.Signature do
   defp build_signature(preimage: preimage) do
     sha256_hash = :crypto.hash(:sha256, preimage)
     signature_hint = signature_hint(sha256_hash: sha256_hash)
-    raw_sha256_hash = KeyPair.raw_sha256_hash(sha256_hash)
+    # raw_sha256_hash = KeyPair.raw_sha256_hash(sha256_hash)
+    # TODO: preimage should be in string, not in raw binary
 
     %__MODULE__{
       type: :sha256_hash,
-      key: sha256_hash,
-      raw_key: raw_sha256_hash,
+      key: preimage,
+      raw_key: preimage,
       hint: signature_hint
     }
   end
