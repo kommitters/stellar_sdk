@@ -45,8 +45,8 @@ defmodule Stellar.Horizon.Offers do
 
     * `sponsor`: The account ID of the sponsor who is paying the reserves for all the offers included in the response.
     * `seller`: The account ID of the offer creator.
-    * `selling_asset`: `:native` or [code: "selling_asset_code", issuer: "selling_asset_issuer"]`.
-    * `buying_asset`: `:native` or [code: "buying_asset_code", issuer: "buying_asset_issuer"]`.
+    * `selling_asset`: `:native` or `[code: "selling_asset_code", issuer: "selling_asset_issuer"]`.
+    * `buying_asset`: `:native` or `[code: "buying_asset_code", issuer: "buying_asset_issuer"]`.
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
     * `order`: A designation of the order in which records should appear. Options include `asc` (ascending) or `desc` (descending).
     * `limit`: The maximum number of records returned. The limit can range from 1 to 200. Defaults to 10.

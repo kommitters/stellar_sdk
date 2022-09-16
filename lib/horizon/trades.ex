@@ -22,8 +22,8 @@ defmodule Stellar.Horizon.Trades do
   ## Options
 
     * `offer_id`: The offer ID. Used to filter for trades originating from a specific offer.
-    * `base_asset`: `:native` or [code: "base_asset_code", issuer: "base_asset_issuer"]`.
-    * `counter_asset`: `:native` or [code: "counter_asset_code", issuer: "counter_asset_issuer"]`.
+    * `base_asset`: `:native` or `[code: "base_asset_code", issuer: "base_asset_issuer"]`.
+    * `counter_asset`: `:native` or `[code: "counter_asset_code", issuer: "counter_asset_issuer"]`.
     * `trade_type`: Can be set to `all`, `orderbook`, or `liquidity_pools` to filter only trades executed across a given mechanism.
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
     * `order`: A designation of the order in which records should appear. Options include `asc` (ascending) or `desc` (descending).
