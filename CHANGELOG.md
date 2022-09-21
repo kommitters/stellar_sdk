@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.2 (21.09.2022)
+* Update assets parameters for Offers and Trades.
+
 ## 0.10.1 (21.09.2022)
 * Fix bug by adding `CreateClaimableBalance` within allowed operations.
 
