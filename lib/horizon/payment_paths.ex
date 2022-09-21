@@ -25,7 +25,7 @@ defmodule Stellar.Horizon.PaymentPaths do
   ## Parameters
 
     * `source_account`: The Stellar address of the sender.
-    * `destination_asset` :native or [code: `destination_asset_code`, issuer: `destination_asset_issuer`]
+    * `destination_asset`: `:native` or `[code: "destination_asset_code", issuer: "destination_asset_issuer"]`
     * `destination_amount`: The amount of the destination asset that should be received.
 
   ## Options
@@ -82,7 +82,7 @@ defmodule Stellar.Horizon.PaymentPaths do
   ## Parameters
 
     Using either `source_account` or `source_assets` as an argument is required for strict receive path payments.
-    * `destination_asset`: :native or [code: `destination_asset_code`, issuer: `destination_asset_issuer`]
+    * `destination_asset`: `:native` or `[code: "destination_asset_code", issuer: "destination_asset_issuer"]`
     * `destination_amount`: The amount of the destination asset that should be received.
 
   ## Options
@@ -139,7 +139,7 @@ defmodule Stellar.Horizon.PaymentPaths do
 
   ## Parameters
       Using either `destination_account` or `destination_assets` as an argument is required for strict send path payments.
-      * `source_asset`: :native or [code: `source_asset_code`, issuer: `source_asset_issuer`]
+      * `source_asset`: `:native` or `[code: "source_asset_code", issuer: "source_asset_issuer"]`
       * `source_amount`: The amount of the source asset that should be sent.
 
   ## Options

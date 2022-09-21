@@ -27,7 +27,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.10.1"}
+    {:stellar_sdk, "~> 0.10.2"}
   ]
 end
 ```
@@ -602,11 +602,41 @@ Stellar.Horizon.Offers.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYU
 # list offers by seller
 Stellar.Horizon.Offers.all(seller: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
 
-# list offers by selling_asset_issuer
-Stellar.Horizon.Offers.all(selling_asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+# list offers by selling_asset
+Stellar.Horizon.Offers.all(
+  selling_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ]
+)
 
-# list offers by buying_asset_type and buying_asset_code
-Stellar.Horizon.Offers.all(buying_asset_type: "credit_alphanum4", buying_asset_code: "TEST")
+# list offers by buying_asset
+Stellar.Horizon.Offers.all(
+  buying_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ]
+)
+
+# list offers by selling_asset and buying_asset
+Stellar.Horizon.Trades.all(
+  selling_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ],
+  buying_asset: [
+    code: "TOKEN",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ]
+)
+
+Stellar.Horizon.Offers.all(
+  selling_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ],
+  buying_asset: :native
+)
 
 # list offer's trades
 Stellar.Horizon.Offers.list_trades(165563085, limit: 20)
@@ -623,11 +653,25 @@ Stellar.Horizon.Trades.all(limit: 20, order: :asc)
 # list trades by offer_id
 Stellar.Horizon.Trades.all(offer_id: 165563085)
 
-# list trades by base_asset_type and base_asset_code
-Stellar.Horizon.Trades.all(base_asset_type: "credit_alphanum4", base_asset_code: "TEST")
+# list trades by specific orderbook
+Stellar.Horizon.Trades.all(
+  base_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ],
+  counter_asset: [
+    code: "TOKEN",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ]
+)
 
-# list trades by counter_asset_issuer
-Stellar.Horizon.Trades.all(counter_asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+Stellar.Horizon.Trades.all(
+    base_asset: [
+    code: "TEST",
+    issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+  ],
+  counter_asset: :native
+)
 
 # list trades by trade_type
 Stellar.Horizon.Trades.all(trade_type: "liquidity_pools", limit: 20)
