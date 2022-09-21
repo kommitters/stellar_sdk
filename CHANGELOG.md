@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.10.1 (21.09.2022)
+* Fix bug by adding `CreateClaimableBalance` within allowed operations.
+
 ## 0.10.0 (15.09.2022)
 * Avoid parsing string amount fields to float in Horizon API responses.
 
