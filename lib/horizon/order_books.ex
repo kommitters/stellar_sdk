@@ -20,8 +20,8 @@ defmodule Stellar.Horizon.OrderBooks do
     Retrieve order books
 
   ## Parameters
-    * `selling_asset`: :native or [code: `selling_asset_code`, issuer: `selling_asset_issuer` ]
-    * `buying_asset`: :native or [code: `buying_asset_code`, issuer: `buying_asset_issuer` ]
+    * `selling_asset`: `:native` or `[code: "selling_asset_code", issuer: "selling_asset_issuer"]`
+    * `buying_asset`: `:native` or `[code: "buying_asset_code", issuer: "buying_asset_issuer"]`
 
   ## Options
     * `limit`: The maximum number of records returned
