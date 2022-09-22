@@ -16,6 +16,7 @@ defmodule Stellar.TxBuild.Signature do
   @behaviour Stellar.TxBuild.XDR
 
   @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :ed25519_signed_payload
+
   @type t :: %__MODULE__{
           type: type(),
           key: String.t(),
@@ -74,7 +75,7 @@ defmodule Stellar.TxBuild.Signature do
 
     signature_hint =
       public_key
-      |> KeyPair.from_secret_seed()
+      |> KeyPair.raw_public_key()
       |> (&signature_hint(ed25519: &1)).()
 
     %__MODULE__{
