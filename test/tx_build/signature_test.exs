@@ -77,4 +77,34 @@ defmodule Stellar.TxBuild.SignatureTest do
       ^signature_xdr = Signature.to_xdr(signature)
     end
   end
+
+  describe "signature type :pre_auth_tx" do
+    setup do
+      pre_auth_tx = "TCVFGJWNBF7LNCX4HNETQH7GXYUXUIZCUTCZ5PXUSZ3KJWESVXNCYN3B"
+
+      raw_pre_auth_tx =
+        <<170, 83, 38, 205, 9, 126, 182, 138, 252, 59, 73, 56, 31, 230, 190, 41, 122, 35, 34, 164,
+          197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>
+
+      hint = <<146, 173, 218, 44>>
+      signature = Signature.new(pre_auth_tx: pre_auth_tx)
+
+      %{
+        key: pre_auth_tx,
+        raw_key: raw_pre_auth_tx,
+        hint: hint,
+        signature: signature
+      }
+    end
+
+    test "new/2", %{key: pre_auth_tx, raw_key: raw_pre_auth_tx, hint: hint} do
+      %Signature{type: :pre_auth_tx, key: ^pre_auth_tx, raw_key: ^raw_pre_auth_tx, hint: ^hint} =
+        Signature.new(pre_auth_tx: pre_auth_tx)
+    end
+
+    test "to_xdr/1", %{signature: signature, raw_key: raw_pre_auth_tx, hint: hint} do
+      signature_xdr = decorated_signature_xdr(raw_pre_auth_tx, hint)
+      ^signature_xdr = Signature.to_xdr(signature)
+    end
+  end
 end
