@@ -16,18 +16,6 @@ defmodule Stellar.TxBuild.Signature do
   @behaviour Stellar.TxBuild.XDR
 
   @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :ed25519_signed_payload
-  @type key :: String.t()
-  @type signer :: {type(), key()}
-  @type validation :: {:ok, any()} | {:error, atom()}
-
-  # @type t :: %__MODULE__{
-  #         public_key: String.t(),
-  #         secret: String.t(),
-  #         raw_public_key: binary(),
-  #         raw_secret: binary(),
-  #         hint: binary()
-  #       }
-
   @type t :: %__MODULE__{
           type: type(),
           key: String.t(),
@@ -47,9 +35,6 @@ defmodule Stellar.TxBuild.Signature do
          do: build_signature(ed25519: secret)
   end
 
-  # preimage: random 32 bytes (256 bits) in binary
-  # NOTE: preimage is received, instead of hash(preimage).
-  # TODO: preimage should be in string, not in raw binary
   def new([preimage: preimage], _opts) do
     with :ok <- validate_preimage(preimage),
          do: build_signature(preimage: preimage)
@@ -61,16 +46,14 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   @spec to_xdr(signature :: t(), base_signature :: binary()) :: DecoratedSignature.t()
-  def to_xdr(%__MODULE__{type: :ed25519, key: secret, hint: hint}, base_signature) do
+  def to_xdr(%__MODULE__{type: :ed25519, key: key, hint: hint}, base_signature) do
     base_signature
-    |> KeyPair.sign(secret)
+    |> KeyPair.sign(key)
     |> decorated_signature(hint)
   end
 
-  # works for ed25519, sha256_hash, tx_pre_auth
-  # TODO: replace raw_secret with raw_key (DONE)
   @impl true
-  def to_xdr(%__MODULE__{hint: hint, raw_key: raw_key}),
+  def to_xdr(%__MODULE__{raw_key: raw_key, hint: hint}),
     do: decorated_signature(raw_key, hint)
 
   @spec decorated_signature(raw_signature :: binary(), hint :: binary()) :: DecoratedSignature.t()
@@ -82,10 +65,17 @@ defmodule Stellar.TxBuild.Signature do
     |> DecoratedSignature.new(signature)
   end
 
-  # @spec build_signature(public_key :: String.t(), secret :: String.t()) :: t()
+  @spec build_signature([
+          {:ed25519 | :preimage | :pre_auth_tx | :ed25519_signed_payload, String.t()}
+        ]) :: t()
   defp build_signature(ed25519: secret) do
     raw_secret = KeyPair.raw_secret_seed(secret)
-    signature_hint = signature_hint(ed25519: secret)
+    {public_key, _secret} = KeyPair.from_secret_seed(secret)
+
+    signature_hint =
+      public_key
+      |> KeyPair.from_secret_seed()
+      |> (&signature_hint(ed25519: &1)).()
 
     %__MODULE__{
       type: :ed25519,
@@ -96,15 +86,17 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   defp build_signature(preimage: preimage) do
-    sha256_hash = :crypto.hash(:sha256, preimage)
-    signature_hint = signature_hint(sha256_hash: sha256_hash)
-    # raw_sha256_hash = KeyPair.raw_sha256_hash(sha256_hash)
-    # TODO: preimage should be in string, not in raw binary
+    raw_preimage = Base.decode16!(preimage, case: :lower)
+
+    signature_hint =
+      :sha256
+      |> :crypto.hash(raw_preimage)
+      |> (&signature_hint(sha256_hash: &1)).()
 
     %__MODULE__{
       type: :sha256_hash,
       key: preimage,
-      raw_key: preimage,
+      raw_key: raw_preimage,
       hint: signature_hint
     }
   end
@@ -121,12 +113,11 @@ defmodule Stellar.TxBuild.Signature do
     }
   end
 
-  defp signature_hint(ed25519: secret) do
+  @spec signature_hint([{type(), binary()}]) :: binary()
+  defp signature_hint(ed25519: raw_public_key) do
     key_type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
-    {public_key, _secret} = KeyPair.from_secret_seed(secret)
 
-    public_key
-    |> KeyPair.raw_public_key()
+    raw_public_key
     |> UInt256.new()
     |> PublicKey.new(key_type)
     |> PublicKey.encode_xdr!()
@@ -141,10 +132,13 @@ defmodule Stellar.TxBuild.Signature do
     binary_part(raw_key, bytes_size - 4, 4)
   end
 
+  @spec validate_preimage(preimage :: String.t()) :: :ok | {:error, :invalid_preimage}
   defp validate_preimage(preimage) do
-    case byte_size(preimage) do
-      32 -> :ok
-      _byte_size -> {:error, :invalid_preimage}
+    with {:ok, raw_preimage} <- Base.decode16(preimage),
+         32 <- byte_size(raw_preimage) do
+      :ok
+    else
+      _ -> {:error, :invalid_preimage}
     end
   end
 end
