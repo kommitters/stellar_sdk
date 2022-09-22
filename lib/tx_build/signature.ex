@@ -135,7 +135,7 @@ defmodule Stellar.TxBuild.Signature do
 
   @spec validate_preimage(preimage :: String.t()) :: :ok | {:error, :invalid_preimage}
   defp validate_preimage(preimage) do
-    with {:ok, raw_preimage} <- Base.decode16(preimage),
+    with {:ok, raw_preimage} <- Base.decode16(preimage, case: :lower),
          32 <- byte_size(raw_preimage) do
       :ok
     else

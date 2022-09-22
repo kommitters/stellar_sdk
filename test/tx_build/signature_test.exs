@@ -24,9 +24,19 @@ defmodule Stellar.TxBuild.SignatureTest do
       }
     end
 
-    test "new/2", %{public_key: public_key, secret: secret, raw_secret: raw_secret, hint: hint} do
+    test "new/2 with keypair", %{
+      public_key: public_key,
+      secret: secret,
+      raw_secret: raw_secret,
+      hint: hint
+    } do
       %Signature{type: :ed25519, key: ^secret, raw_key: ^raw_secret, hint: ^hint} =
         Signature.new({public_key, secret})
+    end
+
+    test "new/2 with secret", %{secret: secret, raw_secret: raw_secret, hint: hint} do
+      %Signature{type: :ed25519, key: ^secret, raw_key: ^raw_secret, hint: ^hint} =
+        Signature.new(ed25519: secret)
     end
 
     test "to_xdr/2", %{signature: signature, secret: raw_secret, hint: hint} do
@@ -36,6 +46,34 @@ defmodule Stellar.TxBuild.SignatureTest do
 
     test "to_xdr/1", %{signature: signature, raw_secret: raw_secret, hint: hint} do
       signature_xdr = decorated_signature_xdr(raw_secret, hint)
+      ^signature_xdr = Signature.to_xdr(signature)
+    end
+  end
+
+  describe "signature type :sha256_hash" do
+    setup do
+      preimage = "47eaeab9b381bdb8d15bc3ef50ef5860bd4fcb8b1a15e6e5d22fa7386d9322e0"
+      hint = <<205, 0, 141, 56>>
+
+      raw_preimage =
+        <<71, 234, 234, 185, 179, 129, 189, 184, 209, 91, 195, 239, 80, 239, 88, 96, 189, 79, 203,
+          139, 26, 21, 230, 229, 210, 47, 167, 56, 109, 147, 34, 224>>
+
+      %{
+        preimage: preimage,
+        raw_preimage: raw_preimage,
+        hint: hint,
+        signature: Signature.new(preimage: preimage)
+      }
+    end
+
+    test "new/2", %{preimage: preimage, raw_preimage: raw_preimage, hint: hint} do
+      %Signature{type: :sha256_hash, key: ^preimage, raw_key: ^raw_preimage, hint: ^hint} =
+        Signature.new(preimage: preimage)
+    end
+
+    test "to_xdr/1", %{signature: signature, raw_preimage: raw_preimage, hint: hint} do
+      signature_xdr = decorated_signature_xdr(raw_preimage, hint)
       ^signature_xdr = Signature.to_xdr(signature)
     end
   end
