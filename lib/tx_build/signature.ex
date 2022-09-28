@@ -15,12 +15,14 @@ defmodule Stellar.TxBuild.Signature do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :ed25519_signed_payload
+  @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :signed_payload
+  @type key :: String.t() | {String.t(), String.t()}
+  @type raw_key :: binary() | {binary(), binary()}
 
   @type t :: %__MODULE__{
           type: type(),
-          key: String.t(),
-          raw_key: binary(),
+          key: key(),
+          raw_key: raw_key(),
           hint: binary()
         }
 
@@ -46,6 +48,12 @@ defmodule Stellar.TxBuild.Signature do
          do: build_signature(pre_auth_tx: pre_auth_tx)
   end
 
+  def new([signed_payload: {payload, secret}], _opts) do
+    with :ok <- validate_payload(payload),
+         :ok <- KeyPair.validate_secret_seed(secret),
+         do: build_signature(signed_payload: {payload, secret})
+  end
+
   @spec to_xdr(signature :: t(), base_signature :: binary()) :: DecoratedSignature.t()
   def to_xdr(%__MODULE__{type: :ed25519, key: key, hint: hint}, base_signature) do
     base_signature
@@ -54,6 +62,17 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   @impl true
+  def to_xdr(%__MODULE__{
+        type: :signed_payload,
+        key: {_payload, secret},
+        raw_key: {raw_payload, _raw_secret},
+        hint: hint
+      }) do
+    raw_payload
+    |> KeyPair.sign(secret)
+    |> decorated_signature(hint)
+  end
+
   def to_xdr(%__MODULE__{raw_key: raw_key, hint: hint}),
     do: decorated_signature(raw_key, hint)
 
@@ -66,9 +85,6 @@ defmodule Stellar.TxBuild.Signature do
     |> DecoratedSignature.new(signature)
   end
 
-  @spec build_signature([
-          {:ed25519 | :preimage | :pre_auth_tx | :ed25519_signed_payload, String.t()}
-        ]) :: t()
   defp build_signature(ed25519: secret) do
     raw_secret = KeyPair.raw_secret_seed(secret)
     {public_key, _secret} = KeyPair.from_secret_seed(secret)
@@ -114,6 +130,25 @@ defmodule Stellar.TxBuild.Signature do
     }
   end
 
+  defp build_signature(signed_payload: {payload, secret}) do
+    raw_payload = Base.decode16!(payload, case: :lower)
+    raw_secret = KeyPair.raw_secret_seed(secret)
+
+    {public_key, _secret} = KeyPair.from_secret_seed(secret)
+
+    signature_hint =
+      public_key
+      |> KeyPair.raw_public_key()
+      |> KeyPair.signature_hint_for_signed_payload(raw_payload)
+
+    %__MODULE__{
+      type: :signed_payload,
+      key: {payload, secret},
+      raw_key: {raw_payload, raw_secret},
+      hint: signature_hint
+    }
+  end
+
   @spec signature_hint([{type(), binary()}]) :: binary()
   defp signature_hint(ed25519: raw_public_key) do
     key_type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
@@ -140,6 +175,16 @@ defmodule Stellar.TxBuild.Signature do
       :ok
     else
       _ -> {:error, :invalid_preimage}
+    end
+  end
+
+  defp validate_payload(payload) do
+    with {:ok, raw_payload} <- Base.decode16(payload, case: :lower),
+         size <- byte_size(raw_payload),
+         true <- size <= 32 do
+      :ok
+    else
+      _ -> {:error, :invalid_payload}
     end
   end
 end
