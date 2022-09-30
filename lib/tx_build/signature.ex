@@ -55,10 +55,14 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   @spec to_xdr(signature :: t(), base_signature :: binary()) :: DecoratedSignature.t()
-  def to_xdr(%__MODULE__{type: :ed25519, key: key, hint: hint}, base_signature) do
+  def to_xdr(%__MODULE__{type: :ed25519, key: secret, hint: hint}, base_signature) do
     base_signature
-    |> KeyPair.sign(key)
+    |> KeyPair.sign(secret)
     |> decorated_signature(hint)
+  end
+
+  def to_xdr(%__MODULE__{} = signature, _base_signature) do
+    to_xdr(signature)
   end
 
   @impl true
