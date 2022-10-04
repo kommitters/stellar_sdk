@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.Signature do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :ed25519 | :sha256_hash | :pre_auth_tx | :signed_payload
+  @type type :: :ed25519 | :hash_x | :signed_payload
   @type key :: String.t() | {String.t(), String.t()}
   @type raw_key :: binary() | {binary(), binary()}
 
@@ -29,23 +29,22 @@ defmodule Stellar.TxBuild.Signature do
   defstruct [:type, :key, :raw_key, :hint]
 
   @impl true
-  def new(keypair, opts \\ [])
+  def new(args, opts \\ [])
 
   def new({_public_key, secret}, _opts), do: new(ed25519: secret)
 
   def new([ed25519: secret], _opts) do
-    with :ok <- KeyPair.validate_secret_seed(secret),
-         do: build_signature(ed25519: secret)
+    case KeyPair.validate_secret_seed(secret) do
+      :ok -> build_signature(ed25519: secret)
+      error -> error
+    end
   end
 
-  def new([preimage: preimage], _opts) do
-    with :ok <- validate_preimage(preimage),
-         do: build_signature(preimage: preimage)
-  end
-
-  def new([pre_auth_tx: pre_auth_tx], _opts) do
-    with :ok <- KeyPair.validate_pre_auth_tx(pre_auth_tx),
-         do: build_signature(pre_auth_tx: pre_auth_tx)
+  def new([hash_x: preimage], _opts) do
+    case validate_preimage(preimage) do
+      :ok -> build_signature(hash_x: preimage)
+      error -> error
+    end
   end
 
   def new([signed_payload: {payload, secret}], _opts) do
@@ -61,9 +60,7 @@ defmodule Stellar.TxBuild.Signature do
     |> decorated_signature(hint)
   end
 
-  def to_xdr(%__MODULE__{} = signature, _base_signature) do
-    to_xdr(signature)
-  end
+  def to_xdr(%__MODULE__{} = signature, _base_signature), do: to_xdr(signature)
 
   @impl true
   def to_xdr(%__MODULE__{
@@ -89,6 +86,7 @@ defmodule Stellar.TxBuild.Signature do
     |> DecoratedSignature.new(signature)
   end
 
+  @spec build_signature([{type(), String.t() | tuple()}]) :: t()
   defp build_signature(ed25519: secret) do
     raw_secret = KeyPair.raw_secret_seed(secret)
     {public_key, _secret} = KeyPair.from_secret_seed(secret)
@@ -106,30 +104,18 @@ defmodule Stellar.TxBuild.Signature do
     }
   end
 
-  defp build_signature(preimage: preimage) do
+  defp build_signature(hash_x: preimage) do
     raw_preimage = Base.decode16!(preimage, case: :lower)
 
     signature_hint =
       :sha256
       |> :crypto.hash(raw_preimage)
-      |> (&signature_hint(sha256_hash: &1)).()
+      |> (&signature_hint(hash_x: &1)).()
 
     %__MODULE__{
-      type: :sha256_hash,
+      type: :hash_x,
       key: preimage,
       raw_key: raw_preimage,
-      hint: signature_hint
-    }
-  end
-
-  defp build_signature(pre_auth_tx: pre_auth_tx) do
-    raw_pre_auth_tx = KeyPair.raw_pre_auth_tx(pre_auth_tx)
-    signature_hint = signature_hint(pre_auth_tx: raw_pre_auth_tx)
-
-    %__MODULE__{
-      type: :pre_auth_tx,
-      key: pre_auth_tx,
-      raw_key: raw_pre_auth_tx,
       hint: signature_hint
     }
   end
@@ -182,6 +168,7 @@ defmodule Stellar.TxBuild.Signature do
     end
   end
 
+  @spec validate_payload(payload :: String.t()) :: :ok | {:error, :invalid_payload}
   defp validate_payload(payload) do
     with {:ok, raw_payload} <- Base.decode16(payload, case: :lower),
          size <- byte_size(raw_payload),

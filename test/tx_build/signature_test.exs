@@ -39,18 +39,18 @@ defmodule Stellar.TxBuild.SignatureTest do
         Signature.new(ed25519: secret)
     end
 
-    test "to_xdr/2", %{signature: signature, secret: raw_secret, hint: hint} do
-      signature_xdr = decorated_signature_xdr(raw_secret, hint, <<0, 0, 0, 0>>)
-      ^signature_xdr = Signature.to_xdr(signature, <<0, 0, 0, 0>>)
-    end
-
     test "to_xdr/1", %{signature: signature, raw_secret: raw_secret, hint: hint} do
       signature_xdr = decorated_signature_xdr(raw_secret, hint)
       ^signature_xdr = Signature.to_xdr(signature)
     end
+
+    test "to_xdr/2", %{signature: signature, secret: raw_secret, hint: hint} do
+      signature_xdr = decorated_signature_xdr(raw_secret, hint, <<0, 0, 0, 0>>)
+      ^signature_xdr = Signature.to_xdr(signature, <<0, 0, 0, 0>>)
+    end
   end
 
-  describe "signature type :sha256_hash" do
+  describe "signature type :hash_x" do
     setup do
       preimage = "47eaeab9b381bdb8d15bc3ef50ef5860bd4fcb8b1a15e6e5d22fa7386d9322e0"
       hint = <<205, 0, 141, 56>>
@@ -63,48 +63,71 @@ defmodule Stellar.TxBuild.SignatureTest do
         preimage: preimage,
         raw_preimage: raw_preimage,
         hint: hint,
-        signature: Signature.new(preimage: preimage)
+        signature: Signature.new(hash_x: preimage)
       }
     end
 
-    test "new/2", %{preimage: preimage, raw_preimage: raw_preimage, hint: hint} do
-      %Signature{type: :sha256_hash, key: ^preimage, raw_key: ^raw_preimage, hint: ^hint} =
-        Signature.new(preimage: preimage)
+    test "new/1", %{preimage: preimage, raw_preimage: raw_preimage, hint: hint} do
+      %Signature{type: :hash_x, key: ^preimage, raw_key: ^raw_preimage, hint: ^hint} =
+        Signature.new(hash_x: preimage)
     end
 
     test "to_xdr/1", %{signature: signature, raw_preimage: raw_preimage, hint: hint} do
       signature_xdr = decorated_signature_xdr(raw_preimage, hint)
       ^signature_xdr = Signature.to_xdr(signature)
     end
+
+    test "to_xdr/2", %{signature: signature, preimage: raw_preimage, hint: hint} do
+      signature_xdr = Signature.to_xdr(signature)
+      ^signature_xdr = Signature.to_xdr(signature, <<0, 0, 0, 0>>)
+    end
   end
 
-  describe "signature type :pre_auth_tx" do
+  describe "signature type :signed_payload" do
     setup do
-      pre_auth_tx = "TCVFGJWNBF7LNCX4HNETQH7GXYUXUIZCUTCZ5PXUSZ3KJWESVXNCYN3B"
-
-      raw_pre_auth_tx =
-        <<170, 83, 38, 205, 9, 126, 182, 138, 252, 59, 73, 56, 31, 230, 190, 41, 122, 35, 34, 164,
-          197, 158, 190, 244, 150, 118, 164, 216, 146, 173, 218, 44>>
-
-      hint = <<146, 173, 218, 44>>
-      signature = Signature.new(pre_auth_tx: pre_auth_tx)
+      raw_payload = <<1, 2, 3, 4>>
+      payload = Base.encode16(raw_payload, case: :lower)
+      secret = "SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z"
+      raw_secret = KeyPair.raw_secret_seed(secret)
+      hint = <<197, 134, 97, 73>>
 
       %{
-        key: pre_auth_tx,
-        raw_key: raw_pre_auth_tx,
+        raw_payload: raw_payload,
+        payload: payload,
+        secret: secret,
+        raw_secret: raw_secret,
         hint: hint,
-        signature: signature
+        signature: Signature.new(signed_payload: {payload, secret})
       }
     end
 
-    test "new/2", %{key: pre_auth_tx, raw_key: raw_pre_auth_tx, hint: hint} do
-      %Signature{type: :pre_auth_tx, key: ^pre_auth_tx, raw_key: ^raw_pre_auth_tx, hint: ^hint} =
-        Signature.new(pre_auth_tx: pre_auth_tx)
+    test "new/1", %{
+      raw_payload: raw_payload,
+      payload: payload,
+      secret: secret,
+      raw_secret: raw_secret,
+      hint: hint
+    } do
+      %Signature{
+        type: :signed_payload,
+        key: {^payload, ^secret},
+        raw_key: {^raw_payload, ^raw_secret},
+        hint: ^hint
+      } = Signature.new(signed_payload: {payload, secret})
     end
 
-    test "to_xdr/1", %{signature: signature, raw_key: raw_pre_auth_tx, hint: hint} do
-      signature_xdr = decorated_signature_xdr(raw_pre_auth_tx, hint)
+    test "to_xdr/1", %{signature: signature, raw_payload: raw_payload, secret: secret, hint: hint} do
+      signature_xdr =
+        raw_payload
+        |> KeyPair.sign(secret)
+        |> decorated_signature_xdr(hint)
+
       ^signature_xdr = Signature.to_xdr(signature)
+    end
+
+    test "to_xdr/2", %{signature: signature} do
+      signature_xdr = Signature.to_xdr(signature)
+      ^signature_xdr = Signature.to_xdr(signature, <<0, 0, 0, 0>>)
     end
   end
 end
