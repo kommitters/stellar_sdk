@@ -68,6 +68,20 @@ defmodule Stellar.TxBuild.Signature do
         key: {_payload, secret},
         raw_key: {raw_payload, _raw_secret},
         hint: hint
+      })
+      when byte_size(raw_payload) < 4 do
+    zeros_needed = 4 - byte_size(raw_payload)
+
+    <<raw_payload::binary, 0::zeros_needed*8>>
+    |> KeyPair.sign(secret)
+    |> decorated_signature(hint)
+  end
+
+  def to_xdr(%__MODULE__{
+        type: :signed_payload,
+        key: {_payload, secret},
+        raw_key: {raw_payload, _raw_secret},
+        hint: hint
       }) do
     raw_payload
     |> KeyPair.sign(secret)
