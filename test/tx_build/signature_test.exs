@@ -77,7 +77,7 @@ defmodule Stellar.TxBuild.SignatureTest do
       ^signature_xdr = Signature.to_xdr(signature)
     end
 
-    test "to_xdr/2", %{signature: signature, preimage: raw_preimage, hint: hint} do
+    test "to_xdr/2", %{signature: signature} do
       signature_xdr = Signature.to_xdr(signature)
       ^signature_xdr = Signature.to_xdr(signature, <<0, 0, 0, 0>>)
     end

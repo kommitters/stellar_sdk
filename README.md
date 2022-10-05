@@ -308,11 +308,8 @@ operation = Stellar.TxBuild.Payment.new(
 
 # build transaction signatures
 # signer accounts should exist in the ledger
-signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
-signer_key_pair2 = Stellar.KeyPair.from_secret_seed("SA2NWVOPQMQYAU5RATOE7HJLMPLQZRNPGSOQGGEG6P2ZSYTWFORY5AV5")
-
-signature1 = Stellar.TxBuild.Signature.new(signer_key_pair)
-signature2 = Stellar.TxBuild.Signature.new(signer_key_pair2)
+signature1 = Stellar.TxBuild.Signature.new(ed25519: "SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
+signature2 = Stellar.TxBuild.Signature.new(ed25519: "SA2NWVOPQMQYAU5RATOE7HJLMPLQZRNPGSOQGGEG6P2ZSYTWFORY5AV5")
 
 # add a single signature to a transaction
 {:ok, tx_build} =
@@ -347,8 +344,7 @@ operation = Stellar.TxBuild.Payment.new(
 
 # build the transaction signatures
 # signer account should exist in the ledger
-signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
-signature = Stellar.TxBuild.Signature.new(signer_key_pair)
+signature = Stellar.TxBuild.Signature.new(ed25519: "SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
 
 # build a base64 transaction envelope
 source_account
@@ -386,8 +382,7 @@ operation = Stellar.TxBuild.Payment.new(
 
 # build the transaction signatures
 # signer account should exist in the ledger
-signer_key_pair = Stellar.KeyPair.from_secret_seed("SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
-signature = Stellar.TxBuild.Signature.new(signer_key_pair)
+signature = Stellar.TxBuild.Signature.new(ed25519: "SBJJSBBXGKNXALBZ3F3UTHAPKJSESACSKPLW2ZEMM5E5WPVNNKTW55XN")
 
 # build a base64 transaction envelope
 {:ok, base64_envelope} =
@@ -846,7 +841,7 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [stellar-docs-extra-signers]: https://developers.stellar.org/docs/glossary/transactions/#extra-signers
 [stellar-docs-tx-envelope]: https://developers.stellar.org/docs/glossary/transactions/#transaction-envelopes
 [stellar-docs-list-operations]: https://developers.stellar.org/docs/start/list-of-operations
-[stellar-docs-tx-signatures]: https://developers.stellar.org/docs/glossary/multisig/#transaction-signatures
+[stellar-docs-tx-signatures]: https://developers.stellar.org/docs/encyclopedia/signatures-multisig
 [stellar-cap-27]: https://stellar.org/protocol/cap-27
 [stellar-protocol-19]: https://stellar.org/blog/announcing-protocol-19
 [stellar-docs-account-seq-num-age]: https://developers.stellar.org/docs/glossary/accounts/#sequence-time-and-ledger
