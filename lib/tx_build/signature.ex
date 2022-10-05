@@ -103,12 +103,7 @@ defmodule Stellar.TxBuild.Signature do
   @spec build_signature([{type(), String.t() | tuple()}]) :: t()
   defp build_signature(ed25519: secret) do
     raw_secret = KeyPair.raw_secret_seed(secret)
-    {public_key, _secret} = KeyPair.from_secret_seed(secret)
-
-    signature_hint =
-      public_key
-      |> KeyPair.raw_public_key()
-      |> (&signature_hint(ed25519: &1)).()
+    signature_hint = signature_hint(ed25519: raw_secret)
 
     %__MODULE__{
       type: :ed25519,
@@ -120,11 +115,7 @@ defmodule Stellar.TxBuild.Signature do
 
   defp build_signature(hash_x: preimage) do
     raw_preimage = Base.decode16!(preimage, case: :lower)
-
-    signature_hint =
-      :sha256
-      |> :crypto.hash(raw_preimage)
-      |> (&signature_hint(hash_x: &1)).()
+    signature_hint = signature_hint(hash_x: raw_preimage)
 
     %__MODULE__{
       type: :hash_x,
@@ -154,22 +145,27 @@ defmodule Stellar.TxBuild.Signature do
   end
 
   @spec signature_hint([{type(), binary()}]) :: binary()
-  defp signature_hint(ed25519: raw_public_key) do
+  defp signature_hint(ed25519: raw_secret) do
     key_type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
 
-    raw_public_key
+    raw_secret
+    |> Ed25519.derive_public_key()
     |> UInt256.new()
     |> PublicKey.new(key_type)
     |> PublicKey.encode_xdr!()
     |> extract_hint()
   end
 
-  defp signature_hint([{_key_type, raw_key}]), do: extract_hint(raw_key)
+  defp signature_hint(hash_x: raw_preimage) do
+    :sha256
+    |> :crypto.hash(raw_preimage)
+    |> extract_hint()
+  end
 
   @spec extract_hint(raw_key :: binary()) :: binary()
   defp extract_hint(raw_key) do
     bytes_size = byte_size(raw_key)
-    binary_part(raw_key, bytes_size - 4, 4)
+    binary_part(raw_key, bytes_size, -4)
   end
 
   @spec validate_preimage(preimage :: String.t()) :: :ok | {:error, :invalid_preimage}
