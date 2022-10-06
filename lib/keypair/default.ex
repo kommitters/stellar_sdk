@@ -131,25 +131,20 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
-  def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) == 4 do
-    public_key
-    |> byte_size()
-    |> (&binary_part(public_key, &1, -4)).()
-    |> :crypto.exor(payload)
-  end
-
-  def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) > 4 do
-    payload
-    |> byte_size()
-    |> (&binary_part(payload, &1, -4)).()
-    |> (&signature_hint_for_signed_payload(public_key, &1)).()
-  end
-
   def signature_hint_for_signed_payload(public_key, payload) when byte_size(payload) < 4 do
-    payload
-    |> byte_size()
-    # Append zeros as needed
-    |> (&(payload <> :binary.copy(<<0>>, 4 - &1))).()
-    |> (&signature_hint_for_signed_payload(public_key, &1)).()
+    zeros_needed = 4 - byte_size(payload)
+    signature_hint_for_signed_payload(public_key, <<payload::binary, 0::zeros_needed*8>>)
+  end
+
+  def signature_hint_for_signed_payload(public_key, payload) do
+    hint = last_bytes(public_key)
+    payload = last_bytes(payload)
+    :crypto.exor(hint, payload)
+  end
+
+  @spec last_bytes(data :: binary()) :: binary()
+  defp last_bytes(data) do
+    bytes_size = byte_size(data)
+    binary_part(data, bytes_size, -4)
   end
 end

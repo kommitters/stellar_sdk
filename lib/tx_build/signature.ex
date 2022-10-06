@@ -15,35 +15,81 @@ defmodule Stellar.TxBuild.Signature do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type type :: :ed25519 | :hash_x | :signed_payload
+  @type key :: String.t() | {String.t(), String.t()}
+  @type raw_key :: binary() | {binary(), binary()}
+
   @type t :: %__MODULE__{
-          public_key: String.t(),
-          secret: String.t(),
-          raw_public_key: binary(),
-          raw_secret: binary(),
+          type: type(),
+          key: key(),
+          raw_key: raw_key(),
           hint: binary()
         }
 
-  defstruct [:public_key, :secret, :raw_public_key, :raw_secret, :hint]
+  defstruct [:type, :key, :raw_key, :hint]
 
   @impl true
-  def new(keypair, opts \\ [])
+  def new(args, opts \\ [])
 
-  def new({public_key, secret}, _opts) do
-    with :ok <- KeyPair.validate_public_key(public_key),
+  def new({_public_key, secret}, _opts), do: new(ed25519: secret)
+
+  def new([ed25519: secret], _opts) do
+    case KeyPair.validate_secret_seed(secret) do
+      :ok -> build_signature(ed25519: secret)
+      error -> error
+    end
+  end
+
+  def new([hash_x: preimage], _opts) do
+    case validate_preimage(preimage) do
+      :ok -> build_signature(hash_x: preimage)
+      error -> error
+    end
+  end
+
+  def new([signed_payload: {payload, secret}], _opts) do
+    with :ok <- validate_payload(payload),
          :ok <- KeyPair.validate_secret_seed(secret),
-         do: build_signature(public_key, secret)
+         do: build_signature(signed_payload: {payload, secret})
   end
 
   @spec to_xdr(signature :: t(), base_signature :: binary()) :: DecoratedSignature.t()
-  def to_xdr(%__MODULE__{hint: hint, secret: secret}, base_signature) do
+  def to_xdr(%__MODULE__{type: :ed25519, key: secret, hint: hint}, base_signature) do
     base_signature
     |> KeyPair.sign(secret)
     |> decorated_signature(hint)
   end
 
+  def to_xdr(%__MODULE__{} = signature, _base_signature), do: to_xdr(signature)
+
   @impl true
-  def to_xdr(%__MODULE__{hint: hint, raw_secret: raw_secret}),
-    do: decorated_signature(raw_secret, hint)
+  def to_xdr(%__MODULE__{
+        type: :signed_payload,
+        key: {_payload, secret},
+        raw_key: {raw_payload, _raw_secret},
+        hint: hint
+      })
+      when byte_size(raw_payload) < 4 do
+    zeros_needed = 4 - byte_size(raw_payload)
+
+    <<raw_payload::binary, 0::zeros_needed*8>>
+    |> KeyPair.sign(secret)
+    |> decorated_signature(hint)
+  end
+
+  def to_xdr(%__MODULE__{
+        type: :signed_payload,
+        key: {_payload, secret},
+        raw_key: {raw_payload, _raw_secret},
+        hint: hint
+      }) do
+    raw_payload
+    |> KeyPair.sign(secret)
+    |> decorated_signature(hint)
+  end
+
+  def to_xdr(%__MODULE__{raw_key: raw_key, hint: hint}),
+    do: decorated_signature(raw_key, hint)
 
   @spec decorated_signature(raw_signature :: binary(), hint :: binary()) :: DecoratedSignature.t()
   defp decorated_signature(raw_signature, hint) do
@@ -54,35 +100,92 @@ defmodule Stellar.TxBuild.Signature do
     |> DecoratedSignature.new(signature)
   end
 
-  @spec build_signature(public_key :: String.t(), secret :: String.t()) :: t()
-  defp build_signature(public_key, secret) do
-    raw_public_key = KeyPair.raw_public_key(public_key)
+  @spec build_signature([{type(), String.t() | tuple()}]) :: t()
+  defp build_signature(ed25519: secret) do
     raw_secret = KeyPair.raw_secret_seed(secret)
-    signature_hint = signature_hint(raw_public_key)
+    signature_hint = signature_hint(ed25519: raw_secret)
 
     %__MODULE__{
-      public_key: public_key,
-      raw_public_key: raw_public_key,
-      secret: secret,
-      raw_secret: raw_secret,
+      type: :ed25519,
+      key: secret,
+      raw_key: raw_secret,
       hint: signature_hint
     }
   end
 
-  @spec signature_hint(raw_public_key :: binary()) :: binary()
-  defp signature_hint(raw_public_key) do
+  defp build_signature(hash_x: preimage) do
+    raw_preimage = Base.decode16!(preimage, case: :lower)
+    signature_hint = signature_hint(hash_x: raw_preimage)
+
+    %__MODULE__{
+      type: :hash_x,
+      key: preimage,
+      raw_key: raw_preimage,
+      hint: signature_hint
+    }
+  end
+
+  defp build_signature(signed_payload: {payload, secret}) do
+    raw_payload = Base.decode16!(payload, case: :lower)
+    raw_secret = KeyPair.raw_secret_seed(secret)
+
+    {public_key, _secret} = KeyPair.from_secret_seed(secret)
+
+    signature_hint =
+      public_key
+      |> KeyPair.raw_public_key()
+      |> KeyPair.signature_hint_for_signed_payload(raw_payload)
+
+    %__MODULE__{
+      type: :signed_payload,
+      key: {payload, secret},
+      raw_key: {raw_payload, raw_secret},
+      hint: signature_hint
+    }
+  end
+
+  @spec signature_hint([{type(), binary()}]) :: binary()
+  defp signature_hint(ed25519: raw_secret) do
     key_type = PublicKeyType.new(:PUBLIC_KEY_TYPE_ED25519)
 
-    raw_public_key
+    raw_secret
+    |> Ed25519.derive_public_key()
     |> UInt256.new()
     |> PublicKey.new(key_type)
     |> PublicKey.encode_xdr!()
-    |> public_key_hint()
+    |> extract_hint()
   end
 
-  @spec public_key_hint(encoded_public_key :: binary()) :: binary()
-  defp public_key_hint(encoded_public_key) do
-    bytes_size = byte_size(encoded_public_key)
-    binary_part(encoded_public_key, bytes_size - 4, 4)
+  defp signature_hint(hash_x: raw_preimage) do
+    :sha256
+    |> :crypto.hash(raw_preimage)
+    |> extract_hint()
+  end
+
+  @spec extract_hint(raw_key :: binary()) :: binary()
+  defp extract_hint(raw_key) do
+    bytes_size = byte_size(raw_key)
+    binary_part(raw_key, bytes_size, -4)
+  end
+
+  @spec validate_preimage(preimage :: String.t()) :: :ok | {:error, :invalid_preimage}
+  defp validate_preimage(preimage) do
+    with {:ok, raw_preimage} <- Base.decode16(preimage, case: :lower),
+         32 <- byte_size(raw_preimage) do
+      :ok
+    else
+      _ -> {:error, :invalid_preimage}
+    end
+  end
+
+  @spec validate_payload(payload :: String.t()) :: :ok | {:error, :invalid_payload}
+  defp validate_payload(payload) do
+    with {:ok, raw_payload} <- Base.decode16(payload, case: :lower),
+         size <- byte_size(raw_payload),
+         true <- size <= 32 do
+      :ok
+    else
+      _ -> {:error, :invalid_payload}
+    end
   end
 end
