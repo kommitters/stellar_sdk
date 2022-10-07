@@ -87,7 +87,6 @@ defmodule Stellar.TxBuild.Transaction do
   def hash(tx) do
     tx
     |> base_signature()
-    |> hash_data()
     |> Base.encode16(case: :lower)
   end
 
