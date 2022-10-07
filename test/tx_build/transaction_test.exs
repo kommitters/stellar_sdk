@@ -269,14 +269,16 @@ defmodule Stellar.TxBuild.TransactionTest do
     base_signature =
       <<232, 58, 100, 77, 53, 147, 183, 228, 59, 234, 60, 11, 215, 201, 7, 20, 182, 219, 243, 41,
         152, 10, 158, 235, 229, 86, 170, 114, 7, 63, 212, 235>>
-    tx = Transaction.new(
-      source_account: source_account,
-      sequence_number: sequence_number,
-      base_fee: base_fee,
-      preconditions: preconditions,
-      memo: memo,
-      operations: operations
-    )
+
+    tx =
+      Transaction.new(
+        source_account: source_account,
+        sequence_number: sequence_number,
+        base_fee: base_fee,
+        preconditions: preconditions,
+        memo: memo,
+        operations: operations
+      )
 
     tx_xdr = Transaction.to_xdr(tx)
 
