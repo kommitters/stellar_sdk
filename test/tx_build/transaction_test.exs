@@ -235,4 +235,52 @@ defmodule Stellar.TxBuild.TransactionTest do
       )
       |> Transaction.to_xdr()
   end
+
+  test "hash/1", %{
+    source_account: source_account,
+    sequence_number: sequence_number,
+    base_fee: base_fee,
+    memo: memo,
+    preconditions: preconditions,
+    operations: operations
+  } do
+    hash = "e83a644d3593b7e43bea3c0bd7c90714b6dbf329980a9eebe556aa72073fd4eb"
+
+    ^hash =
+      Transaction.new(
+        source_account: source_account,
+        sequence_number: sequence_number,
+        base_fee: base_fee,
+        preconditions: preconditions,
+        memo: memo,
+        operations: operations
+      )
+      |> Transaction.hash()
+  end
+
+  test "base_signature/1", %{
+    source_account: source_account,
+    sequence_number: sequence_number,
+    base_fee: base_fee,
+    memo: memo,
+    preconditions: preconditions,
+    operations: operations
+  } do
+    base_signature =
+      <<232, 58, 100, 77, 53, 147, 183, 228, 59, 234, 60, 11, 215, 201, 7, 20, 182, 219, 243, 41,
+        152, 10, 158, 235, 229, 86, 170, 114, 7, 63, 212, 235>>
+    tx = Transaction.new(
+      source_account: source_account,
+      sequence_number: sequence_number,
+      base_fee: base_fee,
+      preconditions: preconditions,
+      memo: memo,
+      operations: operations
+    )
+
+    tx_xdr = Transaction.to_xdr(tx)
+
+    ^base_signature = Transaction.base_signature(tx)
+    ^base_signature = Transaction.base_signature(tx_xdr)
+  end
 end

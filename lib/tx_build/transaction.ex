@@ -106,7 +106,7 @@ defmodule Stellar.TxBuild.Transaction do
   end
 
   @spec signature_payload(tagged_tx :: struct()) :: binary()
-  def signature_payload(tagged_tx) do
+  defp signature_payload(tagged_tx) do
     network_id_xdr()
     |> TransactionSignaturePayload.new(tagged_tx)
     |> TransactionSignaturePayload.encode_xdr!()
@@ -114,7 +114,7 @@ defmodule Stellar.TxBuild.Transaction do
   end
 
   @spec network_id_xdr :: Hash.t()
-  def network_id_xdr do
+  defp network_id_xdr do
     Network.passphrase()
     |> hash_data()
     |> Hash.new()
