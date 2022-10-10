@@ -5,7 +5,6 @@ defmodule Stellar.TxBuild.Signer do
 
   @behaviour Stellar.TxBuild.XDR
 
-  alias Stellar.KeyPair
   alias Stellar.TxBuild.{Weight, SignerKey}
   alias StellarBase.StrKey
   alias StellarBase.XDR.{Signer, VariableOpaque64, UInt256, SignerKeyEd25519SignedPayload}
@@ -19,8 +18,8 @@ defmodule Stellar.TxBuild.Signer do
   @impl true
   def new(args, opts \\ [])
 
-  def new([{_signer_type, _signer_key} = signer_key_tuple, {:weight, weight}], _opts) do
-    with {:ok, signer_key} <- validate_signer_key_tuple(signer_key_tuple),
+  def new([{_signer_type, _signer_key} = signer_key, {:weight, weight}], _opts) do
+    with {:ok, signer_key} <- validate_signer_key(signer_key),
          {:ok, weight} <- validate_signer_weight(weight) do
       %__MODULE__{signer_key: signer_key, weight: weight}
     end
@@ -52,27 +51,23 @@ defmodule Stellar.TxBuild.Signer do
     end
   end
 
-  @spec validate_signer_key_tuple(signer_key :: tuple()) :: validation()
-  defp validate_signer_key_tuple({:pre_auth_tx, signer_key}) do
+  @spec validate_signer_key(signer_key :: tuple() | String.t()) :: validation()
+  defp validate_signer_key({:pre_auth_tx, signer_key}) do
     with {:ok, raw_pre_auth_tx} <- validate_bytes_hex_string(signer_key),
          pre_auth_tx <- StrKey.encode!(raw_pre_auth_tx, :pre_auth_tx) do
       {:ok, SignerKey.new(pre_auth_tx)}
-    else
-      _ -> {:error, :invalid_signer_key}
     end
   end
 
-  defp validate_signer_key_tuple({:hash_x, signer_key}) do
+  defp validate_signer_key({:hash_x, signer_key}) do
     with {:ok, raw_hash_x} <- validate_bytes_hex_string(signer_key),
          hash_x <- StrKey.encode!(raw_hash_x, :sha256_hash) do
       {:ok, SignerKey.new(hash_x)}
-    else
-      _ -> {:error, :invalid_signer_key}
     end
   end
 
-  defp validate_signer_key_tuple({:signed_payload, [ed25519: public_key, payload: payload]}) do
-    with :ok <- KeyPair.validate_public_key(public_key),
+  defp validate_signer_key({:signed_payload, [ed25519: public_key, payload: payload]}) do
+    with {:ok, _public_signer_key} <- validate_signer_key(public_key),
          {:ok, raw_payload} <- validate_payload(payload) do
       payload_xdr = VariableOpaque64.new(raw_payload)
 
@@ -86,12 +81,10 @@ defmodule Stellar.TxBuild.Signer do
         |> SignerKey.new()
 
       {:ok, signed_payload_signer_key}
-    else
-      _ -> {:error, :invalid_signer_key}
     end
   end
 
-  defp validate_signer_key_tuple({:ed25519, public_key}), do: validate_signer_key(public_key)
+  defp validate_signer_key({:ed25519, public_key}), do: validate_signer_key(public_key)
 
   defp validate_signer_key(signer_key) do
     case SignerKey.new(signer_key) do
@@ -106,7 +99,7 @@ defmodule Stellar.TxBuild.Signer do
          ^bytes <- byte_size(raw_value) do
       {:ok, raw_value}
     else
-      _ -> {:error, :invalid_32bytes_hex}
+      _ -> {:error, :invalid_signer_key}
     end
   end
 
@@ -117,7 +110,7 @@ defmodule Stellar.TxBuild.Signer do
          true <- size <= 32 do
       {:ok, raw_payload}
     else
-      _ -> {:error, :invalid_payload}
+      _ -> {:error, :invalid_signer_key}
     end
   end
 end
