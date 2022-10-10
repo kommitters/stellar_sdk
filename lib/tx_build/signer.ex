@@ -93,7 +93,7 @@ defmodule Stellar.TxBuild.Signer do
     end
   end
 
-  @spec validate_bytes_hex_string(value :: String.t()) :: validation()
+  @spec validate_bytes_hex_string(value :: String.t(), bytes :: integer()) :: validation()
   defp validate_bytes_hex_string(value, bytes \\ 32) do
     with {:ok, raw_value} <- Base.decode16(value, case: :lower),
          ^bytes <- byte_size(raw_value) do
