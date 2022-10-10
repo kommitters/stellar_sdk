@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.SignerTest do
     hex_hash_x = "a6fd63a6cfe7331d6cda52a1a1f1df81f814b6e5709ad3d06f18d414a801b891"
     hex_pre_auth_tx = "aa5326cd097eb68afc3b49381fe6be297a2322a4c59ebef49676a4d892adda2c"
 
-    signed_payload_opts = [
+    signed_payload_keyword = [
       ed25519: "GA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJVSGZ",
       payload: "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
     ]
@@ -28,7 +28,7 @@ defmodule Stellar.TxBuild.SignerTest do
       signed_payload: signed_payload,
       hex_hash_x: hex_hash_x,
       hex_pre_auth_tx: hex_pre_auth_tx,
-      signed_payload_opts: signed_payload_opts,
+      signed_payload_keyword: signed_payload_keyword,
       ed25519_signer_key: SignerKey.new(ed25519),
       hash_x_signer_key: SignerKey.new(hash_x),
       pre_auth_tx_signer_key: SignerKey.new(pre_auth_tx),
@@ -94,12 +94,12 @@ defmodule Stellar.TxBuild.SignerTest do
   end
 
   test "new/2 signed_payload with_input_as_keywordlist", %{
-    signed_payload_opts: signed_payload_opts,
+    signed_payload_keyword: signed_payload_keyword,
     signed_payload_signer_key: signer_key,
     weight: weight
   } do
     %Signer{signer_key: ^signer_key, weight: ^weight} =
-      Signer.new(signed_payload: signed_payload_opts, weight: 2)
+      Signer.new(signed_payload: signed_payload_keyword, weight: 2)
   end
 
   test "new/2 with_invalid_signer_key" do
