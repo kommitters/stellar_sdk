@@ -15,7 +15,8 @@ defmodule Stellar.TxBuild.Default do
     Preconditions,
     TimeBounds,
     Transaction,
-    TransactionEnvelope
+    TransactionEnvelope,
+    TransactionSignature
   }
 
   @behaviour Stellar.TxBuild.Spec
@@ -212,4 +213,14 @@ defmodule Stellar.TxBuild.Default do
   end
 
   def sign_envelope(_tx_base64, _signature), do: {:error, :invalid_signature}
+
+  @impl true
+  def hash(%TxBuild{tx: tx}) do
+    tx
+    |> Transaction.to_xdr()
+    |> TransactionSignature.base_signature()
+    |> Base.encode16(case: :lower)
+  end
+
+  def hash(_tx), do: {:error, :invalid_transaction}
 end

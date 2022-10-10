@@ -3,8 +3,6 @@ defmodule Stellar.TxBuild.Transaction do
   `Transaction` struct definition.
   """
 
-  alias Stellar.Network
-
   alias Stellar.TxBuild.{
     Account,
     BaseFee,
@@ -14,11 +12,7 @@ defmodule Stellar.TxBuild.Transaction do
     Preconditions
   }
 
-  alias StellarBase.XDR.{Ext, EnvelopeType, TransactionSignaturePayload, Hash}
-
-  alias StellarBase.XDR.Transaction, as: TransactionXDR
-
-  alias StellarBase.XDR.TransactionSignaturePayloadTaggedTransaction, as: TaggedTransaction
+  alias StellarBase.XDR.{Ext, Transaction}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -72,7 +66,7 @@ defmodule Stellar.TxBuild.Transaction do
         memo: memo,
         operations: operations
       }) do
-    TransactionXDR.new(
+    Transaction.new(
       Account.to_xdr(source_account),
       BaseFee.to_xdr(base_fee),
       SequenceNumber.to_xdr(sequence_number),
@@ -82,46 +76,6 @@ defmodule Stellar.TxBuild.Transaction do
       Ext.new()
     )
   end
-
-  @spec hash(tx :: t()) :: String.t()
-  def hash(tx) do
-    tx
-    |> base_signature()
-    |> Base.encode16(case: :lower)
-  end
-
-  @spec base_signature(tx :: t() | TransactionXDR.t()) :: binary()
-  def base_signature(%__MODULE__{} = tx) do
-    tx
-    |> to_xdr()
-    |> base_signature()
-  end
-
-  def base_signature(%TransactionXDR{} = tx) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
-
-    tx
-    |> TaggedTransaction.new(envelope_type)
-    |> signature_payload()
-  end
-
-  @spec signature_payload(tagged_tx :: struct()) :: binary()
-  defp signature_payload(tagged_tx) do
-    network_id_xdr()
-    |> TransactionSignaturePayload.new(tagged_tx)
-    |> TransactionSignaturePayload.encode_xdr!()
-    |> hash_data()
-  end
-
-  @spec network_id_xdr :: Hash.t()
-  defp network_id_xdr do
-    Network.passphrase()
-    |> hash_data()
-    |> Hash.new()
-  end
-
-  @spec hash_data(data :: binary()) :: binary()
-  defp hash_data(data), do: :crypto.hash(:sha256, data)
 
   @spec validate_source_account(source_account :: Account.t()) :: validation()
   defp validate_source_account(%Account{} = source_account), do: {:ok, source_account}

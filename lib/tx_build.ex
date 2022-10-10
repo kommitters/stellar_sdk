@@ -57,6 +57,9 @@ defmodule Stellar.TxBuild do
   def sign_envelope(base64_envelope, signatures),
     do: impl().sign_envelope(base64_envelope, signatures)
 
+  @impl true
+  def hash(tx), do: impl().hash(tx)
+
   @spec impl() :: atom()
   defp impl do
     Application.get_env(:stellar_sdk, :tx_build_impl, Stellar.TxBuild.Default)
