@@ -21,26 +21,32 @@ defmodule Stellar.TxBuild.SetOptionsTest do
     clear_flags = []
     set_flags = [:required, :revocable, :inmutable, :clawback_enabled]
     master_weight = 1
-    tresholds = [low: 1, med: 2, high: 3]
+    thresholds = [low: 1, med: 2, high: 3]
     home_domain = "stellar.org"
 
     signer = {"TD3ZRMKMZJBWZMQVA476YZZBT4ORHUCRYTX7RLPO2CKKP2UAPZTOJVEP", 1}
+
+    signer_keyword = [
+      pre_auth_tx: "f798b14cca436cb215073fec67219f1d13d051c4eff8adeed094a7ea807e66e4",
+      weight: 1
+    ]
 
     %{
       inflation_destination: inflation_destination,
       clear_flags: clear_flags,
       set_flags: set_flags,
       master_weight: master_weight,
-      tresholds: tresholds,
+      thresholds: thresholds,
       home_domain: home_domain,
       signer: signer,
+      signer_keyword: signer_keyword,
       xdr:
         set_options_xdr(
           inflation_destination,
           clear_flags,
           set_flags,
           master_weight,
-          tresholds,
+          thresholds,
           home_domain,
           signer
         )
@@ -72,8 +78,33 @@ defmodule Stellar.TxBuild.SetOptionsTest do
       )
   end
 
-  test "new/2 set_tresholds", %{
-    tresholds: [low: low_threshold, med: med_threshold, high: high_threshold]
+  test "new/2 with_signer_keyword", %{
+    inflation_destination: inflation_destination,
+    set_flags: set_flags,
+    master_weight: master_weight,
+    signer_keyword: signer_keyword
+  } do
+    inflation_destination_str = OptionalAccountID.new(inflation_destination)
+    set_flags_str = set_flags |> Flags.new() |> OptionalFlags.new()
+    master_weight_str = master_weight |> Weight.new() |> OptionalWeight.new()
+    signer_str = signer_keyword |> Signer.new() |> OptionalSigner.new()
+
+    %SetOptions{
+      inflation_destination: ^inflation_destination_str,
+      set_flags: ^set_flags_str,
+      master_weight: ^master_weight_str,
+      signer: ^signer_str
+    } =
+      SetOptions.new(
+        inflation_destination: inflation_destination,
+        set_flags: set_flags,
+        master_weight: master_weight,
+        signer: signer_keyword
+      )
+  end
+
+  test "new/2 set_thresholds", %{
+    thresholds: [low: low_threshold, med: med_threshold, high: high_threshold]
   } do
     low_threshold_str = low_threshold |> Weight.new() |> OptionalWeight.new()
     med_threshold_str = med_threshold |> Weight.new() |> OptionalWeight.new()
@@ -128,7 +159,7 @@ defmodule Stellar.TxBuild.SetOptionsTest do
     clear_flags: clear_flags,
     set_flags: set_flags,
     master_weight: master_weight,
-    tresholds: tresholds,
+    thresholds: thresholds,
     home_domain: home_domain,
     signer: signer
   } do
@@ -138,9 +169,9 @@ defmodule Stellar.TxBuild.SetOptionsTest do
         clear_flags: clear_flags,
         set_flags: set_flags,
         master_weight: master_weight,
-        low_threshold: tresholds[:low],
-        medium_threshold: tresholds[:med],
-        high_threshold: tresholds[:high],
+        low_threshold: thresholds[:low],
+        medium_threshold: thresholds[:med],
+        high_threshold: thresholds[:high],
         home_domain: home_domain,
         signer: signer
       )
