@@ -74,6 +74,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
     send(self(), {:envelope, "TX_ENVELOPE_GENERATED"})
     :ok
   end
+
+  @impl true
+  def hash(_tx) do
+    send(self(), {:hash, "TX_HASH_GENERATED"})
+    :ok
+  end
 end
 
 defmodule Stellar.TxBuildTest do
@@ -148,5 +154,10 @@ defmodule Stellar.TxBuildTest do
   test "envelope/1" do
     Stellar.TxBuild.envelope(%TxBuild{})
     assert_receive({:envelope, "TX_ENVELOPE_GENERATED"})
+  end
+
+  test "hash/1" do
+    Stellar.TxBuild.hash(%TxBuild{})
+    assert_receive({:hash, "TX_HASH_GENERATED"})
   end
 end
