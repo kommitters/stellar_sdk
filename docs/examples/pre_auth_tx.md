@@ -1,4 +1,4 @@
-# Pre-authorized transaction Signer
+# Pre-authorized transaction Signature
 
 You can actually sign a transaction "in advance", such that it might be valid in the future. To accomplish this, you add the *hash* of the transaction as a signer on the account. Then, when that transaction actually gets submitted to the network, it acts as if it was already signed by the account!
 
@@ -40,7 +40,7 @@ payment_op =
 payment_tx_hash = Stellar.TxBuild.hash(tx_build) # example: "0c771e0ac49dc7798097e222289fd350278bc4aef5cf82ae6fb39b1d869e18a2"
 
 # 6. get the transaction envelope
-{:ok, payment_tx_envelope} = Stellar.TxBuild.envelope(tx_build)
+{:ok, payment_tx_envelope} = Stellar.TxBuild.envelope({:ok, tx_build})
 ```
 
 Then, we'll add the *hash* as a signer on the account (via `SetOptions` operation), and submit the transaction to the network.

@@ -1,4 +1,4 @@
-# Ed25519 Signed Payload Signer
+# Ed25519 Signed Payload Signature
 
 The `Ed25519 Signed Payload` is a new signer type introduced in [CAP-40](https://github.com/stellar/stellar-protocol/blob/master/core/cap-0040.md).
 

@@ -1,4 +1,4 @@
-# Hash(x) Signer
+# Hash(x) Signature
 
 Adding a signature of type **hash(x)** allows anyone who knows **x** to sign the transaction. Of course, once it's used, it is revealed to the world, so it can be used by anyone.
 
