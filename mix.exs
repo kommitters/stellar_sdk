@@ -134,7 +134,10 @@ defmodule Stellar.MixProject do
       "CONTRIBUTING.md",
       "docs/examples.md",
       "docs/examples/create_account.md",
-      "docs/examples/payments.md"
+      "docs/examples/payments.md",
+      "docs/examples/hash_x.md",
+      "docs/examples/pre_auth_tx.md",
+      "docs/examples/ed25519_signed_payload.md"
     ]
   end
 
