@@ -47,7 +47,7 @@ defmodule Stellar.TxBuild.Signature do
     end
   end
 
-  def new([signed_payload: {payload, secret}], _opts) do
+  def new([signed_payload: [payload: payload, ed25519: secret]], _opts) do
     with :ok <- validate_payload(payload),
          :ok <- KeyPair.validate_secret_seed(secret),
          do: build_signature(signed_payload: {payload, secret})

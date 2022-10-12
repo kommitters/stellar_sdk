@@ -97,7 +97,7 @@ defmodule Stellar.TxBuild.SignatureTest do
         secret: secret,
         raw_secret: raw_secret,
         hint: hint,
-        signature: Signature.new(signed_payload: {payload, secret})
+        signature: Signature.new(signed_payload: [payload: payload, ed25519: secret])
       }
     end
 
@@ -113,7 +113,7 @@ defmodule Stellar.TxBuild.SignatureTest do
         key: {^payload, ^secret},
         raw_key: {^raw_payload, ^raw_secret},
         hint: ^hint
-      } = Signature.new(signed_payload: {payload, secret})
+      } = Signature.new(signed_payload: [payload: payload, ed25519: secret])
     end
 
     test "to_xdr/1", %{signature: signature, raw_payload: raw_payload, secret: secret, hint: hint} do
