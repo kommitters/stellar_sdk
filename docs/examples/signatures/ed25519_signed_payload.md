@@ -97,7 +97,7 @@ payment_op =
 
 # 4. build the tx signature with a signed payload
 #    by providing the hex-encoded payload, and the secret key
-signature = Stellar.TxBuild.Signature.new(signed_payload: {payload, payer_sk})
+signature = Stellar.TxBuild.Signature.new(signed_payload: [payload: payload, ed25519: payer_sk])
 
 # 5. submit the transaction to Horizon
 {:ok, envelope} =
