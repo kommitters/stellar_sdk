@@ -60,7 +60,7 @@ defmodule Stellar.TxBuild.Spec do
   @type envelope :: String.t()
   @type tx_build :: {:ok, TxBuild.t()} | {:error, atom()}
   @type tx_envelope :: {:ok, envelope()} | {:error, atom()}
-  @type hash :: String.t()
+  @type hash :: {:ok, String.t()} | {:error, atom()}
 
   @callback new(account(), opts()) :: tx_build()
   @callback add_memo(tx_build(), memo()) :: tx_build()

@@ -394,8 +394,8 @@ defmodule Stellar.TxBuild.DefaultTest do
     {:error, :invalid_signature} = TxBuild.envelope({:error, :invalid_signature})
   end
 
-  test "hash/1", %{tx_build: {:ok, tx_build}, tx_hash: tx_hash} do
-    ^tx_hash = TxBuild.hash(tx_build)
+  test "hash/1", %{tx_build: tx_build, tx_hash: tx_hash} do
+    {:ok, ^tx_hash} = TxBuild.hash(tx_build)
   end
 
   test "hash/1 piping_error" do
