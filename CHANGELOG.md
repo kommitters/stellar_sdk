@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.1 (13.10.2022)
+* Fix documentation paths.
+
 ## 0.11.0 (13.10.2022)
 * Support Signature for the missing signer types: **Hash(x)**, **Ed25519 Signed Payload**.
 * Make `SetOptions` operation more user-friendly and descriptive by changing the initialization entries.
