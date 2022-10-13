@@ -45,6 +45,8 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
         operations: Operations.new([op])
       )
 
+    tx_xdr = Transaction.to_xdr(tx)
+
     base_signature =
       <<221, 149, 123, 171, 23, 103, 0, 36, 251, 93, 218, 51, 151, 37, 43, 98, 224, 206, 210, 221,
         3, 94, 94, 67, 103, 51, 109, 194, 187, 158, 45, 212>>
@@ -56,7 +58,9 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
 
     %{
       tx: tx,
+      tx_xdr: tx_xdr,
       tx_envelope: tx_envelope,
+      base_signature: base_signature,
       decorated_signature: Signature.to_xdr(signature, base_signature),
       signatures: [signature, signature2]
     }
@@ -77,5 +81,9 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
       tx_envelope
       |> TransactionEnvelope.to_xdr()
       |> TransactionSignature.sign_xdr(extra_signature)
+  end
+
+  test "base_signature/1", %{tx_xdr: tx_xdr, base_signature: base_signature} do
+    ^base_signature = TransactionSignature.base_signature(tx_xdr)
   end
 end

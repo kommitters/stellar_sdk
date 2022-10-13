@@ -58,8 +58,10 @@ defmodule Stellar.TxBuild.Spec do
           | SetOptions.t()
   @type operations :: list(operation())
   @type envelope :: String.t()
+  @type hash :: String.t()
   @type tx_build :: {:ok, TxBuild.t()} | {:error, atom()}
   @type tx_envelope :: {:ok, envelope()} | {:error, atom()}
+  @type tx_hash :: {:ok, hash()} | {:error, atom()}
 
   @callback new(account(), opts()) :: tx_build()
   @callback add_memo(tx_build(), memo()) :: tx_build()
@@ -73,6 +75,7 @@ defmodule Stellar.TxBuild.Spec do
   @callback build(tx_build()) :: tx_build()
   @callback envelope(tx_build()) :: tx_envelope()
   @callback sign_envelope(envelope(), signatures()) :: tx_envelope()
+  @callback hash(tx_build()) :: tx_hash()
 
   @optional_callbacks add_memo: 2,
                       set_base_fee: 2,

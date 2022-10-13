@@ -49,7 +49,7 @@ defmodule Stellar.TxBuild.TransactionSignature do
   end
 
   @spec base_signature(tx_xdr :: TransactionXDR.t()) :: binary()
-  defp base_signature(%TransactionXDR{} = tx_xdr) do
+  def base_signature(%TransactionXDR{} = tx_xdr) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
 
     tx_xdr

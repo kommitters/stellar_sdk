@@ -61,7 +61,8 @@ defmodule Stellar.TxBuild.DefaultTest do
       tx_build_precond_v2: tx_build_precond_v2,
       tx_envelope: TransactionEnvelope.new(tx, []),
       tx_envelope_base64:
-        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO"
+        "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO",
+      tx_hash: "02eef2a9f2941077b5aa76fb7023494291f9c4e97e65c0e3c705475a69272484"
     }
   end
 
@@ -391,5 +392,13 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "envelope/1 piping_error" do
     {:error, :invalid_signature} = TxBuild.envelope({:error, :invalid_signature})
+  end
+
+  test "hash/1", %{tx_build: tx_build, tx_hash: tx_hash} do
+    {:ok, ^tx_hash} = TxBuild.hash(tx_build)
+  end
+
+  test "hash/1 piping_error" do
+    {:error, :invalid_transaction} = TxBuild.hash({:error, :invalid_transaction})
   end
 end
