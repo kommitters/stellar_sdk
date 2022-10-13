@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.11.0"
+  @version "0.11.1"
 
   def project do
     [
@@ -132,20 +132,18 @@ defmodule Stellar.MixProject do
       "README.md",
       "CHANGELOG.md",
       "CONTRIBUTING.md",
-      "docs/README.md",
       "docs/examples/operations/create_account.md",
       "docs/examples/operations/payments.md",
       "docs/examples/signatures/hash_x.md",
       "docs/examples/signatures/pre_auth_tx.md",
-      "docs/examples/signatures/ed25519_signed_payload.md"
+      "docs/examples/signatures/ed25519_signed_payload.md",
+      "docs/README.md": [filename: "examples"]
     ]
   end
 
   defp groups_for_extras do
     [
-      Examples: ~r/^docs\/README.md/,
-      Operations: ~r/docs\/examples\/operations\/.?/,
-      Signatures: ~r/docs\/examples\/signatures\/.?/
+      Examples: ~r/docs\/examples\/.?/
     ]
   end
 end
