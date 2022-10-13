@@ -19,7 +19,7 @@ This library is aimed at developers building Elixir applications that interact w
 The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
 * **`TxBuild`** - used for [**building transactions.**](#building-transactions)
 * **`Horizon`** - used for [**querying Horizon.**](#querying-horizon)
-* [**Examples.**](/docs/examples.md)
+* [**Examples.**](/docs/README.md)
 
 ## Installation
 [**Available in Hex**][hex], add `stellar_sdk` to your list of dependencies in `mix.exs`:
