@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.11.0 (13.10.2022)
+* Support Signature for the missing signer types: **Hash(x)**, **Ed25519 Signed Payload**.
+* Make `SetOptions` operation more user-friendly and descriptive by changing the initialization entries.
+* Add `TxBuild.hash/1` function to get the hash of a transaction.
+* Expose `TransactionSignature.base_signature/1` function.
+* Add example guides for the signature types: **Hash(x)**, **Pre-authorized transaction**, and **Ed25519 Signed Payload**.
+
 ## 0.10.2 (21.09.2022)
 * Update assets parameters for Offers and Trades.
 
