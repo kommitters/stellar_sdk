@@ -9,7 +9,7 @@ You can actually sign a transaction "in advance", such that it might be valid in
 
 This guide will lead you to send a payment without a signature, which is called a preauthorized transaction. But to achieve this, several steps are necessary, which will be detailed below.
 
-### 1. Prerrequisites
+### 1. Prerequisites
 
 You need to have two funded accounts.
 
