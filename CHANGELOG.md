@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.2 (18.10.2022)
+* Include OpenSSF BestPractices & Scorecard badges in README.
+
 ## 0.11.1 (13.10.2022)
 * Fix documentation paths.
 
