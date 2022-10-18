@@ -4,6 +4,8 @@
 [![Version Badge](https://img.shields.io/hexpm/v/stellar_sdk?style=for-the-badge)](https://hexdocs.pm/stellar_sdk)
 ![Downloads Badge](https://img.shields.io/hexpm/dt/stellar_sdk?style=for-the-badge)
 [![License badge](https://img.shields.io/hexpm/l/stellar_sdk.svg?style=for-the-badge)](https://github.com/kommitters/stellar_sdk/blob/main/LICENSE.md)
+[![OpenSSF Best Practices](https://img.shields.io/cii/summary/6367?label=openssf%20best%20practices&style=for-the-badge)](https://bestpractices.coreinfrastructure.org/projects/6367)
+[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/kommitters/stellar_sdk?label=openssf%20scorecard&style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/kommitters/stellar_sdk)
 
 The **Stellar SDK** enables the construction, signing and encoding of Stellar [transactions][stellar-docs-tx] and [operations][stellar-docs-list-operations] in **Elixir**, as well as provides a client for interfacing with [Horizon][horizon-api] server REST endpoints to retrieve ledger information, and to submit transactions.
 
