@@ -39,7 +39,24 @@ jobs:
         run: mix test
       - name: Run Credo
         run: mix credo --strict
-      # - name: Run Excoveralls
-      #   run: mix coveralls.github
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Excoveralls
+        run: mix coveralls.github --parallel --flagname otp-${{ matrix.otp }}-elixir-${{ matrix.elixir }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  finish:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set BUILD_NUMBER for Pull Request event
+        if: github.event_name == 'pull_request'
+        run: echo "BUILD_NUMBER=${{ github.event.pull_request.head.sha }}-PR-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+      - name: Set BUILD_NUMBER for Push event
+        if: github.event_name == 'push'
+        run: echo "BUILD_NUMBER=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Publish Coverage Report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+        run: |
+          curl -k "https://coveralls.io/webhook" -d "repo_token=$GITHUB_TOKEN&repo_name=$GITHUB_REPOSITORY&payload[build_num]=$BUILD_NUMBER&payload[status]=done"
