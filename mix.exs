@@ -42,7 +42,7 @@ defmodule Stellar.MixProject do
       {:hackney, "~> 1.17"},
       {:jason, "~> 1.0"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:excoveralls, "~> 0.14", only: :test},
+      {:excoveralls, "~> 0.15", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.24", only: :dev, runtime: false}
     ]
