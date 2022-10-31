@@ -72,6 +72,10 @@ defmodule Stellar.TxBuild.SignatureTest do
         Signature.new(hash_x: preimage)
     end
 
+    test "new/1 invalid_preimage" do
+      {:error, :invalid_preimage} = Signature.new(hash_x: "01020304")
+    end
+
     test "to_xdr/1", %{signature: signature, raw_preimage: raw_preimage, hint: hint} do
       signature_xdr = decorated_signature_xdr(raw_preimage, hint)
       ^signature_xdr = Signature.to_xdr(signature)
@@ -85,19 +89,29 @@ defmodule Stellar.TxBuild.SignatureTest do
 
   describe "signature type :signed_payload" do
     setup do
-      raw_payload = <<1, 2, 3, 4>>
-      payload = Base.encode16(raw_payload, case: :lower)
       secret = "SACHJRYLY43MUXRRCRFA6CZ5ZW5JVPPR4CWYWIX6BWRAOHOFVPVYDO5Z"
       raw_secret = KeyPair.raw_secret_seed(secret)
+
+      raw_payload = <<1, 2, 3, 4>>
+      payload = Base.encode16(raw_payload, case: :lower)
       hint = <<197, 134, 97, 73>>
+      signature = Signature.new(signed_payload: [payload: payload, ed25519: secret])
+
+      raw_payload2 = <<1, 2, 3>>
+      payload2 = Base.encode16(raw_payload2, case: :lower)
+      hint2 = <<197, 134, 97, 77>>
+      signature2 = Signature.new(signed_payload: [payload: payload2, ed25519: secret])
 
       %{
-        raw_payload: raw_payload,
-        payload: payload,
         secret: secret,
         raw_secret: raw_secret,
+        raw_payload: raw_payload,
+        payload: payload,
         hint: hint,
-        signature: Signature.new(signed_payload: [payload: payload, ed25519: secret])
+        signature: signature,
+        raw_payload2: raw_payload2,
+        hint2: hint2,
+        signature2: signature2
       }
     end
 
@@ -114,6 +128,23 @@ defmodule Stellar.TxBuild.SignatureTest do
         raw_key: {^raw_payload, ^raw_secret},
         hint: ^hint
       } = Signature.new(signed_payload: [payload: payload, ed25519: secret])
+    end
+
+    test "to_xdr/1 raw_payload_length_less_than_4", %{
+      signature2: signature,
+      raw_payload2: raw_payload,
+      secret: secret,
+      hint2: hint
+    } do
+      # pad with 0 to make it 4 bytes long
+      padded_raw_payload = <<raw_payload::binary, 0>>
+
+      signature_xdr =
+        padded_raw_payload
+        |> KeyPair.sign(secret)
+        |> decorated_signature_xdr(hint)
+
+      ^signature_xdr = Signature.to_xdr(signature)
     end
 
     test "to_xdr/1", %{signature: signature, raw_payload: raw_payload, secret: secret, hint: hint} do
