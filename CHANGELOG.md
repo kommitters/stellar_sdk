@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.11.4 (31.10.2022)
+* Add missing tests in `Signature` module.
+* Upgrade `stellar_base` to `v0.8.7` and `ossf/scorecard-action` to `v2.0.6`.
+
 ## 0.11.3 (25.10.2022)
 * Enable ExCoveralls with parallel builds.
 
