@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.11.5 (20.12.2022)
-* Update build badge and lock to ubuntu-20.04
+* Update build badge and lock to ubuntu-20.04.
 
 ## 0.11.4 (31.10.2022)
 * Add missing tests in `Signature` module.
