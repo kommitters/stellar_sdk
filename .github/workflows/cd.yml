@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     name: Publish Release to HEX PM
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         otp: ['23.3']
