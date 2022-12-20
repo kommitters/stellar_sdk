@@ -1,5 +1,5 @@
 # Elixir Stellar SDK
-![Build Badge](https://img.shields.io/github/workflow/status/kommitters/stellar_sdk/StellarSDK%20CI/main?style=for-the-badge)
+![Build Badge](https://img.shields.io/github/actions/workflow/status/kommitters/stellar_sdk/ci.yml?branch=main&style=for-the-badge)
 [![Coverage Status](https://img.shields.io/coveralls/github/kommitters/stellar_sdk?style=for-the-badge)](https://coveralls.io/github/kommitters/stellar_sdk)
 [![Version Badge](https://img.shields.io/hexpm/v/stellar_sdk?style=for-the-badge)](https://hexdocs.pm/stellar_sdk)
 ![Downloads Badge](https://img.shields.io/hexpm/dt/stellar_sdk?style=for-the-badge)
@@ -29,7 +29,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.11.4"}
+    {:stellar_sdk, "~> 0.11.5"}
   ]
 end
 ```
