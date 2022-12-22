@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.11.6 (22.12.2022)
+* Harden GitHub Actions.
+
 ## 0.11.5 (20.12.2022)
 * Update build badge and lock to ubuntu-20.04.
 
