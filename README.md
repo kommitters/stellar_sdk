@@ -1,4 +1,6 @@
 # Elixir Stellar SDK
+
+![stability-beta](https://img.shields.io/badge/stability-beta-33bbff.svg?style=for-the-badge)
 ![Build Badge](https://img.shields.io/github/actions/workflow/status/kommitters/stellar_sdk/ci.yml?branch=main&style=for-the-badge)
 [![Coverage Status](https://img.shields.io/coveralls/github/kommitters/stellar_sdk?style=for-the-badge)](https://coveralls.io/github/kommitters/stellar_sdk)
 [![Version Badge](https://img.shields.io/hexpm/v/stellar_sdk?style=for-the-badge)](https://hexdocs.pm/stellar_sdk)
