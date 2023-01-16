@@ -20,16 +20,21 @@ jobs:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+        uses: step-security/harden-runner@18bf8ad2ca49c14cbb28b91346d626ccfb00c518 # v2.1.0
         with:
-          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            hex.pm:443
+            repo.hex.pm:443
 
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
-      - uses: erlef/setup-elixir@b980a5ac9b7316a23ebc16de2bb69b7c3ad731b5 # v1.15.0
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: erlef/setup-elixir@e3f6ffe2878180f57318bf13febd3933ee81f664 # v1.15.2
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
-      - uses: actions/cache@c17f4bf4666a8001b1a45c09eb7a485c41aa64c3 # v3.2.0
+      - uses: actions/cache@58c146cc91c5b9e778e71775dfe9bf1442ad9a12 # v3.2.3
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}

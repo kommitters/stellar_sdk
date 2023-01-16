@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.8 (16.01.2023)
+* Update all dependencies.
+* Block egress traffic in GitHub Actions.
+* Add stability badge in README.
+
 ## 0.11.7 (27.12.2022)
 * Add Renovate as dependency update tool.
 * Add default permissions as read-only in the CI workflow.
