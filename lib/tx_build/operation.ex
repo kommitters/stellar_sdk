@@ -41,6 +41,7 @@ defmodule Stellar.TxBuild.Operation do
           | Clawback.t()
           | ClawbackClaimableBalance.t()
           | CreateAccount.t()
+          | CreateClaimableBalance.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
           | LiquidityPoolDeposit.t()
