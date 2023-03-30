@@ -5,29 +5,26 @@ defmodule Stellar.TxBuild.HostFunction do
   - invoke
   """
 
-  import Stellar.TxBuild.Validations,
-    only: [
-      validate_account: 1,
-      validate_asset: 1,
-      validate_amount: 1,
-      validate_optional_account: 1
-    ]
-
-  alias Stellar.TxBuild.{HostFunction, LedgerFootprint, ContractAuthList, OptionalAccount}
-  alias StellarBase.XDR.{OperationBody, OperationType, Operations.Payment}
+  alias Stellar.TxBuild.{HostFunction, SCVal}
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :invoke | :create | :install
+  @type type :: :install | :invoke | :create
   @type contract_id :: :source_account | :ed25519_public_key | :asset | String.t()
+  @type function_name :: String.t()
+  @type parameters :: list(SCVal.t())
 
   @type t :: %__MODULE__{
           type: type(),
-          args: list(SCVal.t()) | [contract_id: contract_id(), wasm_id: String.t() | nil]
+          args: [
+            contract_id: contract_id(),
+            function_name: function_name(),
+            parameters: parameters()
+          ]
         }
 
   # Invocar.
-  # HostFunction? HostFunction.new(:invoke, [name: "miguel"])
+  # HostFunction? HostFunction.new(:invoke, contract_id: "", function_name: "", args: [scval1, scval2, scval3])
 
   defstruct [:function, :footprint, :auth, :source_account]
 
@@ -35,22 +32,24 @@ defmodule Stellar.TxBuild.HostFunction do
   def new(args, opts \\ [])
 
   def new(args, _opts) when is_list(args) do
-    destination = Keyword.get(args, :function)
-    asset = Keyword.get(args, :footprint)
-    amount = Keyword.get(args, :auth)
+    host_function_op = Keyword.get(args, :invoke)
+    contract_id = Keyword.get(args, :contract_id)
+    function_name = Keyword.get(args, :function_name)
+    parameters = Keyword.get(args, :parameters)
     source_account = Keyword.get(args, :source_account)
 
-    with {:ok, destination} <- validate_account({:destination, destination}),
-         {:ok, asset} <- validate_asset({:asset, asset}),
-         {:ok, amount} <- validate_amount({:amount, amount}),
-         {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
-      %__MODULE__{
-        destination: destination,
-        asset: asset,
-        amount: amount,
+    with {:ok, contract_id} <- validate_contract_id(contract_id),
+         {:ok, function_name} do
+    %__MODULE__{
+      type: host_function_op,
+      args: [
+        contract_id: contract_id,
+        function_name: function_name(),
+        parameters: parameters,
         source_account: source_account
-      }
-    end
+      ]
+    }
+  end
   end
 
   def new(_args, _opts), do: {:error, :invalid_operation_attributes}

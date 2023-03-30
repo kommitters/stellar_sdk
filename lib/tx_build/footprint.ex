@@ -1,4 +1,4 @@
-# defmodule Stellar.TxBuild.InvokeHostFunction do
+# defmodule Stellar.TxBuild.FootPrint do
 #   @moduledoc """
 #   Performs the following operations:
 #   - Invokes contract functions.
@@ -32,9 +32,15 @@
 #   defstruct [:function, :footprint, :auth, :source_account]
 
 #   @impl true
-#   def new(args, opts \\ [])
+#   def new(args \\ [], opts \\ [])
 
 #   def new(args, _opts) when is_list(args) do
+#     #asignar 2 listas vacias
+#     read_only = Keyword.get(args, :read_only, [])
+#     read_write = Keyword.get(args, :read_write, [])
+
+#     #validar lista de ledgerKeys
+
 #     function = Keyword.get(args, :function)
 #     footprint = Keyword.get(args, :footprint, Footprint.new())
 #     auth = Keyword.get(args, :auth)
