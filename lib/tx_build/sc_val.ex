@@ -72,6 +72,14 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
+  def to_xdr(%__MODULE__{type: :symbol, value: value}) do
+    type = SCValType.new(:SCV_SYMBOL)
+
+    value
+    |> SCSymbol.new()
+    |> SCVal.new(type)
+  end
+
   @spec validate_sc_val(tuple :: tuple()) :: validation()
   def validate_sc_val({:u32, value}) do
     case value |> UInt32.new() |> UInt32.encode_xdr() do
