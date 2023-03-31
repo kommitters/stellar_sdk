@@ -5,7 +5,11 @@ defmodule Stellar.TxBuild.SCVal do
 
   @behaviour Stellar.TxBuild.XDR
 
+  alias Stellar.TxBuild.{SCObject}
+  alias Stellar.TxBuild.SCStatus, as: TxSCStatus
+
   alias StellarBase.XDR.{
+    SCStatus,
     SCVal,
     SCValType,
     Int32,
@@ -14,9 +18,7 @@ defmodule Stellar.TxBuild.SCVal do
     OptionalSCObject,
     SCSymbol,
     UInt64,
-    SCStatus,
-    Int64,
-    Void
+    Int64
   }
 
   @type validation :: {:ok, any()} | {:error, atom()}
@@ -72,11 +74,53 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
+  def to_xdr(%__MODULE__{type: :i32, value: value}) do
+    type = SCValType.new(:SCV_I32)
+
+    value
+    |> Int32.new()
+    |> SCVal.new(type)
+  end
+
+  def to_xdr(%__MODULE__{type: :static, value: value}) do
+    type = SCValType.new(:SCV_STATIC)
+
+    value
+    |> SCStatic.new()
+    |> SCVal.new(type)
+  end
+
+  # DEFINE TYPE FOR THE SCS_OBJ
+  def to_xdr(%__MODULE__{type: :object, value: value}) do
+    type = SCValType.new(:SCV_OBJECT)
+
+    value
+    |> SCObject.to_xdr()
+    |> OptionalSCObject.new()
+    |> SCVal.new(type)
+  end
+
   def to_xdr(%__MODULE__{type: :symbol, value: value}) do
     type = SCValType.new(:SCV_SYMBOL)
 
     value
     |> SCSymbol.new()
+    |> SCVal.new(type)
+  end
+
+  def to_xdr(%__MODULE__{type: :bitset, value: value}) do
+    type = SCValType.new(:SCV_BITSET)
+
+    value
+    |> UInt64.new()
+    |> SCVal.new(type)
+  end
+
+  def to_xdr(%__MODULE__{type: :status, value: value}) do
+    type = SCValType.new(:SCV_STATUS)
+
+    value
+    |> TxSCStatus.to_xdr()
     |> SCVal.new(type)
   end
 
@@ -111,7 +155,7 @@ defmodule Stellar.TxBuild.SCVal do
 
   # How to valid SCObject
   def validate_sc_val({:object, value}) do
-    case value |> OptionalSCObject.new() |> OptionalSCObject.encode_xdr() do
+    case value |> SCObject.to_xdr() |> OptionalSCObject.new() |> OptionalSCObject.encode_xdr() do
       {:ok, _binary} -> {:ok, value}
       {:error, _reason} -> {:error, :invalid_optional_sc_object}
     end
@@ -132,7 +176,7 @@ defmodule Stellar.TxBuild.SCVal do
   end
 
   def validate_sc_val({:status, value}) do
-    case Void.new() |> SCStatus.new(value) |> SCStatus.encode_xdr() do
+    case value |> TxSCStatus.to_xdr() |> SCStatus.encode_xdr() do
       {:ok, _sc_status} -> {:ok, value}
       {:error, _reason} -> {:error, :invalid_status}
     end

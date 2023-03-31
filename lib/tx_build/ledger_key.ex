@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.LedgerKey do
   `LedgerKey` struct definition.
   """
   alias StellarBase.XDR.{LedgerEntryType, LedgerKey}
-  alias Stellar.TxBuild.Ledger.{Account, ClaimableBalance, Data, LiquidityPool, Offer, Trustline, ContractData}
+  alias Stellar.TxBuild.Ledger.{Account, ClaimableBalance, Data, LiquidityPool, Offer, Trustline}
 
   @behaviour Stellar.TxBuild.XDR
 

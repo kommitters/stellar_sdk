@@ -1,8 +1,14 @@
-alias Stellar.TxBuild.{InvokeHostFunction, HostFunction, SCVal}
+alias Stellar.TxBuild.{InvokeHostFunction, HostFunction, SCVal, SCStatus}
 
 contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
 function_name = "hello"
 args = [SCVal.new(symbol: "world")]
+
+#when is SCVal is SCStatus
+SCStatus.new(host_value_error: :HOST_VALUE_UNKNOWN_ERROR)
+SCStatus.new(ok: nil)
+SCStatus.new(host_auth_error: :HOST_AUTH_DUPLICATE_AUTHORIZATION)
+SCStatus.new(host_auth_error: :duplicate_authorization)
 
 function = HostFunction.new(
   type: :invoke,

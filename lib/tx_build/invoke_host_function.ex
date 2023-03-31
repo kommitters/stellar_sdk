@@ -8,9 +8,9 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]
 
-  alias Stellar.TxBuild.{HostFunction, Footprint, OptionalAccount}
+  alias Stellar.TxBuild.{HostFunction, OptionalAccount}
 
-  alias StellarBase.XDR.Operations.InvokeHostFunctionOp
+  alias StellarBase.XDR.Operations.InvokeHostFunction
 
   alias StellarBase.XDR.{
     OperationBody,
@@ -41,7 +41,6 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     source_account = Keyword.get(args, :source_account)
 
     with {:ok, function} <- validate_function(function),
-         #  {:ok, footprint} <- validate_footprint(footprint),
          {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
       %__MODULE__{
         function: function,
@@ -67,7 +66,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     contract_auth_list = ContractAuthList.new([])
 
     host_function
-    |> InvokeHostFunctionOp.new(ledger_footprint, contract_auth_list)
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
     |> OperationBody.new(op_type)
   end
 
@@ -87,7 +86,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     contract_auth_list = ContractAuthList.new([])
 
     host_function
-    |> InvokeHostFunctionOp.new(ledger_footprint, contract_auth_list)
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
     |> OperationBody.new(op_type)
   end
 
@@ -97,13 +96,6 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     case function do
       %HostFunction{} -> {:ok, function}
       _ -> {:error, :invalid_function}
-    end
-  end
-
-  defp validate_footprint(footprint) do
-    case footprint do
-      %Footprint{} -> {:ok, footprint}
-      _ -> {:error, :invalid_footprint}
     end
   end
 end

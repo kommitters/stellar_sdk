@@ -1,37 +1,34 @@
 defmodule Stellar.TxBuild.InvokeHostFunctionTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{InvokeHostFunction}
+  alias Stellar.TxBuild.{HostFunction, InvokeHostFunction, SCVal}
 
   describe "InvokeHostFunction" do
     setup do
-      read_only = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
-      read_write = "hello"
-      %{
-        read_only: read_only,
-        read_write: read_write
-        xdr: InvokeHostFunction(
-          read_only: read_only,
-          read_write: read_write
+      type = :invoke
+      contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
+      function_name = "hello"
+      args = [SCVal.new(symbol: "world")]
+
+      function =
+        HostFunction.new(
+          type: type,
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args
         )
+
+      %{
+        function: function
       }
     end
 
-    test "new/2", %{read_only: read_only, read_write: read_write} do
+    test "new/2", %{
+      function: function
+    } do
       %InvokeHostFunction{
-        read_only: ^read_only,
-        read_write: ^read_write,
-      } = InvokeHostFunction.new(
-        read_only: read_only,
-        read_write: read_write,
-        )
+        function: ^function
+      } = InvokeHostFunction.new(function: function)
     end
-
-    test "to_xdr/1", %{xdr: xdr, read_only: read_only, read_write: read_write} do
-    ^xdr =
-      [read_only: read_only, read_write: read_write]
-      |> InvokeHostFunction.new()
-      |> InvokeHostFunction.to_xdr()
-  end
   end
 end
