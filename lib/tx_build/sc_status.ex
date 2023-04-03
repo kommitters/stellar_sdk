@@ -99,7 +99,6 @@ defmodule Stellar.TxBuild.SCStatus do
     |> SCStatus.new(type)
   end
 
-  # DEFINE TYPE FOR THE SCS_OBJ
   def to_xdr(%__MODULE__{type: :host_storage_error, value: value}) do
     type = SCStatusType.new(:SST_HOST_STORAGE_ERROR)
 
@@ -141,13 +140,8 @@ defmodule Stellar.TxBuild.SCStatus do
   end
 
   @spec validate_sc_status(tuple :: tuple()) :: validation()
-  def validate_sc_status({:ok, value}) when value == nil do
-    {:ok, value}
-  end
-
-  def validate_sc_status({:ok, value}) when value != nil do
-    {:error, :invalid_void}
-  end
+  def validate_sc_status({:ok, nil}), do: {:ok, nil}
+  def validate_sc_status({:ok, _value}), do: {:error, :invalid_void}
 
   def validate_sc_status({:unknown_error, value}) do
     case value |> SCUnknownErrorCode.new() |> SCUnknownErrorCode.encode_xdr() do

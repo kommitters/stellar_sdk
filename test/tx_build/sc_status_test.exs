@@ -94,8 +94,81 @@ defmodule Stellar.TxBuild.SCStatusTest do
 
   test "to_xdr when type is ok" do
     %StellarBase.XDR.SCStatus{
-      type: %StellarBase.XDR.SCStatusType{identifier: :SST_OK},
-      value: %StellarBase.XDR.Void{void: nil}
+      code: %StellarBase.XDR.Void{value: nil},
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_OK}
     } = SCStatus.new(ok: nil) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is unknown_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCUnknownErrorCode{identifier: :UNKNOWN_ERROR_GENERAL},
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_UNKNOWN_ERROR}
+    } = SCStatus.new(unknown_error: :UNKNOWN_ERROR_GENERAL) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_value_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostValErrorCode{
+        identifier: :HOST_VALUE_UNKNOWN_ERROR
+      },
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_VALUE_ERROR}
+    } = SCStatus.new(host_value_error: :HOST_VALUE_UNKNOWN_ERROR) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_object_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostObjErrorCode{
+        identifier: :HOST_OBJECT_UNKNOWN_ERROR
+      },
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_OBJECT_ERROR}
+    } = SCStatus.new(host_object_error: :HOST_OBJECT_UNKNOWN_ERROR) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_function_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostFnErrorCode{identifier: :HOST_FN_UNKNOWN_ERROR},
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_FUNCTION_ERROR}
+    } = SCStatus.new(host_function_error: :HOST_FN_UNKNOWN_ERROR) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_storage_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostStorageErrorCode{
+        identifier: :HOST_STORAGE_UNKNOWN_ERROR
+      },
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_STORAGE_ERROR}
+    } = SCStatus.new(host_storage_error: :HOST_STORAGE_UNKNOWN_ERROR) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_context_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostContextErrorCode{
+        identifier: :HOST_CONTEXT_UNKNOWN_ERROR
+      },
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_CONTEXT_ERROR}
+    } = SCStatus.new(host_context_error: :HOST_CONTEXT_UNKNOWN_ERROR) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is vm_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCVmErrorCode{identifier: :VM_UNKNOWN},
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_VM_ERROR}
+    } = SCStatus.new(vm_error: :VM_UNKNOWN) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is contract_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.UInt32{datum: 4_294_967_295},
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_CONTRACT_ERROR}
+    } = SCStatus.new(contract_error: 4_294_967_295) |> SCStatus.to_xdr()
+  end
+
+  test "to_xdr when type is host_auth_error" do
+    %StellarBase.XDR.SCStatus{
+      code: %StellarBase.XDR.SCHostAuthErrorCode{
+        identifier: :HOST_AUTH_UNKNOWN_ERROR
+      },
+      type: %StellarBase.XDR.SCStatusType{identifier: :SST_HOST_AUTH_ERROR}
+    } = SCStatus.new(host_auth_error: :HOST_AUTH_UNKNOWN_ERROR) |> SCStatus.to_xdr()
   end
 end

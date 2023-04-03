@@ -3,29 +3,28 @@ defmodule Stellar.TxBuild.SCAddress do
   `SCAddress` struct definition.
   """
 
+  import Stellar.TxBuild.Validations, only: [validate_account_id: 1]
+
   @behaviour Stellar.TxBuild.XDR
 
   alias StellarBase.XDR.{
     SCAddressType,
     Hash,
-    SCAddress,
-    AccountID
+    SCAddress
   }
-
-  alias StellarBase.XDR.AccountID, as: AccountIDFromXDR
 
   alias Stellar.TxBuild.AccountID
 
   @type validation :: {:ok, any()} | {:error, atom()}
 
-  @type value :: AccountID.t() | binary()
+  @type value :: binary()
 
   @type t :: %__MODULE__{
-          type: String.t(),
+          type: atom(),
           value: value()
         }
 
-  @allowed_types ~w(type_account type_contract)a
+  @allowed_types ~w(account contract)a
 
   defstruct [:type, :value]
 
@@ -44,16 +43,17 @@ defmodule Stellar.TxBuild.SCAddress do
   def new(_args, _opts), do: {:error, :invalid_sc_address}
 
   @impl true
-  def to_xdr(%__MODULE__{type: :type_account, value: value}) do
+  def to_xdr(%__MODULE__{type: :account, value: value}) do
     type = SCAddressType.new(:SC_ADDRESS_TYPE_ACCOUNT)
 
     value
+    |> AccountID.new()
     |> AccountID.to_xdr()
     |> SCAddress.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :type_contract, value: value}) do
-    type = SCAddressType.new(:SC_ADDRESS_TYPE_CONTRACT)
+  def to_xdr(%__MODULE__{type: :contract, value: value}) do
+    type = SCAddressType.new(:SC_ADDRESS_contract)
 
     value
     |> Hash.new()
@@ -61,17 +61,13 @@ defmodule Stellar.TxBuild.SCAddress do
   end
 
   @spec validate_sc_address(tuple :: tuple()) :: validation()
-  def validate_sc_address({:type_account, value}) do
-    case value |> AccountID.to_xdr() |> AccountIDFromXDR.encode_xdr() do
-      {:ok, _void} -> {:ok, value}
+  defp validate_sc_address({:account, value}) do
+    case validate_account_id({:account, value}) do
+      {:ok, account_id} -> {:ok, account_id}
       {:error, _reason} -> {:error, :invalid_account_id}
     end
   end
 
-  def validate_sc_address({:type_contract, value}) do
-    case value |> Hash.new() |> Hash.encode_xdr() do
-      {:ok, _hash} -> {:ok, value}
-      {:error, _reason} -> {:error, :invalid_hash}
-    end
-  end
+  defp validate_sc_address({:contract, value}) when is_binary(value), do: {:ok, value}
+  defp validate_sc_address({:contract, _value}), do: {:error, :invalid_contract_hash}
 end

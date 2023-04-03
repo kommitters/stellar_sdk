@@ -26,8 +26,8 @@ defmodule Stellar.TxBuild.SCValTest do
     sc_contract_code = SCContractCode.new(token: nil)
 
     # SCAddress
-    sc_account_id = AccountID.new("GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
-    sc_address = SCAddress.new(type_account: sc_account_id)
+    public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
+    sc_address = SCAddress.new(account: public_key)
 
     sc_object_discriminants = [
       %{sc_object: SCObject.new(vec: [sc_val])},
@@ -65,7 +65,7 @@ defmodule Stellar.TxBuild.SCValTest do
   end
 
   test "new/1 when type u63 is incorrect" do
-    {:error, :invalid_u64} = SCVal.new(u63: "123")
+    {:error, :invalid_u63} = SCVal.new(u63: "123")
   end
 
   test "new/1 when type is u32" do
@@ -105,7 +105,7 @@ defmodule Stellar.TxBuild.SCValTest do
 
   test "new/1 when type object is incorrect" do
     sc_object = SCObject.new(:u64, "123")
-    {:error, :invalid_optional_sc_object} = SCVal.new(object: sc_object)
+    {:error, :invalid_object} = SCVal.new(object: sc_object)
   end
 
   test "new/1 when type is symbol" do

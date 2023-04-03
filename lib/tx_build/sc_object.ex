@@ -6,20 +6,21 @@ defmodule Stellar.TxBuild.SCObject do
   @behaviour Stellar.TxBuild.XDR
 
   alias Stellar.TxBuild.{SCMapEntry, SCVal}
-  alias Stellar.TxBuild.SCContractCode, as: TxSCContractCode
   alias Stellar.TxBuild.SCAddress, as: TxSCAddress
 
   alias StellarBase.XDR.{
     Int128Parts,
     Int64,
     SCAddress,
-    SCContractCode,
     SCMap,
     SCObject,
     SCObjectType,
     SCVec,
     UInt64,
-    VariableOpaque256000
+    VariableOpaque256000,
+    SCContractCode,
+    SCContractCodeType,
+    Void
   }
 
   @type validation :: {:ok, any()} | {:error, atom()}
@@ -120,11 +121,19 @@ defmodule Stellar.TxBuild.SCObject do
     |> SCObject.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :contract_code, value: value}) do
+  def to_xdr(%__MODULE__{type: :contract_code, value: {:wasm_ref, hash}}) do
     type = SCObjectType.new(:SCO_CONTRACT_CODE)
+    contract_code = SCContractCodeType.new(:SCCONTRACT_CODE_WASM_REF)
+    hash
+    |> SCContractCode.new(contract_code)
+    |> SCObject.new(type)
+  end
 
-    value
-    |> TxSCContractCode.to_xdr()
+  def to_xdr(%__MODULE__{type: :contract_code, value: {:token}}) do
+    type = SCObjectType.new(:SCO_CONTRACT_CODE)
+    contract_code = SCContractCodeType.new(:SCCONTRACT_CODE_TOKEN)
+    Void.new()
+    |> SCContractCode.new(contract_code)
     |> SCObject.new(type)
   end
 
@@ -146,73 +155,38 @@ defmodule Stellar.TxBuild.SCObject do
 
   def to_xdr(_error), do: {:error, :invalid_object_structure}
 
+  @allowed_types ~w(vec map u64 i64 u128 i128 bytes contract_code address nonce_key)a
+
   @spec validate_sc_obj(tuple :: tuple()) :: validation()
-  def validate_sc_obj({:vec, value}) do
-    case value |> Enum.map(&SCVal.to_xdr/1) |> SCVec.new() |> SCVec.encode_xdr() do
-      {:ok, _sc_vec} -> {:ok, value}
-      {:error, _reason} -> {:error, :invalid_scvec}
-    end
+  defp validate_sc_obj({type, value})
+       when type in ~w(u64)a and is_integer(value) and value >= 0,
+       do: {:ok, value}
+
+  defp validate_sc_obj({:vec, value}) when is_list(value) do
+    if Enum.all?(value, &is_struct(&1, SCVal)),
+      do: {:ok, value},
+      else: {:error, :invalid_vec}
   end
 
-  def validate_sc_obj({:map, value}) do
-    case value |> Enum.map(&SCMapEntry.to_xdr/1) |> SCMap.new() |> SCMap.encode_xdr() do
-      {:ok, _sc_map} -> {:ok, value}
-      {:error, _reason} -> {:error, :invalid_scmap}
-    end
+  defp validate_sc_obj({:map, value}) when is_list(value) do
+    if Enum.all?(value, &is_struct(&1, SCMapEntry)),
+      do: {:ok, value},
+      else: {:error, :invalid_map}
   end
 
-  def validate_sc_obj({:u64, value}) do
-    case value |> UInt64.new() |> UInt64.encode_xdr() do
-      {:ok, _uint64} -> {:ok, value}
-      {:error, _reason} -> {:error, :invalid_uint64}
-    end
-  end
+  defp validate_sc_obj({:bytes, value}) when is_binary(value), do: {:ok, value}
+  defp validate_sc_obj({:i64, value}) when is_integer(value), do: {:ok, value}
 
-  def validate_sc_obj({:i64, value}) do
-    case value |> Int64.new() |> Int64.encode_xdr() do
-      {:ok, _int64} -> {:ok, value}
-      {:error, _reason} -> {:error, :int64}
-    end
-  end
+  defp validate_sc_obj({type, %{lo: lo, hi: hi} = value})
+       when type in ~w(u128 i128)a and is_integer(lo) and is_integer(hi),
+       do: {:ok, value}
 
-  # How to valid SCObject
-  def validate_sc_obj({:u128, %{lo: lo, hi: hi} = value}) do
-    lo = UInt64.new(lo)
-    hi = UInt64.new(hi)
+  defp validate_sc_obj({:address, %TxSCAddress{} = value}), do: {:ok, value}
+  defp validate_sc_obj({:nonce_key, %TxSCAddress{} = value}), do: {:ok, value}
+  defp validate_sc_obj({:contract_code, :token}), do: {:ok, :token}
 
-    case lo |> Int128Parts.new(hi) |> Int128Parts.encode_xdr() do
-      {:ok, _int128_parts} -> {:ok, value}
-      {:error, _reason} -> {:error, :int128_parts}
-    end
-  end
+  defp validate_sc_obj({:contract_code, {:wasm_ref, hash} = value}) when is_binary(hash),
+    do: {:ok, value}
 
-  def validate_sc_obj({:u128, _value}), do: {:error, :invalid_value_format}
-
-  def validate_sc_obj({:bytes, value}) do
-    case value |> VariableOpaque256000.new() |> VariableOpaque256000.encode_xdr() do
-      {:ok, _variable_opaque_256000} -> {:ok, value}
-      {:error, _reason} -> {:error, :variable_opaque_256000}
-    end
-  end
-
-  def validate_sc_obj({:contract_code, value}) do
-    case value |> TxSCContractCode.to_xdr() |> SCContractCode.encode_xdr() do
-      {:ok, _sc_contract_code} -> {:ok, value}
-      {:error, _reason} -> {:error, :sc_contract_code}
-    end
-  end
-
-  def validate_sc_obj({:address, value}) do
-    case value |> TxSCAddress.to_xdr() |> SCAddress.encode_xdr() do
-      {:ok, _sc_address} -> {:ok, value}
-      {:error, _reason} -> {:error, :sc_address}
-    end
-  end
-
-  def validate_sc_obj({:nonce_key, value}) do
-    case value |> TxSCAddress.to_xdr() |> SCAddress.encode_xdr() do
-      {:ok, _sc_address} -> {:ok, value}
-      {:error, _reason} -> {:error, :sc_address}
-    end
-  end
+  defp validate_sc_obj({type, _value}), do: {:error, :"invalid_#{type}"}
 end
