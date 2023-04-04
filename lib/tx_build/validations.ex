@@ -20,13 +20,15 @@ defmodule Stellar.TxBuild.Validations do
     Price,
     Signer,
     String32,
-    Weight
+    Weight,
+    SCVal
   }
 
   @type account_id :: String.t()
   @type asset_code :: String.t()
+  @type args :: list(SCVal.t())
   @type asset :: {asset_code(), account_id()} | Keyword.t() | atom()
-  @type value :: account_id() | asset() | number()
+  @type value :: account_id() | asset() | number() | args()
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()
   @type validation :: {:ok, any()} | {:error, error()}
@@ -167,4 +169,23 @@ defmodule Stellar.TxBuild.Validations do
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
+
+  @spec validate_sc_vals(component :: component()) :: validation()
+  def validate_sc_vals({field, args}) when is_list(args) do
+    if Enum.all?(args, &is_struct(&1, SCVal)),
+      do: {:ok, args},
+      else: {:error, :"invalid_#{field}"}
+  end
+
+  def validate_sc_vals({field, _args}), do: {:error, :"invalid_#{field}"}
+
+  @spec validate_contract_id(component :: component()) :: validation()
+  def validate_contract_id({field, contract_id}) when is_binary(contract_id) do
+    case Base.decode16(contract_id, case: :lower) do
+      {:ok, _} -> {:ok, contract_id}
+      :error -> {:error, :"invalid_#{field}"}
+    end
+  end
+
+  def validate_contract_id({field, _contract_id}), do: {:error, :"invalid_#{field}"}
 end

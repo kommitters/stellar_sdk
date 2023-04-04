@@ -21,6 +21,12 @@ defmodule Stellar.TxBuild.SCVal do
     Int64
   }
 
+  @parse_static %{
+    void: :SCS_VOID,
+    true: :SCS_TRUE,
+    false: :SCS_FALSE,
+    ledger_contract_code: :SCS_LEDGER_KEY_CONTRACT_CODE
+  }
   @type type :: :u63 | :u32 | :i32 | :static | :object | :symbol | :bitset | :status
   @type validation :: {:ok, any()} | {:error, atom()}
   @type value ::
@@ -83,7 +89,7 @@ defmodule Stellar.TxBuild.SCVal do
   def to_xdr(%__MODULE__{type: :static, value: value}) do
     type = SCValType.new(:SCV_STATIC)
 
-    value
+    @parse_static[value]
     |> SCStatic.new()
     |> SCVal.new(type)
   end
@@ -130,7 +136,7 @@ defmodule Stellar.TxBuild.SCVal do
   defp validate_sc_val({:symbol, value}) when is_binary(value), do: {:ok, value}
 
   defp validate_sc_val({:static, value})
-       when value in ~w(void true false contract_code)a,
+       when value in ~w(void true false ledger_contract_code)a,
        do: {:ok, value}
 
   defp validate_sc_val({:object, %SCObject{} = value}), do: {:ok, value}

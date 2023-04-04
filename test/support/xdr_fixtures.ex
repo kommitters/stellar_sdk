@@ -3,8 +3,9 @@ defmodule Stellar.Test.XDRFixtures do
   Stellar's XDR data for test constructions.
   """
   alias Stellar.KeyPair
-  alias Stellar.TxBuild.{TransactionSignature, SignerKey}
+  alias Stellar.TxBuild.{TransactionSignature, SignerKey, SCVal}
   alias Stellar.TxBuild.Transaction, as: Tx
+  alias Stellar.TxBuild.HostFunction, as: TxHostFunction
 
   alias StellarBase.XDR.{
     AccountID,
@@ -56,7 +57,10 @@ defmodule Stellar.Test.XDRFixtures do
     UInt32,
     UInt64,
     UInt256,
-    Void
+    Void,
+    ContractAuthList,
+    LedgerFootprint,
+    HostFunction
   }
 
   alias StellarBase.XDR.Operations.{
@@ -74,7 +78,8 @@ defmodule Stellar.Test.XDRFixtures do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
-    SetOptions
+    SetOptions,
+    InvokeHostFunction
   }
 
   @type optional_account_id :: String.t() | nil
@@ -580,6 +585,71 @@ defmodule Stellar.Test.XDRFixtures do
     value
     |> String32.new()
     |> OptionalString32.new()
+  end
+
+  @spec host_function_xdr(
+          type :: :invoke,
+          contract_id :: String.t(),
+          function_name :: String.t(),
+          args :: list(SCVal.t())
+        ) :: HostFunction.t()
+  def host_function_xdr(
+        :invoke,
+        "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c",
+        "hello",
+        [%SCVal{type: :symbol, value: "world"}]
+      ) do
+    %HostFunction{
+      host_function: %StellarBase.XDR.SCVec{
+        sc_vals: [
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.OptionalSCObject{
+              sc_object: %StellarBase.XDR.SCObject{
+                sc_object: %StellarBase.XDR.VariableOpaque256000{
+                  opaque:
+                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
+                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+                },
+                type: %StellarBase.XDR.SCObjectType{identifier: :SCO_BYTES}
+              }
+            },
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_OBJECT}
+          },
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.SCSymbol{value: "hello"},
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+          },
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.SCSymbol{value: "world"},
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+          }
+        ]
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
+      }
+    }
+  end
+
+  @spec invoke_host_function_op_xdr(
+          function :: HostFunction.t(),
+          footprint :: String.t(),
+          auth :: ContractAuthList.t()
+        ) :: InvokeHostFunction.t()
+  def invoke_host_function_op_xdr(function, footprint, auth \\ []) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+    host_function = TxHostFunction.to_xdr(function)
+
+    {ledger_footprint, _} =
+      footprint
+      |> Base.decode64!()
+      |> LedgerFootprint.decode_xdr!()
+
+    contract_auth_list = ContractAuthList.new(auth)
+
+    host_function
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    |> OperationBody.new(op_type)
   end
 
   @spec build_asset_xdr(asset :: any()) :: list(Asset.t())

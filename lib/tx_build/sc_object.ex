@@ -5,6 +5,11 @@ defmodule Stellar.TxBuild.SCObject do
 
   @behaviour Stellar.TxBuild.XDR
 
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_sc_vals: 1
+    ]
+
   alias Stellar.TxBuild.{SCMapEntry, SCVal}
   alias Stellar.TxBuild.SCAddress, as: TxSCAddress
 
@@ -20,7 +25,8 @@ defmodule Stellar.TxBuild.SCObject do
     VariableOpaque256000,
     SCContractCode,
     SCContractCodeType,
-    Void
+    Void,
+    Hash
   }
 
   @type validation :: {:ok, any()} | {:error, atom()}
@@ -124,14 +130,17 @@ defmodule Stellar.TxBuild.SCObject do
   def to_xdr(%__MODULE__{type: :contract_code, value: {:wasm_ref, hash}}) do
     type = SCObjectType.new(:SCO_CONTRACT_CODE)
     contract_code = SCContractCodeType.new(:SCCONTRACT_CODE_WASM_REF)
+
     hash
+    |> Hash.new()
     |> SCContractCode.new(contract_code)
     |> SCObject.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :contract_code, value: {:token}}) do
+  def to_xdr(%__MODULE__{type: :contract_code, value: :token}) do
     type = SCObjectType.new(:SCO_CONTRACT_CODE)
     contract_code = SCContractCodeType.new(:SCCONTRACT_CODE_TOKEN)
+
     Void.new()
     |> SCContractCode.new(contract_code)
     |> SCObject.new(type)
@@ -155,17 +164,11 @@ defmodule Stellar.TxBuild.SCObject do
 
   def to_xdr(_error), do: {:error, :invalid_object_structure}
 
-  @allowed_types ~w(vec map u64 i64 u128 i128 bytes contract_code address nonce_key)a
-
   @spec validate_sc_obj(tuple :: tuple()) :: validation()
-  defp validate_sc_obj({type, value})
-       when type in ~w(u64)a and is_integer(value) and value >= 0,
-       do: {:ok, value}
+  defp validate_sc_obj({:u64, value}) when is_integer(value) and value >= 0, do: {:ok, value}
 
-  defp validate_sc_obj({:vec, value}) when is_list(value) do
-    if Enum.all?(value, &is_struct(&1, SCVal)),
-      do: {:ok, value},
-      else: {:error, :invalid_vec}
+  defp validate_sc_obj({:vec, value}) do
+    validate_sc_vals({:vec, value})
   end
 
   defp validate_sc_obj({:map, value}) when is_list(value) do

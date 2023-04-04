@@ -1,16 +1,12 @@
 defmodule Stellar.TxBuild.SCValTest do
   use ExUnit.Case
 
-  alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
-
   alias Stellar.TxBuild.{
-    AccountID,
     SCAddress,
     SCStatus,
     SCVal,
     SCObject,
-    SCMapEntry,
-    SCContractCode
+    SCMapEntry
   }
 
   setup do
@@ -21,9 +17,6 @@ defmodule Stellar.TxBuild.SCValTest do
     sc_val_key = SCVal.new(symbol: "sc_val_key")
     sc_val_val = SCVal.new(i32: 123)
     sc_map_entry = SCMapEntry.new(sc_val_key, sc_val_val)
-
-    # SCContractCode
-    sc_contract_code = SCContractCode.new(token: nil)
 
     # SCAddress
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
@@ -37,7 +30,7 @@ defmodule Stellar.TxBuild.SCValTest do
       %{sc_object: SCObject.new(u128: %{lo: 123, hi: 321})},
       %{sc_object: SCObject.new(u128: %{lo: 123, hi: 321})},
       %{sc_object: SCObject.new(bytes: "binary")},
-      %{sc_object: SCObject.new(contract_code: sc_contract_code)},
+      %{sc_object: SCObject.new(contract_code: :token)},
       %{sc_object: SCObject.new(address: sc_address)},
       %{sc_object: SCObject.new(nonce_key: sc_address)}
     ]
@@ -85,12 +78,11 @@ defmodule Stellar.TxBuild.SCValTest do
   end
 
   test "new/1 when type is static" do
-    %SCVal{type: :static, value: :SCS_VOID} = SCVal.new(static: :SCS_VOID)
-    %SCVal{type: :static, value: :SCS_TRUE} = SCVal.new(static: :SCS_TRUE)
-    %SCVal{type: :static, value: :SCS_FALSE} = SCVal.new(static: :SCS_FALSE)
+    %SCVal{type: :static, value: :void} = SCVal.new(static: :void)
+    %SCVal{type: :static, value: true} = SCVal.new(static: true)
+    %SCVal{type: :static, value: false} = SCVal.new(static: false)
 
-    %SCVal{type: :static, value: :SCS_LEDGER_KEY_CONTRACT_CODE} =
-      SCVal.new(static: :SCS_LEDGER_KEY_CONTRACT_CODE)
+    %SCVal{type: :static, value: :ledger_contract_code} = SCVal.new(static: :ledger_contract_code)
   end
 
   test "new/1 when type static is incorrect" do
@@ -153,9 +145,9 @@ defmodule Stellar.TxBuild.SCValTest do
 
   test "to_xdr when type is static" do
     %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_STATIC},
-      value: %StellarBase.XDR.SCStatic{identifier: :SCS_VOID}
-    } = SCVal.new(static: :SCS_VOID) |> SCVal.to_xdr()
+      value: %StellarBase.XDR.SCStatic{identifier: :SCS_VOID},
+      type: %StellarBase.XDR.SCValType{identifier: :SCV_STATIC}
+    } = SCVal.new(static: :void) |> SCVal.to_xdr()
   end
 
   test "to_xdr when type is object" do

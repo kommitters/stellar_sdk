@@ -22,6 +22,8 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   @behaviour Stellar.TxBuild.XDR
 
+  @type validation :: {:ok, any()} | {:error, atom()}
+
   @type t :: %__MODULE__{
           function: HostFunction.t(),
           footprint: String.t(),
@@ -36,11 +38,12 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   def new(args, _opts) when is_list(args) do
     function = Keyword.get(args, :function)
-    footprint = Keyword.get(args, :footprint, "")
+    footprint = Keyword.get(args, :footprint)
     auth = Keyword.get(args, :auth)
     source_account = Keyword.get(args, :source_account)
 
     with {:ok, function} <- validate_function(function),
+         {:ok, footprint} <- validate_footprint({:footprint, footprint}),
          {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
       %__MODULE__{
         function: function,
@@ -56,7 +59,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   @impl true
   def to_xdr(%__MODULE__{
         function: function,
-        footprint: "",
+        footprint: nil,
         auth: nil
       }) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
@@ -90,12 +93,26 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     |> OperationBody.new(op_type)
   end
 
-  def set_footprint(%__MODULE__{} = module, footprint), do: %{module | footprint: footprint}
-
-  defp validate_function(function) do
-    case function do
-      %HostFunction{} -> {:ok, function}
-      _ -> {:error, :invalid_function}
+  @spec set_footprint(module :: t(), footprint :: String.t()) :: t()
+  def set_footprint(%__MODULE__{} = module, footprint) do
+    with {:ok, footprint} <- validate_footprint({:footprint, footprint}) do
+      %{module | footprint: footprint}
     end
   end
+
+  @spec validate_function(function :: HostFunction.t()) :: validation()
+  defp validate_function(%HostFunction{} = function), do: {:ok, function}
+  defp validate_function(_), do: {:error, :invalid_function}
+
+  @spec validate_footprint(tuple :: tuple()) :: validation()
+  defp validate_footprint({:footprint, nil}), do: {:ok, nil}
+
+  defp validate_footprint({:footprint, footprint}) when is_binary(footprint) do
+    case Base.decode64(footprint) do
+      {:ok, _} -> {:ok, footprint}
+      :error -> {:error, :invalid_footprint}
+    end
+  end
+
+  defp validate_footprint({:footprint, _}), do: {:error, :invalid_footprint}
 end

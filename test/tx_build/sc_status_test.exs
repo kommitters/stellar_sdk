@@ -1,8 +1,7 @@
 defmodule Stellar.TxBuild.SCStatusTest do
   use ExUnit.Case
 
-  alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
-  alias Stellar.TxBuild.{SCStatus}
+  alias Stellar.TxBuild.SCStatus
 
   test "new/1 when type is ok", %{} do
     %SCStatus{type: :ok, value: nil} = SCStatus.new(ok: nil)
