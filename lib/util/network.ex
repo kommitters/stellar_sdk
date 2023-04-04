@@ -5,11 +5,13 @@ defmodule Stellar.Network do
 
   @passphrases [
     test: "Test SDF Network ; September 2015",
+    future: "Test SDF Future Network ; October 2022",
     public: "Public Global Stellar Network ; September 2015"
   ]
 
   @base_urls [
     test: "https://horizon-testnet.stellar.org",
+    future: "https://horizon-futurenet.stellar.org",
     public: "https://horizon.stellar.org"
   ]
 

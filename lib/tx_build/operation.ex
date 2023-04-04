@@ -2,6 +2,7 @@ defmodule Stellar.TxBuild.Operation do
   @moduledoc """
   `Operation` struct definition.
   """
+
   alias Stellar.TxBuild.{
     AccountMerge,
     BumpSequence,
@@ -25,7 +26,8 @@ defmodule Stellar.TxBuild.Operation do
     PathPaymentStrictReceive,
     RevokeSponsorship,
     SetOptions,
-    SetTrustlineFlags
+    SetTrustlineFlags,
+    InvokeHostFunction
   }
 
   alias StellarBase.XDR.Operation
@@ -41,6 +43,7 @@ defmodule Stellar.TxBuild.Operation do
           | Clawback.t()
           | ClawbackClaimableBalance.t()
           | CreateAccount.t()
+          | CreateClaimableBalance.t()
           | CreatePassiveSellOffer.t()
           | EndSponsoringFutureReserves.t()
           | LiquidityPoolDeposit.t()
@@ -54,6 +57,7 @@ defmodule Stellar.TxBuild.Operation do
           | RevokeSponsorship.t()
           | SetOptions.t()
           | SetTrustlineFlags.t()
+          | InvokeHostFunction.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -102,7 +106,8 @@ defmodule Stellar.TxBuild.Operation do
       PathPaymentStrictSend,
       RevokeSponsorship,
       SetOptions,
-      SetTrustlineFlags
+      SetTrustlineFlags,
+      InvokeHostFunction
     ]
 
     if op_type in op_types, do: :ok, else: {:error, [{:unknown_operation, op_body}]}
