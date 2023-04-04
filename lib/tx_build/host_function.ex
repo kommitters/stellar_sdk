@@ -1,8 +1,6 @@
 defmodule Stellar.TxBuild.HostFunction do
   @moduledoc """
-  - install
-  - create
-  - invoke
+    `HostFunction` struct definition.
   """
 
   alias Stellar.TxBuild.SCVal

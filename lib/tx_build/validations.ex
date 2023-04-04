@@ -172,7 +172,7 @@ defmodule Stellar.TxBuild.Validations do
 
   @spec validate_sc_vals(component :: component()) :: validation()
   def validate_sc_vals({field, args}) when is_list(args) do
-    if Enum.all?(args, &is_struct(&1, SCVal)),
+    if Enum.all?(args, &is_sc_val?/1),
       do: {:ok, args},
       else: {:error, :"invalid_#{field}"}
   end
@@ -188,4 +188,8 @@ defmodule Stellar.TxBuild.Validations do
   end
 
   def validate_contract_id({field, _contract_id}), do: {:error, :"invalid_#{field}"}
+
+  @spec is_sc_val?(value :: any()) :: boolean()
+  defp is_sc_val?(%SCVal{}), do: true
+  defp is_sc_val?(_), do: false
 end
