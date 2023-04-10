@@ -2,13 +2,19 @@ defmodule Stellar.Test.XDRFixtures do
   @moduledoc """
   Stellar's XDR data for test constructions.
   """
+  alias Stellar.TxBuild.SourceAccountContractID
   alias Stellar.KeyPair
-  alias Stellar.TxBuild.{TransactionSignature, SignerKey, SCVal}
+  alias Stellar.TxBuild.{TransactionSignature, SignerKey, SCAddress, SCVal}
   alias Stellar.TxBuild.Transaction, as: Tx
   alias Stellar.TxBuild.HostFunction, as: TxHostFunction
+  alias Stellar.TxBuild.ContractAuth, as: TxContractAuth
+  alias Stellar.TxBuild.Asset, as: TxAsset
+  alias Stellar.TxBuild.AccountID, as: TxAccountID
+  alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
 
   alias StellarBase.XDR.{
     AccountID,
+    AddressWithNonce,
     AlphaNum12,
     AlphaNum4,
     Asset,
@@ -22,9 +28,12 @@ defmodule Stellar.Test.XDRFixtures do
     CryptoKeyType,
     DataValue,
     DecoratedSignature,
+    Ed25519ContractID,
     EnvelopeType,
     Ext,
+    FromAsset,
     Hash,
+    HashIDPreimageCreateContractArgs,
     Int32,
     Int64,
     Memo,
@@ -34,6 +43,7 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody,
     Operation,
     Operations,
+    OperationID,
     OptionalAccountID,
     OptionalDataValue,
     OptionalMuxedAccount,
@@ -47,10 +57,14 @@ defmodule Stellar.Test.XDRFixtures do
     SequenceNumber,
     Signature,
     SignatureHint,
+    SourceAccountContractID,
     String28,
     String32,
     String64,
+    StructContractID,
     Signer,
+    SCContractCode,
+    SCContractCodeType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -111,6 +125,104 @@ defmodule Stellar.Test.XDRFixtures do
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
+  end
+
+  @spec address_with_nonce_xdr(sc_address :: SCAddress.t(), nonce :: non_neg_integer()) ::
+          AddressWithNonce.t()
+  def address_with_nonce_xdr(sc_address, nonce) do
+    nonce = UInt64.new(nonce)
+
+    sc_address
+    |> SCAddress.to_xdr()
+    |> AddressWithNonce.new(nonce)
+  end
+
+  @spec ed25519_contract_id_xdr(
+          network_id :: String.t(),
+          ed25519 :: non_neg_integer(),
+          salt :: non_neg_integer()
+        ) :: Ed25519ContractID.t()
+  def ed25519_contract_id_xdr(network_id, ed25519, salt) do
+    network_id = Hash.new(network_id)
+    ed25519 = UInt256.new(ed25519)
+    salt = UInt256.new(salt)
+
+    Ed25519ContractID.new(network_id, ed25519, salt)
+  end
+
+  @spec from_asset_xdr(network_id :: binary(), asset :: TxAsset.t()) :: FromAsset.t()
+  def from_asset_xdr(network_id, asset) do
+    asset = TxAsset.to_xdr(asset)
+
+    network_id
+    |> Hash.new()
+    |> FromAsset.new(asset)
+  end
+
+  @spec operation_id_xdr(
+          source_account :: TxAccountID.t(),
+          sequence_number :: TxSequenceNumber.t(),
+          op_num :: non_neg_integer()
+        ) :: OperationID.t()
+  def operation_id_xdr(source_account, sequence_number, op_num) do
+    sequence_number = TxSequenceNumber.to_xdr(sequence_number)
+    op_num = UInt32.new(op_num)
+
+    source_account
+    |> TxAccountID.to_xdr()
+    |> OperationID.new(sequence_number, op_num)
+  end
+
+  @spec source_account_contract_id_xdr(
+          network_id :: binary(),
+          source_account :: String.t(),
+          salt :: non_neg_integer()
+        ) :: SourceAccountContractID.t()
+  def source_account_contract_id_xdr(network_id, source_account, salt) do
+    source_account = account_id_xdr(source_account)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> SourceAccountContractID.new(source_account, salt)
+  end
+
+  @spec struct_contract_id_xdr(
+          network_id :: binary(),
+          contract_id :: binary(),
+          salt :: non_neg_integer()
+        ) :: StructContractID.t()
+  def struct_contract_id_xdr(network_id, contract_id, salt) do
+    contract_id = Hash.new(contract_id)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> StructContractID.new(contract_id, salt)
+  end
+
+  @spec hash_id_preimage_create_contract_args_xdr(
+          network_id :: binary(),
+          source :: binary(),
+          source_type :: String.t(),
+          salt :: non_neg_integer()
+        ) :: HashIDPreimageCreateContractArgs.t()
+  def hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt) do
+    source = sc_contract_code_xdr(source_type, source)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> HashIDPreimageCreateContractArgs.new(source, salt)
+  end
+
+  @spec sc_contract_code_xdr(type :: String.t(), value :: binary()) :: SCContractCode.t()
+  def sc_contract_code_xdr(type, value) do
+    type = SCContractCodeType.new(type)
+
+    value
+    |> Hash.new()
+    |> SCContractCode.new(type)
   end
 
   @spec signer_xdr(key :: String.t(), weight :: non_neg_integer()) :: Signer.t()
@@ -636,6 +748,7 @@ defmodule Stellar.Test.XDRFixtures do
           footprint :: String.t(),
           auth :: ContractAuthList.t()
         ) :: InvokeHostFunction.t()
+
   def invoke_host_function_op_xdr(function, footprint, auth \\ []) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
     host_function = TxHostFunction.to_xdr(function)
@@ -645,7 +758,7 @@ defmodule Stellar.Test.XDRFixtures do
       |> Base.decode64!()
       |> LedgerFootprint.decode_xdr!()
 
-    contract_auth_list = ContractAuthList.new(auth)
+    contract_auth_list = auth |> Enum.map(&TxContractAuth.to_xdr/1) |> ContractAuthList.new()
 
     host_function
     |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)

@@ -8,7 +8,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]
 
-  alias Stellar.TxBuild.{HostFunction, OptionalAccount}
+  alias Stellar.TxBuild.{ContractAuth, HostFunction, OptionalAccount}
 
   alias StellarBase.XDR.Operations.InvokeHostFunction
 
@@ -27,7 +27,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   @type t :: %__MODULE__{
           function: HostFunction.t(),
           footprint: String.t(),
-          auth: ContractAuthList.t(),
+          auth: list(ContractAuth.t()),
           source_account: OptionalAccount.t()
         }
 
@@ -44,7 +44,8 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
     with {:ok, function} <- validate_function(function),
          {:ok, footprint} <- validate_footprint({:footprint, footprint}),
-         {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
+         {:ok, source_account} <- validate_optional_account({:source_account, source_account}),
+         {:ok, auth} <- validate_auth(auth) do
       %__MODULE__{
         function: function,
         footprint: footprint,
@@ -75,6 +76,22 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   def to_xdr(%__MODULE__{
         function: function,
+        footprint: nil,
+        auth: auth
+      }) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+    host_function = HostFunction.to_xdr(function)
+    ledger_key_list = LedgerKeyList.new([])
+    ledger_footprint = LedgerFootprint.new(ledger_key_list, ledger_key_list)
+    contract_auth_list = auth |> Enum.map(&ContractAuth.to_xdr/1) |> ContractAuthList.new()
+
+    host_function
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    |> OperationBody.new(op_type)
+  end
+
+  def to_xdr(%__MODULE__{
+        function: function,
         footprint: footprint,
         auth: nil
       }) do
@@ -87,6 +104,26 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
       |> LedgerFootprint.decode_xdr!()
 
     contract_auth_list = ContractAuthList.new([])
+
+    host_function
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    |> OperationBody.new(op_type)
+  end
+
+  def to_xdr(%__MODULE__{
+        function: function,
+        footprint: footprint,
+        auth: auth
+      }) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+    host_function = HostFunction.to_xdr(function)
+
+    {ledger_footprint, _} =
+      footprint
+      |> Base.decode64!()
+      |> LedgerFootprint.decode_xdr!()
+
+    contract_auth_list = auth |> Enum.map(&ContractAuth.to_xdr/1) |> ContractAuthList.new()
 
     host_function
     |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
@@ -115,4 +152,9 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   end
 
   defp validate_footprint({:footprint, _}), do: {:error, :invalid_footprint}
+
+  @spec validate_auth(function :: list(ContractAuth.t())) :: validation()
+  defp validate_auth([%ContractAuth{} | _] = auth), do: {:ok, auth}
+  defp validate_auth(nil), do: {:ok, nil}
+  defp validate_auth(_), do: {:error, :invalid_auth}
 end
