@@ -2,6 +2,12 @@ defmodule Stellar.TxBuild.AddressWithNonce do
   @moduledoc """
   `AddressWithNonce` struct definition.
   """
+
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_pos_integer: 1
+    ]
+
   alias Stellar.TxBuild.SCAddress
   alias StellarBase.XDR.{AddressWithNonce, UInt64}
 
@@ -9,22 +15,24 @@ defmodule Stellar.TxBuild.AddressWithNonce do
 
   defstruct [:address, :nonce]
 
+  @type validation :: {:ok, any()} | {:error, atom()}
+
   @type t :: %__MODULE__{address: SCAddress.t(), nonce: non_neg_integer()}
   @impl true
   def new(args, opts \\ nil)
 
-  def new(
-        [
-          %SCAddress{} = address,
-          nonce
-        ],
-        _opts
-      )
-      when is_integer(nonce) and nonce >= 0 do
-    %__MODULE__{
-      address: address,
-      nonce: nonce
-    }
+  ## change functions to keyword list
+  def new(args, _opts) when is_list(args) do
+    address = Keyword.get(args, :address)
+    nonce = Keyword.get(args, :nonce)
+
+    with {:ok, address} <- validate_address({:address, address}),
+         {:ok, nonce} <- validate_pos_integer({:nonce, nonce}) do
+      %__MODULE__{
+        address: address,
+        nonce: nonce
+      }
+    end
   end
 
   def new(_args, _opts), do: {:error, :invalid_address_with_nonce}
@@ -41,4 +49,8 @@ defmodule Stellar.TxBuild.AddressWithNonce do
   end
 
   def to_xdr(_error), do: {:error, :invalid_struct_address_with_nonce}
+
+  @spec validate_address(tuple()) :: validation()
+  defp validate_address({_field, %SCAddress{} = value}), do: {:ok, value}
+  defp validate_address({field, _value}), do: {:error, :"invalid_#{field}"}
 end

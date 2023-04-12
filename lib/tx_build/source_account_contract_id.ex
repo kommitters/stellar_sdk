@@ -2,6 +2,12 @@ defmodule Stellar.TxBuild.SourceAccountContractID do
   @moduledoc """
   `SourceAccountContractID` struct definition.
   """
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_pos_integer: 1,
+      validate_string: 1,
+      validate_account_id: 1
+    ]
 
   alias StellarBase.XDR.{SourceAccountContractID, Hash, UInt256}
   alias Stellar.TxBuild.AccountID
@@ -19,20 +25,20 @@ defmodule Stellar.TxBuild.SourceAccountContractID do
   @impl true
   def new(args, opts \\ nil)
 
-  def new(
-        [
-          network_id,
-          %AccountID{} = source_account,
-          salt
-        ],
-        _opts
-      )
-      when is_binary(network_id) and is_integer(salt) and salt >= 0 do
-    %__MODULE__{
-      network_id: network_id,
-      source_account: source_account,
-      salt: salt
-    }
+  def new(args, _opts) when is_list(args) do
+    network_id = Keyword.get(args, :network_id)
+    source_account = Keyword.get(args, :source_account)
+    salt = Keyword.get(args, :salt)
+
+    with {:ok, network_id} <- validate_string({:network_id, network_id}),
+         {:ok, source_account} <- validate_account_id({:source_account, source_account}),
+         {:ok, salt} <- validate_pos_integer({:salt, salt}) do
+      %__MODULE__{
+        network_id: network_id,
+        source_account: source_account,
+        salt: salt
+      }
+    end
   end
 
   def new(_args, _opts), do: {:error, :invalid_source_account_contract_id}

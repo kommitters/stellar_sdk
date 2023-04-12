@@ -11,7 +11,8 @@ defmodule Stellar.TxBuild.HostFunction do
   import Stellar.TxBuild.Validations,
     only: [
       validate_sc_vals: 1,
-      validate_contract_id: 1
+      validate_contract_id: 1,
+      validate_string: 1
     ]
 
   alias StellarBase.XDR.{
@@ -107,8 +108,4 @@ defmodule Stellar.TxBuild.HostFunction do
     host_function_type = HostFunctionType.new()
     HostFunctionXDR.new(sc_vec, host_function_type)
   end
-
-  @spec validate_string(tuple :: tuple()) :: validation()
-  defp validate_string({_type, string}) when is_binary(string), do: {:ok, string}
-  defp validate_string({type, _string}), do: {:error, :"invalid_#{type}"}
 end

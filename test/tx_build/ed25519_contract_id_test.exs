@@ -28,10 +28,10 @@ defmodule Stellar.TxBuild.Ed25519ContractIDTest do
       network_id: ^network_id,
       ed25519: ^ed25519,
       salt: ^salt
-    } = TxEd25519ContractID.new([network_id, ed25519, salt])
+    } = TxEd25519ContractID.new(network_id: network_id, ed25519: ed25519, salt: salt)
   end
 
-  test "new/1 invalid args" do
+  test "new/1 with invalid args" do
     {:error, :invalid_ed25519_contract_id} = TxEd25519ContractID.new("invalid_args")
   end
 
@@ -42,7 +42,7 @@ defmodule Stellar.TxBuild.Ed25519ContractIDTest do
     xdr: xdr
   } do
     ^xdr =
-      TxEd25519ContractID.new([network_id, ed25519, salt])
+      TxEd25519ContractID.new(network_id: network_id, ed25519: ed25519, salt: salt)
       |> TxEd25519ContractID.to_xdr()
   end
 

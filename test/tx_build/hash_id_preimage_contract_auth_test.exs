@@ -23,14 +23,25 @@ defmodule Stellar.TxBuild.HashIDPreimageContractAuthTest do
     sc_val = TxSCVal.new(i32: 123)
 
     # AUTHORIZED INVOCATION
-    contract_id = "contract_id"
+    contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
     function_name = "function_name"
     args = [sc_val]
 
-    authorized_invocation_1 = TxAuthorizedInvocation.new([contract_id, function_name, args, []])
+    authorized_invocation_1 =
+      TxAuthorizedInvocation.new(
+        contract_id: contract_id,
+        function_name: function_name,
+        args: args,
+        sub_invocations: []
+      )
 
     authorized_invocation_2 =
-      TxAuthorizedInvocation.new([contract_id, function_name, args, [authorized_invocation_1]])
+      TxAuthorizedInvocation.new(
+        contract_id: contract_id,
+        function_name: function_name,
+        args: args,
+        sub_invocations: [authorized_invocation_1]
+      )
 
     %{
       network_id: "network_id",
@@ -45,16 +56,25 @@ defmodule Stellar.TxBuild.HashIDPreimageContractAuthTest do
       nonce: ^nonce,
       invocation: ^invocation
     } =
-      TxHashIDPreimageContractAuth.new([
-        network_id,
-        nonce,
-        invocation
-      ])
+      TxHashIDPreimageContractAuth.new(
+        network_id: network_id,
+        nonce: nonce,
+        invocation: invocation
+      )
   end
 
   test "new/1 with invalid args" do
     {:error, :invalid_hash_id_preimage_contract_auth} =
       TxHashIDPreimageContractAuth.new("invalid_args")
+  end
+
+  test "new/1 with invalid authorized invocation", %{network_id: network_id, nonce: nonce} do
+    {:error, :invalid_invocation} =
+      TxHashIDPreimageContractAuth.new(
+        network_id: network_id,
+        nonce: nonce,
+        invocation: "invalid_value"
+      )
   end
 
   test "to_xdr/1", %{
@@ -63,10 +83,14 @@ defmodule Stellar.TxBuild.HashIDPreimageContractAuthTest do
     invocation: invocation
   } do
     %HashIDPreimageContractAuth{
-      network_id: %Hash{value: ^network_id},
-      nonce: %UInt64{datum: ^nonce},
+      network_id: %Hash{value: "network_id"},
+      nonce: %UInt64{datum: 123},
       invocation: %AuthorizedInvocation{
-        contract_id: %Hash{value: "contract_id"},
+        contract_id: %Hash{
+          value:
+            <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68, 84,
+              157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+        },
         function_name: %SCSymbol{value: "function_name"},
         args: %SCVec{
           sc_vals: [
@@ -79,7 +103,11 @@ defmodule Stellar.TxBuild.HashIDPreimageContractAuthTest do
         sub_invocations: %AuthorizedInvocationList{
           sub_invocations: [
             %AuthorizedInvocation{
-              contract_id: %Hash{value: "contract_id"},
+              contract_id: %Hash{
+                value:
+                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+              },
               function_name: %SCSymbol{value: "function_name"},
               args: %SCVec{
                 sc_vals: [
@@ -95,7 +123,11 @@ defmodule Stellar.TxBuild.HashIDPreimageContractAuthTest do
         }
       }
     } =
-      TxHashIDPreimageContractAuth.new([network_id, nonce, invocation])
+      TxHashIDPreimageContractAuth.new(
+        network_id: network_id,
+        nonce: nonce,
+        invocation: invocation
+      )
       |> TxHashIDPreimageContractAuth.to_xdr()
   end
 

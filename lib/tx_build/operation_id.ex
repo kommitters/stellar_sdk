@@ -2,6 +2,12 @@ defmodule Stellar.TxBuild.OperationID do
   @moduledoc """
   `OperationID` struct definition.
   """
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_pos_integer: 1,
+      validate_account_id: 1,
+      validate_sequence_number: 1
+    ]
 
   alias Stellar.TxBuild.{AccountID, SequenceNumber}
   alias StellarBase.XDR.{OperationID, UInt32}
@@ -19,13 +25,20 @@ defmodule Stellar.TxBuild.OperationID do
   @impl true
   def new(args, opts \\ nil)
 
-  def new([%AccountID{} = source_account, %SequenceNumber{} = sequence_number, op_num], _opts)
-      when is_integer(op_num) and op_num >= 0 do
-    %__MODULE__{
-      source_account: source_account,
-      sequence_number: sequence_number,
-      op_num: op_num
-    }
+  def new(args, _opts) when is_list(args) do
+    source_account = Keyword.get(args, :source_account)
+    sequence_number = Keyword.get(args, :sequence_number)
+    op_num = Keyword.get(args, :op_num)
+
+    with {:ok, source_account} <- validate_account_id({:source_account, source_account}),
+         {:ok, sequence_number} <- validate_sequence_number({:sequence_number, sequence_number}),
+         {:ok, op_num} <- validate_pos_integer({:op_num, op_num}) do
+      %__MODULE__{
+        source_account: source_account,
+        sequence_number: sequence_number,
+        op_num: op_num
+      }
+    end
   end
 
   def new(_args, _opts), do: {:error, :invalid_operation_id}

@@ -22,20 +22,19 @@ defmodule Stellar.TxBuild.FromAssetTest do
     %TxFromAsset{
       network_id: ^network_id,
       asset: ^asset
-    } = TxFromAsset.new([network_id, asset])
+    } = TxFromAsset.new(network_id: network_id, asset: :native)
   end
 
-  test "new/1 invalid args" do
+  test "new/1 with invalid args" do
     {:error, :invalid_from_asset} = TxFromAsset.new("invalid_args")
   end
 
   test "to_xdr/1", %{
     network_id: network_id,
-    asset: asset,
     xdr: xdr
   } do
     ^xdr =
-      TxFromAsset.new([network_id, asset])
+      TxFromAsset.new(network_id: network_id, asset: :native)
       |> TxFromAsset.to_xdr()
   end
 

@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.AddressWithNonceTest do
   alias Stellar.TxBuild.SCAddress, as: TxSCAddress
 
   setup do
-    address = TxSCAddress.new(account: "GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
+    address = TxSCAddress.new(account: "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
     nonce = 123
     xdr = address_with_nonce_xdr(address, nonce)
 
@@ -18,17 +18,17 @@ defmodule Stellar.TxBuild.AddressWithNonceTest do
     %TxAddressWithNonce{
       address: ^address,
       nonce: ^nonce
-    } = TxAddressWithNonce.new([address, nonce])
+    } = TxAddressWithNonce.new(address: address, nonce: nonce)
   end
 
-  test "new/1 with invalid operation id" do
-    {:error, :invalid_address_with_nonce} = TxAddressWithNonce.new("invalid_address_with_nonce")
+  test "new/1 with invalid args" do
+    {:error, :invalid_address_with_nonce} = TxAddressWithNonce.new("invalid_args")
   end
 
   test "to_xdr/1",
        %{address: address, nonce: nonce, xdr: xdr} do
     ^xdr =
-      TxAddressWithNonce.new([address, nonce])
+      TxAddressWithNonce.new(address: address, nonce: nonce)
       |> TxAddressWithNonce.to_xdr()
   end
 

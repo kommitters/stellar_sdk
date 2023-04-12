@@ -1,15 +1,20 @@
 defmodule Stellar.TxBuild.ValidationsTest do
   use ExUnit.Case
 
+  alias Stellar.TxBuild.SequenceNumber
+
   alias Stellar.TxBuild.{
     Account,
     AccountID,
+    AddressWithNonce,
     Amount,
     Asset,
     AssetsPath,
     ClaimableBalanceID,
     Validations,
     OptionalAccountID,
+    OptionalAddressWithNonce,
+    SCAddress,
     PoolID,
     Price
   }
@@ -134,5 +139,27 @@ defmodule Stellar.TxBuild.ValidationsTest do
   test "validate_pool_id/1 error" do
     {:error, [liquidity_pool_id: :invalid_pool_id]} =
       Validations.validate_pool_id({:liquidity_pool_id, "ABC"})
+  end
+
+  test "validate_optional_address_with_nonce/1", %{account_id: account_id} do
+    address_with_nonce =
+      AddressWithNonce.new(address: SCAddress.new(account: account_id), nonce: 123)
+
+    {:ok, %OptionalAddressWithNonce{}} =
+      Validations.validate_optional_address_with_nonce({:address_with_nonce, address_with_nonce})
+  end
+
+  test "validate_optional_address_with_nonce/1 error" do
+    {:error, :invalid_address_with_nonce} =
+      Validations.validate_optional_address_with_nonce({:address_with_nonce, "invalid"})
+  end
+
+  test "validate_sequence_number/1" do
+    seq_number = SequenceNumber.new()
+    {:ok, ^seq_number} = Validations.validate_sequence_number({:seq_number, seq_number})
+  end
+
+  test "validate_sequence_number/1 error" do
+    {:error, :invalid_seq_number} = Validations.validate_sequence_number({:seq_number, "invalid"})
   end
 end

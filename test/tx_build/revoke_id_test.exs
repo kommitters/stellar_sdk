@@ -9,9 +9,7 @@ defmodule Stellar.TxBuild.RevokeIDTest do
 
   alias StellarBase.XDR.{
     AccountID,
-    AlphaNum4,
     Asset,
-    AssetCode4,
     AssetType,
     PublicKey,
     PublicKeyType,
@@ -19,7 +17,8 @@ defmodule Stellar.TxBuild.RevokeIDTest do
     RevokeID,
     SequenceNumber,
     UInt32,
-    UInt256
+    UInt256,
+    Void
   }
 
   setup do
@@ -28,8 +27,7 @@ defmodule Stellar.TxBuild.RevokeIDTest do
     pool_id_value = "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
 
     # ASSET
-    issuer_public_key = "GCQDWMVBF4MQ4D56MJHJI6OKNY2FZRNLV2UYZXAEPXHK6VIMT2NZRFSC"
-    asset = TxAsset.new(code: "ABC", issuer: issuer_public_key)
+    asset = TxAsset.new(:native)
 
     %{
       public_key: public_key,
@@ -48,7 +46,9 @@ defmodule Stellar.TxBuild.RevokeIDTest do
     sequence_number: sequence_number,
     op_num: op_num,
     liquidity_pool_id: liquidity_pool_id,
-    asset: asset
+    asset: asset,
+    public_key: public_key,
+    pool_id_value: pool_id_value
   } do
     %TxRevokeID{
       source_account: ^source_account,
@@ -56,19 +56,25 @@ defmodule Stellar.TxBuild.RevokeIDTest do
       op_num: ^op_num,
       liquidity_pool_id: ^liquidity_pool_id,
       asset: ^asset
-    } = TxRevokeID.new([source_account, sequence_number, op_num, liquidity_pool_id, asset])
+    } =
+      TxRevokeID.new(
+        source_account: public_key,
+        sequence_number: sequence_number,
+        op_num: op_num,
+        liquidity_pool_id: pool_id_value,
+        asset: :native
+      )
   end
 
-  test "new/1 when invalid revoke id" do
-    {:error, :invalid_revoke_id} = TxRevokeID.new("invalid_revoke_id")
+  test "new/1 with invalid args" do
+    {:error, :invalid_revoke_id} = TxRevokeID.new("invalid_args")
   end
 
   test "to_xdr/1", %{
-    source_account: source_account,
     sequence_number: sequence_number,
     op_num: op_num,
-    liquidity_pool_id: liquidity_pool_id,
-    asset: asset
+    public_key: public_key,
+    pool_id_value: pool_id_value
   } do
     %RevokeID{
       source_account: %AccountID{
@@ -89,25 +95,17 @@ defmodule Stellar.TxBuild.RevokeIDTest do
             141, 51, 54, 125, 36, 221, 97, 76, 253, 245, 73, 16, 114>>
       },
       asset: %Asset{
-        asset: %AlphaNum4{
-          asset_code: %AssetCode4{code: "ABC", length: 3},
-          issuer: %AccountID{
-            account_id: %PublicKey{
-              public_key: %UInt256{
-                datum:
-                  <<160, 59, 50, 161, 47, 25, 14, 15, 190, 98, 78, 148, 121, 202, 110, 52, 92,
-                    197, 171, 174, 169, 140, 220, 4, 125, 206, 175, 85, 12, 158, 155, 152>>
-              },
-              type: %PublicKeyType{
-                identifier: :PUBLIC_KEY_TYPE_ED25519
-              }
-            }
-          }
-        },
-        type: %AssetType{identifier: :ASSET_TYPE_CREDIT_ALPHANUM4}
+        asset: %Void{value: nil},
+        type: %AssetType{identifier: :ASSET_TYPE_NATIVE}
       }
     } =
-      TxRevokeID.new([source_account, sequence_number, op_num, liquidity_pool_id, asset])
+      TxRevokeID.new(
+        source_account: public_key,
+        sequence_number: sequence_number,
+        op_num: op_num,
+        liquidity_pool_id: pool_id_value,
+        asset: :native
+      )
       |> TxRevokeID.to_xdr()
   end
 

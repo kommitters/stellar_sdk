@@ -2,6 +2,8 @@ defmodule Stellar.TxBuild.FromAsset do
   @moduledoc """
   `FromAsset` struct definition.
   """
+  import Stellar.TxBuild.Validations,
+    only: [validate_string: 1, validate_asset: 1]
 
   alias StellarBase.XDR.{FromAsset, Hash}
   alias Stellar.TxBuild.Asset
@@ -18,18 +20,17 @@ defmodule Stellar.TxBuild.FromAsset do
   @impl true
   def new(args, opts \\ nil)
 
-  def new(
-        [
-          network_id,
-          %Asset{} = asset
-        ],
-        _opts
-      )
-      when is_binary(network_id) do
-    %__MODULE__{
-      network_id: network_id,
-      asset: asset
-    }
+  def new(args, _opts) when is_list(args) do
+    network_id = Keyword.get(args, :network_id)
+    asset = Keyword.get(args, :asset)
+
+    with {:ok, network_id} <- validate_string({:network_id, network_id}),
+         {:ok, asset} <- validate_asset({:asset, asset}) do
+      %__MODULE__{
+        network_id: network_id,
+        asset: asset
+      }
+    end
   end
 
   def new(_args, _opts), do: {:error, :invalid_from_asset}

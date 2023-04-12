@@ -13,6 +13,7 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
 
   import Stellar.Test.XDRFixtures,
     only: [
+      invoke_host_function_op_xdr: 1,
       invoke_host_function_op_xdr: 2,
       invoke_host_function_op_xdr: 3
     ]
@@ -35,23 +36,42 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
       footprint =
         "AAAAAgAAAAYEYRaMu64NqWxUO3H9VxrsS0RUnVA/mvnnaFzO28FhPAAAAAMAAAADAAAAB333b6x0UKU606981VsXWEBukqHf/ofD44TsB48KjKRLAAAAAA=="
 
-      sc_address = SCAddress.new(contract: "contract_id")
-      address_with_nonce = AddressWithNonce.new([sc_address, 123])
+      sc_address =
+        SCAddress.new(contract: "GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
 
-      authorized_invocation_1 = AuthorizedInvocation.new([contract_id, function_name, args, []])
+      address_with_nonce = AddressWithNonce.new(address: sc_address, nonce: 123)
+
+      authorized_invocation_1 =
+        AuthorizedInvocation.new(
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args,
+          sub_invocations: []
+        )
 
       authorized_invocation_2 =
-        AuthorizedInvocation.new([contract_id, function_name, args, [authorized_invocation_1]])
+        AuthorizedInvocation.new(
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args,
+          sub_invocations: [authorized_invocation_1]
+        )
 
       contract_authentication =
-        ContractAuth.new([address_with_nonce, authorized_invocation_2, args])
+        ContractAuth.new(
+          address_with_nonce: address_with_nonce,
+          authorized_invocation: authorized_invocation_2,
+          args: args
+        )
 
       %{
         function: function,
         footprint: footprint,
         contract_authentication: [contract_authentication],
         xdr: invoke_host_function_op_xdr(function, footprint),
-        xdr_with_auth: invoke_host_function_op_xdr(function, footprint, [contract_authentication])
+        xdr_with_auth:
+          invoke_host_function_op_xdr(function, footprint, [contract_authentication]),
+        xdr_without_auth_and_footprint: invoke_host_function_op_xdr(function)
       }
     end
 
@@ -116,6 +136,11 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
       {:error, :invalid_footprint} = InvokeHostFunction.new(function: function, footprint: 11)
     end
 
+    test "new/2 with invalid operation attribute" do
+      {:error, :invalid_operation_attributes} =
+        InvokeHostFunction.new("invalid_operation_attribute")
+    end
+
     test "set_footprint", %{function: function, footprint: footprint} do
       %InvokeHostFunction{
         function: ^function,
@@ -126,6 +151,13 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         |> InvokeHostFunction.set_footprint(footprint)
     end
 
+    test "set_footprint with invalid footprint", %{function: function} do
+      {:error, :invalid_footprint} =
+        [function: function]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.set_footprint("invalid_footprint")
+    end
+
     test "to_xdr/1", %{function: function, footprint: footprint, xdr: xdr} do
       ^xdr =
         [function: function, footprint: footprint]
@@ -133,7 +165,7 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         |> InvokeHostFunction.to_xdr()
     end
 
-    test "to_xdr/1 with authorization", %{
+    test "to_xdr/1 with footprint and authorization", %{
       function: function,
       footprint: footprint,
       contract_authentication: auth,
@@ -141,6 +173,16 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     } do
       ^xdr =
         [function: function, footprint: footprint, auth: auth]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.to_xdr()
+    end
+
+    test "to_xdr/1 without footprint and authorization", %{
+      function: function,
+      xdr_without_auth_and_footprint: xdr
+    } do
+      ^xdr =
+        [function: function]
         |> InvokeHostFunction.new()
         |> InvokeHostFunction.to_xdr()
     end

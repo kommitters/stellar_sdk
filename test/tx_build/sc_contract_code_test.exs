@@ -25,7 +25,11 @@ defmodule Stellar.TxBuild.SCContractCodeTest do
   end
 
   test "new/1 with invalid type", %{hash: hash} do
-    {:error, :invalid_sc_val_type} = TxSCContractCode.new(any: hash)
+    {:error, :invalid_sc_contract_code} = TxSCContractCode.new(any: hash)
+  end
+
+  test "new/1 with invalid args" do
+    {:error, :invalid_sc_contract_code} = TxSCContractCode.new("invalid_args")
   end
 
   test "new/1 with wasm invalid hash" do

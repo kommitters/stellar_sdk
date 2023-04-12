@@ -39,6 +39,7 @@ defmodule Stellar.Test.XDRFixtures do
     Memo,
     MemoType,
     MuxedAccount,
+    LedgerKeyList,
     OperationType,
     OperationBody,
     Operation,
@@ -749,20 +750,32 @@ defmodule Stellar.Test.XDRFixtures do
           auth :: ContractAuthList.t()
         ) :: InvokeHostFunction.t()
 
-  def invoke_host_function_op_xdr(function, footprint, auth \\ []) do
+  def invoke_host_function_op_xdr(function, footprint \\ nil, auth \\ []) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
     host_function = TxHostFunction.to_xdr(function)
 
-    {ledger_footprint, _} =
-      footprint
-      |> Base.decode64!()
-      |> LedgerFootprint.decode_xdr!()
+    ledger_footprint = build_ledger_footprint(footprint)
 
     contract_auth_list = auth |> Enum.map(&TxContractAuth.to_xdr/1) |> ContractAuthList.new()
 
     host_function
     |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
     |> OperationBody.new(op_type)
+  end
+
+  @spec build_ledger_footprint(footprint :: binary() | nil) :: LedgerFootprint.t()
+  defp build_ledger_footprint(nil) do
+    ledger_key_list = LedgerKeyList.new([])
+    LedgerFootprint.new(ledger_key_list, ledger_key_list)
+  end
+
+  defp build_ledger_footprint(footprint) do
+    {ledger_footprint, _} =
+      footprint
+      |> Base.decode64!()
+      |> LedgerFootprint.decode_xdr!()
+
+    ledger_footprint
   end
 
   @spec build_asset_xdr(asset :: any()) :: list(Asset.t())

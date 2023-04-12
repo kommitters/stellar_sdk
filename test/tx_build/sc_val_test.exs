@@ -122,6 +122,10 @@ defmodule Stellar.TxBuild.SCValTest do
     end
   end
 
+  test "new/1 when type is invalid" do
+    {:error, :invalid_sc_val_type} = SCVal.new(invalid_type: "invalid_type")
+  end
+
   test "to_xdr when type is u63" do
     %StellarBase.XDR.SCVal{
       type: %StellarBase.XDR.SCValType{identifier: :SCV_U63},

@@ -2,8 +2,6 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.HashIDPreimage, as: TxHashIDPreimage
-  alias Stellar.TxBuild.AccountID, as: TxAccountID
-  alias Stellar.TxBuild.Asset, as: TxAsset
   alias Stellar.TxBuild.AuthorizedInvocation, as: TxAuthorizedInvocation
   alias Stellar.TxBuild.Ed25519ContractID, as: TxEd25519ContractID
   alias Stellar.TxBuild.FromAsset, as: TxFromAsset
@@ -15,14 +13,11 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   alias Stellar.TxBuild.SCContractCode, as: TxSCContractCode
   alias Stellar.TxBuild.SCVal, as: TxSCVal
   alias Stellar.TxBuild.OperationID, as: TxOperationID
-  alias Stellar.TxBuild.PoolID, as: TxPoolID
   alias Stellar.TxBuild.RevokeID, as: TxRevokeID
 
   alias StellarBase.XDR.{
     AccountID,
-    AlphaNum4,
     Asset,
-    AssetCode4,
     AssetType,
     AuthorizedInvocation,
     AuthorizedInvocationList,
@@ -58,14 +53,12 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
 
     # OperationID
-    source_account = TxAccountID.new(public_key)
     sequence_number = TxSequenceNumber.new(123_456_789)
     op_num = 123
 
     # RevokeID
     pool_id_value = "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
-    liquidity_pool_id = TxPoolID.new(pool_id_value)
-    asset = TxAsset.new(code: "ABC", issuer: public_key)
+    asset = :native
 
     # Ed25519ContractID
     network_id = "network_id"
@@ -73,7 +66,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     salt = 456
 
     # StructContractID
-    contract_id = "contract_id"
+    contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
 
     # HashIDPreimageCreateContractArgs
     wasm_ref_sc_contract_code = TxSCContractCode.new(wasm_ref: "wasm_ref")
@@ -83,24 +76,67 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     nonce = 987
     function_name = "function_name"
     args = [TxSCVal.new(i32: 654)]
-    invocation_1 = TxAuthorizedInvocation.new([contract_id, function_name, args, []])
-    invocation_2 = TxAuthorizedInvocation.new([contract_id, function_name, args, [invocation_1]])
+
+    invocation_1 =
+      TxAuthorizedInvocation.new(
+        contract_id: contract_id,
+        function_name: function_name,
+        args: args,
+        sub_invocations: []
+      )
+
+    invocation_2 =
+      TxAuthorizedInvocation.new(
+        contract_id: contract_id,
+        function_name: function_name,
+        args: args,
+        sub_invocations: [invocation_1]
+      )
 
     %{
-      operation_id: TxOperationID.new([source_account, sequence_number, op_num]),
+      operation_id:
+        TxOperationID.new(
+          source_account: public_key,
+          sequence_number: sequence_number,
+          op_num: op_num
+        ),
       revoke_id:
-        TxRevokeID.new([source_account, sequence_number, op_num, liquidity_pool_id, asset]),
-      ed25519_contract_id: TxEd25519ContractID.new([network_id, ed25519, salt]),
-      struct_contract_id: TxStructContractID.new([network_id, contract_id, salt]),
-      from_asset: TxFromAsset.new([network_id, asset]),
+        TxRevokeID.new(
+          source_account: public_key,
+          sequence_number: sequence_number,
+          op_num: op_num,
+          liquidity_pool_id: pool_id_value,
+          asset: asset
+        ),
+      ed25519_contract_id:
+        TxEd25519ContractID.new(network_id: network_id, ed25519: ed25519, salt: salt),
+      struct_contract_id:
+        TxStructContractID.new(network_id: network_id, contract_id: contract_id, salt: salt),
+      from_asset: TxFromAsset.new(network_id: network_id, asset: asset),
       source_account_contract_id:
-        TxSourceAccountContractID.new([network_id, source_account, salt]),
+        TxSourceAccountContractID.new(
+          network_id: network_id,
+          source_account: public_key,
+          salt: salt
+        ),
       hash_id_preimage_create_contract_arg_wasm_ref:
-        TxHashIDPreimageCreateContractArgs.new([network_id, wasm_ref_sc_contract_code, salt]),
+        TxHashIDPreimageCreateContractArgs.new(
+          network_id: network_id,
+          source: wasm_ref_sc_contract_code,
+          salt: salt
+        ),
       hash_id_preimage_create_contract_arg_token:
-        TxHashIDPreimageCreateContractArgs.new([network_id, token_sc_contract_code, salt]),
+        TxHashIDPreimageCreateContractArgs.new(
+          network_id: network_id,
+          source: token_sc_contract_code,
+          salt: salt
+        ),
       hash_id_preimage_contract_auth:
-        TxHashIDPreimageContractAuth.new([network_id, nonce, invocation_2])
+        TxHashIDPreimageContractAuth.new(
+          network_id: network_id,
+          nonce: nonce,
+          invocation: invocation_2
+        )
     }
   end
 
@@ -157,6 +193,10 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   } do
     %TxHashIDPreimage{type: :contact_id_from_source_acc, value: ^source_account_contract_id} =
       TxHashIDPreimage.new(contact_id_from_source_acc: source_account_contract_id)
+  end
+
+  test "new/1 with invalid args" do
+    {:error, :invalid_hash_id_preimage_type} = TxHashIDPreimage.new("invalid_args")
   end
 
   test "new/1 when contact_id_from_source_acc value is wrong" do
@@ -219,31 +259,6 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   test "to_xdr/1 when type is pool_revoke_op_id", %{revoke_id: revoke_id} do
     %HashIDPreimage{
       hash_id: %RevokeID{
-        asset: %Asset{
-          asset: %AlphaNum4{
-            asset_code: %AssetCode4{code: "ABC", length: 3},
-            issuer: %AccountID{
-              account_id: %PublicKey{
-                public_key: %UInt256{
-                  datum:
-                    <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87,
-                      6, 25, 27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
-                },
-                type: %PublicKeyType{
-                  identifier: :PUBLIC_KEY_TYPE_ED25519
-                }
-              }
-            }
-          },
-          type: %AssetType{identifier: :ASSET_TYPE_CREDIT_ALPHANUM4}
-        },
-        liquidity_pool_id: %PoolID{
-          value:
-            <<146, 155, 32, 183, 46, 88, 144, 171, 81, 194, 79, 28, 196, 111, 160, 28, 79, 49,
-              141, 141, 51, 54, 125, 36, 221, 97, 76, 253, 245, 73, 16, 114>>
-        },
-        op_num: %UInt32{datum: 123},
-        sequence_number: %SequenceNumber{sequence_number: 123_456_789},
         source_account: %AccountID{
           account_id: %PublicKey{
             public_key: %UInt256{
@@ -251,15 +266,22 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
                 <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87, 6,
                   25, 27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
             },
-            type: %PublicKeyType{
-              identifier: :PUBLIC_KEY_TYPE_ED25519
-            }
+            type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
           }
+        },
+        sequence_number: %SequenceNumber{sequence_number: 123_456_789},
+        op_num: %UInt32{datum: 123},
+        liquidity_pool_id: %PoolID{
+          value:
+            <<146, 155, 32, 183, 46, 88, 144, 171, 81, 194, 79, 28, 196, 111, 160, 28, 79, 49,
+              141, 141, 51, 54, 125, 36, 221, 97, 76, 253, 245, 73, 16, 114>>
+        },
+        asset: %Asset{
+          asset: %Void{value: nil},
+          type: %AssetType{identifier: :ASSET_TYPE_NATIVE}
         }
       },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_POOL_REVOKE_OP_ID
-      }
+      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_POOL_REVOKE_OP_ID}
     } =
       TxHashIDPreimage.new(pool_revoke_op_id: revoke_id)
       |> TxHashIDPreimage.to_xdr()
@@ -287,13 +309,13 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   } do
     %HashIDPreimage{
       hash_id: %StructContractID{
-        contract_id: %Hash{value: "contract_id"},
         network_id: %Hash{value: "network_id"},
+        contract_id: %Hash{
+          value: "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
+        },
         salt: %UInt256{datum: 456}
       },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_POOL_REVOKE_OP_ID
-      }
+      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_POOL_REVOKE_OP_ID}
     } =
       TxHashIDPreimage.new(contract_id_from_contract: struct_contract_id)
       |> TxHashIDPreimage.to_xdr()
@@ -302,29 +324,13 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   test "to_xdr/1 when type is contract_id_from_asset", %{from_asset: from_asset} do
     %HashIDPreimage{
       hash_id: %FromAsset{
+        network_id: %Hash{value: "network_id"},
         asset: %Asset{
-          asset: %AlphaNum4{
-            asset_code: %AssetCode4{code: "ABC", length: 3},
-            issuer: %AccountID{
-              account_id: %PublicKey{
-                public_key: %UInt256{
-                  datum:
-                    <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87,
-                      6, 25, 27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
-                },
-                type: %PublicKeyType{
-                  identifier: :PUBLIC_KEY_TYPE_ED25519
-                }
-              }
-            }
-          },
-          type: %AssetType{identifier: :ASSET_TYPE_CREDIT_ALPHANUM4}
-        },
-        network_id: %Hash{value: "network_id"}
+          asset: %Void{value: nil},
+          type: %AssetType{identifier: :ASSET_TYPE_NATIVE}
+        }
       },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET
-      }
+      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET}
     } =
       TxHashIDPreimage.new(contract_id_from_asset: from_asset)
       |> TxHashIDPreimage.to_xdr()
@@ -385,39 +391,45 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   } do
     %HashIDPreimage{
       hash_id: %HashIDPreimageContractAuth{
+        network_id: %Hash{value: "network_id"},
+        nonce: %UInt64{datum: 987},
         invocation: %AuthorizedInvocation{
+          contract_id: %Hash{
+            value:
+              <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68, 84,
+                157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+          },
+          function_name: %SCSymbol{value: "function_name"},
           args: %SCVec{
             sc_vals: [
               %SCVal{
-                type: %SCValType{identifier: :SCV_I32},
-                value: %Int32{datum: 654}
+                value: %Int32{datum: 654},
+                type: %SCValType{identifier: :SCV_I32}
               }
             ]
           },
-          contract_id: %Hash{value: "contract_id"},
-          function_name: %SCSymbol{value: "function_name"},
           sub_invocations: %AuthorizedInvocationList{
             sub_invocations: [
               %AuthorizedInvocation{
+                contract_id: %Hash{
+                  value:
+                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
+                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+                },
+                function_name: %SCSymbol{value: "function_name"},
                 args: %SCVec{
                   sc_vals: [
                     %SCVal{
-                      type: %SCValType{identifier: :SCV_I32},
-                      value: %Int32{datum: 654}
+                      value: %Int32{datum: 654},
+                      type: %SCValType{identifier: :SCV_I32}
                     }
                   ]
                 },
-                contract_id: %Hash{value: "contract_id"},
-                function_name: %SCSymbol{value: "function_name"},
-                sub_invocations: %AuthorizedInvocationList{
-                  sub_invocations: []
-                }
+                sub_invocations: %AuthorizedInvocationList{sub_invocations: []}
               }
             ]
           }
-        },
-        network_id: %Hash{value: "network_id"},
-        nonce: %UInt64{datum: 987}
+        }
       },
       type: %EnvelopeType{identifier: :ENVELOPE_TYPE_CONTRACT_AUTH}
     } =

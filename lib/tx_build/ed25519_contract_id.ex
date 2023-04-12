@@ -3,6 +3,12 @@ defmodule Stellar.TxBuild.Ed25519ContractID do
   `Ed25519ContractID` struct definition.
   """
 
+  import Stellar.TxBuild.Validations,
+    only: [
+      validate_pos_integer: 1,
+      validate_string: 1
+    ]
+
   alias StellarBase.XDR.{Ed25519ContractID, Hash, UInt256}
 
   @type t :: %__MODULE__{
@@ -18,21 +24,20 @@ defmodule Stellar.TxBuild.Ed25519ContractID do
   @impl true
   def new(args, opts \\ nil)
 
-  def new(
-        [
-          network_id,
-          ed25519,
-          salt
-        ],
-        _opts
-      )
-      when is_binary(network_id) and is_integer(ed25519) and ed25519 >= 0 and is_integer(salt) and
-             salt >= 0 do
-    %__MODULE__{
-      network_id: network_id,
-      ed25519: ed25519,
-      salt: salt
-    }
+  def new(args, _opts) when is_list(args) do
+    network_id = Keyword.get(args, :network_id)
+    ed25519 = Keyword.get(args, :ed25519)
+    salt = Keyword.get(args, :salt)
+
+    with {:ok, network_id} <- validate_string({:network_id, network_id}),
+         {:ok, ed25519} <- validate_pos_integer({:ed25519, ed25519}),
+         {:ok, salt} <- validate_pos_integer({:salt, salt}) do
+      %__MODULE__{
+        network_id: network_id,
+        ed25519: ed25519,
+        salt: salt
+      }
+    end
   end
 
   def new(_args, _opts), do: {:error, :invalid_ed25519_contract_id}

@@ -30,7 +30,7 @@ defmodule Stellar.TxBuild.SCContractCode do
     end
   end
 
-  def new(_args, _opts), do: {:error, :invalid_sc_val_type}
+  def new(_args, _opts), do: {:error, :invalid_sc_contract_code}
 
   @impl true
   def to_xdr(%__MODULE__{type: :wasm_ref, value: value}) do
@@ -51,7 +51,7 @@ defmodule Stellar.TxBuild.SCContractCode do
 
   def to_xdr(_error), do: {:error, :invalid_sc_contract_code}
 
-  @spec validate_sc_contract_code(tuple :: tuple()) :: validation()
+  @spec validate_sc_contract_code(tuple()) :: validation()
   defp validate_sc_contract_code({:wasm_ref, value}) when is_binary(value), do: {:ok, value}
   defp validate_sc_contract_code({:token, value}) when is_binary(value), do: {:ok, value}
 

@@ -16,30 +16,42 @@ defmodule Stellar.TxBuild.SourceAccountContractIDTest do
       network_id: network_id,
       source_account: TxAccountID.new(public_key),
       salt: salt,
-      xdr: xdr
+      xdr: xdr,
+      public_key: public_key
     }
   end
 
-  test "new/1", %{network_id: network_id, source_account: source_account, salt: salt} do
+  test "new/1", %{
+    network_id: network_id,
+    source_account: source_account,
+    salt: salt,
+    public_key: public_key
+  } do
     %TxSourceAccountContractID{
       network_id: ^network_id,
       source_account: ^source_account,
       salt: ^salt
-    } = TxSourceAccountContractID.new([network_id, source_account, salt])
+    } =
+      TxSourceAccountContractID.new(
+        network_id: network_id,
+        source_account: public_key,
+        salt: salt
+      )
   end
 
-  test "new/1 invalid source account contract id" do
-    {:error, :invalid_source_account_contract_id} = TxSourceAccountContractID.new("invalid")
+  test "new/1 with invalid args" do
+    {:error, :invalid_source_account_contract_id} = TxSourceAccountContractID.new("invalid_args")
   end
 
   test "to_xdr/1", %{
     network_id: network_id,
-    source_account: source_account,
     salt: salt,
-    xdr: xdr
+    xdr: xdr,
+    public_key: public_key
   } do
     ^xdr =
-      TxSourceAccountContractID.new([network_id, source_account, salt])
+      [network_id: network_id, source_account: public_key, salt: salt]
+      |> TxSourceAccountContractID.new()
       |> TxSourceAccountContractID.to_xdr()
   end
 

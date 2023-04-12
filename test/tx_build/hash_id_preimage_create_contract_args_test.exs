@@ -27,17 +27,27 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgsTest do
       network_id: ^network_id,
       source: ^source,
       salt: ^salt
-    } = TxHashIDPreimageCreateContractArgs.new([network_id, source, salt])
+    } = TxHashIDPreimageCreateContractArgs.new(network_id: network_id, source: source, salt: salt)
   end
 
-  test "new/1 with invalid hash id preimage contract_args" do
+  test "new/1 with invalid args" do
     {:error, :invalid_hash_id_preimage_contract_args} =
-      TxHashIDPreimageCreateContractArgs.new("invalid_preimage_args")
+      TxHashIDPreimageCreateContractArgs.new("invalid_args")
+  end
+
+  test "new/1 with invalid source", %{network_id: network_id, salt: salt} do
+    {:error, :invalid_source} =
+      TxHashIDPreimageCreateContractArgs.new(
+        network_id: network_id,
+        source: "invalid_value",
+        salt: salt
+      )
   end
 
   test "to_xdr/1", %{network_id: network_id, source: source, salt: salt, xdr: xdr} do
     ^xdr =
-      TxHashIDPreimageCreateContractArgs.new([network_id, source, salt])
+      [network_id: network_id, source: source, salt: salt]
+      |> TxHashIDPreimageCreateContractArgs.new()
       |> TxHashIDPreimageCreateContractArgs.to_xdr()
   end
 
