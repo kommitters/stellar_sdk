@@ -65,7 +65,9 @@ defmodule Stellar.TxBuild.AuthorizedInvocation do
 
     function_name = SCSymbol.new(function_name)
     args = args |> Enum.map(&SCVal.to_xdr/1) |> SCVec.new()
-    sub_invocations = format_authorized_invocations(sub_invocations, [])
+
+    sub_invocations =
+      sub_invocations |> Enum.map(&__MODULE__.to_xdr/1) |> AuthorizedInvocationList.new()
 
     AuthorizedInvocation.new(contract_id, function_name, args, sub_invocations)
   end
@@ -74,18 +76,10 @@ defmodule Stellar.TxBuild.AuthorizedInvocation do
 
   @spec validate_sub_invocations(tuple :: tuple()) :: validation()
   defp validate_sub_invocations({field, args}) when is_list(args) do
-    if Enum.all?(args, fn arg -> is_struct?(arg, __MODULE__) end),
+    if Enum.all?(args, &is_struct?(&1, __MODULE__)),
       do: {:ok, args},
       else: {:error, :"invalid_#{field}"}
   end
 
   defp validate_sub_invocations({field, _args}), do: {:error, :"invalid_#{field}"}
-
-  @spec format_authorized_invocations(list(), list()) :: authorized_invocation_list()
-  def format_authorized_invocations([], invocation_list),
-    do: AuthorizedInvocationList.new(invocation_list)
-
-  def format_authorized_invocations([auth_invocation | rest], invocation_list),
-    do:
-      format_authorized_invocations(rest, invocation_list ++ [__MODULE__.to_xdr(auth_invocation)])
 end

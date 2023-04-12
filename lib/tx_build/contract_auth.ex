@@ -17,8 +17,7 @@ defmodule Stellar.TxBuild.ContractAuth do
     HashIDPreimage
   }
 
-  alias Stellar.KeyPair
-  alias Stellar.Network
+  alias Stellar.{KeyPair, Network}
   alias StellarBase.XDR.{ContractAuth, SCVec}
   alias StellarBase.XDR.HashIDPreimage, as: HashIDPreimageXDR
 

@@ -93,7 +93,6 @@ defmodule Stellar.TxBuild.ContractAuthTest do
 
   test "new/1 with invalid authorized_invocation", %{
     address_with_nonce: address_with_nonce,
-    optional_address_with_nonce: optional_address_with_nonce,
     signature_args: signature_args
   } do
     {:error, :invalid_authorized_invocation} =

@@ -1,8 +1,6 @@
 defmodule Stellar.TxBuild.ValidationsTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.SequenceNumber
-
   alias Stellar.TxBuild.{
     Account,
     AccountID,
@@ -15,6 +13,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
     OptionalAccountID,
     OptionalAddressWithNonce,
     SCAddress,
+    SequenceNumber,
     PoolID,
     Price
   }

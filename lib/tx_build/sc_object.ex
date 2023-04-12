@@ -173,7 +173,7 @@ defmodule Stellar.TxBuild.SCObject do
   end
 
   defp validate_sc_obj({:map, value}) when is_list(value) do
-    if Enum.all?(value, fn arg -> is_struct?(arg, SCMapEntry) end),
+    if Enum.all?(value, &is_struct?(&1, SCMapEntry)),
       do: {:ok, value},
       else: {:error, :invalid_map}
   end

@@ -2,9 +2,16 @@ defmodule Stellar.Test.XDRFixtures do
   @moduledoc """
   Stellar's XDR data for test constructions.
   """
-  alias Stellar.TxBuild.SourceAccountContractID
   alias Stellar.KeyPair
-  alias Stellar.TxBuild.{TransactionSignature, SignerKey, SCAddress, SCVal}
+
+  alias Stellar.TxBuild.{
+    TransactionSignature,
+    SignerKey,
+    SourceAccountContractID,
+    SCAddress,
+    SCVal
+  }
+
   alias Stellar.TxBuild.Transaction, as: Tx
   alias Stellar.TxBuild.HostFunction, as: TxHostFunction
   alias Stellar.TxBuild.ContractAuth, as: TxContractAuth

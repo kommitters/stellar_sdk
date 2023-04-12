@@ -179,7 +179,7 @@ defmodule Stellar.TxBuild.Validations do
 
   @spec validate_sc_vals(component :: component()) :: validation()
   def validate_sc_vals({field, args}) when is_list(args) do
-    if Enum.all?(args, fn arg -> is_struct?(arg, SCVal) end),
+    if Enum.all?(args, &is_struct?(&1, SCVal)),
       do: {:ok, args},
       else: {:error, :"invalid_#{field}"}
   end
