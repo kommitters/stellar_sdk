@@ -66,8 +66,7 @@ defmodule Stellar.TxBuild.AuthorizedInvocation do
     function_name = SCSymbol.new(function_name)
     args = args |> Enum.map(&SCVal.to_xdr/1) |> SCVec.new()
 
-    sub_invocations =
-      sub_invocations |> Enum.map(&__MODULE__.to_xdr/1) |> AuthorizedInvocationList.new()
+    sub_invocations = sub_invocations |> Enum.map(&to_xdr/1) |> AuthorizedInvocationList.new()
 
     AuthorizedInvocation.new(contract_id, function_name, args, sub_invocations)
   end
