@@ -75,9 +75,11 @@ defmodule Stellar.TxBuild.ContractAuth do
     authorized_invocation = AuthorizedInvocation.to_xdr(authorized_invocation)
 
     signature_args =
-      signature_args
-      |> Enum.map(&SCVal.to_xdr/1)
-      |> SCVec.new()
+      [vec: signature_args]
+      |> SCObject.new()
+      |> SCVal.new()
+      |> SCVal.to_xdr()
+      |> (&SCVec.new([&1])).()
 
     ContractAuth.new(address_with_nonce, authorized_invocation, signature_args)
   end

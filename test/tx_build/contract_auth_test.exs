@@ -17,10 +17,13 @@ defmodule Stellar.TxBuild.ContractAuthTest do
     Hash,
     Int32,
     OptionalAddressWithNonce,
+    OptionalSCObject,
     PublicKey,
     PublicKeyType,
     SCAddress,
     SCAddressType,
+    SCObject,
+    SCObjectType,
     SCVec,
     SCVal,
     SCValType,
@@ -119,47 +122,53 @@ defmodule Stellar.TxBuild.ContractAuthTest do
                     <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87,
                       6, 25, 27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
                 },
-                type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+                type: %PublicKeyType{
+                  identifier: :PUBLIC_KEY_TYPE_ED25519
+                }
               }
             },
-            type: %SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+            type: %SCAddressType{
+              identifier: :SC_ADDRESS_TYPE_ACCOUNT
+            }
           },
           nonce: %UInt64{datum: 123}
         }
       },
       authorized_invocation: %AuthorizedInvocation{
+        args: %SCVec{
+          sc_vals: [
+            %SCVal{
+              type: %SCValType{identifier: :SCV_I32},
+              value: %Int32{datum: 321}
+            }
+          ]
+        },
         contract_id: %Hash{
           value:
             <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68, 84,
               157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
         },
         function_name: %SCSymbol{value: "hello"},
-        args: %SCVec{
-          sc_vals: [
-            %SCVal{
-              value: %Int32{datum: 321},
-              type: %SCValType{identifier: :SCV_I32}
-            }
-          ]
-        },
         sub_invocations: %AuthorizedInvocationList{
           sub_invocations: [
             %AuthorizedInvocation{
+              args: %SCVec{
+                sc_vals: [
+                  %SCVal{
+                    type: %SCValType{identifier: :SCV_I32},
+                    value: %Int32{datum: 321}
+                  }
+                ]
+              },
               contract_id: %Hash{
                 value:
                   <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
                     84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
               },
               function_name: %SCSymbol{value: "hello"},
-              args: %SCVec{
-                sc_vals: [
-                  %SCVal{
-                    value: %Int32{datum: 321},
-                    type: %SCValType{identifier: :SCV_I32}
-                  }
-                ]
-              },
-              sub_invocations: %AuthorizedInvocationList{sub_invocations: []}
+              sub_invocations: %AuthorizedInvocationList{
+                sub_invocations: []
+              }
             }
           ]
         }
@@ -167,8 +176,20 @@ defmodule Stellar.TxBuild.ContractAuthTest do
       signature_args: %SCVec{
         sc_vals: [
           %SCVal{
-            value: %Int32{datum: 456},
-            type: %SCValType{identifier: :SCV_I32}
+            type: %SCValType{identifier: :SCV_OBJECT},
+            value: %OptionalSCObject{
+              sc_object: %SCObject{
+                sc_object: %SCVec{
+                  sc_vals: [
+                    %SCVal{
+                      type: %SCValType{identifier: :SCV_I32},
+                      value: %Int32{datum: 456}
+                    }
+                  ]
+                },
+                type: %SCObjectType{identifier: :SCO_VEC}
+              }
+            }
           }
         ]
       }

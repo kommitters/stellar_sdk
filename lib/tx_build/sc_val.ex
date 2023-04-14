@@ -59,6 +59,8 @@ defmodule Stellar.TxBuild.SCVal do
     end
   end
 
+  def new(%SCObject{} = object, _opts), do: %__MODULE__{type: :object, value: object}
+  def new(%SCStatusSDK{} = status, _opts), do: %__MODULE__{type: :status, value: status}
   def new(_args, _opts), do: {:error, :invalid_sc_val_type}
 
   @impl true

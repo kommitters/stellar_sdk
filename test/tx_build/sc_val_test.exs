@@ -95,6 +95,12 @@ defmodule Stellar.TxBuild.SCValTest do
     end
   end
 
+  test "new/1 when using object struct", %{sc_object_discriminants: sc_object_discriminants} do
+    for %{sc_object: sc_object} <- sc_object_discriminants do
+      %SCVal{type: :object, value: ^sc_object} = SCVal.new(sc_object)
+    end
+  end
+
   test "new/1 when type object is incorrect" do
     sc_object = SCObject.new(:u64, "123")
     {:error, :invalid_object} = SCVal.new(object: sc_object)
@@ -119,6 +125,12 @@ defmodule Stellar.TxBuild.SCValTest do
   test "new/1 when type is status", %{sc_status_discriminants: sc_status_discriminants} do
     for %{sc_status: sc_status} <- sc_status_discriminants do
       %SCVal{type: :status, value: ^sc_status} = SCVal.new(status: sc_status)
+    end
+  end
+
+  test "new/1 when using status struct", %{sc_status_discriminants: sc_status_discriminants} do
+    for %{sc_status: sc_status} <- sc_status_discriminants do
+      %SCVal{type: :status, value: ^sc_status} = SCVal.new(sc_status)
     end
   end
 
