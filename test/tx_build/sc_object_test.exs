@@ -24,6 +24,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :vec,
         value: sc_vec,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.SCVec{
             sc_vals: [
@@ -43,6 +44,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :map,
         value: sc_map,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.SCMap{
             scmap_entries: [
@@ -74,6 +76,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :u64,
         value: 23,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.UInt64{datum: 23},
           type: %StellarBase.XDR.SCObjectType{identifier: :SCO_U64}
@@ -82,6 +85,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :i64,
         value: -5,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.Int64{datum: -5},
           type: %StellarBase.XDR.SCObjectType{identifier: :SCO_I64}
@@ -90,6 +94,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :u128,
         value: %{lo: 5, hi: 6},
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.Int128Parts{
             lo: %StellarBase.XDR.UInt64{datum: 5},
@@ -101,6 +106,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :i128,
         value: %{lo: 3, hi: 4},
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.Int128Parts{
             lo: %StellarBase.XDR.UInt64{datum: 3},
@@ -112,6 +118,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :bytes,
         value: "GCIZ3GSM5",
+        invalid_value: 123,
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.VariableOpaque256000{opaque: "GCIZ3GSM5"},
           type: %StellarBase.XDR.SCObjectType{identifier: :SCO_BYTES}
@@ -120,6 +127,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :contract_code,
         value: {:wasm_ref, hash},
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.SCContractCode{
             contract_code: %StellarBase.XDR.Hash{
@@ -133,8 +141,27 @@ defmodule Stellar.TxBuild.SCObjectTest do
         }
       },
       %{
+        type: :contract_code,
+        value: :token,
+        invalid_value: 123,
+        to_xdr: %StellarBase.XDR.SCObject{
+          sc_object: %StellarBase.XDR.SCContractCode{
+            contract_code: %StellarBase.XDR.Void{
+              value: nil
+            },
+            type: %StellarBase.XDR.SCContractCodeType{
+              identifier: :SCCONTRACT_CODE_TOKEN
+            }
+          },
+          type: %StellarBase.XDR.SCObjectType{
+            identifier: :SCO_CONTRACT_CODE
+          }
+        }
+      },
+      %{
         type: :address,
         value: address,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.SCAddress{
             sc_address: %StellarBase.XDR.AccountID{
@@ -157,6 +184,7 @@ defmodule Stellar.TxBuild.SCObjectTest do
       %{
         type: :nonce_key,
         value: nonce_key,
+        invalid_value: "invalid_value",
         to_xdr: %StellarBase.XDR.SCObject{
           sc_object: %StellarBase.XDR.SCAddress{
             sc_address: %StellarBase.XDR.Hash{value: "GCIZ3GSM5XL7OUS4UP64THMDZ7CZ3ZWN"},
@@ -176,10 +204,21 @@ defmodule Stellar.TxBuild.SCObjectTest do
     end
   end
 
+  test "new/1 invalid value for type", %{discriminants: discriminants} do
+    for %{type: type, invalid_value: value} <- discriminants do
+      invalid_message = :"invalid_#{type}"
+      {:error, ^invalid_message} = SCObject.new([{type, value}])
+    end
+  end
+
   test "to_xdr/1", %{discriminants: discriminants} do
     for %{type: type, value: value, to_xdr: to_xdr} <- discriminants do
       expect = [{type, value}] |> SCObject.new() |> SCObject.to_xdr()
       ^to_xdr = expect
     end
+  end
+
+  test "to_xdr/1 with invalid structure" do
+    {:error, :invalid_object_structure} = SCObject.to_xdr("invalid_structure")
   end
 end
