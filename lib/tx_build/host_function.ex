@@ -3,10 +3,11 @@ defmodule Stellar.TxBuild.HostFunction do
     `HostFunction` struct definition.
   """
 
-  alias Stellar.TxBuild.SCVal
+  alias Stellar.TxBuild.{InstallContractCodeArgs, SCVal}
 
   alias StellarBase.XDR.SCVal, as: SCValXDR
   alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
+  alias StellarBase.XDR.InstallContractCodeArgs, as: InstallContractCodeArgsXDR
 
   import Stellar.TxBuild.Validations,
     only: [
@@ -41,10 +42,11 @@ defmodule Stellar.TxBuild.HostFunction do
           type: type(),
           contract_id: contract_id(),
           function_name: function_name(),
-          args: args()
+          args: args(),
+          code: binary()
         }
 
-  defstruct [:type, :contract_id, :function_name, :args]
+  defstruct [:type, :contract_id, :function_name, :args, :code]
 
   @impl true
   def new(args, opts \\ [])
@@ -69,6 +71,20 @@ defmodule Stellar.TxBuild.HostFunction do
         args: args
       }
     end
+  end
+
+  def new(
+        [
+          {:type, :install},
+          {:code, code}
+        ],
+        _opts
+      )
+      when is_binary(code) do
+    %__MODULE__{
+      type: :install,
+      code: code
+    }
   end
 
   def new(_args, _opts), do: {:error, :invalid_operation_attributes}
@@ -107,5 +123,17 @@ defmodule Stellar.TxBuild.HostFunction do
 
     host_function_type = HostFunctionType.new()
     HostFunctionXDR.new(sc_vec, host_function_type)
+  end
+
+  def to_xdr(%__MODULE__{
+        type: :install,
+        code: code
+      }) do
+    host_function_type = HostFunctionType.new(:HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE)
+
+    code
+    |> InstallContractCodeArgs.new()
+    |> InstallContractCodeArgs.to_xdr()
+    |> HostFunctionXDR.new(host_function_type)
   end
 end

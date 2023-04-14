@@ -751,6 +751,21 @@ defmodule Stellar.Test.XDRFixtures do
     }
   end
 
+  @spec host_function_install_xdr(
+          type :: :install,
+          code :: binary()
+        ) :: HostFunction.t()
+  def host_function_install_xdr(:install, code) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.InstallContractCodeArgs{
+        code: %StellarBase.XDR.VariableOpaque256000{opaque: code}
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE
+      }
+    }
+  end
+
   @spec invoke_host_function_op_xdr(
           function :: HostFunction.t(),
           footprint :: String.t(),
