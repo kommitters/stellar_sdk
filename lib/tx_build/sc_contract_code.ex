@@ -20,11 +20,12 @@ defmodule Stellar.TxBuild.SCContractCode do
   @impl true
   def new(args, opts \\ nil)
 
-  def new([{type, value}], _opts)
-      when type in ~w(wasm_ref token)a do
-    with {:ok, _value} <- validate_sc_contract_code({type, value}) do
+  def new(:token, _opts), do: %__MODULE__{type: :token, value: nil}
+
+  def new([{:wasm_ref, value}], _opts) do
+    with {:ok, _value} <- validate_sc_contract_code({:wasm_ref, value}) do
       %__MODULE__{
-        type: type,
+        type: :wasm_ref,
         value: value
       }
     end
@@ -41,20 +42,17 @@ defmodule Stellar.TxBuild.SCContractCode do
     |> SCContractCode.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :token, value: value}) do
+  def to_xdr(%__MODULE__{type: :token, value: nil}) do
     type = SCContractCodeType.new(:SCCONTRACT_CODE_TOKEN)
+    void = Void.new()
 
-    value
-    |> Void.new()
-    |> SCContractCode.new(type)
+    SCContractCode.new(void, type)
   end
 
   def to_xdr(_error), do: {:error, :invalid_sc_contract_code}
 
   @spec validate_sc_contract_code(tuple()) :: validation()
   defp validate_sc_contract_code({:wasm_ref, value}) when is_binary(value), do: {:ok, value}
-  defp validate_sc_contract_code({:token, value}) when is_binary(value), do: {:ok, value}
 
   defp validate_sc_contract_code({:wasm_ref, _value}), do: {:error, :invalid_contract_hash}
-  defp validate_sc_contract_code({:token, _value}), do: {:error, :invalid_contract_hash}
 end

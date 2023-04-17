@@ -17,11 +17,11 @@ defmodule Stellar.TxBuild.SCContractCodeTest do
     } = TxSCContractCode.new(wasm_ref: hash)
   end
 
-  test "new/1 when type is token", %{hash: hash} do
+  test "new/1 when type is token" do
     %TxSCContractCode{
       type: :token,
-      value: ^hash
-    } = TxSCContractCode.new(token: hash)
+      value: nil
+    } = TxSCContractCode.new(:token)
   end
 
   test "new/1 with invalid type", %{hash: hash} do
@@ -36,10 +36,6 @@ defmodule Stellar.TxBuild.SCContractCodeTest do
     {:error, :invalid_contract_hash} = TxSCContractCode.new(wasm_ref: 123)
   end
 
-  test "new/1 with token invalid hash" do
-    {:error, :invalid_contract_hash} = TxSCContractCode.new(token: 123)
-  end
-
   test "to_xdr/1 with type is wasm_ref", %{hash: hash} do
     %SCContractCode{
       contract_code: %Hash{value: ^hash},
@@ -49,11 +45,11 @@ defmodule Stellar.TxBuild.SCContractCodeTest do
     } = TxSCContractCode.new(wasm_ref: hash) |> TxSCContractCode.to_xdr()
   end
 
-  test "to_xdr/1 with type is token", %{hash: hash} do
+  test "to_xdr/1 with type is token" do
     %SCContractCode{
       contract_code: %Void{value: nil},
       type: %SCContractCodeType{identifier: :SCCONTRACT_CODE_TOKEN}
-    } = TxSCContractCode.new(token: hash) |> TxSCContractCode.to_xdr()
+    } = TxSCContractCode.new(:token) |> TxSCContractCode.to_xdr()
   end
 
   test "to_xdr/1 with the struct is invalid" do

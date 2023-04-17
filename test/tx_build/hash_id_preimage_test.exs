@@ -70,7 +70,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
 
     # HashIDPreimageCreateContractArgs
     wasm_ref_sc_contract_code = TxSCContractCode.new(wasm_ref: "wasm_ref")
-    token_sc_contract_code = TxSCContractCode.new(token: "")
+    token_sc_contract_code = TxSCContractCode.new(:token)
 
     # HashIDPreimageContractAuth
     nonce = 987
