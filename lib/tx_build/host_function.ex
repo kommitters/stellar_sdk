@@ -3,11 +3,11 @@ defmodule Stellar.TxBuild.HostFunction do
     `HostFunction` struct definition.
   """
 
-  alias Stellar.TxBuild.{InstallContractCodeArgs, SCVal}
+  alias Stellar.TxBuild.SCVal
 
   alias StellarBase.XDR.SCVal, as: SCValXDR
   alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
-  alias StellarBase.XDR.InstallContractCodeArgs, as: InstallContractCodeArgsXDR
+  alias StellarBase.XDR.InstallContractCodeArgs
 
   import Stellar.TxBuild.Validations,
     only: [
@@ -132,8 +132,8 @@ defmodule Stellar.TxBuild.HostFunction do
     host_function_type = HostFunctionType.new(:HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE)
 
     code
+    |> VariableOpaque256000.new()
     |> InstallContractCodeArgs.new()
-    |> InstallContractCodeArgs.to_xdr()
     |> HostFunctionXDR.new(host_function_type)
   end
 end
