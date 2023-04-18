@@ -766,6 +766,58 @@ defmodule Stellar.Test.XDRFixtures do
     }
   end
 
+  @spec host_function_create_with_wasm_xdr(type :: atom(), wasm_id :: binary(), salt :: binary()) ::
+          HostFunction.t()
+  def host_function_create_with_wasm_xdr(:create, wasm_id, salt) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.CreateContractArgs{
+        contract_id: %StellarBase.XDR.ContractID{
+          contract_id: %StellarBase.XDR.UInt256{
+            datum: salt
+          },
+          type: %StellarBase.XDR.ContractIDType{
+            identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT
+          }
+        },
+        source: %StellarBase.XDR.SCContractCode{
+          contract_code: %StellarBase.XDR.Hash{
+            value: wasm_id
+          },
+          type: %StellarBase.XDR.SCContractCodeType{
+            identifier: :SCCONTRACT_CODE_WASM_REF
+          }
+        }
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
+      }
+    }
+  end
+
+  @spec host_function_create_with_asset(type :: atom()) :: HostFunction.t()
+  def host_function_create_with_asset(:create) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.CreateContractArgs{
+        contract_id: %StellarBase.XDR.ContractID{
+          contract_id: %StellarBase.XDR.Asset{
+            asset: %StellarBase.XDR.Void{value: nil},
+            type: %StellarBase.XDR.AssetType{identifier: :ASSET_TYPE_NATIVE}
+          },
+          type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_ASSET}
+        },
+        source: %StellarBase.XDR.SCContractCode{
+          contract_code: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.SCContractCodeType{
+            identifier: :SCCONTRACT_CODE_TOKEN
+          }
+        }
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
+      }
+    }
+  end
+
   @spec invoke_host_function_op_xdr(
           function :: HostFunction.t(),
           footprint :: String.t(),
