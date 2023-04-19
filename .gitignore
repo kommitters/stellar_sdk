@@ -28,3 +28,5 @@ stellar_sdk-*.tar
 
 # DS_Store
 .DS_Store
+
+.elixir_ls/

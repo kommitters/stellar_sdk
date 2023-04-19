@@ -3,11 +3,25 @@ defmodule Stellar.Test.XDRFixtures do
   Stellar's XDR data for test constructions.
   """
   alias Stellar.KeyPair
-  alias Stellar.TxBuild.{TransactionSignature, SignerKey}
+
+  alias Stellar.TxBuild.{
+    TransactionSignature,
+    SignerKey,
+    SourceAccountContractID,
+    SCAddress,
+    SCVal
+  }
+
   alias Stellar.TxBuild.Transaction, as: Tx
+  alias Stellar.TxBuild.HostFunction, as: TxHostFunction
+  alias Stellar.TxBuild.ContractAuth, as: TxContractAuth
+  alias Stellar.TxBuild.Asset, as: TxAsset
+  alias Stellar.TxBuild.AccountID, as: TxAccountID
+  alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
 
   alias StellarBase.XDR.{
     AccountID,
+    AddressWithNonce,
     AlphaNum12,
     AlphaNum4,
     Asset,
@@ -21,18 +35,23 @@ defmodule Stellar.Test.XDRFixtures do
     CryptoKeyType,
     DataValue,
     DecoratedSignature,
+    Ed25519ContractID,
     EnvelopeType,
     Ext,
+    FromAsset,
     Hash,
+    HashIDPreimageCreateContractArgs,
     Int32,
     Int64,
     Memo,
     MemoType,
     MuxedAccount,
+    LedgerKeyList,
     OperationType,
     OperationBody,
     Operation,
     Operations,
+    OperationID,
     OptionalAccountID,
     OptionalDataValue,
     OptionalMuxedAccount,
@@ -46,17 +65,24 @@ defmodule Stellar.Test.XDRFixtures do
     SequenceNumber,
     Signature,
     SignatureHint,
+    SourceAccountContractID,
     String28,
     String32,
     String64,
+    StructContractID,
     Signer,
+    SCContractCode,
+    SCContractCodeType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
     UInt32,
     UInt64,
     UInt256,
-    Void
+    Void,
+    ContractAuthList,
+    LedgerFootprint,
+    HostFunction
   }
 
   alias StellarBase.XDR.Operations.{
@@ -74,7 +100,8 @@ defmodule Stellar.Test.XDRFixtures do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
-    SetOptions
+    SetOptions,
+    InvokeHostFunction
   }
 
   @type optional_account_id :: String.t() | nil
@@ -106,6 +133,104 @@ defmodule Stellar.Test.XDRFixtures do
     |> UInt256.new()
     |> PublicKey.new(type)
     |> AccountID.new()
+  end
+
+  @spec address_with_nonce_xdr(sc_address :: SCAddress.t(), nonce :: non_neg_integer()) ::
+          AddressWithNonce.t()
+  def address_with_nonce_xdr(sc_address, nonce) do
+    nonce = UInt64.new(nonce)
+
+    sc_address
+    |> SCAddress.to_xdr()
+    |> AddressWithNonce.new(nonce)
+  end
+
+  @spec ed25519_contract_id_xdr(
+          network_id :: String.t(),
+          ed25519 :: non_neg_integer(),
+          salt :: non_neg_integer()
+        ) :: Ed25519ContractID.t()
+  def ed25519_contract_id_xdr(network_id, ed25519, salt) do
+    network_id = Hash.new(network_id)
+    ed25519 = UInt256.new(ed25519)
+    salt = UInt256.new(salt)
+
+    Ed25519ContractID.new(network_id, ed25519, salt)
+  end
+
+  @spec from_asset_xdr(network_id :: binary(), asset :: TxAsset.t()) :: FromAsset.t()
+  def from_asset_xdr(network_id, asset) do
+    asset = TxAsset.to_xdr(asset)
+
+    network_id
+    |> Hash.new()
+    |> FromAsset.new(asset)
+  end
+
+  @spec operation_id_xdr(
+          source_account :: TxAccountID.t(),
+          sequence_number :: TxSequenceNumber.t(),
+          op_num :: non_neg_integer()
+        ) :: OperationID.t()
+  def operation_id_xdr(source_account, sequence_number, op_num) do
+    sequence_number = TxSequenceNumber.to_xdr(sequence_number)
+    op_num = UInt32.new(op_num)
+
+    source_account
+    |> TxAccountID.to_xdr()
+    |> OperationID.new(sequence_number, op_num)
+  end
+
+  @spec source_account_contract_id_xdr(
+          network_id :: binary(),
+          source_account :: String.t(),
+          salt :: non_neg_integer()
+        ) :: SourceAccountContractID.t()
+  def source_account_contract_id_xdr(network_id, source_account, salt) do
+    source_account = account_id_xdr(source_account)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> SourceAccountContractID.new(source_account, salt)
+  end
+
+  @spec struct_contract_id_xdr(
+          network_id :: binary(),
+          contract_id :: binary(),
+          salt :: non_neg_integer()
+        ) :: StructContractID.t()
+  def struct_contract_id_xdr(network_id, contract_id, salt) do
+    contract_id = Hash.new(contract_id)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> StructContractID.new(contract_id, salt)
+  end
+
+  @spec hash_id_preimage_create_contract_args_xdr(
+          network_id :: binary(),
+          source :: binary(),
+          source_type :: String.t(),
+          salt :: non_neg_integer()
+        ) :: HashIDPreimageCreateContractArgs.t()
+  def hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt) do
+    source = sc_contract_code_xdr(source_type, source)
+    salt = UInt256.new(salt)
+
+    network_id
+    |> Hash.new()
+    |> HashIDPreimageCreateContractArgs.new(source, salt)
+  end
+
+  @spec sc_contract_code_xdr(type :: String.t(), value :: binary()) :: SCContractCode.t()
+  def sc_contract_code_xdr(type, value) do
+    type = SCContractCodeType.new(type)
+
+    value
+    |> Hash.new()
+    |> SCContractCode.new(type)
   end
 
   @spec signer_xdr(key :: String.t(), weight :: non_neg_integer()) :: Signer.t()
@@ -580,6 +705,151 @@ defmodule Stellar.Test.XDRFixtures do
     value
     |> String32.new()
     |> OptionalString32.new()
+  end
+
+  @spec host_function_xdr(
+          type :: :invoke,
+          contract_id :: String.t(),
+          function_name :: String.t(),
+          args :: list(SCVal.t())
+        ) :: HostFunction.t()
+  def host_function_xdr(
+        :invoke,
+        "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c",
+        "hello",
+        [%SCVal{type: :symbol, value: "world"}]
+      ) do
+    %HostFunction{
+      host_function: %StellarBase.XDR.SCVec{
+        sc_vals: [
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.OptionalSCObject{
+              sc_object: %StellarBase.XDR.SCObject{
+                sc_object: %StellarBase.XDR.VariableOpaque256000{
+                  opaque:
+                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
+                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+                },
+                type: %StellarBase.XDR.SCObjectType{identifier: :SCO_BYTES}
+              }
+            },
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_OBJECT}
+          },
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.SCSymbol{value: "hello"},
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+          },
+          %StellarBase.XDR.SCVal{
+            value: %StellarBase.XDR.SCSymbol{value: "world"},
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+          }
+        ]
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
+      }
+    }
+  end
+
+  @spec host_function_install_xdr(
+          type :: :install,
+          code :: binary()
+        ) :: HostFunction.t()
+  def host_function_install_xdr(:install, code) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.InstallContractCodeArgs{
+        code: %StellarBase.XDR.VariableOpaque256000{opaque: code}
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE
+      }
+    }
+  end
+
+  @spec host_function_create_with_wasm_xdr(type :: atom(), wasm_id :: binary(), salt :: binary()) ::
+          HostFunction.t()
+  def host_function_create_with_wasm_xdr(:create, wasm_id, salt) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.CreateContractArgs{
+        contract_id: %StellarBase.XDR.ContractID{
+          contract_id: %StellarBase.XDR.UInt256{
+            datum: salt
+          },
+          type: %StellarBase.XDR.ContractIDType{
+            identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT
+          }
+        },
+        source: %StellarBase.XDR.SCContractCode{
+          contract_code: %StellarBase.XDR.Hash{
+            value: wasm_id
+          },
+          type: %StellarBase.XDR.SCContractCodeType{
+            identifier: :SCCONTRACT_CODE_WASM_REF
+          }
+        }
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
+      }
+    }
+  end
+
+  @spec host_function_create_with_asset(type :: atom()) :: HostFunction.t()
+  def host_function_create_with_asset(:create) do
+    %StellarBase.XDR.HostFunction{
+      host_function: %StellarBase.XDR.CreateContractArgs{
+        contract_id: %StellarBase.XDR.ContractID{
+          contract_id: %StellarBase.XDR.Asset{
+            asset: %StellarBase.XDR.Void{value: nil},
+            type: %StellarBase.XDR.AssetType{identifier: :ASSET_TYPE_NATIVE}
+          },
+          type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_ASSET}
+        },
+        source: %StellarBase.XDR.SCContractCode{
+          contract_code: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.SCContractCodeType{
+            identifier: :SCCONTRACT_CODE_TOKEN
+          }
+        }
+      },
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
+      }
+    }
+  end
+
+  @spec invoke_host_function_op_xdr(
+          function :: HostFunction.t(),
+          footprint :: String.t(),
+          auth :: ContractAuthList.t()
+        ) :: InvokeHostFunction.t()
+
+  def invoke_host_function_op_xdr(function, footprint \\ nil, auth \\ []) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+    host_function = TxHostFunction.to_xdr(function)
+
+    ledger_footprint = build_ledger_footprint(footprint)
+
+    contract_auth_list = auth |> Enum.map(&TxContractAuth.to_xdr/1) |> ContractAuthList.new()
+
+    host_function
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    |> OperationBody.new(op_type)
+  end
+
+  @spec build_ledger_footprint(footprint :: binary() | nil) :: LedgerFootprint.t()
+  defp build_ledger_footprint(nil) do
+    ledger_key_list = LedgerKeyList.new([])
+    LedgerFootprint.new(ledger_key_list, ledger_key_list)
+  end
+
+  defp build_ledger_footprint(footprint) do
+    {ledger_footprint, _} =
+      footprint
+      |> Base.decode64!()
+      |> LedgerFootprint.decode_xdr!()
+
+    ledger_footprint
   end
 
   @spec build_asset_xdr(asset :: any()) :: list(Asset.t())

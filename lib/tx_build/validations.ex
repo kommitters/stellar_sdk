@@ -2,6 +2,7 @@ defmodule Stellar.TxBuild.Validations do
   @moduledoc """
   Ensures that child components/structures used by operations are properly initialized otherwise, returns a formatted error.
   """
+
   alias Stellar.TxBuild.{
     Account,
     AccountID,
@@ -16,20 +17,28 @@ defmodule Stellar.TxBuild.Validations do
     OptionalWeight,
     OptionalSigner,
     OptionalString32,
+    OptionalAddressWithNonce,
     PoolID,
     Price,
+    SequenceNumber,
     Signer,
     String32,
-    Weight
+    Weight,
+    SCVal
   }
 
   @type account_id :: String.t()
   @type asset_code :: String.t()
+  @type args :: list(SCVal.t())
   @type asset :: {asset_code(), account_id()} | Keyword.t() | atom()
-  @type value :: account_id() | asset() | number()
+  @type value :: account_id() | asset() | number() | args()
   @type component :: {atom(), value()}
   @type error :: Keyword.t() | atom()
   @type validation :: {:ok, any()} | {:error, error()}
+
+  @spec is_struct?(term :: any(), name :: module()) :: boolean()
+  def is_struct?(term, name) when is_struct(term) and is_atom(name), do: term.__struct__ == name
+  def is_struct?(_term, _name), do: false
 
   @spec validate_pos_integer(component :: component()) :: validation()
   def validate_pos_integer({_field, number}) when is_integer(number) and number >= 0,
@@ -167,4 +176,41 @@ defmodule Stellar.TxBuild.Validations do
       {:error, reason} -> {:error, [{field, reason}]}
     end
   end
+
+  @spec validate_sc_vals(component :: component()) :: validation()
+  def validate_sc_vals({field, args}) when is_list(args) do
+    if Enum.all?(args, &is_struct?(&1, SCVal)),
+      do: {:ok, args},
+      else: {:error, :"invalid_#{field}"}
+  end
+
+  def validate_sc_vals({field, _args}), do: {:error, :"invalid_#{field}"}
+
+  @spec validate_contract_id(component :: component()) :: validation()
+  def validate_contract_id({field, contract_id}) when is_binary(contract_id) do
+    case Base.decode16(contract_id, case: :lower) do
+      {:ok, _} -> {:ok, contract_id}
+      :error -> {:error, :"invalid_#{field}"}
+    end
+  end
+
+  def validate_contract_id({field, _contract_id}), do: {:error, :"invalid_#{field}"}
+
+  @spec validate_optional_address_with_nonce(component :: component()) :: validation()
+  def validate_optional_address_with_nonce({field, value}) do
+    case OptionalAddressWithNonce.new(value) do
+      %OptionalAddressWithNonce{} = opt_address_with_nonce -> {:ok, opt_address_with_nonce}
+      {:error, _reason} -> {:error, :"invalid_#{field}"}
+    end
+  end
+
+  @spec validate_string(tuple()) :: validation()
+  def validate_string({_type, string}) when is_binary(string), do: {:ok, string}
+  def validate_string({type, _string}), do: {:error, :"invalid_#{type}"}
+
+  @spec validate_sequence_number(tuple()) :: validation()
+  def validate_sequence_number({_field, %SequenceNumber{} = value}),
+    do: {:ok, value}
+
+  def validate_sequence_number({field, _}), do: {:error, :"invalid_#{field}"}
 end
