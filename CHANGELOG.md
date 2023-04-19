@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.12.0 (19.04.2023)
+* CAP-0046 Add support for smart contracts (Soroban preview 7).
+
 ## 0.11.8 (16.01.2023)
 * Update all dependencies.
 * Block egress traffic in GitHub Actions.
