@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.11.8"
+  @version "0.12.0"
 
   def project do
     [
