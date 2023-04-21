@@ -230,7 +230,9 @@ defmodule Stellar.TxBuild.SCValTest do
         val_type: :SCV_CONTRACT_EXECUTABLE,
         module: %StellarBase.XDR.SCContractExecutable{
           contract_executable: %StellarBase.XDR.Hash{value: "hash"},
-          type: %StellarBase.XDR.SCContractExecutableType{identifier: :SCCONTRACT_CODE_WASM_REF}
+          type: %StellarBase.XDR.SCContractExecutableType{
+            identifier: :SCCONTRACT_EXECUTABLE_WASM_REF
+          }
         },
         type: :contract,
         value: {:wasm_ref, "hash"}

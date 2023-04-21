@@ -33,12 +33,6 @@ defmodule Stellar.TxBuild.SCVal do
     Void
   }
 
-  @parse_static %{
-    void: :SCS_VOID,
-    true: :SCS_TRUE,
-    false: :SCS_FALSE,
-    ledger_contract_code: :SCS_LEDGER_KEY_CONTRACT_CODE
-  }
   @type type ::
           :bool
           | :void
@@ -95,8 +89,6 @@ defmodule Stellar.TxBuild.SCVal do
     end
   end
 
-  def new(%SCObject{} = object, _opts), do: %__MODULE__{type: :object, value: object}
-  def new(%SCStatusSDK{} = status, _opts), do: %__MODULE__{type: :status, value: status}
   def new(_args, _opts), do: {:error, :invalid_sc_val_type}
 
   @impl true
@@ -269,7 +261,7 @@ defmodule Stellar.TxBuild.SCVal do
 
   def to_xdr(%__MODULE__{type: :contract, value: {:wasm_ref, hash}}) do
     type = SCValType.new(:SCV_CONTRACT_EXECUTABLE)
-    contract_code = SCContractExecutableType.new(:SCCONTRACT_CODE_WASM_REF)
+    contract_code = SCContractExecutableType.new(:SCCONTRACT_EXECUTABLE_WASM_REF)
 
     hash
     |> Hash.new()

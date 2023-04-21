@@ -12,7 +12,6 @@ defmodule Stellar.TxBuild.ContractAuth do
   alias Stellar.TxBuild.{
     AuthorizedInvocation,
     OptionalAddressWithNonce,
-    SCObject,
     SCMapEntry,
     HashIDPreimage
   }
@@ -76,7 +75,6 @@ defmodule Stellar.TxBuild.ContractAuth do
 
     signature_args =
       [vec: signature_args]
-      |> SCObject.new()
       |> SCVal.new()
       |> SCVal.to_xdr()
       |> (&SCVec.new([&1])).()
@@ -118,17 +116,16 @@ defmodule Stellar.TxBuild.ContractAuth do
     public_key_map_entry =
       SCMapEntry.new(
         SCVal.new(symbol: "public_key"),
-        SCVal.new(object: SCObject.new(bytes: raw_public_key))
+        SCVal.new(bytes: raw_public_key)
       )
 
     signature_map_entry =
       SCMapEntry.new(
         SCVal.new(symbol: "signature"),
-        SCVal.new(object: SCObject.new(bytes: signature))
+        SCVal.new(bytes: signature)
       )
 
-    signature_sc_val =
-      SCVal.new(object: SCObject.new(map: [public_key_map_entry, signature_map_entry]))
+    signature_sc_val = SCVal.new(map: [public_key_map_entry, signature_map_entry])
 
     %{contract_auth | signature_args: signature_args ++ [signature_sc_val]}
   end

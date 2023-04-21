@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.HostFunction do
       validate_string: 1
     ]
 
-  alias Stellar.TxBuild.{Asset, SCVal, SCContractCode}
+  alias Stellar.TxBuild.{Asset, SCVal, SCContractExecutable}
   alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
 
   alias StellarBase.XDR.{
@@ -185,10 +185,11 @@ defmodule Stellar.TxBuild.HostFunction do
     contract_id_type = ContractIDType.new(:CONTRACT_ID_FROM_SOURCE_ACCOUNT)
     contract_id = salt |> UInt256.new() |> ContractID.new(contract_id_type)
 
-    sc_contract_code = [wasm_ref: wasm_id] |> SCContractCode.new() |> SCContractCode.to_xdr()
+    sc_contract_executable =
+      [wasm_ref: wasm_id] |> SCContractExecutable.new() |> SCContractExecutable.to_xdr()
 
     contract_id
-    |> CreateContractArgs.new(sc_contract_code)
+    |> CreateContractArgs.new(sc_contract_executable)
     |> HostFunctionXDR.new(host_function_type)
   end
 
@@ -201,10 +202,10 @@ defmodule Stellar.TxBuild.HostFunction do
     contract_id_type = ContractIDType.new(:CONTRACT_ID_FROM_ASSET)
     contract_id = asset |> Asset.to_xdr() |> ContractID.new(contract_id_type)
 
-    sc_contract_code = :token |> SCContractCode.new() |> SCContractCode.to_xdr()
+    sc_contract_executable = :token |> SCContractExecutable.new() |> SCContractExecutable.to_xdr()
 
     contract_id
-    |> CreateContractArgs.new(sc_contract_code)
+    |> CreateContractArgs.new(sc_contract_executable)
     |> HostFunctionXDR.new(host_function_type)
   end
 
