@@ -719,21 +719,16 @@ defmodule Stellar.Test.XDRFixtures do
         "hello",
         [%SCVal{type: :symbol, value: "world"}]
       ) do
-    %HostFunction{
+    %StellarBase.XDR.HostFunction{
       host_function: %StellarBase.XDR.SCVec{
         sc_vals: [
           %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.OptionalSCObject{
-              sc_object: %StellarBase.XDR.SCObject{
-                sc_object: %StellarBase.XDR.VariableOpaque256000{
-                  opaque:
-                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
-                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-                },
-                type: %StellarBase.XDR.SCObjectType{identifier: :SCO_BYTES}
-              }
+            value: %StellarBase.XDR.SCBytes{
+              value:
+                <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                  84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
             },
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_OBJECT}
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
           },
           %StellarBase.XDR.SCVal{
             value: %StellarBase.XDR.SCSymbol{value: "hello"},
