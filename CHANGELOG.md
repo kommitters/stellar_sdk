@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.0 (26.04.2023)
+* Add Soroban Preview 8 support.
+
 ## 0.12.0 (19.04.2023)
 * CAP-0046 Add support for smart contracts (Soroban preview 7).
 

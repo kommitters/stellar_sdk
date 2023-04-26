@@ -4,19 +4,19 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgsTest do
   import Stellar.Test.XDRFixtures, only: [hash_id_preimage_create_contract_args_xdr: 4]
 
   alias Stellar.TxBuild.HashIDPreimageCreateContractArgs, as: TxHashIDPreimageCreateContractArgs
-  alias Stellar.TxBuild.SCContractCode, as: TxSCContractCode
+  alias Stellar.TxBuild.SCContractExecutable, as: TxSCContractExecutable
 
   setup do
     network_id = "network_id"
-    source = "sc_contract_code"
-    source_type = :SCCONTRACT_CODE_WASM_REF
+    source = "sc_contract_executable"
+    source_type = :SCCONTRACT_EXECUTABLE_WASM_REF
     salt = 123
 
     xdr = hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt)
 
     %{
       network_id: network_id,
-      source: TxSCContractCode.new(wasm_ref: "sc_contract_code"),
+      source: TxSCContractExecutable.new(wasm_ref: "sc_contract_executable"),
       salt: salt,
       xdr: xdr
     }

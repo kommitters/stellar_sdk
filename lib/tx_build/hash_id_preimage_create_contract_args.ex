@@ -9,12 +9,12 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgs do
     ]
 
   alias StellarBase.XDR.{HashIDPreimageCreateContractArgs, Hash, UInt256}
-  alias Stellar.TxBuild.SCContractCode
+  alias Stellar.TxBuild.SCContractExecutable
 
   @type validation :: {:ok, any()} | {:error, atom()}
   @type t :: %__MODULE__{
           network_id: binary(),
-          source: SCContractCode.t(),
+          source: SCContractExecutable.t(),
           salt: non_neg_integer()
         }
 
@@ -50,7 +50,7 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgs do
         salt: salt
       }) do
     network_id = Hash.new(network_id)
-    source = SCContractCode.to_xdr(source)
+    source = SCContractExecutable.to_xdr(source)
     salt = UInt256.new(salt)
 
     HashIDPreimageCreateContractArgs.new(network_id, source, salt)
@@ -59,7 +59,7 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgs do
   def to_xdr(_error), do: {:error, :invalid_struct_hash_id_preimage_contract_args}
 
   @spec validate_contract_code(tuple :: tuple()) :: validation()
-  defp validate_contract_code({_field, %SCContractCode{} = value}),
+  defp validate_contract_code({_field, %SCContractExecutable{} = value}),
     do: {:ok, value}
 
   defp validate_contract_code({field, _}), do: {:error, :"invalid_#{field}"}
