@@ -10,26 +10,18 @@ defmodule Stellar.TxBuild.HostFunction do
       validate_string: 1
     ]
 
-  alias Stellar.TxBuild.{SCVal, Asset, SCContractCode}
-
-  alias StellarBase.XDR.SCVal, as: SCValXDR
+  alias Stellar.TxBuild.{Asset, SCVal, SCContractExecutable}
   alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
-  alias StellarBase.XDR.InstallContractCodeArgs
 
   alias StellarBase.XDR.{
     ContractID,
     ContractIDType,
     CreateContractArgs,
+    InstallContractCodeArgs,
     SCVec,
     HostFunctionType,
-    OptionalSCObject,
-    SCObject,
-    SCValType,
-    SCSymbol,
-    SCObjectType,
     UInt256,
-    VariableOpaque256000,
-    SCValType
+    VariableOpaque256000
   }
 
   @behaviour Stellar.TxBuild.XDR
@@ -148,23 +140,16 @@ defmodule Stellar.TxBuild.HostFunction do
         function_name: function_name,
         args: args
       }) do
-    sc_object_type = SCObjectType.new(:SCO_BYTES)
-    sc_val_type = SCValType.new(:SCV_OBJECT)
-
     contract_id_scval =
       contract_id
       |> Base.decode16!(case: :lower)
-      |> VariableOpaque256000.new()
-      |> SCObject.new(sc_object_type)
-      |> OptionalSCObject.new()
-      |> SCValXDR.new(sc_val_type)
-
-    sc_symbol_type = SCValType.new(:SCV_SYMBOL)
+      |> (&SCVal.new(bytes: &1)).()
+      |> SCVal.to_xdr()
 
     sc_symbol_scval =
       function_name
-      |> SCSymbol.new()
-      |> SCValXDR.new(sc_symbol_type)
+      |> (&SCVal.new(symbol: &1)).()
+      |> SCVal.to_xdr()
 
     args_scvalxdr = Enum.map(args, &SCVal.to_xdr/1)
 
@@ -200,10 +185,11 @@ defmodule Stellar.TxBuild.HostFunction do
     contract_id_type = ContractIDType.new(:CONTRACT_ID_FROM_SOURCE_ACCOUNT)
     contract_id = salt |> UInt256.new() |> ContractID.new(contract_id_type)
 
-    sc_contract_code = [wasm_ref: wasm_id] |> SCContractCode.new() |> SCContractCode.to_xdr()
+    sc_contract_executable =
+      [wasm_ref: wasm_id] |> SCContractExecutable.new() |> SCContractExecutable.to_xdr()
 
     contract_id
-    |> CreateContractArgs.new(sc_contract_code)
+    |> CreateContractArgs.new(sc_contract_executable)
     |> HostFunctionXDR.new(host_function_type)
   end
 
@@ -216,10 +202,10 @@ defmodule Stellar.TxBuild.HostFunction do
     contract_id_type = ContractIDType.new(:CONTRACT_ID_FROM_ASSET)
     contract_id = asset |> Asset.to_xdr() |> ContractID.new(contract_id_type)
 
-    sc_contract_code = :token |> SCContractCode.new() |> SCContractCode.to_xdr()
+    sc_contract_executable = :token |> SCContractExecutable.new() |> SCContractExecutable.to_xdr()
 
     contract_id
-    |> CreateContractArgs.new(sc_contract_code)
+    |> CreateContractArgs.new(sc_contract_executable)
     |> HostFunctionXDR.new(host_function_type)
   end
 

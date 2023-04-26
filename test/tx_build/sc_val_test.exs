@@ -5,7 +5,6 @@ defmodule Stellar.TxBuild.SCValTest do
     SCAddress,
     SCStatus,
     SCVal,
-    SCObject,
     SCMapEntry
   }
 
@@ -22,17 +21,66 @@ defmodule Stellar.TxBuild.SCValTest do
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
     sc_address = SCAddress.new(account: public_key)
 
-    sc_object_discriminants = [
-      %{sc_object: SCObject.new(vec: [sc_val])},
-      %{sc_object: SCObject.new(map: [sc_map_entry])},
-      %{sc_object: SCObject.new(u64: 123)},
-      %{sc_object: SCObject.new(i64: 123)},
-      %{sc_object: SCObject.new(u128: %{lo: 123, hi: 321})},
-      %{sc_object: SCObject.new(u128: %{lo: 123, hi: 321})},
-      %{sc_object: SCObject.new(bytes: "binary")},
-      %{sc_object: SCObject.new(contract_code: :token)},
-      %{sc_object: SCObject.new(address: sc_address)},
-      %{sc_object: SCObject.new(nonce_key: sc_address)}
+    sc_address_xdr = %StellarBase.XDR.SCAddress{
+      sc_address: %StellarBase.XDR.AccountID{
+        account_id: %StellarBase.XDR.PublicKey{
+          public_key: %StellarBase.XDR.UInt256{
+            datum:
+              <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87, 6, 25,
+                27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
+          },
+          type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+        }
+      },
+      type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+    }
+
+    discriminants = [
+      %{type: :bool, value: true},
+      %{type: :void, value: nil},
+      %{type: :u32, value: 12_345},
+      %{type: :i32, value: -12_345},
+      %{type: :u64, value: 67_890},
+      %{type: :i64, value: -67_890},
+      %{type: :time_point, value: 12_345},
+      %{type: :duration, value: 67_890},
+      %{type: :u128, value: %{lo: -12_345, hi: 12_345}},
+      %{type: :i128, value: %{lo: -67_890, hi: 67_890}},
+      %{type: :u256, value: "u256"},
+      %{type: :i256, value: "i256"},
+      %{type: :bytes, value: "bytes"},
+      %{type: :string, value: "string"},
+      %{type: :symbol, value: "symbol"},
+      %{type: :vec, value: [sc_val]},
+      %{type: :map, value: [sc_map_entry]},
+      %{type: :contract, value: :token},
+      %{type: :contract, value: {:wasm_ref, "hash"}},
+      %{type: :address, value: sc_address},
+      %{type: :ledger_key_contract, value: nil},
+      %{type: :ledger_key_nonce, value: sc_address}
+    ]
+
+    invalid_discriminants = [
+      %{type: :bool, value: "true"},
+      %{type: :u32, value: "12345"},
+      %{type: :i32, value: "-12345"},
+      %{type: :u64, value: "67890"},
+      %{type: :i64, value: "-67890"},
+      %{type: :time_point, value: "12345"},
+      %{type: :duration, value: "67890"},
+      %{type: :u128, value: %{lo: "-12345", hi: "12345"}},
+      %{type: :i128, value: %{lo: "-67890", hi: "67890"}},
+      %{type: :u256, value: 256},
+      %{type: :i256, value: 256},
+      %{type: :bytes, value: :bytes},
+      %{type: :string, value: :string},
+      %{type: :symbol, value: :symbol},
+      %{type: :vec, value: [:sc_val]},
+      %{type: :map, value: [:sc_map_entry]},
+      %{type: :contract, value: :invalid},
+      %{type: :contract, value: {:wasm_ref, :invalid}},
+      %{type: :address, value: :invalid},
+      %{type: :ledger_key_nonce, value: :invalid}
     ]
 
     sc_status_discriminants = [
@@ -47,79 +95,197 @@ defmodule Stellar.TxBuild.SCValTest do
       %{sc_status: SCStatus.new(host_auth_error: :HOST_AUTH_UNKNOWN_ERROR)}
     ]
 
+    xdr_discriminants = [
+      %{
+        val_type: :SCV_BOOL,
+        module: %StellarBase.XDR.Bool{value: true},
+        type: :bool,
+        value: true
+      },
+      %{val_type: :SCV_VOID, module: %StellarBase.XDR.Void{value: nil}, type: :void, value: nil},
+      %{
+        val_type: :SCV_STATUS,
+        module: %StellarBase.XDR.SCStatus{
+          code: %StellarBase.XDR.SCUnknownErrorCode{
+            identifier: :UNKNOWN_ERROR_GENERAL
+          },
+          type: %StellarBase.XDR.SCStatusType{identifier: :SST_UNKNOWN_ERROR}
+        },
+        type: :status,
+        value: SCStatus.new(unknown_error: :UNKNOWN_ERROR_GENERAL)
+      },
+      %{val_type: :SCV_U32, module: %StellarBase.XDR.UInt32{datum: 123}, type: :u32, value: 123},
+      %{val_type: :SCV_I32, module: %StellarBase.XDR.Int32{datum: 123}, type: :i32, value: 123},
+      %{val_type: :SCV_U64, module: %StellarBase.XDR.UInt64{datum: 123}, type: :u64, value: 123},
+      %{val_type: :SCV_I64, module: %StellarBase.XDR.Int64{datum: 123}, type: :i64, value: 123},
+      %{
+        val_type: :SCV_TIMEPOINT,
+        module: %StellarBase.XDR.TimePoint{value: 123},
+        type: :time_point,
+        value: 123
+      },
+      %{
+        val_type: :SCV_DURATION,
+        module: %StellarBase.XDR.Duration{value: 123},
+        type: :duration,
+        value: 123
+      },
+      %{
+        val_type: :SCV_U128,
+        module: %StellarBase.XDR.Int128Parts{
+          lo: %StellarBase.XDR.UInt64{datum: 123},
+          hi: %StellarBase.XDR.UInt64{datum: 123}
+        },
+        type: :u128,
+        value: %{lo: 123, hi: 123}
+      },
+      %{
+        val_type: :SCV_I128,
+        module: %StellarBase.XDR.Int128Parts{
+          lo: %StellarBase.XDR.UInt64{datum: 123},
+          hi: %StellarBase.XDR.UInt64{datum: 123}
+        },
+        type: :i128,
+        value: %{lo: 123, hi: 123}
+      },
+      %{
+        val_type: :SCV_U256,
+        module: %StellarBase.XDR.UInt256{datum: "Hello"},
+        type: :u256,
+        value: "Hello"
+      },
+      %{
+        val_type: :SCV_I256,
+        module: %StellarBase.XDR.UInt256{datum: "Hello"},
+        type: :i256,
+        value: "Hello"
+      },
+      %{
+        val_type: :SCV_BYTES,
+        module: %StellarBase.XDR.SCBytes{value: "Hello"},
+        type: :bytes,
+        value: "Hello"
+      },
+      %{
+        val_type: :SCV_STRING,
+        module: %StellarBase.XDR.SCString{value: "Hello"},
+        type: :string,
+        value: "Hello"
+      },
+      %{
+        val_type: :SCV_SYMBOL,
+        module: %StellarBase.XDR.SCSymbol{value: "Hello"},
+        type: :symbol,
+        value: "Hello"
+      },
+      %{
+        val_type: :SCV_VEC,
+        module: %StellarBase.XDR.OptionalSCVec{sc_vec: nil},
+        type: :vec,
+        value: nil
+      },
+      %{
+        val_type: :SCV_VEC,
+        module: %StellarBase.XDR.OptionalSCVec{
+          sc_vec: %StellarBase.XDR.SCVec{
+            sc_vals: [
+              %StellarBase.XDR.SCVal{
+                value: %StellarBase.XDR.Int32{datum: 123},
+                type: %StellarBase.XDR.SCValType{identifier: :SCV_I32}
+              }
+            ]
+          }
+        },
+        type: :vec,
+        value: [sc_val]
+      },
+      %{
+        val_type: :SCV_MAP,
+        module: %StellarBase.XDR.OptionalSCMap{sc_map: nil},
+        type: :map,
+        value: nil
+      },
+      %{
+        val_type: :SCV_MAP,
+        module: %StellarBase.XDR.OptionalSCMap{
+          sc_map: %StellarBase.XDR.SCMap{
+            scmap_entries: [
+              %StellarBase.XDR.SCMapEntry{
+                key: %StellarBase.XDR.SCVal{
+                  value: %StellarBase.XDR.SCSymbol{value: "sc_val_key"},
+                  type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+                },
+                val: %StellarBase.XDR.SCVal{
+                  value: %StellarBase.XDR.Int32{datum: 123},
+                  type: %StellarBase.XDR.SCValType{identifier: :SCV_I32}
+                }
+              }
+            ]
+          }
+        },
+        type: :map,
+        value: [sc_map_entry]
+      },
+      %{
+        val_type: :SCV_CONTRACT_EXECUTABLE,
+        module: %StellarBase.XDR.SCContractExecutable{
+          contract_executable: %StellarBase.XDR.Hash{value: "hash"},
+          type: %StellarBase.XDR.SCContractExecutableType{
+            identifier: :SCCONTRACT_EXECUTABLE_WASM_REF
+          }
+        },
+        type: :contract,
+        value: {:wasm_ref, "hash"}
+      },
+      %{
+        val_type: :SCV_CONTRACT_EXECUTABLE,
+        module: %StellarBase.XDR.SCContractExecutable{
+          contract_executable: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.SCContractExecutableType{
+            identifier: :SCCONTRACT_EXECUTABLE_TOKEN
+          }
+        },
+        type: :contract,
+        value: :token
+      },
+      %{val_type: :SCV_ADDRESS, module: sc_address_xdr, type: :address, value: sc_address},
+      %{
+        val_type: :SCV_LEDGER_KEY_CONTRACT_EXECUTABLE,
+        module: %StellarBase.XDR.Void{value: nil},
+        type: :ledger_key_contract,
+        value: nil
+      },
+      %{
+        val_type: :SCV_LEDGER_KEY_NONCE,
+        module: %StellarBase.XDR.SCNonceKey{nonce_address: sc_address_xdr},
+        type: :ledger_key_nonce,
+        value: sc_address
+      }
+    ]
+
     %{
-      sc_object_discriminants: sc_object_discriminants,
-      sc_status_discriminants: sc_status_discriminants
+      sc_status_discriminants: sc_status_discriminants,
+      discriminants: discriminants,
+      invalid_discriminants: invalid_discriminants,
+      xdr_discriminants: xdr_discriminants
     }
   end
 
-  test "new/1 when type is u63" do
-    %SCVal{type: :u63, value: 123} = SCVal.new(u63: 123)
-  end
-
-  test "new/1 when type u63 is incorrect" do
-    {:error, :invalid_u63} = SCVal.new(u63: "123")
-  end
-
-  test "new/1 when type is u32" do
-    %SCVal{type: :u32, value: 123} = SCVal.new(u32: 123)
-  end
-
-  test "new/1 when type u32 is incorrect" do
-    {:error, :invalid_u32} = SCVal.new(u32: "123")
-  end
-
-  test "new/1 when type is i32" do
-    %SCVal{type: :i32, value: 123} = SCVal.new(i32: 123)
-  end
-
-  test "new/1 when type i32 is incorrect" do
-    {:error, :invalid_i32} = SCVal.new(i32: "123")
-  end
-
-  test "new/1 when type is static" do
-    %SCVal{type: :static, value: :void} = SCVal.new(static: :void)
-    %SCVal{type: :static, value: true} = SCVal.new(static: true)
-    %SCVal{type: :static, value: false} = SCVal.new(static: false)
-
-    %SCVal{type: :static, value: :ledger_contract_code} = SCVal.new(static: :ledger_contract_code)
-  end
-
-  test "new/1 when type static is incorrect" do
-    {:error, :invalid_static} = SCVal.new(static: "123")
-  end
-
-  test "new/1 when type is object", %{sc_object_discriminants: sc_object_discriminants} do
-    for %{sc_object: sc_object} <- sc_object_discriminants do
-      %SCVal{type: :object, value: ^sc_object} = SCVal.new(object: sc_object)
+  test "new/1", %{discriminants: discriminants} do
+    for %{type: type, value: value} <- discriminants do
+      %SCVal{type: ^type, value: ^value} = SCVal.new([{type, value}])
     end
   end
 
-  test "new/1 when using object struct", %{sc_object_discriminants: sc_object_discriminants} do
-    for %{sc_object: sc_object} <- sc_object_discriminants do
-      %SCVal{type: :object, value: ^sc_object} = SCVal.new(sc_object)
+  test "new/1 with invalid type" do
+    {:error, :invalid_sc_val_type} = SCVal.new(invalid_type: nil)
+  end
+
+  test "new/1 with invalid discriminants", %{invalid_discriminants: invalid_discriminants} do
+    for %{type: type, value: value} <- invalid_discriminants do
+      error = :"invalid_#{type}"
+      {:error, ^error} = SCVal.new([{type, value}])
     end
-  end
-
-  test "new/1 when type object is incorrect" do
-    sc_object = SCObject.new(:u64, "123")
-    {:error, :invalid_object} = SCVal.new(object: sc_object)
-  end
-
-  test "new/1 when type is symbol" do
-    %SCVal{type: :symbol, value: "symbol"} = SCVal.new(symbol: "symbol")
-  end
-
-  test "new/1 when type symbol is incorrect" do
-    {:error, :invalid_symbol} = SCVal.new(symbol: 123)
-  end
-
-  test "new/1 when type is bitset" do
-    %SCVal{type: :bitset, value: 123} = SCVal.new(bitset: 123)
-  end
-
-  test "new/1 when type bitset is incorrect" do
-    {:error, :invalid_bitset} = SCVal.new(bitset: "123")
   end
 
   test "new/1 when type is status", %{sc_status_discriminants: sc_status_discriminants} do
@@ -128,83 +294,12 @@ defmodule Stellar.TxBuild.SCValTest do
     end
   end
 
-  test "new/1 when using status struct", %{sc_status_discriminants: sc_status_discriminants} do
-    for %{sc_status: sc_status} <- sc_status_discriminants do
-      %SCVal{type: :status, value: ^sc_status} = SCVal.new(sc_status)
+  test "to_xdr/1", %{xdr_discriminants: xdr_discriminants} do
+    for %{val_type: val_type, module: module, type: type, value: value} <- xdr_discriminants do
+      %StellarBase.XDR.SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: ^val_type},
+        value: ^module
+      } = SCVal.new([{type, value}]) |> SCVal.to_xdr()
     end
-  end
-
-  test "new/1 when type is invalid" do
-    {:error, :invalid_sc_val_type} = SCVal.new(invalid_type: "invalid_type")
-  end
-
-  test "to_xdr when type is u63" do
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_U63},
-      value: %StellarBase.XDR.UInt64{datum: 123}
-    } = SCVal.new(u63: 123) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is u32" do
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_U32},
-      value: %StellarBase.XDR.UInt32{datum: 123}
-    } = SCVal.new(u32: 123) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is i32" do
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_I32},
-      value: %StellarBase.XDR.Int32{datum: 123}
-    } = SCVal.new(i32: 123) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is static" do
-    %StellarBase.XDR.SCVal{
-      value: %StellarBase.XDR.SCStatic{identifier: :SCS_VOID},
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_STATIC}
-    } = SCVal.new(static: :void) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is object" do
-    sc_object = SCObject.new(u64: 123)
-
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_OBJECT},
-      value: %StellarBase.XDR.OptionalSCObject{
-        sc_object: %StellarBase.XDR.SCObject{
-          sc_object: %StellarBase.XDR.UInt64{datum: 123},
-          type: %StellarBase.XDR.SCObjectType{identifier: :SCO_U64}
-        }
-      }
-    } = SCVal.new(object: sc_object) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is symbol" do
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL},
-      value: %StellarBase.XDR.SCSymbol{value: "symbol"}
-    } = SCVal.new(symbol: "symbol") |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is bitset" do
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_BITSET},
-      value: %StellarBase.XDR.UInt64{datum: 123}
-    } = SCVal.new(bitset: 123) |> SCVal.to_xdr()
-  end
-
-  test "to_xdr when type is status" do
-    sc_status = SCStatus.new(unknown_error: :UNKNOWN_ERROR_GENERAL)
-
-    %StellarBase.XDR.SCVal{
-      type: %StellarBase.XDR.SCValType{identifier: :SCV_STATUS},
-      value: %StellarBase.XDR.SCStatus{
-        code: %StellarBase.XDR.SCUnknownErrorCode{
-          identifier: :UNKNOWN_ERROR_GENERAL
-        },
-        type: %StellarBase.XDR.SCStatusType{identifier: :SST_UNKNOWN_ERROR}
-      }
-    } = SCVal.new(status: sc_status) |> SCVal.to_xdr()
   end
 end

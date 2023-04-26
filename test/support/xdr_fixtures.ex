@@ -71,8 +71,8 @@ defmodule Stellar.Test.XDRFixtures do
     String64,
     StructContractID,
     Signer,
-    SCContractCode,
-    SCContractCodeType,
+    SCContractExecutable,
+    SCContractExecutableType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -216,7 +216,7 @@ defmodule Stellar.Test.XDRFixtures do
           salt :: non_neg_integer()
         ) :: HashIDPreimageCreateContractArgs.t()
   def hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt) do
-    source = sc_contract_code_xdr(source_type, source)
+    source = sc_contract_executable_xdr(source_type, source)
     salt = UInt256.new(salt)
 
     network_id
@@ -224,13 +224,14 @@ defmodule Stellar.Test.XDRFixtures do
     |> HashIDPreimageCreateContractArgs.new(source, salt)
   end
 
-  @spec sc_contract_code_xdr(type :: String.t(), value :: binary()) :: SCContractCode.t()
-  def sc_contract_code_xdr(type, value) do
-    type = SCContractCodeType.new(type)
+  @spec sc_contract_executable_xdr(type :: String.t(), value :: binary()) ::
+          SCContractExecutable.t()
+  def sc_contract_executable_xdr(type, value) do
+    type = SCContractExecutableType.new(type)
 
     value
     |> Hash.new()
-    |> SCContractCode.new(type)
+    |> SCContractExecutable.new(type)
   end
 
   @spec signer_xdr(key :: String.t(), weight :: non_neg_integer()) :: Signer.t()
@@ -719,21 +720,16 @@ defmodule Stellar.Test.XDRFixtures do
         "hello",
         [%SCVal{type: :symbol, value: "world"}]
       ) do
-    %HostFunction{
+    %StellarBase.XDR.HostFunction{
       host_function: %StellarBase.XDR.SCVec{
         sc_vals: [
           %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.OptionalSCObject{
-              sc_object: %StellarBase.XDR.SCObject{
-                sc_object: %StellarBase.XDR.VariableOpaque256000{
-                  opaque:
-                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
-                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-                },
-                type: %StellarBase.XDR.SCObjectType{identifier: :SCO_BYTES}
-              }
+            value: %StellarBase.XDR.SCBytes{
+              value:
+                <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                  84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
             },
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_OBJECT}
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
           },
           %StellarBase.XDR.SCVal{
             value: %StellarBase.XDR.SCSymbol{value: "hello"},
@@ -779,12 +775,12 @@ defmodule Stellar.Test.XDRFixtures do
             identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT
           }
         },
-        source: %StellarBase.XDR.SCContractCode{
-          contract_code: %StellarBase.XDR.Hash{
+        source: %StellarBase.XDR.SCContractExecutable{
+          contract_executable: %StellarBase.XDR.Hash{
             value: wasm_id
           },
-          type: %StellarBase.XDR.SCContractCodeType{
-            identifier: :SCCONTRACT_CODE_WASM_REF
+          type: %StellarBase.XDR.SCContractExecutableType{
+            identifier: :SCCONTRACT_EXECUTABLE_WASM_REF
           }
         }
       },
@@ -805,10 +801,10 @@ defmodule Stellar.Test.XDRFixtures do
           },
           type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_ASSET}
         },
-        source: %StellarBase.XDR.SCContractCode{
-          contract_code: %StellarBase.XDR.Void{value: nil},
-          type: %StellarBase.XDR.SCContractCodeType{
-            identifier: :SCCONTRACT_CODE_TOKEN
+        source: %StellarBase.XDR.SCContractExecutable{
+          contract_executable: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.SCContractExecutableType{
+            identifier: :SCCONTRACT_EXECUTABLE_TOKEN
           }
         }
       },

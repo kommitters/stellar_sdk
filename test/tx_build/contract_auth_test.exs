@@ -17,13 +17,11 @@ defmodule Stellar.TxBuild.ContractAuthTest do
     Hash,
     Int32,
     OptionalAddressWithNonce,
-    OptionalSCObject,
+    OptionalSCVec,
     PublicKey,
     PublicKeyType,
     SCAddress,
     SCAddressType,
-    SCObject,
-    SCObjectType,
     SCVec,
     SCVal,
     SCValType,
@@ -176,18 +174,15 @@ defmodule Stellar.TxBuild.ContractAuthTest do
       signature_args: %SCVec{
         sc_vals: [
           %SCVal{
-            type: %SCValType{identifier: :SCV_OBJECT},
-            value: %OptionalSCObject{
-              sc_object: %SCObject{
-                sc_object: %SCVec{
-                  sc_vals: [
-                    %SCVal{
-                      type: %SCValType{identifier: :SCV_I32},
-                      value: %Int32{datum: 456}
-                    }
-                  ]
-                },
-                type: %SCObjectType{identifier: :SCO_VEC}
+            type: %SCValType{identifier: :SCV_VEC},
+            value: %OptionalSCVec{
+              sc_vec: %SCVec{
+                sc_vals: [
+                  %SCVal{
+                    type: %SCValType{identifier: :SCV_I32},
+                    value: %Int32{datum: 456}
+                  }
+                ]
               }
             }
           }
@@ -241,38 +236,29 @@ defmodule Stellar.TxBuild.ContractAuthTest do
       signature_args: [
         %Stellar.TxBuild.SCVal{type: :i32, value: 456},
         %Stellar.TxBuild.SCVal{
-          type: :object,
-          value: %Stellar.TxBuild.SCObject{
-            type: :map,
-            value: [
-              %Stellar.TxBuild.SCMapEntry{
-                key: %Stellar.TxBuild.SCVal{type: :symbol, value: "public_key"},
-                val: %Stellar.TxBuild.SCVal{
-                  type: :object,
-                  value: %Stellar.TxBuild.SCObject{
-                    type: :bytes,
-                    value:
-                      <<90, 59, 33, 159, 27, 241, 148, 234, 43, 78, 208, 73, 92, 40, 119, 5, 169,
-                        84, 190, 125, 179, 121, 108, 107, 112, 211, 32, 194, 193, 98, 177, 218>>
-                  }
-                }
-              },
-              %Stellar.TxBuild.SCMapEntry{
-                key: %Stellar.TxBuild.SCVal{type: :symbol, value: "signature"},
-                val: %Stellar.TxBuild.SCVal{
-                  type: :object,
-                  value: %Stellar.TxBuild.SCObject{
-                    type: :bytes,
-                    value:
-                      <<52, 121, 237, 28, 179, 150, 62, 12, 233, 15, 34, 135, 55, 243, 210, 56,
-                        160, 153, 50, 155, 145, 117, 205, 53, 110, 199, 148, 255, 146, 42, 132,
-                        50, 49, 107, 237, 170, 211, 188, 17, 62, 56, 128, 81, 88, 43, 61, 78, 27,
-                        55, 183, 67, 118, 45, 66, 178, 186, 53, 240, 29, 187, 102, 118, 125, 2>>
-                  }
-                }
+          type: :map,
+          value: [
+            %Stellar.TxBuild.SCMapEntry{
+              key: %Stellar.TxBuild.SCVal{type: :symbol, value: "public_key"},
+              val: %Stellar.TxBuild.SCVal{
+                type: :bytes,
+                value:
+                  <<90, 59, 33, 159, 27, 241, 148, 234, 43, 78, 208, 73, 92, 40, 119, 5, 169, 84,
+                    190, 125, 179, 121, 108, 107, 112, 211, 32, 194, 193, 98, 177, 218>>
               }
-            ]
-          }
+            },
+            %Stellar.TxBuild.SCMapEntry{
+              key: %Stellar.TxBuild.SCVal{type: :symbol, value: "signature"},
+              val: %Stellar.TxBuild.SCVal{
+                type: :bytes,
+                value:
+                  <<70, 0, 69, 48, 162, 145, 42, 247, 159, 79, 173, 195, 194, 115, 212, 186, 218,
+                    171, 113, 111, 0, 136, 135, 161, 252, 135, 105, 217, 69, 85, 196, 95, 223,
+                    168, 95, 103, 122, 132, 220, 26, 84, 216, 10, 6, 123, 204, 218, 216, 102, 166,
+                    159, 111, 129, 17, 233, 40, 245, 237, 184, 223, 158, 0, 41, 10>>
+              }
+            }
+          ]
         }
       ]
     } =
