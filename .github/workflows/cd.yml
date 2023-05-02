@@ -28,6 +28,7 @@ jobs:
             github.com:443
             hex.pm:443
             repo.hex.pm:443
+            builds.hex.pm:443
 
       - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
       - uses: erlef/setup-elixir@c2e02f777c158310fc6d3d4e11b36a52d2d52db8 # v1.15.4
