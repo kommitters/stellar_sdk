@@ -67,6 +67,11 @@ defmodule Stellar.KeyPair.Default do
   end
 
   @impl true
+  def raw_contract(contract) do
+    StrKey.decode!(contract, :contract)
+  end
+
+  @impl true
   def sign(<<payload::binary>>, <<secret::binary>>) do
     raw_secret = raw_secret_seed(secret)
     Ed25519.signature(payload, raw_secret)
@@ -127,6 +132,14 @@ defmodule Stellar.KeyPair.Default do
     case StrKey.decode(sha256_hash, :sha256_hash) do
       {:ok, _key} -> :ok
       {:error, _reason} -> {:error, :invalid_sha256_hash}
+    end
+  end
+
+  @impl true
+  def validate_contract(contract) do
+    case StrKey.decode(contract, :contract) do
+      {:ok, _key} -> :ok
+      {:error, _reason} -> {:error, :invalid_contract}
     end
   end
 

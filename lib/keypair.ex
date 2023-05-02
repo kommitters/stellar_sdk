@@ -39,6 +39,9 @@ defmodule Stellar.KeyPair do
   def raw_signed_payload(signed_payload), do: impl().raw_signed_payload(signed_payload)
 
   @impl true
+  def raw_contract(contract), do: impl().raw_contract(contract)
+
+  @impl true
   def sign(payload, secret), do: impl().sign(payload, secret)
 
   @impl true
@@ -62,6 +65,9 @@ defmodule Stellar.KeyPair do
 
   @impl true
   def validate_signed_payload(signed_payload), do: impl().validate_signed_payload(signed_payload)
+
+  @impl true
+  def validate_contract(contract), do: impl().validate_contract(contract)
 
   @impl true
   def signature_hint_for_signed_payload(public_key, payload),

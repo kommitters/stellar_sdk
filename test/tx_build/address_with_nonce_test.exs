@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.AddressWithNonceTest do
   alias Stellar.TxBuild.SCAddress, as: TxSCAddress
 
   setup do
-    address = TxSCAddress.new(account: "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
+    address = TxSCAddress.new("GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
     nonce = 123
     xdr = address_with_nonce_xdr(address, nonce)
 

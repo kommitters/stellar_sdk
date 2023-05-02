@@ -32,8 +32,7 @@ defmodule Stellar.TxBuild.ContractAuthTest do
 
   setup do
     # ADDRESS WITH NONCE
-    sc_address =
-      TxSCAddress.new(account: "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
+    sc_address = TxSCAddress.new("GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
 
     address_with_nonce = TxAddressWithNonce.new(address: sc_address, nonce: 123)
     optional_address_with_nonce = TxOptionalAddressWithNonce.new(address_with_nonce)

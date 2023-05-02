@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.OptionalAddressWithNonceTest do
   alias Stellar.TxBuild.{OptionalAddressWithNonce, AddressWithNonce, SCAddress}
 
   setup do
-    address = SCAddress.new(account: "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
+    address = SCAddress.new("GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A")
     nonce = 123
     address_with_nonce = AddressWithNonce.new(address: address, nonce: nonce)
     optional_address_with_nonce = OptionalAddressWithNonce.new(address_with_nonce)
