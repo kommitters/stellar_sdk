@@ -3,9 +3,9 @@ defmodule Stellar.TxBuild.SCAddress do
   `SCAddress` struct definition.
   """
 
-  import Stellar.TxBuild.Validations, only: [validate_account_id: 1]
-
   @behaviour Stellar.TxBuild.XDR
+
+  alias Stellar.KeyPair
 
   alias StellarBase.XDR.{
     SCAddressType,
@@ -24,23 +24,19 @@ defmodule Stellar.TxBuild.SCAddress do
           value: value()
         }
 
-  @allowed_types ~w(account contract)a
-
   defstruct [:type, :value]
 
   @impl true
   def new(args, opts \\ nil)
 
-  def new([{type, value}], _opts) when type in @allowed_types do
-    with {:ok, _value} <- validate_sc_address({type, value}) do
+  def new(value, _opts) do
+    with {:ok, {type, value}} <- validate_sc_address(value) do
       %__MODULE__{
         type: type,
         value: value
       }
     end
   end
-
-  def new(_args, _opts), do: {:error, :invalid_sc_address}
 
   @impl true
   def to_xdr(%__MODULE__{type: :account, value: value}) do
@@ -60,14 +56,14 @@ defmodule Stellar.TxBuild.SCAddress do
     |> SCAddress.new(type)
   end
 
-  @spec validate_sc_address(tuple :: tuple()) :: validation()
-  defp validate_sc_address({:account, value}) do
-    case validate_account_id({:account, value}) do
-      {:ok, account_id} -> {:ok, account_id}
-      {:error, _reason} -> {:error, :invalid_account_id}
+  @spec validate_sc_address(value :: binary()) :: validation()
+  defp validate_sc_address(value) when is_binary(value) do
+    cond do
+      KeyPair.validate_public_key(value) == :ok -> {:ok, {:account, value}}
+      KeyPair.validate_contract(value) == :ok -> {:ok, {:contract, value}}
+      true -> {:error, :invalid_sc_address}
     end
   end
 
-  defp validate_sc_address({:contract, value}) when is_binary(value), do: {:ok, value}
-  defp validate_sc_address({:contract, _value}), do: {:error, :invalid_contract_hash}
+  defp validate_sc_address(_value), do: {:error, :invalid_sc_address}
 end

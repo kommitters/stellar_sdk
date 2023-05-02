@@ -36,8 +36,7 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
       footprint =
         "AAAAAgAAAAYEYRaMu64NqWxUO3H9VxrsS0RUnVA/mvnnaFzO28FhPAAAAAMAAAADAAAAB333b6x0UKU606981VsXWEBukqHf/ofD44TsB48KjKRLAAAAAA=="
 
-      sc_address =
-        SCAddress.new(contract: "GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
+      sc_address = SCAddress.new("GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
 
       address_with_nonce = AddressWithNonce.new(address: sc_address, nonce: 123)
 

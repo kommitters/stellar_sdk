@@ -141,8 +141,7 @@ defmodule Stellar.TxBuild.ValidationsTest do
   end
 
   test "validate_optional_address_with_nonce/1", %{account_id: account_id} do
-    address_with_nonce =
-      AddressWithNonce.new(address: SCAddress.new(account: account_id), nonce: 123)
+    address_with_nonce = AddressWithNonce.new(address: SCAddress.new(account_id), nonce: 123)
 
     {:ok, %OptionalAddressWithNonce{}} =
       Validations.validate_optional_address_with_nonce({:address_with_nonce, address_with_nonce})
