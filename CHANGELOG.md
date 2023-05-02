@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.13.1 (02.05.2023)
+* Update `scaddress` based on `strkey`
+
 ## 0.13.0 (26.04.2023)
 * Add Soroban Preview 8 support.
 
