@@ -55,6 +55,11 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   end
 
   @impl true
+  def raw_contract(_contract) do
+    send(self(), {:raw_contract, "RAW_CONTRACT"})
+  end
+
+  @impl true
   def sign(_payload, _secret) do
     send(self(), {:signature, "SIGNATURE"})
     :ok
@@ -98,6 +103,11 @@ defmodule Stellar.KeyPair.CannedKeyPairImpl do
   @impl true
   def validate_signed_payload(_signed_payload) do
     send(self(), {:validate_signed_payload, "SIGNED_PAYLOAD"})
+  end
+
+  @impl true
+  def validate_contract(_contract) do
+    send(self(), {:validate_contract, "CONTRACT"})
   end
 
   @impl true
@@ -165,6 +175,11 @@ defmodule Stellar.KeyPairTest do
     assert_receive({:raw_signed_payload, "RAW_SIGNED_PAYLOAD"})
   end
 
+  test "raw_contract/1" do
+    Stellar.KeyPair.raw_contract("CONTRACT")
+    assert_receive({:raw_contract, "RAW_CONTRACT"})
+  end
+
   test "sign/2" do
     Stellar.KeyPair.sign(<<0, 0, 0, 0>>, "SECRET")
     assert_receive({:signature, "SIGNATURE"})
@@ -203,6 +218,11 @@ defmodule Stellar.KeyPairTest do
   test "validate_signed_payload/2" do
     Stellar.KeyPair.validate_signed_payload("SIGNED_PAYLOAD")
     assert_receive({:validate_signed_payload, "SIGNED_PAYLOAD"})
+  end
+
+  test "validate_contract/2" do
+    Stellar.KeyPair.validate_contract("CONTRACT")
+    assert_receive({:validate_contract, "CONTRACT"})
   end
 
   test "signature_hint_for_signed_payload/2" do

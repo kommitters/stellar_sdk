@@ -11,6 +11,7 @@ defmodule Stellar.KeyPair.DefaultTest do
       sha256_hash: "XCTP2Y5GZ7TTGHLM3JJKDIPR36A7QFFW4VYJVU6QN4MNIFFIAG4JC6CC",
       signed_payload:
         "PA7QYNF7SOWQ3GLR2BGMZEHXAVIRZA4KVWLTJJFC7MGXUA74P7UJUAAAAAQACAQDAQCQMBYIBEFAWDANBYHRAEISCMKBKFQXDAMRUGY4DUPB6IBZGM",
+      contract: "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN",
       encoded_public_key:
         <<192, 239, 146, 127, 88, 230, 238, 208, 76, 100, 112, 242, 105, 159, 196, 98, 173, 174,
           16, 31, 53, 213, 251, 150, 180, 213, 18, 70, 165, 216, 24, 231>>,
@@ -28,6 +29,9 @@ defmodule Stellar.KeyPair.DefaultTest do
           173, 151, 52, 164, 162, 251, 13, 122, 3, 252, 127, 232, 154, 0, 0, 0, 32, 1, 2, 3, 4, 5,
           6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
           29, 30, 31, 32>>,
+      encoded_contract:
+        <<136, 199, 21, 221, 153, 62, 83, 56, 9, 112, 55, 17, 157, 226, 244, 109, 177, 22, 241,
+          170, 12, 226, 193, 229, 39, 50, 103, 40, 26, 129, 1, 237>>,
       signature:
         <<215, 199, 186, 220, 150, 210, 229, 108, 54, 13, 160, 26, 38, 184, 120, 233, 253, 170,
           252, 68, 235, 166, 205, 2, 115, 76, 254, 20, 85, 1, 224, 106, 84, 196, 217, 38, 248,
@@ -81,6 +85,13 @@ defmodule Stellar.KeyPair.DefaultTest do
     encoded_signed_payload: encoded_signed_payload
   } do
     ^encoded_signed_payload = Default.raw_signed_payload(signed_payload)
+  end
+
+  test "raw_contract/1", %{
+    contract: contract,
+    encoded_contract: encoded_contract
+  } do
+    ^encoded_contract = Default.raw_contract(contract)
   end
 
   test "sign/2", %{secret: secret, signature: signature} do
@@ -143,6 +154,14 @@ defmodule Stellar.KeyPair.DefaultTest do
 
   test "validate_signed_payload/1 invalid_signed_payload" do
     {:error, :invalid_signed_payload} = Default.validate_signed_payload("GCA")
+  end
+
+  test "validate_contract/1", %{contract: contract} do
+    :ok = Default.validate_contract(contract)
+  end
+
+  test "validate_contract/1 invalid_contract" do
+    {:error, :invalid_contract} = Default.validate_contract("GCA")
   end
 
   test "signature_hint_for_signed_payload/2 payload with more than 4 bytes", %{

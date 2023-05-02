@@ -15,31 +15,24 @@ defmodule Stellar.TxBuild.SCAddressTest do
 
   setup do
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
-    hash = "GCIZ3GSM5XL7OUS4UP64THMDZ7CZ3ZWN"
+    contract = "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN"
 
     %{
       public_key: public_key,
-      hash: hash
+      contract: contract
     }
   end
 
   test "new/1 when type is account", %{public_key: public_key} do
-    %TxSCAddress{type: :account, value: ^public_key} = TxSCAddress.new(account: public_key)
+    %TxSCAddress{type: :account, value: ^public_key} = TxSCAddress.new(public_key)
   end
 
-  test "new/1 when type is contract", %{hash: hash} do
-    %TxSCAddress{
-      type: :contract,
-      value: ^hash
-    } = TxSCAddress.new(contract: hash)
+  test "new/1 when type is contract", %{contract: contract} do
+    %TxSCAddress{type: :contract, value: ^contract} = TxSCAddress.new(contract)
   end
 
-  test "new/1 when data type account_id is incorrect" do
-    {:error, :invalid_account_id} = TxSCAddress.new(account: "123")
-  end
-
-  test "new/1 when type contract is incorrect" do
-    {:error, :invalid_contract_hash} = TxSCAddress.new(contract: 123)
+  test "new/1 when data is incorrect" do
+    {:error, :invalid_sc_address} = TxSCAddress.new("CCEMOFO5TE7FGOAJOA3RDH")
   end
 
   test "to_xdr when type is account", %{public_key: public_key} do
@@ -55,16 +48,13 @@ defmodule Stellar.TxBuild.SCAddressTest do
         }
       },
       type: %SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
-    } =
-      [account: public_key]
-      |> TxSCAddress.new()
-      |> TxSCAddress.to_xdr()
+    } = public_key |> TxSCAddress.new() |> TxSCAddress.to_xdr()
   end
 
-  test "to_xdr when type is contract", %{hash: hash} do
+  test "to_xdr when type is contract", %{contract: contract} do
     %SCAddress{
-      sc_address: %Hash{value: "GCIZ3GSM5XL7OUS4UP64THMDZ7CZ3ZWN"},
+      sc_address: %Hash{value: "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN"},
       type: %SCAddressType{identifier: :SC_ADDRESS_contract}
-    } = TxSCAddress.new(contract: hash) |> TxSCAddress.to_xdr()
+    } = contract |> TxSCAddress.new() |> TxSCAddress.to_xdr()
   end
 end

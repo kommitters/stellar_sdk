@@ -19,7 +19,7 @@ defmodule Stellar.TxBuild.SCValTest do
 
     # SCAddress
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
-    sc_address = SCAddress.new(account: public_key)
+    sc_address = SCAddress.new(public_key)
 
     sc_address_xdr = %StellarBase.XDR.SCAddress{
       sc_address: %StellarBase.XDR.AccountID{
