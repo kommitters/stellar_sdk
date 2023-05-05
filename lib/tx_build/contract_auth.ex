@@ -132,6 +132,63 @@ defmodule Stellar.TxBuild.ContractAuth do
 
   def sign(_args, _val), do: {:error, :invalid_secret_key}
 
+  def sign_xdr(base_64, secret_key) do
+    {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
+    raw_public_key = KeyPair.raw_public_key(public_key)
+    network_id = network_id_xdr()
+
+    {:ok,
+     {%StellarBase.XDR.ContractAuth{
+        address_with_nonce: %{
+          address_with_nonce: %{
+            nonce: nonce
+          }
+        },
+        authorized_invocation: authorized_invocation
+      },
+      ""}} =
+      {:ok, {contract_auth, ""}} =
+      base_64
+      |> Base.decode64!()
+      |> StellarBase.XDR.ContractAuth.decode_xdr()
+
+    envelope_type = StellarBase.XDR.EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_AUTH)
+
+    signature =
+      network_id
+      |> StellarBase.XDR.Hash.new()
+      |> StellarBase.XDR.HashIDPreimageContractAuth.new(nonce, authorized_invocation)
+      |> StellarBase.XDR.HashIDPreimage.new(envelope_type)
+      |> StellarBase.XDR.HashIDPreimage.encode_xdr!()
+      |> hash()
+      |> KeyPair.sign(secret_key)
+
+    public_key_map_entry =
+      SCMapEntry.new(
+        SCVal.new(symbol: "public_key"),
+        SCVal.new(bytes: raw_public_key)
+      )
+
+    signature_map_entry =
+      SCMapEntry.new(
+        SCVal.new(symbol: "signature"),
+        SCVal.new(bytes: signature)
+      )
+
+    signature_xdr_val =
+      [vec: [SCVal.new(map: [public_key_map_entry, signature_map_entry])]]
+      |> SCVal.new()
+      |> SCVal.to_xdr()
+      |> (&SCVec.new([&1])).()
+
+    %{
+      contract_auth
+      | signature_args: signature_xdr_val
+    }
+    |> StellarBase.XDR.ContractAuth.encode_xdr!()
+    |> Base.encode64()
+  end
+
   @spec network_id_xdr :: binary()
   defp network_id_xdr, do: hash(Network.passphrase())
 
