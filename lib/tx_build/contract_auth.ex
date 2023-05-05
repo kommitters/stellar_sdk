@@ -176,8 +176,10 @@ defmodule Stellar.TxBuild.ContractAuth do
         SCVal.new(bytes: signature)
       )
 
+    signature_args = [SCVal.new(map: [public_key_map_entry, signature_map_entry])]
+
     signature_xdr_val =
-      [vec: [SCVal.new(map: [public_key_map_entry, signature_map_entry])]]
+      [vec: signature_args]
       |> SCVal.new()
       |> SCVal.to_xdr()
       |> (&SCVec.new([&1])).()
