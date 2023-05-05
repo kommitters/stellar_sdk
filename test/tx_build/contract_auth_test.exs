@@ -61,11 +61,22 @@ defmodule Stellar.TxBuild.ContractAuthTest do
     # SCVAL
     signature_args = [TxSCVal.new(i32: 456)]
 
+    secret_key = "SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK"
+
+    base_64_without_sign =
+      "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAAAAAABL5BOLMcxdDZ2RtTGT10MW0lRAZ5TsD4HT7UD03BuGpuAAAABHN3YXAAAAACAAAACgAAAAAAAABkAAAAAAAAAAAAAAAKAAAAAAAAE4gAAAAAAAAAAAAAAAAAAAAA"
+
+    base_64_string =
+      "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAAAAAABL5BOLMcxdDZ2RtTGT10MW0lRAZ5TsD4HT7UD03BuGpuAAAABHN3YXAAAAACAAAACgAAAAAAAABkAAAAAAAAAAAAAAAKAAAAAAAAE4gAAAAAAAAAAAAAAAAAAAABAAAAEAAAAAEAAAABAAAAEQAAAAEAAAACAAAADwAAAApwdWJsaWNfa2V5AAAAAAANAAAAIMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAADwAAAAlzaWduYXR1cmUAAAAAAAANAAAAQJUdF06WSRhT4dI1W4OhVEyjN3lOCTIFcLDmF+F1d4tc+g1e9sRmjDuz14tj+wXE3VeJxgn+94B92A6fZmeZEgI="
+
     %{
       address_with_nonce: address_with_nonce,
       authorized_invocation: authorized_invocation_2,
       signature_args: signature_args,
-      optional_address_with_nonce: optional_address_with_nonce
+      optional_address_with_nonce: optional_address_with_nonce,
+      secret_key: secret_key,
+      base_64_string: base_64_string,
+      base_64_without_sign: base_64_without_sign
     }
   end
 
@@ -284,5 +295,13 @@ defmodule Stellar.TxBuild.ContractAuthTest do
 
   test "to_xdr/1 when the struct is invalid" do
     {:error, :invalid_struct_contract_auth} = TxContractAuth.to_xdr("invalid_struct")
+  end
+
+  test "sign_xdr/2", %{
+    base_64_without_sign: base_64_without_sign,
+    base_64_string: base_64_string,
+    secret_key: secret_key
+  } do
+    ^base_64_string = TxContractAuth.sign_xdr(base_64_without_sign, secret_key)
   end
 end

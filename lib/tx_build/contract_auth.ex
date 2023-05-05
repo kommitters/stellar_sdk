@@ -17,8 +17,10 @@ defmodule Stellar.TxBuild.ContractAuth do
   }
 
   alias Stellar.{KeyPair, Network}
-  alias StellarBase.XDR.{ContractAuth, SCVec}
+  alias StellarBase.XDR.{ContractAuth, EnvelopeType, SCVec}
   alias StellarBase.XDR.HashIDPreimage, as: HashIDPreimageXDR
+  alias StellarBase.XDR.Hash, as: HashXDR
+  alias StellarBase.XDR.HashIDPreimageContractAuth, as: HashIDPreimageContractAuthXDR
 
   alias Stellar.TxBuild.{
     AddressWithNonce,
@@ -132,34 +134,33 @@ defmodule Stellar.TxBuild.ContractAuth do
 
   def sign(_args, _val), do: {:error, :invalid_secret_key}
 
+  @spec sign_xdr(base_64 :: binary(), secret_key :: binary()) :: binary()
   def sign_xdr(base_64, secret_key) do
     {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
     raw_public_key = KeyPair.raw_public_key(public_key)
     network_id = network_id_xdr()
 
-    {:ok,
-     {%StellarBase.XDR.ContractAuth{
-        address_with_nonce: %{
-          address_with_nonce: %{
-            nonce: nonce
-          }
-        },
-        authorized_invocation: authorized_invocation
-      },
-      ""}} =
-      {:ok, {contract_auth, ""}} =
+    {%ContractAuth{
+       address_with_nonce: %{
+         address_with_nonce: %{
+           nonce: nonce
+         }
+       },
+       authorized_invocation: authorized_invocation
+     } = contract_auth,
+     ""} =
       base_64
       |> Base.decode64!()
-      |> StellarBase.XDR.ContractAuth.decode_xdr()
+      |> ContractAuth.decode_xdr!()
 
-    envelope_type = StellarBase.XDR.EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_AUTH)
+    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_AUTH)
 
     signature =
       network_id
-      |> StellarBase.XDR.Hash.new()
-      |> StellarBase.XDR.HashIDPreimageContractAuth.new(nonce, authorized_invocation)
-      |> StellarBase.XDR.HashIDPreimage.new(envelope_type)
-      |> StellarBase.XDR.HashIDPreimage.encode_xdr!()
+      |> HashXDR.new()
+      |> HashIDPreimageContractAuthXDR.new(nonce, authorized_invocation)
+      |> HashIDPreimageXDR.new(envelope_type)
+      |> HashIDPreimageXDR.encode_xdr!()
       |> hash()
       |> KeyPair.sign(secret_key)
 
@@ -185,7 +186,7 @@ defmodule Stellar.TxBuild.ContractAuth do
       contract_auth
       | signature_args: signature_xdr_val
     }
-    |> StellarBase.XDR.ContractAuth.encode_xdr!()
+    |> ContractAuth.encode_xdr!()
     |> Base.encode64()
   end
 
