@@ -15,7 +15,8 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     only: [
       invoke_host_function_op_xdr: 1,
       invoke_host_function_op_xdr: 2,
-      invoke_host_function_op_xdr: 3
+      invoke_host_function_op_xdr: 3,
+      invoke_host_function_auth_operation: 0
     ]
 
   describe "InvokeHostFunction" do
@@ -63,6 +64,9 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
           args: args
         )
 
+      contract_auth =
+        "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAAAAAABL5BOLMcxdDZ2RtTGT10MW0lRAZ5TsD4HT7UD03BuGpuAAAABHN3YXAAAAACAAAACgAAAAAAAABkAAAAAAAAAAAAAAAKAAAAAAAAE4gAAAAAAAAAAAAAAAAAAAABAAAAEAAAAAEAAAABAAAAEQAAAAEAAAACAAAADwAAAApwdWJsaWNfa2V5AAAAAAANAAAAIMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAADwAAAAlzaWduYXR1cmUAAAAAAAANAAAAQJUdF06WSRhT4dI1W4OhVEyjN3lOCTIFcLDmF+F1d4tc+g1e9sRmjDuz14tj+wXE3VeJxgn+94B92A6fZmeZEgI="
+
       %{
         function: function,
         footprint: footprint,
@@ -70,7 +74,9 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         xdr: invoke_host_function_op_xdr(function, footprint),
         xdr_with_auth:
           invoke_host_function_op_xdr(function, footprint, [contract_authentication]),
-        xdr_without_auth_and_footprint: invoke_host_function_op_xdr(function)
+        xdr_without_auth_and_footprint: invoke_host_function_op_xdr(function),
+        invoke_host_function_auth_operation: invoke_host_function_auth_operation(),
+        contract_auth: contract_auth
       }
     end
 
@@ -132,7 +138,7 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     end
 
     test "new/2 with_invalid_footprint", %{function: function} do
-      {:error, :invalid_footprint} = InvokeHostFunction.new(function: function, footprint: 11)
+      {:error, :invalid_xdr} = InvokeHostFunction.new(function: function, footprint: 11)
     end
 
     test "new/2 with invalid operation attribute" do
@@ -151,10 +157,27 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     end
 
     test "set_footprint with invalid footprint", %{function: function} do
-      {:error, :invalid_footprint} =
+      {:error, :invalid_xdr} =
         [function: function]
         |> InvokeHostFunction.new()
-        |> InvokeHostFunction.set_footprint("invalid_footprint")
+        |> InvokeHostFunction.set_footprint("invalid_xdr")
+    end
+
+    test "set_contract_auth", %{function: function, contract_auth: contract_auth} do
+      %InvokeHostFunction{
+        function: ^function,
+        auth: ^contract_auth
+      } =
+        [function: function]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.set_contract_auth(contract_auth)
+    end
+
+    test "set_contract_auth with invalid contract_auth", %{function: function} do
+      {:error, :invalid_xdr} =
+        [function: function]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.set_contract_auth("invalid_xdr")
     end
 
     test "to_xdr/1", %{function: function, footprint: footprint, xdr: xdr} do
@@ -183,6 +206,19 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
       ^xdr =
         [function: function]
         |> InvokeHostFunction.new()
+        |> InvokeHostFunction.to_xdr()
+    end
+
+    test "to_xdr/1 with footprint and xdr authorization", %{
+      function: function,
+      invoke_host_function_auth_operation: xdr,
+      contract_auth: contract_auth,
+      footprint: footprint
+    } do
+      ^xdr =
+        [function: function, footprint: footprint]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.set_contract_auth(contract_auth)
         |> InvokeHostFunction.to_xdr()
     end
   end
