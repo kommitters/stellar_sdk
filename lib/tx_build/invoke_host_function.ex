@@ -11,6 +11,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   alias Stellar.TxBuild.{ContractAuth, HostFunction, OptionalAccount}
 
   alias StellarBase.XDR.Operations.InvokeHostFunction
+  alias StellarBase.XDR.ContractAuth, as: ContractAuthXDR
 
   alias StellarBase.XDR.{
     OperationBody,
@@ -27,7 +28,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   @type t :: %__MODULE__{
           function: HostFunction.t(),
           footprint: String.t(),
-          auth: list(ContractAuth.t()),
+          auth: list(ContractAuth.t()) | String.t(),
           source_account: OptionalAccount.t()
         }
 
@@ -43,7 +44,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
     source_account = Keyword.get(args, :source_account)
 
     with {:ok, function} <- validate_function(function),
-         {:ok, footprint} <- validate_footprint({:footprint, footprint}),
+         {:ok, footprint} <- validate_xdr_string({:xdr, footprint}),
          {:ok, source_account} <- validate_optional_account({:source_account, source_account}),
          {:ok, auth} <- validate_auth(auth) do
       %__MODULE__{
@@ -114,6 +115,32 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
         function: function,
         footprint: footprint,
         auth: auth
+      })
+      when is_binary(auth) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+    host_function = HostFunction.to_xdr(function)
+
+    {ledger_footprint, _} =
+      footprint
+      |> Base.decode64!()
+      |> LedgerFootprint.decode_xdr!()
+
+    {contract_auth, ""} =
+      auth
+      |> Base.decode64!()
+      |> ContractAuthXDR.decode_xdr!()
+
+    contract_auth_list = ContractAuthList.new([contract_auth])
+
+    host_function
+    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    |> OperationBody.new(op_type)
+  end
+
+  def to_xdr(%__MODULE__{
+        function: function,
+        footprint: footprint,
+        auth: auth
       }) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
     host_function = HostFunction.to_xdr(function)
@@ -132,8 +159,15 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
 
   @spec set_footprint(module :: t(), footprint :: String.t()) :: t()
   def set_footprint(%__MODULE__{} = module, footprint) do
-    with {:ok, footprint} <- validate_footprint({:footprint, footprint}) do
+    with {:ok, footprint} <- validate_xdr_string({:xdr, footprint}) do
       %{module | footprint: footprint}
+    end
+  end
+
+  @spec set_contract_auth(module :: t(), auth :: String.t()) :: t()
+  def set_contract_auth(%__MODULE__{} = module, auth) when is_binary(auth) do
+    with {:ok, auth} <- validate_xdr_string({:xdr, auth}) do
+      %{module | auth: auth}
     end
   end
 
@@ -141,17 +175,17 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   defp validate_function(%HostFunction{} = function), do: {:ok, function}
   defp validate_function(_), do: {:error, :invalid_function}
 
-  @spec validate_footprint(tuple :: tuple()) :: validation()
-  defp validate_footprint({:footprint, nil}), do: {:ok, nil}
+  @spec validate_xdr_string(tuple :: tuple()) :: validation()
+  defp validate_xdr_string({:xdr, nil}), do: {:ok, nil}
 
-  defp validate_footprint({:footprint, footprint}) when is_binary(footprint) do
-    case Base.decode64(footprint) do
-      {:ok, _} -> {:ok, footprint}
-      :error -> {:error, :invalid_footprint}
+  defp validate_xdr_string({:xdr, xdr}) when is_binary(xdr) do
+    case Base.decode64(xdr) do
+      {:ok, _} -> {:ok, xdr}
+      :error -> {:error, :invalid_xdr}
     end
   end
 
-  defp validate_footprint({:footprint, _}), do: {:error, :invalid_footprint}
+  defp validate_xdr_string({:xdr, _}), do: {:error, :invalid_xdr}
 
   @spec validate_auth(function :: list(ContractAuth.t())) :: validation()
   defp validate_auth([%ContractAuth{} | _] = auth), do: {:ok, auth}
