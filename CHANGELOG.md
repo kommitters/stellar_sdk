@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0 (08.05.2023)
+
+* Add `sign_xdr` function to `ContractAuth` module to allow signing base 64 contract auth structures.
+* Update `InvokeHostFunction` module to allow adding base 64 authorizations.
+
 ## 0.13.1 (02.05.2023)
 * Update `SCAddress` module to infer address types: account or contract.
 * Update all dependencies
