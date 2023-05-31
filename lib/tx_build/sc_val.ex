@@ -12,6 +12,7 @@ defmodule Stellar.TxBuild.SCVal do
     Duration,
     Hash,
     Int128Parts,
+    Int256Parts,
     Int32,
     Int64,
     SCBytes,
@@ -27,9 +28,10 @@ defmodule Stellar.TxBuild.SCVal do
     OptionalSCMap,
     OptionalSCVec,
     TimePoint,
+    UInt128Parts,
+    UInt256Parts,
     UInt32,
     UInt64,
-    UInt256,
     Void
   }
 
@@ -165,37 +167,51 @@ defmodule Stellar.TxBuild.SCVal do
 
   def to_xdr(%__MODULE__{type: :u128, value: %{lo: lo, hi: hi}}) do
     type = SCValType.new(:SCV_U128)
-    lo = UInt64.new(lo)
     hi = UInt64.new(hi)
+    lo = UInt64.new(lo)
 
-    lo
-    |> Int128Parts.new(hi)
+    hi
+    |> UInt128Parts.new(lo)
     |> SCVal.new(type)
   end
 
   def to_xdr(%__MODULE__{type: :i128, value: %{lo: lo, hi: hi}}) do
     type = SCValType.new(:SCV_I128)
+    hi = Int64.new(hi)
     lo = UInt64.new(lo)
-    hi = UInt64.new(hi)
 
-    lo
-    |> Int128Parts.new(hi)
+    hi
+    |> Int128Parts.new(lo)
     |> SCVal.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :u256, value: value}) do
+  def to_xdr(%__MODULE__{
+        type: :u256,
+        value: %{hi_hi: hi_hi, hi_lo: hi_lo, lo_hi: lo_hi, lo_lo: lo_lo}
+      }) do
     type = SCValType.new(:SCV_U256)
+    hi_hi = UInt64.new(hi_hi)
+    hi_lo = UInt64.new(hi_lo)
+    lo_hi = UInt64.new(lo_hi)
+    lo_lo = UInt64.new(lo_lo)
 
-    value
-    |> UInt256.new()
+    hi_hi
+    |> UInt256Parts.new(hi_lo, lo_hi, lo_lo)
     |> SCVal.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :i256, value: value}) do
+  def to_xdr(%__MODULE__{
+        type: :i256,
+        value: %{hi_hi: hi_hi, hi_lo: hi_lo, lo_hi: lo_hi, lo_lo: lo_lo}
+      }) do
     type = SCValType.new(:SCV_I256)
+    hi_hi = Int64.new(hi_hi)
+    hi_lo = UInt64.new(hi_lo)
+    lo_hi = UInt64.new(lo_hi)
+    lo_lo = UInt64.new(lo_lo)
 
-    value
-    |> UInt256.new()
+    hi_hi
+    |> Int256Parts.new(hi_lo, lo_hi, lo_lo)
     |> SCVal.new(type)
   end
 

@@ -45,6 +45,9 @@ defmodule Stellar.TxBuild do
   def add_operations(tx, operations), do: impl().add_operations(tx, operations)
 
   @impl true
+  def set_soroban_data(tx, soroban_data), do: impl().set_soroban_data(tx, soroban_data)
+
+  @impl true
   def sign(tx, signatures), do: impl().sign(tx, signatures)
 
   @impl true

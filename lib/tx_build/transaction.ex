@@ -12,7 +12,7 @@ defmodule Stellar.TxBuild.Transaction do
     Preconditions
   }
 
-  alias StellarBase.XDR.{Ext, Transaction}
+  alias StellarBase.XDR.{TransactionExt, Transaction, Void}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -24,10 +24,19 @@ defmodule Stellar.TxBuild.Transaction do
           base_fee: BaseFee.t(),
           memo: Memo.t(),
           preconditions: Preconditions.t(),
-          operations: Operations.t()
+          operations: Operations.t(),
+          ext: TransactionExt.t()
         }
 
-  defstruct [:source_account, :sequence_number, :base_fee, :memo, :preconditions, :operations]
+  defstruct [
+    :source_account,
+    :sequence_number,
+    :base_fee,
+    :memo,
+    :preconditions,
+    :operations,
+    :ext
+  ]
 
   @impl true
   def new(args, opts \\ [])
@@ -39,6 +48,7 @@ defmodule Stellar.TxBuild.Transaction do
     preconditions = Keyword.get(args, :preconditions)
     memo = Keyword.get(args, :memo)
     operations = Keyword.get(args, :operations)
+    ext = Keyword.get(args, :ext, TransactionExt.new(Void.new(), 0))
 
     with {:ok, source_account} <- validate_source_account(source_account),
          {:ok, sequence_number} <- validate_sequence_number(sequence_number),
@@ -52,7 +62,8 @@ defmodule Stellar.TxBuild.Transaction do
         base_fee: base_fee,
         preconditions: preconditions,
         memo: memo,
-        operations: operations
+        operations: operations,
+        ext: ext
       }
     end
   end
@@ -64,7 +75,8 @@ defmodule Stellar.TxBuild.Transaction do
         base_fee: base_fee,
         preconditions: preconditions,
         memo: memo,
-        operations: operations
+        operations: operations,
+        ext: ext
       }) do
     Transaction.new(
       Account.to_xdr(source_account),
@@ -73,7 +85,7 @@ defmodule Stellar.TxBuild.Transaction do
       Preconditions.to_xdr(preconditions),
       Memo.to_xdr(memo),
       Operations.to_xdr(operations),
-      Ext.new()
+      ext
     )
   end
 
