@@ -65,7 +65,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   defp validate_host_function_list(functions) do
     if Enum.all?(functions, &is_host_function?/1),
       do: {:ok, functions},
-      else: {:error, :invalid_auth_list}
+      else: {:error, :invalid_host_function_list}
   end
 
   @spec is_host_function?(function :: HostFunction.t()) :: boolean()

@@ -164,7 +164,7 @@ defmodule Stellar.TxBuild.Default do
   def add_operation(error, _operation), do: error
 
   @impl true
-  def set_soroban_data({:ok, %TxBuild{} = tx_build}, soroban_data)
+  def set_soroban_data({:ok, %TxBuild{}} = tx_build, soroban_data)
       when is_binary(soroban_data) do
     case check_soroban_data(soroban_data) do
       {:ok, soroban_tx_data} ->
@@ -176,7 +176,7 @@ defmodule Stellar.TxBuild.Default do
   end
 
   def set_soroban_data(
-        %TxBuild{tx: tx} = tx_build,
+        {:ok, %TxBuild{tx: tx} = tx_build},
         %SorobanTransactionData{} = soroban_tx_data
       ) do
     ext = TransactionExt.new(soroban_tx_data, 1)
@@ -261,7 +261,8 @@ defmodule Stellar.TxBuild.Default do
            SorobanTransactionData.decode_xdr(raw_soroban_data) do
       {:ok, soroban_tx_data}
     else
-      _ -> {:error, :invalid_soroban_data}
+      _ ->
+        {:error, :invalid_soroban_data}
     end
   end
 end

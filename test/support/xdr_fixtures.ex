@@ -14,7 +14,6 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias Stellar.TxBuild.Transaction, as: Tx
   alias Stellar.TxBuild.HostFunction, as: TxHostFunction
-  alias Stellar.TxBuild.ContractAuth, as: TxContractAuth
   alias Stellar.TxBuild.Asset, as: TxAsset
   alias Stellar.TxBuild.AccountID, as: TxAccountID
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
@@ -41,12 +40,13 @@ defmodule Stellar.Test.XDRFixtures do
     FromAsset,
     Hash,
     HashIDPreimageCreateContractArgs,
+    HostFunction,
+    HostFunctionList100,
     Int32,
     Int64,
     Memo,
     MemoType,
     MuxedAccount,
-    LedgerKeyList,
     OperationType,
     OperationBody,
     Operation,
@@ -80,8 +80,6 @@ defmodule Stellar.Test.XDRFixtures do
     UInt64,
     UInt256,
     Void,
-    ContractAuthList,
-    LedgerFootprint,
     HostFunction
   }
 
@@ -720,8 +718,8 @@ defmodule Stellar.Test.XDRFixtures do
         "hello",
         [%SCVal{type: :symbol, value: "world"}]
       ) do
-    %StellarBase.XDR.HostFunction{
-      host_function: %StellarBase.XDR.SCVec{
+    %StellarBase.XDR.HostFunctionArgs{
+      value: %StellarBase.XDR.SCVec{
         sc_vals: [
           %StellarBase.XDR.SCVal{
             value: %StellarBase.XDR.SCBytes{
@@ -741,23 +739,136 @@ defmodule Stellar.Test.XDRFixtures do
           }
         ]
       },
-      type: %StellarBase.XDR.HostFunctionType{
-        identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
+      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT}
+    }
+  end
+
+  @spec host_function_with_auth_xdr(
+          type :: :invoke,
+          contract_id :: String.t(),
+          function_name :: String.t(),
+          args :: list(SCVal.t())
+        ) :: HostFunction.t()
+  def host_function_with_auth_xdr(
+        :invoke,
+        "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c",
+        "hello",
+        [%SCVal{type: :symbol, value: "world"}]
+      ) do
+    %StellarBase.XDR.HostFunction{
+      args: %StellarBase.XDR.HostFunctionArgs{
+        value: %StellarBase.XDR.SCVec{
+          sc_vals: [
+            %StellarBase.XDR.SCVal{
+              value: %StellarBase.XDR.SCBytes{
+                value:
+                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+              },
+              type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
+            },
+            %StellarBase.XDR.SCVal{
+              value: %StellarBase.XDR.SCSymbol{value: "hello"},
+              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+            },
+            %StellarBase.XDR.SCVal{
+              value: %StellarBase.XDR.SCSymbol{value: "world"},
+              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+            }
+          ]
+        },
+        type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT}
+      },
+      auth: %StellarBase.XDR.ContractAuthList{
+        auth: [
+          %StellarBase.XDR.ContractAuth{
+            address_with_nonce: %StellarBase.XDR.OptionalAddressWithNonce{
+              address_with_nonce: %StellarBase.XDR.AddressWithNonce{
+                address: %StellarBase.XDR.SCAddress{
+                  sc_address: %StellarBase.XDR.AccountID{
+                    account_id: %StellarBase.XDR.PublicKey{
+                      public_key: %StellarBase.XDR.UInt256{
+                        datum:
+                          <<35, 91, 203, 138, 180, 145, 234, 66, 217, 94, 128, 4, 7, 74, 31, 24,
+                            11, 155, 95, 195, 137, 228, 19, 220, 153, 243, 25, 2, 64, 172, 119,
+                            151>>
+                      },
+                      type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+                    }
+                  },
+                  type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+                },
+                nonce: %StellarBase.XDR.UInt64{datum: 123}
+              }
+            },
+            authorized_invocation: %StellarBase.XDR.AuthorizedInvocation{
+              contract_id: %StellarBase.XDR.Hash{
+                value:
+                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+              },
+              function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
+              args: %StellarBase.XDR.SCVec{
+                sc_vals: [
+                  %StellarBase.XDR.SCVal{
+                    value: %StellarBase.XDR.SCSymbol{value: "world"},
+                    type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+                  }
+                ]
+              },
+              sub_invocations: %StellarBase.XDR.AuthorizedInvocationList{
+                sub_invocations: [
+                  %StellarBase.XDR.AuthorizedInvocation{
+                    contract_id: %StellarBase.XDR.Hash{
+                      value:
+                        <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236,
+                          75, 68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+                    },
+                    function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
+                    args: %StellarBase.XDR.SCVec{
+                      sc_vals: [
+                        %StellarBase.XDR.SCVal{
+                          value: %StellarBase.XDR.SCSymbol{value: "world"},
+                          type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+                        }
+                      ]
+                    },
+                    sub_invocations: %StellarBase.XDR.AuthorizedInvocationList{
+                      sub_invocations: []
+                    }
+                  }
+                ]
+              }
+            },
+            signature_args: %StellarBase.XDR.SCVec{
+              sc_vals: [
+                %StellarBase.XDR.SCVal{
+                  value: %StellarBase.XDR.OptionalSCVec{
+                    sc_vec: %StellarBase.XDR.SCVec{sc_vals: []}
+                  },
+                  type: %StellarBase.XDR.SCValType{identifier: :SCV_VEC}
+                }
+              ]
+            }
+          }
+        ]
       }
     }
   end
 
-  @spec host_function_install_xdr(
-          type :: :install,
+  @spec host_function_upload_xdr(
+          type :: :upload,
           code :: binary()
         ) :: HostFunction.t()
-  def host_function_install_xdr(:install, code) do
-    %StellarBase.XDR.HostFunction{
-      host_function: %StellarBase.XDR.InstallContractCodeArgs{
-        code: %StellarBase.XDR.VariableOpaque256000{opaque: code}
+  def host_function_upload_xdr(:upload, code) do
+    %StellarBase.XDR.HostFunctionArgs{
+      value: %StellarBase.XDR.UploadContractWasmArgs{
+        code: %StellarBase.XDR.VariableOpaque256000{
+          opaque: code
+        }
       },
       type: %StellarBase.XDR.HostFunctionType{
-        identifier: :HOST_FUNCTION_TYPE_INSTALL_CONTRACT_CODE
+        identifier: :HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM
       }
     }
   end
@@ -765,17 +876,15 @@ defmodule Stellar.Test.XDRFixtures do
   @spec host_function_create_with_wasm_xdr(type :: atom(), wasm_id :: binary(), salt :: binary()) ::
           HostFunction.t()
   def host_function_create_with_wasm_xdr(:create, wasm_id, salt) do
-    %StellarBase.XDR.HostFunction{
-      host_function: %StellarBase.XDR.CreateContractArgs{
+    %StellarBase.XDR.HostFunctionArgs{
+      value: %StellarBase.XDR.CreateContractArgs{
         contract_id: %StellarBase.XDR.ContractID{
           contract_id: %StellarBase.XDR.UInt256{
             datum: salt
           },
-          type: %StellarBase.XDR.ContractIDType{
-            identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT
-          }
+          type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT}
         },
-        source: %StellarBase.XDR.SCContractExecutable{
+        executable: %StellarBase.XDR.SCContractExecutable{
           contract_executable: %StellarBase.XDR.Hash{
             value: wasm_id
           },
@@ -784,16 +893,14 @@ defmodule Stellar.Test.XDRFixtures do
           }
         }
       },
-      type: %StellarBase.XDR.HostFunctionType{
-        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
-      }
+      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT}
     }
   end
 
   @spec host_function_create_with_asset(type :: atom()) :: HostFunction.t()
   def host_function_create_with_asset(:create) do
-    %StellarBase.XDR.HostFunction{
-      host_function: %StellarBase.XDR.CreateContractArgs{
+    %StellarBase.XDR.HostFunctionArgs{
+      value: %StellarBase.XDR.CreateContractArgs{
         contract_id: %StellarBase.XDR.ContractID{
           contract_id: %StellarBase.XDR.Asset{
             asset: %StellarBase.XDR.Void{value: nil},
@@ -801,242 +908,26 @@ defmodule Stellar.Test.XDRFixtures do
           },
           type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_ASSET}
         },
-        source: %StellarBase.XDR.SCContractExecutable{
+        executable: %StellarBase.XDR.SCContractExecutable{
           contract_executable: %StellarBase.XDR.Void{value: nil},
           type: %StellarBase.XDR.SCContractExecutableType{
             identifier: :SCCONTRACT_EXECUTABLE_TOKEN
           }
         }
       },
-      type: %StellarBase.XDR.HostFunctionType{
-        identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT
-      }
+      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT}
     }
   end
 
-  @spec invoke_host_function_auth_operation() :: OperationBody.t()
-  def invoke_host_function_auth_operation do
-    %StellarBase.XDR.OperationBody{
-      operation: %StellarBase.XDR.Operations.InvokeHostFunction{
-        host_function: %StellarBase.XDR.HostFunction{
-          host_function: %StellarBase.XDR.SCVec{
-            sc_vals: [
-              %StellarBase.XDR.SCVal{
-                value: %StellarBase.XDR.SCBytes{
-                  value:
-                    <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
-                      68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-                },
-                type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
-              },
-              %StellarBase.XDR.SCVal{
-                value: %StellarBase.XDR.SCSymbol{value: "hello"},
-                type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-              },
-              %StellarBase.XDR.SCVal{
-                value: %StellarBase.XDR.SCSymbol{value: "world"},
-                type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-              }
-            ]
-          },
-          type: %StellarBase.XDR.HostFunctionType{
-            identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
-          }
-        },
-        footprint: %StellarBase.XDR.LedgerFootprint{
-          read_only: %StellarBase.XDR.LedgerKeyList{
-            ledger_keys: [
-              %StellarBase.XDR.LedgerKey{
-                entry: %StellarBase.XDR.ContractData{
-                  contract_id: %StellarBase.XDR.Hash{
-                    value:
-                      <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
-                        68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-                  },
-                  key: %StellarBase.XDR.SCVal{
-                    value: %StellarBase.XDR.UInt32{datum: 3},
-                    type: %StellarBase.XDR.SCValType{identifier: :SCV_U32}
-                  }
-                },
-                type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_DATA}
-              },
-              %StellarBase.XDR.LedgerKey{
-                entry: %StellarBase.XDR.ContractCode{
-                  hash: %StellarBase.XDR.Hash{
-                    value:
-                      <<125, 247, 111, 172, 116, 80, 165, 58, 211, 175, 124, 213, 91, 23, 88, 64,
-                        110, 146, 161, 223, 254, 135, 195, 227, 132, 236, 7, 143, 10, 140, 164,
-                        75>>
-                  }
-                },
-                type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
-              }
-            ]
-          },
-          read_write: %StellarBase.XDR.LedgerKeyList{ledger_keys: []}
-        },
-        auth: %StellarBase.XDR.ContractAuthList{
-          auth: [
-            %StellarBase.XDR.ContractAuth{
-              address_with_nonce: %StellarBase.XDR.OptionalAddressWithNonce{
-                address_with_nonce: %StellarBase.XDR.AddressWithNonce{
-                  address: %StellarBase.XDR.SCAddress{
-                    sc_address: %StellarBase.XDR.AccountID{
-                      account_id: %StellarBase.XDR.PublicKey{
-                        public_key: %StellarBase.XDR.UInt256{
-                          datum:
-                            <<201, 78, 120, 229, 97, 194, 113, 72, 160, 218, 183, 191, 35, 108,
-                              76, 131, 145, 90, 168, 218, 232, 105, 53, 126, 1, 116, 27, 106, 26,
-                              188, 126, 214>>
-                        },
-                        type: %StellarBase.XDR.PublicKeyType{
-                          identifier: :PUBLIC_KEY_TYPE_ED25519
-                        }
-                      }
-                    },
-                    type: %StellarBase.XDR.SCAddressType{
-                      identifier: :SC_ADDRESS_TYPE_ACCOUNT
-                    }
-                  },
-                  nonce: %StellarBase.XDR.UInt64{datum: 4}
-                }
-              },
-              authorized_invocation: %StellarBase.XDR.AuthorizedInvocation{
-                contract_id: %StellarBase.XDR.Hash{
-                  value:
-                    <<190, 65, 56, 179, 28, 197, 208, 217, 217, 27, 83, 25, 61, 116, 49, 109, 37,
-                      68, 6, 121, 78, 192, 248, 29, 62, 212, 15, 77, 193, 184, 106, 110>>
-                },
-                function_name: %StellarBase.XDR.SCSymbol{value: "swap"},
-                args: %StellarBase.XDR.SCVec{
-                  sc_vals: [
-                    %StellarBase.XDR.SCVal{
-                      value: %StellarBase.XDR.Int128Parts{
-                        lo: %StellarBase.XDR.UInt64{datum: 100},
-                        hi: %StellarBase.XDR.UInt64{datum: 0}
-                      },
-                      type: %StellarBase.XDR.SCValType{identifier: :SCV_I128}
-                    },
-                    %StellarBase.XDR.SCVal{
-                      value: %StellarBase.XDR.Int128Parts{
-                        lo: %StellarBase.XDR.UInt64{datum: 5000},
-                        hi: %StellarBase.XDR.UInt64{datum: 0}
-                      },
-                      type: %StellarBase.XDR.SCValType{identifier: :SCV_I128}
-                    }
-                  ]
-                },
-                sub_invocations: %StellarBase.XDR.AuthorizedInvocationList{
-                  sub_invocations: []
-                }
-              },
-              signature_args: %StellarBase.XDR.SCVec{
-                sc_vals: [
-                  %StellarBase.XDR.SCVal{
-                    value: %StellarBase.XDR.OptionalSCVec{
-                      sc_vec: %StellarBase.XDR.SCVec{
-                        sc_vals: [
-                          %StellarBase.XDR.SCVal{
-                            value: %StellarBase.XDR.OptionalSCMap{
-                              sc_map: %StellarBase.XDR.SCMap{
-                                scmap_entries: [
-                                  %StellarBase.XDR.SCMapEntry{
-                                    key: %StellarBase.XDR.SCVal{
-                                      value: %StellarBase.XDR.SCSymbol{
-                                        value: "public_key"
-                                      },
-                                      type: %StellarBase.XDR.SCValType{
-                                        identifier: :SCV_SYMBOL
-                                      }
-                                    },
-                                    val: %StellarBase.XDR.SCVal{
-                                      value: %StellarBase.XDR.SCBytes{
-                                        value:
-                                          <<201, 78, 120, 229, 97, 194, 113, 72, 160, 218, 183,
-                                            191, 35, 108, 76, 131, 145, 90, 168, 218, 232, 105,
-                                            53, 126, 1, 116, 27, 106, 26, 188, 126, 214>>
-                                      },
-                                      type: %StellarBase.XDR.SCValType{
-                                        identifier: :SCV_BYTES
-                                      }
-                                    }
-                                  },
-                                  %StellarBase.XDR.SCMapEntry{
-                                    key: %StellarBase.XDR.SCVal{
-                                      value: %StellarBase.XDR.SCSymbol{
-                                        value: "signature"
-                                      },
-                                      type: %StellarBase.XDR.SCValType{
-                                        identifier: :SCV_SYMBOL
-                                      }
-                                    },
-                                    val: %StellarBase.XDR.SCVal{
-                                      value: %StellarBase.XDR.SCBytes{
-                                        value:
-                                          <<149, 29, 23, 78, 150, 73, 24, 83, 225, 210, 53, 91,
-                                            131, 161, 84, 76, 163, 55, 121, 78, 9, 50, 5, 112,
-                                            176, 230, 23, 225, 117, 119, 139, 92, 250, 13, 94,
-                                            246, 196, 102, 140, 59, 179, 215, 139, 99, 251, 5,
-                                            196, 221, 87, 137, 198, 9, 254, 247, 128, 125, 216,
-                                            14, 159, 102, 103, 153, 18, 2>>
-                                      },
-                                      type: %StellarBase.XDR.SCValType{
-                                        identifier: :SCV_BYTES
-                                      }
-                                    }
-                                  }
-                                ]
-                              }
-                            },
-                            type: %StellarBase.XDR.SCValType{identifier: :SCV_MAP}
-                          }
-                        ]
-                      }
-                    },
-                    type: %StellarBase.XDR.SCValType{identifier: :SCV_VEC}
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      type: %StellarBase.XDR.OperationType{identifier: :INVOKE_HOST_FUNCTION}
-    }
-  end
-
-  @spec invoke_host_function_op_xdr(
-          function :: HostFunction.t(),
-          footprint :: String.t(),
-          auth :: ContractAuthList.t()
-        ) :: InvokeHostFunction.t()
-
-  def invoke_host_function_op_xdr(function, footprint \\ nil, auth \\ []) do
+  @spec invoke_host_function_op_xdr(functions :: list(TxHostFunction.t())) :: OperationBody.t()
+  def invoke_host_function_op_xdr(functions) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
-    host_function = TxHostFunction.to_xdr(function)
 
-    ledger_footprint = build_ledger_footprint(footprint)
-
-    contract_auth_list = auth |> Enum.map(&TxContractAuth.to_xdr/1) |> ContractAuthList.new()
-
-    host_function
-    |> InvokeHostFunction.new(ledger_footprint, contract_auth_list)
+    functions
+    |> Enum.map(&TxHostFunction.to_xdr/1)
+    |> HostFunctionList100.new()
+    |> InvokeHostFunction.new()
     |> OperationBody.new(op_type)
-  end
-
-  @spec build_ledger_footprint(footprint :: binary() | nil) :: LedgerFootprint.t()
-  defp build_ledger_footprint(nil) do
-    ledger_key_list = LedgerKeyList.new([])
-    LedgerFootprint.new(ledger_key_list, ledger_key_list)
-  end
-
-  defp build_ledger_footprint(footprint) do
-    {ledger_footprint, _} =
-      footprint
-      |> Base.decode64!()
-      |> LedgerFootprint.decode_xdr!()
-
-    ledger_footprint
   end
 
   @spec build_asset_xdr(asset :: any()) :: list(Asset.t())

@@ -46,8 +46,8 @@ defmodule Stellar.TxBuild.SCValTest do
       %{type: :duration, value: 67_890},
       %{type: :u128, value: %{lo: -12_345, hi: 12_345}},
       %{type: :i128, value: %{lo: -67_890, hi: 67_890}},
-      %{type: :u256, value: "u256"},
-      %{type: :i256, value: "i256"},
+      %{type: :u256, value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}},
+      %{type: :i256, value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}},
       %{type: :bytes, value: "bytes"},
       %{type: :string, value: "string"},
       %{type: :symbol, value: "symbol"},
@@ -70,8 +70,8 @@ defmodule Stellar.TxBuild.SCValTest do
       %{type: :duration, value: "67890"},
       %{type: :u128, value: %{lo: "-12345", hi: "12345"}},
       %{type: :i128, value: %{lo: "-67890", hi: "67890"}},
-      %{type: :u256, value: 256},
-      %{type: :i256, value: 256},
+      %{type: :u256, value: %{hi_hi: "123", hi_lo: "123", lo_hi: "123", lo_lo: "123"}},
+      %{type: :i256, value: %{hi_hi: "123", hi_lo: "123", lo_hi: "123", lo_lo: "123"}},
       %{type: :bytes, value: :bytes},
       %{type: :string, value: :string},
       %{type: :symbol, value: :symbol},
@@ -132,33 +132,43 @@ defmodule Stellar.TxBuild.SCValTest do
       },
       %{
         val_type: :SCV_U128,
-        module: %StellarBase.XDR.Int128Parts{
-          lo: %StellarBase.XDR.UInt64{datum: 123},
-          hi: %StellarBase.XDR.UInt64{datum: 123}
+        module: %StellarBase.XDR.UInt128Parts{
+          hi: %StellarBase.XDR.UInt64{datum: 123},
+          lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :u128,
-        value: %{lo: 123, hi: 123}
+        value: %{hi: 123, lo: 123}
       },
       %{
         val_type: :SCV_I128,
         module: %StellarBase.XDR.Int128Parts{
-          lo: %StellarBase.XDR.UInt64{datum: 123},
-          hi: %StellarBase.XDR.UInt64{datum: 123}
+          hi: %StellarBase.XDR.Int64{datum: 123},
+          lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :i128,
-        value: %{lo: 123, hi: 123}
+        value: %{hi: 123, lo: 123}
       },
       %{
         val_type: :SCV_U256,
-        module: %StellarBase.XDR.UInt256{datum: "Hello"},
+        module: %StellarBase.XDR.UInt256Parts{
+          hi_hi: %StellarBase.XDR.UInt64{datum: 123},
+          hi_lo: %StellarBase.XDR.UInt64{datum: 123},
+          lo_hi: %StellarBase.XDR.UInt64{datum: 123},
+          lo_lo: %StellarBase.XDR.UInt64{datum: 123}
+        },
         type: :u256,
-        value: "Hello"
+        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}
       },
       %{
         val_type: :SCV_I256,
-        module: %StellarBase.XDR.UInt256{datum: "Hello"},
+        module: %StellarBase.XDR.Int256Parts{
+          hi_hi: %StellarBase.XDR.Int64{datum: 123},
+          hi_lo: %StellarBase.XDR.UInt64{datum: 123},
+          lo_hi: %StellarBase.XDR.UInt64{datum: 123},
+          lo_lo: %StellarBase.XDR.UInt64{datum: 123}
+        },
         type: :i256,
-        value: "Hello"
+        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}
       },
       %{
         val_type: :SCV_BYTES,

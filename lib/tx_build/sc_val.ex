@@ -335,8 +335,13 @@ defmodule Stellar.TxBuild.SCVal do
        when type in ~w(u128 i128)a and is_integer(lo) and is_integer(hi),
        do: {:ok, value}
 
+  defp validate_sc_val({type, %{hi_hi: hi_hi, hi_lo: hi_lo, lo_hi: lo_hi, lo_lo: lo_lo} = value})
+       when type in ~w(u256 i256)a and is_integer(hi_hi) and is_integer(hi_lo) and
+              is_integer(lo_hi) and is_integer(lo_lo),
+       do: {:ok, value}
+
   defp validate_sc_val({type, value})
-       when type in ~w(u256 i256 bytes string symbol)a and is_binary(value),
+       when type in ~w(bytes string symbol)a and is_binary(value),
        do: {:ok, value}
 
   defp validate_sc_val({:vec, nil}), do: {:ok, nil}
