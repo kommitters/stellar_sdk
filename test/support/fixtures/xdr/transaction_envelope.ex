@@ -9,7 +9,6 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
     DecoratedSignatures,
     DecoratedSignature,
     EnvelopeType,
-    Ext,
     Int64,
     Memo,
     MemoType,
@@ -28,6 +27,7 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
     Signature,
     TransactionEnvelope,
     TransactionV1Envelope,
+    TransactionExt,
     Transaction,
     UInt32,
     UInt256,
@@ -44,6 +44,58 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
       ) do
     %TransactionEnvelope{
       envelope: %TransactionV1Envelope{
+        tx: %Transaction{
+          source_account: %MuxedAccount{
+            type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519},
+            account: %UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            }
+          },
+          fee: %UInt32{datum: 500},
+          seq_num: %SequenceNumber{sequence_number: 123_456},
+          preconditions: %Preconditions{
+            preconditions: %Void{value: nil},
+            type: %PreconditionType{identifier: :PRECOND_NONE}
+          },
+          memo: %Memo{
+            value: %Void{value: nil},
+            type: %MemoType{identifier: :MEMO_NONE}
+          },
+          operations: %Operations{
+            operations: [
+              %Operation{
+                source_account: %OptionalMuxedAccount{
+                  source_account: nil
+                },
+                body: %OperationBody{
+                  operation: %Operations.CreateAccount{
+                    destination: %AccountID{
+                      account_id: %PublicKey{
+                        public_key: %UInt256{
+                          datum:
+                            <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97,
+                              106, 93, 18, 18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132,
+                              98, 77>>
+                        },
+                        type: %PublicKeyType{
+                          identifier: :PUBLIC_KEY_TYPE_ED25519
+                        }
+                      }
+                    },
+                    starting_balance: %Int64{datum: 15_000_000}
+                  },
+                  type: %OperationType{identifier: :CREATE_ACCOUNT}
+                }
+              }
+            ]
+          },
+          ext: %TransactionExt{
+            value: %Void{value: nil},
+            type: 0
+          }
+        },
         signatures: %DecoratedSignatures{
           signatures: [
             %DecoratedSignature{
@@ -67,20 +119,40 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
               }
             }
           ]
-        },
+        }
+      },
+      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_TX}
+    }
+  end
+
+  def transaction_envelope(_opts) do
+    %TransactionEnvelope{
+      envelope: %TransactionV1Envelope{
         tx: %Transaction{
-          ext: %Ext{
-            type: 0,
-            value: %Void{value: nil}
+          source_account: %MuxedAccount{
+            type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519},
+            account: %UInt256{
+              datum:
+                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
+                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
+            }
           },
           fee: %UInt32{datum: 500},
+          seq_num: %SequenceNumber{sequence_number: 123_456},
+          preconditions: %Preconditions{
+            preconditions: %Void{value: nil},
+            type: %PreconditionType{identifier: :PRECOND_NONE}
+          },
           memo: %Memo{
-            type: %MemoType{identifier: :MEMO_NONE},
-            value: %Void{value: nil}
+            value: nil,
+            type: %MemoType{identifier: :MEMO_NONE}
           },
           operations: %Operations{
             operations: [
               %Operation{
+                source_account: %OptionalMuxedAccount{
+                  source_account: nil
+                },
                 body: %OperationBody{
                   operation: %Operations.CreateAccount{
                     destination: %AccountID{
@@ -99,35 +171,15 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
                     starting_balance: %Int64{datum: 15_000_000}
                   },
                   type: %OperationType{identifier: :CREATE_ACCOUNT}
-                },
-                source_account: %OptionalMuxedAccount{
-                  source_account: nil
                 }
               }
             ]
           },
-          seq_num: %SequenceNumber{sequence_number: 123_456},
-          source_account: %MuxedAccount{
-            account: %UInt256{
-              datum:
-                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
-                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
-            },
-            type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519}
-          },
-          preconditions: %Preconditions{
-            type: %PreconditionType{identifier: :PRECOND_NONE},
-            preconditions: %Void{value: nil}
+          ext: %TransactionExt{
+            value: %Void{value: nil},
+            type: 0
           }
-        }
-      },
-      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_TX}
-    }
-  end
-
-  def transaction_envelope(_opts) do
-    %TransactionEnvelope{
-      envelope: %TransactionV1Envelope{
+        },
         signatures: %DecoratedSignatures{
           signatures: [
             %DecoratedSignature{
@@ -141,58 +193,6 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
               }
             }
           ]
-        },
-        tx: %Transaction{
-          ext: %Ext{
-            type: 0,
-            value: %Void{value: nil}
-          },
-          fee: %UInt32{datum: 500},
-          memo: %Memo{
-            type: %MemoType{identifier: :MEMO_NONE},
-            value: nil
-          },
-          operations: %Operations{
-            operations: [
-              %Operation{
-                body: %OperationBody{
-                  operation: %Operations.CreateAccount{
-                    destination: %AccountID{
-                      account_id: %PublicKey{
-                        public_key: %UInt256{
-                          datum:
-                            <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97,
-                              106, 93, 18, 18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132,
-                              98, 77>>
-                        },
-                        type: %PublicKeyType{
-                          identifier: :PUBLIC_KEY_TYPE_ED25519
-                        }
-                      }
-                    },
-                    starting_balance: %Int64{datum: 15_000_000}
-                  },
-                  type: %OperationType{identifier: :CREATE_ACCOUNT}
-                },
-                source_account: %OptionalMuxedAccount{
-                  source_account: nil
-                }
-              }
-            ]
-          },
-          seq_num: %SequenceNumber{sequence_number: 123_456},
-          source_account: %MuxedAccount{
-            account: %UInt256{
-              datum:
-                <<255, 175, 19, 218, 55, 141, 192, 52, 246, 58, 33, 51, 245, 109, 97, 106, 93, 18,
-                  18, 37, 209, 48, 248, 121, 16, 166, 170, 211, 196, 132, 98, 77>>
-            },
-            type: %CryptoKeyType{identifier: :KEY_TYPE_ED25519}
-          },
-          preconditions: %Preconditions{
-            type: %PreconditionType{identifier: :PRECOND_NONE},
-            preconditions: %Void{value: nil}
-          }
         }
       },
       type: %EnvelopeType{identifier: :ENVELOPE_TYPE_TX}

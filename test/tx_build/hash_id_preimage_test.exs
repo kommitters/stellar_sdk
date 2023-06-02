@@ -122,13 +122,13 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
       hash_id_preimage_create_contract_arg_wasm_ref:
         TxHashIDPreimageCreateContractArgs.new(
           network_id: network_id,
-          source: wasm_ref_sc_contract_executable,
+          executable: wasm_ref_sc_contract_executable,
           salt: salt
         ),
       hash_id_preimage_create_contract_arg_token:
         TxHashIDPreimageCreateContractArgs.new(
           network_id: network_id,
-          source: token_sc_contract_executable,
+          executable: token_sc_contract_executable,
           salt: salt
         ),
       hash_id_preimage_contract_auth:
@@ -371,7 +371,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
       hash_id: %HashIDPreimageCreateContractArgs{
         network_id: %Hash{value: "network_id"},
         salt: %UInt256{datum: 456},
-        source: %SCContractExecutable{
+        executable: %SCContractExecutable{
           contract_executable: %Void{value: nil},
           type: %SCContractExecutableType{
             identifier: :SCCONTRACT_EXECUTABLE_TOKEN

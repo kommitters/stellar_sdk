@@ -8,26 +8,31 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgsTest do
 
   setup do
     network_id = "network_id"
-    source = "sc_contract_executable"
-    source_type = :SCCONTRACT_EXECUTABLE_WASM_REF
+    executable = "sc_contract_executable"
+    executable_type = :SCCONTRACT_EXECUTABLE_WASM_REF
     salt = 123
 
-    xdr = hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt)
+    xdr = hash_id_preimage_create_contract_args_xdr(network_id, executable, executable_type, salt)
 
     %{
       network_id: network_id,
-      source: TxSCContractExecutable.new(wasm_ref: "sc_contract_executable"),
+      executable: TxSCContractExecutable.new(wasm_ref: "sc_contract_executable"),
       salt: salt,
       xdr: xdr
     }
   end
 
-  test "new/1", %{network_id: network_id, source: source, salt: salt} do
+  test "new/1", %{network_id: network_id, executable: executable, salt: salt} do
     %TxHashIDPreimageCreateContractArgs{
       network_id: ^network_id,
-      source: ^source,
+      executable: ^executable,
       salt: ^salt
-    } = TxHashIDPreimageCreateContractArgs.new(network_id: network_id, source: source, salt: salt)
+    } =
+      TxHashIDPreimageCreateContractArgs.new(
+        network_id: network_id,
+        executable: executable,
+        salt: salt
+      )
   end
 
   test "new/1 with invalid args" do
@@ -35,18 +40,18 @@ defmodule Stellar.TxBuild.HashIDPreimageCreateContractArgsTest do
       TxHashIDPreimageCreateContractArgs.new("invalid_args")
   end
 
-  test "new/1 with invalid source", %{network_id: network_id, salt: salt} do
-    {:error, :invalid_source} =
+  test "new/1 with invalid executable", %{network_id: network_id, salt: salt} do
+    {:error, :invalid_executable} =
       TxHashIDPreimageCreateContractArgs.new(
         network_id: network_id,
-        source: "invalid_value",
+        executable: "invalid_value",
         salt: salt
       )
   end
 
-  test "to_xdr/1", %{network_id: network_id, source: source, salt: salt, xdr: xdr} do
+  test "to_xdr/1", %{network_id: network_id, executable: executable, salt: salt, xdr: xdr} do
     ^xdr =
-      [network_id: network_id, source: source, salt: salt]
+      [network_id: network_id, executable: executable, salt: salt]
       |> TxHashIDPreimageCreateContractArgs.new()
       |> TxHashIDPreimageCreateContractArgs.to_xdr()
   end

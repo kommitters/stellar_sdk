@@ -52,6 +52,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
+  def set_soroban_data(_tx, _soroban_data) do
+    send(self(), {:set_soroban_data, "SOROBAN_DATA_SET"})
+    :ok
+  end
+
+  @impl true
   def sign(_tx, _signatures) do
     send(self(), {:sign, "TX_SIGNED"})
     :ok
@@ -134,6 +140,11 @@ defmodule Stellar.TxBuildTest do
   test "add_operations/2" do
     Stellar.TxBuild.add_operations(%TxBuild{}, [:op1, :op2])
     assert_receive({:add_operations, "OPS_ADDED"})
+  end
+
+  test "set_soroban_data/2" do
+    Stellar.TxBuild.set_soroban_data(%TxBuild{}, :set_soroban_data)
+    assert_receive({:set_soroban_data, "SOROBAN_DATA_SET"})
   end
 
   test "sign/2" do
