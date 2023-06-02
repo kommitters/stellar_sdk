@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
   Performs the following operations:
   - Invokes contract functions.
   - Upload WASM of the new contracts.
-  - Deploys new contracts using the installed WASM or built-in implementations.
+  - Deploys new contracts using the uploaded WASM or built-in implementations.
   """
 
   import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]

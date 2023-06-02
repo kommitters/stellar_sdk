@@ -41,7 +41,7 @@ defmodule Stellar.TxBuild.HostFunctionArgsArgsTest do
         function_name: function_name,
         args: args,
         xdr: host_function_xdr(type, contract_id, function_name, args),
-        install_xdr: host_function_upload_xdr(upload_type, code),
+        upload_xdr: host_function_upload_xdr(upload_type, code),
         create_wasm_xdr: host_function_create_with_wasm_xdr(create_type, wasm_id, salt),
         create_asset_xdr: host_function_create_with_asset(create_type),
         code: code,
@@ -127,7 +127,7 @@ defmodule Stellar.TxBuild.HostFunctionArgsArgsTest do
         )
     end
 
-    test "new/2 when type is :install", %{upload_type: type, code: code} do
+    test "new/2 when type is :upload", %{upload_type: type, code: code} do
       %HostFunctionArgs{type: ^type, code: ^code} =
         HostFunctionArgs.new(
           type: type,
@@ -135,7 +135,7 @@ defmodule Stellar.TxBuild.HostFunctionArgsArgsTest do
         )
     end
 
-    test "new/2 when type is :install with invalid code", %{upload_type: type} do
+    test "new/2 when type is :upload with invalid code", %{upload_type: type} do
       {:error, :invalid_operation_attributes} =
         HostFunctionArgs.new(
           type: type,
@@ -213,12 +213,12 @@ defmodule Stellar.TxBuild.HostFunctionArgsArgsTest do
         |> HostFunctionArgs.to_xdr()
     end
 
-    test "to_xdr/1 install", %{
+    test "to_xdr/1 upload", %{
       upload_type: upload_type,
       code: code,
-      install_xdr: install_xdr
+      upload_xdr: upload_xdr
     } do
-      ^install_xdr =
+      ^upload_xdr =
         [type: upload_type, code: code]
         |> HostFunctionArgs.new()
         |> HostFunctionArgs.to_xdr()

@@ -9,7 +9,6 @@ defmodule Stellar.TxBuild.HostFunction do
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :invoke | :install | :create
   @type args :: HostFunctionArgs.t()
   @type contract_auth :: ContractAuth.t()
   @type contract_auth_xdr :: ContractAuthXDR.t()
