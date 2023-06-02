@@ -3,7 +3,7 @@
 > Please note that Soroban is still under development, so breaking changes may occur.
 
 > **Note**
-> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to archive the contract upload.
+> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to achieve the contract upload.
 
 ```elixir
 alias Stellar.TxBuild.{

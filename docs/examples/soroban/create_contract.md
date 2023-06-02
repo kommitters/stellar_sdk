@@ -3,7 +3,7 @@
 > Please note that Soroban is still under development, so breaking changes may occur.
 
 > **Note**
-> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to archive the contract creation, additionally we need the transaction result of an already uploaded contract or its id.
+> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to achieve the contract creation, additionally we need the binary id of an already uploaded contract WASM.
 
 ```elixir
 alias Stellar.TxBuild.{
@@ -18,29 +18,12 @@ alias Stellar.TxBuild.{
 
 alias Stellar.Horizon.Accounts
 
-{:ok,
- {%StellarBase.XDR.TransactionResult{
-    result: %{
-      value: %{
-        operations: [
-          %{
-            result: %{
-              result: %{value: %{items: [%{value: %StellarBase.XDR.SCBytes{value: id}}]}}
-            }
-          }
-        ]
-      }
-    }
-  },
-  ""}} =
-  "AAAAAAAAHrsAAAAAAAAAAQAAAAAAAAAYAAAAAAAAAAEAAAANAAAAILu7RbvWMafUdFVTfVEeTEAuJ/jKd9EbqKJGHhVwvnAaAAAAAA=="
-  |> Base.decode64!()
-  |> StellarBase.XDR.TransactionResult.decode_xdr()
+wasm_id = <<some binary here>>
 
 function_args =
   HostFunctionArgs.new(
     type: :create,
-    wasm_id: id
+    wasm_id: wasm_id
   )
 
 function = HostFunction.new(args: function_args)

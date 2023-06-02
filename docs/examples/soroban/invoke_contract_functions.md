@@ -3,7 +3,7 @@
 > Please note that Soroban is still under development, so breaking changes may occur.
 
 > **Note**
-> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to archive the contract function invocation.
+> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to achieve the contract function invocation.
 
 There are three ways to perform a contract function invocation:
 
