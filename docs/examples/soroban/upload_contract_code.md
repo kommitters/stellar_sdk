@@ -48,7 +48,6 @@ source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
 |> Stellar.TxBuild.add_operation(invoke_host_function_op)
 |> Stellar.TxBuild.envelope()
-|> IO.inspect()
 
 # Simulate Transaction
 soroban_data =

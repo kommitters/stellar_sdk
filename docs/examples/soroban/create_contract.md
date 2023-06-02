@@ -113,7 +113,6 @@ source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
 |> Stellar.TxBuild.add_operation(invoke_host_function_op)
 |> Stellar.TxBuild.envelope()
-|> IO.inspect()
 
 soroban_data =
   "AAAAAAAAAAQAAAAGy7BJuM4i1Q0rEQ2fd0X9qJqvJugM2lEpbY21qRJAzmsAAAAPAAAACE1FVEFEQVRBAAAABsuwSbjOItUNKxENn3dF/aiaryboDNpRKW2NtakSQM5rAAAAEAAAAAEAAAABAAAADwAAAAVBZG1pbgAAAAAAAAbLsEm4ziLVDSsRDZ93Rf2omq8m6AzaUSltjbWpEkDOawAAABAAAAABAAAAAQAAAA8AAAAJQXNzZXRJbmZvAAAAAAAABsuwSbjOItUNKxENn3dF/aiaryboDNpRKW2NtakSQM5rAAAAFAAD2ZUAAADgAAADFAAAA/QAAAAAAAAAxgAAAAA="
