@@ -216,6 +216,7 @@ sequence_number = SequenceNumber.new(seq_num)
 signature = Stellar.TxBuild.Signature.new(keypair2)
 
 # Use this XDR to simulate the transaction and get the soroban_data and min_resource_fee
+source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
 |> Stellar.TxBuild.add_operation(invoke_host_function_op)
 |> Stellar.TxBuild.envelope()
