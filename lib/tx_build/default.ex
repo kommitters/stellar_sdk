@@ -2,8 +2,7 @@ defmodule Stellar.TxBuild.Default do
   @moduledoc """
   Default TxBuild implementation.
   """
-  alias StellarBase.XDR.TransactionExt
-  alias StellarBase.XDR.SorobanTransactionData
+  alias StellarBase.XDR.{TransactionExt, SorobanTransactionData}
   alias Stellar.TxBuild
 
   alias Stellar.TxBuild.{
