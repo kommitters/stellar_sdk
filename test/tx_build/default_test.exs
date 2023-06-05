@@ -1,6 +1,7 @@
 defmodule Stellar.TxBuild.DefaultTest do
   use ExUnit.Case
 
+  alias StellarBase.XDR.{SorobanTransactionData, TransactionExt}
   alias Stellar.{KeyPair, TxBuild}
 
   alias Stellar.TxBuild.{
@@ -322,8 +323,42 @@ defmodule Stellar.TxBuild.DefaultTest do
     {:error, :invalid_operation} = TxBuild.add_operations(tx_build, [operation])
   end
 
+  test "add_operations/2 invalid_operation arg", %{tx_build: tx_build} do
+    {:error, :invalid_operation} = TxBuild.add_operations(tx_build, :invalid)
+  end
+
   test "add_operations/2 piping_error" do
     {:error, :invalid_memo} = TxBuild.add_operations({:error, :invalid_memo}, :operation)
+  end
+
+  test "set_soroban_data/2", %{tx_build: tx_build} do
+    soroban_data =
+      "AAAAAgAAAAZQma4vqEU8Njqacc34GYyiWNEvpEu13GiuAiVZX0YdNwAAABQAAAAHRhmB7Imi4CwJhmzp1r/d76UShPJrO5PSHOV2Z9tPbE8AAAAAABJ8KwAAE3AAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+
+    {soroban_xdr_data, ""} =
+      soroban_data |> Base.decode64!() |> SorobanTransactionData.decode_xdr!()
+
+    {:ok, %TxBuild{tx: %Transaction{ext: %TransactionExt{value: ^soroban_xdr_data}}}} =
+      TxBuild.set_soroban_data(tx_build, soroban_data)
+  end
+
+  test "set_soroban_data/2 with invalid soroban data type", %{tx_build: tx_build} do
+    {:error, :invalid_soroban_data} = TxBuild.set_soroban_data(tx_build, :invalid)
+  end
+
+  test "set_soroban_data/2 with invalid soroban data", %{tx_build: tx_build} do
+    {:error, :invalid_soroban_data} = TxBuild.set_soroban_data(tx_build, "invalid")
+  end
+
+  test "set_soroban_data/2 piping_error" do
+    soroban_data =
+      "AAAAAgAAAAZQma4vqEU8Njqacc34GYyiWNEvpEu13GiuAiVZX0YdNwAAABQAAAAHRhmB7Imi4CwJhmzp1r/d76UShPJrO5PSHOV2Z9tPbE8AAAAAABJ8KwAAE3AAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+
+    {soroban_xdr_data, ""} =
+      soroban_data |> Base.decode64!() |> SorobanTransactionData.decode_xdr!()
+
+    {:error, :invalid_operation} =
+      TxBuild.set_soroban_data({:error, :invalid_operation}, soroban_xdr_data)
   end
 
   test "sign/2", %{keypair: keypair, tx_build: tx_build} do

@@ -3,6 +3,7 @@ defmodule Stellar.TxBuild.Spec do
   Defines contracts to build a Stellar transaction.
   """
 
+  alias StellarBase.XDR.SorobanTransactionData
   alias Stellar.TxBuild
 
   alias Stellar.TxBuild.{
@@ -56,6 +57,7 @@ defmodule Stellar.TxBuild.Spec do
           | PathPaymentStrictSend.t()
           | PathPaymentStrictReceive.t()
           | SetOptions.t()
+  @type soroban_data :: String.t() | SorobanTransactionData.t()
   @type operations :: list(operation())
   @type envelope :: String.t()
   @type hash :: String.t()
@@ -71,6 +73,7 @@ defmodule Stellar.TxBuild.Spec do
   @callback set_sequence_number(tx_build(), sequence_number()) :: tx_build()
   @callback add_operation(tx_build(), operation()) :: tx_build()
   @callback add_operations(tx_build(), operations()) :: tx_build()
+  @callback set_soroban_data(tx_build(), soroban_data()) :: tx_build()
   @callback sign(tx_build(), signatures()) :: tx_build()
   @callback build(tx_build()) :: tx_build()
   @callback envelope(tx_build()) :: tx_envelope()

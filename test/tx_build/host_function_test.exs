@@ -1,249 +1,157 @@
 defmodule Stellar.TxBuild.HostFunctionTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.{Asset, HostFunction, SCVal}
+  alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
+
+  alias Stellar.TxBuild.{
+    AddressWithNonce,
+    AuthorizedInvocation,
+    ContractAuth,
+    HostFunction,
+    HostFunctionArgs,
+    SCAddress,
+    SCVal
+  }
 
   import Stellar.Test.XDRFixtures,
     only: [
       host_function_xdr: 4,
-      host_function_install_xdr: 2,
-      host_function_create_with_wasm_xdr: 3,
-      host_function_create_with_asset: 1
+      host_function_with_auth_xdr: 4
     ]
 
   describe "HostFunction invoke" do
     setup do
-      type = :invoke
-      install_type = :install
-      create_type = :create
       contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
       function_name = "hello"
       args = [SCVal.new(symbol: "world")]
+      sc_address = SCAddress.new("GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
+      address_with_nonce = AddressWithNonce.new(address: sc_address, nonce: 123)
 
-      code =
-        <<0, 97, 115, 109, 1, 0, 0, 0, 1, 19, 4, 96, 1, 126, 1, 126, 96, 2, 126, 126, 1, 126, 96,
-          1, 127, 0, 96, 0, 0, 2, 37, 6, 1, 118, 1, 95, 0, 0, 1, 118, 1, 54, 0, 1, 1, 97, 1, 48,
-          0, 0, 1, 108, 1, 48, 0, 0>>
+      authorized_invocation_1 =
+        AuthorizedInvocation.new(
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args,
+          sub_invocations: []
+        )
 
-      wasm_id =
-        <<86, 32, 6, 9, 172, 4, 212, 185, 249, 87, 184, 164, 58, 34, 167, 183, 226, 117, 205, 116,
-          11, 130, 119, 172, 224, 51, 12, 148, 90, 251, 17, 12>>
+      authorized_invocation_2 =
+        AuthorizedInvocation.new(
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args,
+          sub_invocations: [authorized_invocation_1]
+        )
 
-      salt = :crypto.strong_rand_bytes(32)
+      contract_authentication =
+        ContractAuth.new(
+          address_with_nonce: address_with_nonce,
+          authorized_invocation: authorized_invocation_2,
+          args: args
+        )
 
-      asset = Asset.new(:native)
+      contract_auth_strs = [
+        "AAAAAQAAAAAAAAAAI1vLirSR6kLZXoAEB0ofGAubX8OJ5BPcmfMZAkCsd5cAAAAAAAAAewRhFoy7rg2pbFQ7cf1XGuxLRFSdUD+a+edoXM7bwWE8AAAABWhlbGxvAAAAAAAAAQAAAA8AAAAFd29ybGQAAAAAAAABBGEWjLuuDalsVDtx/Vca7EtEVJ1QP5r552hcztvBYTwAAAAFaGVsbG8AAAAAAAABAAAADwAAAAV3b3JsZAAAAAAAAAAAAAABAAAAEAAAAAEAAAAA"
+      ]
+
+      function_args =
+        HostFunctionArgs.new(
+          type: :invoke,
+          contract_id: contract_id,
+          function_name: function_name,
+          args: args
+        )
 
       %{
-        type: type,
-        install_type: install_type,
-        create_type: create_type,
-        contract_id: contract_id,
-        function_name: function_name,
-        args: args,
-        xdr: host_function_xdr(type, contract_id, function_name, args),
-        install_xdr: host_function_install_xdr(install_type, code),
-        create_wasm_xdr: host_function_create_with_wasm_xdr(create_type, wasm_id, salt),
-        create_asset_xdr: host_function_create_with_asset(create_type),
-        code: code,
-        wasm_id: wasm_id,
-        salt: salt,
-        asset: asset
+        function_args: function_args,
+        contract_authentication: contract_authentication,
+        contract_auth_strs: contract_auth_strs,
+        host_function: HostFunction.new(args: function_args),
+        host_function_with_auth:
+          HostFunction.new(args: function_args, auth: [contract_authentication]),
+        host_function_xdr: host_function_xdr(:invoke, contract_id, function_name, args),
+        host_function_with_auth_xdr:
+          host_function_with_auth_xdr(:invoke, contract_id, function_name, args)
       }
     end
 
     test "new/2", %{
-      type: type,
-      contract_id: contract_id,
-      function_name: function_name,
-      args: args
+      function_args: function_args
     } do
       %HostFunction{
-        type: ^type,
-        contract_id: ^contract_id,
-        function_name: ^function_name,
-        args: ^args
-      } =
-        HostFunction.new(
-          type: type,
-          contract_id: contract_id,
-          function_name: function_name,
-          args: args
-        )
+        args: ^function_args
+      } = HostFunction.new(args: function_args)
     end
 
-    test "new/2 with_invalid_type", %{
-      contract_id: contract_id,
-      function_name: function_name,
-      args: args
+    test "new/2 with auth", %{
+      function_args: function_args,
+      contract_authentication: contract_authentication
     } do
-      {:error, :invalid_operation_attributes} =
-        HostFunction.new(
-          type: :invalid,
-          contract_id: contract_id,
-          function_name: function_name,
-          args: args
-        )
+      %HostFunction{
+        args: ^function_args
+      } = HostFunction.new(args: function_args, auth: [contract_authentication])
     end
 
-    test "new/2 with_invalid_contract_id", %{
-      type: type,
-      function_name: function_name,
-      args: args
+    test "new/2 invalid attributes" do
+      {:error, :invalid_operation_attributes} = HostFunction.new(:invalid)
+    end
+
+    test "new/2 invalid args" do
+      {:error, :invalid_args} = HostFunction.new(args: :invalid)
+    end
+
+    test "new/2 invalid auth", %{function_args: function_args} do
+      {:error, :invalid_auth} = HostFunction.new(args: function_args, auth: [123])
+    end
+
+    test "set_auth/2", %{
+      function_args: function_args,
+      host_function: host_function,
+      contract_auth_strs: contract_auth_strs
     } do
-      {:error, :invalid_contract_id} =
-        HostFunction.new(
-          type: type,
-          contract_id: "hello-not-hex-encoded-string",
-          function_name: function_name,
-          args: args
-        )
+      %HostFunction{
+        args: ^function_args,
+        auth: ^contract_auth_strs
+      } = HostFunction.set_auth(host_function, contract_auth_strs)
     end
 
-    test "new/2 with_invalid_function_name", %{
-      type: type,
-      contract_id: contract_id,
-      args: args
+    test "set_auth/2 nil auth str", %{
+      function_args: function_args,
+      host_function: host_function
     } do
-      {:error, :invalid_function_name} =
-        HostFunction.new(
-          type: type,
-          contract_id: contract_id,
-          function_name: 123,
-          args: args
-        )
+      %HostFunction{
+        args: ^function_args,
+        auth: [nil]
+      } = HostFunction.set_auth(host_function, [nil])
     end
 
-    test "new/2 with_invalid_args", %{
-      type: type,
-      contract_id: contract_id,
-      function_name: function_name
-    } do
-      {:error, :invalid_args} =
-        HostFunction.new(
-          type: type,
-          contract_id: contract_id,
-          function_name: function_name,
-          args: [1, 2, 3]
-        )
-    end
-
-    test "new/2 when type is :install", %{install_type: type, code: code} do
-      %HostFunction{type: ^type, code: ^code} =
-        HostFunction.new(
-          type: type,
-          code: code
-        )
-    end
-
-    test "new/2 when type is :install with invalid code", %{install_type: type} do
-      {:error, :invalid_operation_attributes} =
-        HostFunction.new(
-          type: type,
-          code: 1234
-        )
-    end
-
-    test "new/2 when type is :create with wasm_id without salt", %{
-      create_type: type,
-      wasm_id: wasm_id
-    } do
-      %HostFunction{type: ^type, wasm_id: ^wasm_id} =
-        HostFunction.new(
-          type: type,
-          wasm_id: wasm_id
-        )
-    end
-
-    test "new/2 when type is :create with invalid wasm_id", %{create_type: type} do
-      {:error, :invalid_wasm_id} =
-        HostFunction.new(
-          type: type,
-          wasm_id: 123
-        )
-    end
-
-    test "new/2 when type is :create with wasm_id and salt", %{
-      create_type: type,
-      wasm_id: wasm_id,
-      salt: salt
-    } do
-      %HostFunction{type: ^type, wasm_id: ^wasm_id, salt: ^salt} =
-        HostFunction.new(
-          type: type,
-          wasm_id: wasm_id,
-          salt: salt
-        )
-    end
-
-    test "new/2 when type is :create with invalid salt", %{create_type: type, wasm_id: wasm_id} do
-      {:error, :invalid_salt} =
-        HostFunction.new(
-          type: type,
-          wasm_id: wasm_id,
-          salt: 123
-        )
-    end
-
-    test "new/2 when type is :create with asset", %{create_type: type, asset: asset} do
-      %HostFunction{type: ^type, asset: ^asset} =
-        HostFunction.new(
-          type: type,
-          asset: asset
-        )
-    end
-
-    test "new/2 when type is :create with invalid asset", %{create_type: type} do
-      {:error, :invalid_asset} =
-        HostFunction.new(
-          type: type,
-          asset: 123
-        )
+    test "set_auth/2 invalid xdr string", %{host_function: host_function} do
+      {:error, :invalid_auth} = HostFunction.set_auth(host_function, ["invalid"])
     end
 
     test "to_xdr/1", %{
-      type: type,
-      contract_id: contract_id,
-      function_name: function_name,
-      args: args,
-      xdr: xdr
+      host_function_xdr: host_function_xdr,
+      host_function: host_function
     } do
-      ^xdr =
-        [type: type, contract_id: contract_id, function_name: function_name, args: args]
-        |> HostFunction.new()
-        |> HostFunction.to_xdr()
+      %HostFunctionXDR{args: ^host_function_xdr} = HostFunction.to_xdr(host_function)
     end
 
-    test "to_xdr/1 install", %{
-      install_type: install_type,
-      code: code,
-      install_xdr: install_xdr
+    test "to_xdr/1 with auth", %{
+      host_function_with_auth_xdr: host_function_with_auth_xdr,
+      host_function_with_auth: host_function_with_auth
     } do
-      ^install_xdr =
-        [type: install_type, code: code]
-        |> HostFunction.new()
-        |> HostFunction.to_xdr()
+      # %HostFunctionXDR{args: ^host_function_xdr}
+      ^host_function_with_auth_xdr = HostFunction.to_xdr(host_function_with_auth)
     end
 
-    test "to_xdr/1 when type is :create with wasm_id", %{
-      create_type: type,
-      wasm_id: wasm_id,
-      salt: salt,
-      create_wasm_xdr: xdr
+    test "to_xdr/1 with auth strs", %{
+      host_function_with_auth_xdr: host_function_with_auth_xdr,
+      host_function: host_function,
+      contract_auth_strs: contract_auth_strs
     } do
-      ^xdr =
-        [type: type, wasm_id: wasm_id, salt: salt]
-        |> HostFunction.new()
-        |> HostFunction.to_xdr()
-    end
-
-    test "to_xdr/1 when type is :create with asset", %{
-      create_type: type,
-      asset: asset,
-      create_asset_xdr: xdr
-    } do
-      ^xdr =
-        [type: type, asset: asset]
-        |> HostFunction.new()
+      ^host_function_with_auth_xdr =
+        host_function
+        |> HostFunction.set_auth(contract_auth_strs)
         |> HostFunction.to_xdr()
     end
   end

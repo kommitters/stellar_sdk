@@ -5,7 +5,7 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
 
   alias StellarBase.XDR.{
     Transaction,
-    Ext,
+    TransactionExt,
     UInt32,
     Memo,
     MemoType,
@@ -28,7 +28,7 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
   @spec transaction(account_id :: account_id()) :: xdr()
   def transaction("GBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMQQH") do
     %Transaction{
-      ext: %Ext{type: 0, value: %Void{value: nil}},
+      ext: %TransactionExt{type: 0, value: %Void{value: nil}},
       fee: %UInt32{datum: 100},
       memo: %Memo{
         type: %MemoType{identifier: :MEMO_NONE},
@@ -58,7 +58,7 @@ defmodule Stellar.Test.Fixtures.XDR.Transactions do
         "MBXV5U2D67J7HUW42JKBGD4WNZON4SOPXXDFTYQ7BCOG5VCARGCRMAAAAAAAAAAAARKPQ"
       ) do
     %Transaction{
-      ext: %Ext{type: 0, value: %Void{value: nil}},
+      ext: %TransactionExt{type: 0, value: %Void{value: nil}},
       fee: %UInt32{datum: 100},
       memo: %Memo{
         type: %MemoType{identifier: :MEMO_NONE},

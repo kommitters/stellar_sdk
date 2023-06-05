@@ -2,6 +2,7 @@ defmodule Stellar.TxBuild.Default do
   @moduledoc """
   Default TxBuild implementation.
   """
+  alias StellarBase.XDR.{TransactionExt, SorobanTransactionData}
   alias Stellar.TxBuild
 
   alias Stellar.TxBuild.{
@@ -162,6 +163,32 @@ defmodule Stellar.TxBuild.Default do
   def add_operation(error, _operation), do: error
 
   @impl true
+  def set_soroban_data({:ok, %TxBuild{}} = tx_build, soroban_data)
+      when is_binary(soroban_data) do
+    case check_soroban_data(soroban_data) do
+      {:ok, soroban_tx_data} ->
+        set_soroban_data(tx_build, soroban_tx_data)
+
+      error ->
+        error
+    end
+  end
+
+  def set_soroban_data(
+        {:ok, %TxBuild{tx: tx} = tx_build},
+        %SorobanTransactionData{} = soroban_tx_data
+      ) do
+    ext = TransactionExt.new(soroban_tx_data, 1)
+    transaction = %{tx | ext: ext}
+    {:ok, %{tx_build | tx: transaction}}
+  end
+
+  def set_soroban_data({:ok, %TxBuild{}}, _soroban_tx_data),
+    do: {:error, :invalid_soroban_data}
+
+  def set_soroban_data(error, _soroban_data), do: error
+
+  @impl true
   def sign({:ok, %TxBuild{}} = tx_build, []), do: tx_build
 
   def sign({:ok, %TxBuild{}} = tx_build, [%Signature{} = signature | signatures]) do
@@ -224,4 +251,17 @@ defmodule Stellar.TxBuild.Default do
   end
 
   def hash(error), do: error
+
+  @spec check_soroban_data(soroban_data :: binary()) ::
+          {:ok, SorobanTransactionData.t()} | {:error, atom()}
+  defp check_soroban_data(soroban_data) do
+    with {:ok, raw_soroban_data} <- Base.decode64(soroban_data),
+         {:ok, {%SorobanTransactionData{} = soroban_tx_data, ""}} <-
+           SorobanTransactionData.decode_xdr(raw_soroban_data) do
+      {:ok, soroban_tx_data}
+    else
+      _ ->
+        {:error, :invalid_soroban_data}
+    end
+  end
 end
