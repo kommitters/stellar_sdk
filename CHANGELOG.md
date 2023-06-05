@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 (05.06.2023)
+* Add Soroban Preview 9 support.
+* Add Soroban examples.
+
 ## 0.14.0 (08.05.2023)
 
 * Add `sign_xdr` function to `ContractAuth` module to allow signing base 64 contract auth structures.
