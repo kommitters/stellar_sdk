@@ -53,8 +53,12 @@ defmodule Stellar.TxBuild.SCAddressTest do
 
   test "to_xdr when type is contract", %{contract: contract} do
     %SCAddress{
-      sc_address: %Hash{value: "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN"},
-      type: %SCAddressType{identifier: :SC_ADDRESS_contract}
+      sc_address: %Hash{
+        value:
+          <<136, 199, 21, 221, 153, 62, 83, 56, 9, 112, 55, 17, 157, 226, 244, 109, 177, 22, 241,
+            170, 12, 226, 193, 229, 39, 50, 103, 40, 26, 129, 1, 237>>
+      },
+      type: %SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
     } = contract |> TxSCAddress.new() |> TxSCAddress.to_xdr()
   end
 end
