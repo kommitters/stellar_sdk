@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.1 (13.06.2023)
+
+* Fix `SCAddress` contract type.
+
 ## 0.15.0 (05.06.2023)
 * Add Soroban Preview 9 support.
 * Add Soroban examples.

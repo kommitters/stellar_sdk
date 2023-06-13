@@ -49,9 +49,10 @@ defmodule Stellar.TxBuild.SCAddress do
   end
 
   def to_xdr(%__MODULE__{type: :contract, value: value}) do
-    type = SCAddressType.new(:SC_ADDRESS_contract)
+    type = SCAddressType.new(:SC_ADDRESS_TYPE_CONTRACT)
 
     value
+    |> KeyPair.raw_contract()
     |> Hash.new()
     |> SCAddress.new(type)
   end
