@@ -2,14 +2,17 @@ defmodule Stellar.Test.XDRFixtures do
   @moduledoc """
   Stellar's XDR data for test constructions.
   """
+  alias StellarBase.XDR.SorobanAuthorizationEntryList
+  alias Stellar.TxBuild.VariableOpaque
+  alias Stellar.TxBuild.CreateContractArgs
   alias Stellar.KeyPair
 
   alias Stellar.TxBuild.{
     TransactionSignature,
     SignerKey,
+    SorobanAuthorizedInvocation,
     SourceAccountContractID,
-    SCAddress,
-    SCVal
+    SCVec
   }
 
   alias Stellar.TxBuild.Transaction, as: Tx
@@ -20,7 +23,6 @@ defmodule Stellar.Test.XDRFixtures do
 
   alias StellarBase.XDR.{
     AccountID,
-    AddressWithNonce,
     AlphaNum12,
     AlphaNum4,
     Asset,
@@ -39,9 +41,8 @@ defmodule Stellar.Test.XDRFixtures do
     Ext,
     FromAsset,
     Hash,
-    HashIDPreimageCreateContractArgs,
+    HashIDPreimageSorobanAuthorization,
     HostFunction,
-    HostFunctionList100,
     Int32,
     Int64,
     Memo,
@@ -51,7 +52,7 @@ defmodule Stellar.Test.XDRFixtures do
     OperationBody,
     Operation,
     Operations,
-    OperationID,
+    HashIDPreimageOperationID,
     OptionalAccountID,
     OptionalDataValue,
     OptionalMuxedAccount,
@@ -71,8 +72,6 @@ defmodule Stellar.Test.XDRFixtures do
     String64,
     StructContractID,
     Signer,
-    SCContractExecutable,
-    SCContractExecutableType,
     Transaction,
     TransactionV1Envelope,
     TransactionEnvelope,
@@ -133,16 +132,6 @@ defmodule Stellar.Test.XDRFixtures do
     |> AccountID.new()
   end
 
-  @spec address_with_nonce_xdr(sc_address :: SCAddress.t(), nonce :: non_neg_integer()) ::
-          AddressWithNonce.t()
-  def address_with_nonce_xdr(sc_address, nonce) do
-    nonce = UInt64.new(nonce)
-
-    sc_address
-    |> SCAddress.to_xdr()
-    |> AddressWithNonce.new(nonce)
-  end
-
   @spec ed25519_contract_id_xdr(
           network_id :: String.t(),
           ed25519 :: non_neg_integer(),
@@ -169,14 +158,35 @@ defmodule Stellar.Test.XDRFixtures do
           source_account :: TxAccountID.t(),
           sequence_number :: TxSequenceNumber.t(),
           op_num :: non_neg_integer()
-        ) :: OperationID.t()
+        ) :: HashIDPreimageOperationID.t()
   def operation_id_xdr(source_account, sequence_number, op_num) do
     sequence_number = TxSequenceNumber.to_xdr(sequence_number)
     op_num = UInt32.new(op_num)
 
     source_account
     |> TxAccountID.to_xdr()
-    |> OperationID.new(sequence_number, op_num)
+    |> HashIDPreimageOperationID.new(sequence_number, op_num)
+  end
+
+  @spec soroban_auth_xdr(
+          network_id :: String.t(),
+          nonce :: non_neg_integer(),
+          signature_expiration_ledger :: non_neg_integer(),
+          invocation :: SorobanAuthorizedInvocation.t()
+        ) :: HashIDPreimageSorobanAuthorization.t()
+  def soroban_auth_xdr(
+        network_id,
+        nonce,
+        signature_expiration_ledger,
+        invocation
+      ) do
+    nonce = Int64.new(nonce)
+    signature_expiration_ledger = UInt32.new(signature_expiration_ledger)
+    invocation = SorobanAuthorizedInvocation.to_xdr(invocation)
+
+    network_id
+    |> Hash.new()
+    |> HashIDPreimageSorobanAuthorization.new(nonce, signature_expiration_ledger, invocation)
   end
 
   @spec source_account_contract_id_xdr(
@@ -205,31 +215,6 @@ defmodule Stellar.Test.XDRFixtures do
     network_id
     |> Hash.new()
     |> StructContractID.new(contract_id, salt)
-  end
-
-  @spec hash_id_preimage_create_contract_args_xdr(
-          network_id :: binary(),
-          source :: binary(),
-          source_type :: String.t(),
-          salt :: non_neg_integer()
-        ) :: HashIDPreimageCreateContractArgs.t()
-  def hash_id_preimage_create_contract_args_xdr(network_id, source, source_type, salt) do
-    source = sc_contract_executable_xdr(source_type, source)
-    salt = UInt256.new(salt)
-
-    network_id
-    |> Hash.new()
-    |> HashIDPreimageCreateContractArgs.new(source, salt)
-  end
-
-  @spec sc_contract_executable_xdr(type :: String.t(), value :: binary()) ::
-          SCContractExecutable.t()
-  def sc_contract_executable_xdr(type, value) do
-    type = SCContractExecutableType.new(type)
-
-    value
-    |> Hash.new()
-    |> SCContractExecutable.new(type)
   end
 
   @spec signer_xdr(key :: String.t(), weight :: non_neg_integer()) :: Signer.t()
@@ -328,7 +313,6 @@ defmodule Stellar.Test.XDRFixtures do
 
     destination
     |> muxed_account_xdr()
-    |> AccountMerge.new()
     |> OperationBody.new(op_type)
   end
 
@@ -707,27 +691,28 @@ defmodule Stellar.Test.XDRFixtures do
   end
 
   @spec host_function_xdr(
-          type :: :invoke,
-          contract_id :: String.t(),
-          function_name :: String.t(),
-          args :: list(SCVal.t())
+          type :: :invoke_contract,
+          args :: SCVec.t()
         ) :: HostFunction.t()
   def host_function_xdr(
-        :invoke,
-        "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c",
-        "hello",
-        [%SCVal{type: :symbol, value: "world"}]
+        :invoke_contract,
+        %SCVec{}
       ) do
-    %StellarBase.XDR.HostFunctionArgs{
+    %StellarBase.XDR.HostFunction{
       value: %StellarBase.XDR.SCVec{
-        sc_vals: [
+        items: [
           %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.SCBytes{
-              value:
-                <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
-                  84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+            value: %StellarBase.XDR.SCAddress{
+              sc_address: %StellarBase.XDR.Hash{
+                value:
+                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
+                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
+              },
+              type: %StellarBase.XDR.SCAddressType{
+                identifier: :SC_ADDRESS_TYPE_CONTRACT
+              }
             },
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
+            type: %StellarBase.XDR.SCValType{identifier: :SCV_ADDRESS}
           },
           %StellarBase.XDR.SCVal{
             value: %StellarBase.XDR.SCSymbol{value: "hello"},
@@ -739,133 +724,74 @@ defmodule Stellar.Test.XDRFixtures do
           }
         ]
       },
-      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT}
-    }
-  end
-
-  @spec host_function_with_auth_xdr(
-          type :: :invoke,
-          contract_id :: String.t(),
-          function_name :: String.t(),
-          args :: list(SCVal.t())
-        ) :: HostFunction.t()
-  def host_function_with_auth_xdr(
-        :invoke,
-        "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c",
-        "hello",
-        [%SCVal{type: :symbol, value: "world"}]
-      ) do
-    %StellarBase.XDR.HostFunction{
-      args: %StellarBase.XDR.HostFunctionArgs{
-        value: %StellarBase.XDR.SCVec{
-          sc_vals: [
-            %StellarBase.XDR.SCVal{
-              value: %StellarBase.XDR.SCBytes{
-                value:
-                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
-                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-              },
-              type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES}
-            },
-            %StellarBase.XDR.SCVal{
-              value: %StellarBase.XDR.SCSymbol{value: "hello"},
-              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-            },
-            %StellarBase.XDR.SCVal{
-              value: %StellarBase.XDR.SCSymbol{value: "world"},
-              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-            }
-          ]
-        },
-        type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT}
-      },
-      auth: %StellarBase.XDR.ContractAuthList{
-        auth: [
-          %StellarBase.XDR.ContractAuth{
-            address_with_nonce: %StellarBase.XDR.OptionalAddressWithNonce{
-              address_with_nonce: %StellarBase.XDR.AddressWithNonce{
-                address: %StellarBase.XDR.SCAddress{
-                  sc_address: %StellarBase.XDR.AccountID{
-                    account_id: %StellarBase.XDR.PublicKey{
-                      public_key: %StellarBase.XDR.UInt256{
-                        datum:
-                          <<35, 91, 203, 138, 180, 145, 234, 66, 217, 94, 128, 4, 7, 74, 31, 24,
-                            11, 155, 95, 195, 137, 228, 19, 220, 153, 243, 25, 2, 64, 172, 119,
-                            151>>
-                      },
-                      type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
-                    }
-                  },
-                  type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
-                },
-                nonce: %StellarBase.XDR.UInt64{datum: 123}
-              }
-            },
-            authorized_invocation: %StellarBase.XDR.AuthorizedInvocation{
-              contract_id: %StellarBase.XDR.Hash{
-                value:
-                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
-                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-              },
-              function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-              args: %StellarBase.XDR.SCVec{
-                sc_vals: [
-                  %StellarBase.XDR.SCVal{
-                    value: %StellarBase.XDR.SCSymbol{value: "world"},
-                    type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-                  }
-                ]
-              },
-              sub_invocations: %StellarBase.XDR.AuthorizedInvocationList{
-                sub_invocations: [
-                  %StellarBase.XDR.AuthorizedInvocation{
-                    contract_id: %StellarBase.XDR.Hash{
-                      value:
-                        <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236,
-                          75, 68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-                    },
-                    function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-                    args: %StellarBase.XDR.SCVec{
-                      sc_vals: [
-                        %StellarBase.XDR.SCVal{
-                          value: %StellarBase.XDR.SCSymbol{value: "world"},
-                          type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-                        }
-                      ]
-                    },
-                    sub_invocations: %StellarBase.XDR.AuthorizedInvocationList{
-                      sub_invocations: []
-                    }
-                  }
-                ]
-              }
-            },
-            signature_args: %StellarBase.XDR.SCVec{
-              sc_vals: [
-                %StellarBase.XDR.SCVal{
-                  value: %StellarBase.XDR.OptionalSCVec{
-                    sc_vec: %StellarBase.XDR.SCVec{sc_vals: []}
-                  },
-                  type: %StellarBase.XDR.SCValType{identifier: :SCV_VEC}
-                }
-              ]
-            }
-          }
-        ]
+      type: %StellarBase.XDR.HostFunctionType{
+        identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
       }
     }
   end
 
-  @spec host_function_upload_xdr(
-          type :: :upload,
-          code :: binary()
+  @spec host_function_xdr(
+          type :: :create_contract,
+          args :: CreateContractArgs.t()
         ) :: HostFunction.t()
-  def host_function_upload_xdr(:upload, code) do
-    %StellarBase.XDR.HostFunctionArgs{
-      value: %StellarBase.XDR.UploadContractWasmArgs{
-        code: %StellarBase.XDR.VariableOpaque256000{
-          opaque: code
+  def host_function_xdr(
+        :create_contract,
+        %CreateContractArgs{}
+      ) do
+    %StellarBase.XDR.HostFunction{
+      value: %StellarBase.XDR.CreateContractArgs{
+        contract_id_preimage: %StellarBase.XDR.ContractIDPreimage{
+          value: %StellarBase.XDR.ContractIDPreimageFromAddress{
+            address: %StellarBase.XDR.SCAddress{
+              sc_address: %StellarBase.XDR.AccountID{
+                account_id: %StellarBase.XDR.PublicKey{
+                  public_key: %StellarBase.XDR.UInt256{
+                    datum:
+                      <<35, 91, 203, 138, 180, 145, 234, 66, 217, 94, 128, 4, 7, 74, 31, 24, 11,
+                        155, 95, 195, 137, 228, 19, 220, 153, 243, 25, 2, 64, 172, 119, 151>>
+                  },
+                  type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
+                }
+              },
+              type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+            },
+            salt: %StellarBase.XDR.UInt256{
+              datum:
+                <<142, 226, 180, 159, 151, 224, 223, 135, 33, 210, 154, 238, 13, 199, 60, 77, 67,
+                  167, 216, 125, 245, 241, 237, 114, 207, 74, 226, 98, 166, 200, 43, 89>>
+            }
+          },
+          type: %StellarBase.XDR.ContractIDPreimageType{
+            identifier: :CONTRACT_ID_PREIMAGE_FROM_ADDRESS
+          }
+        },
+        executable: %StellarBase.XDR.ContractExecutable{
+          value: %StellarBase.XDR.Hash{
+            value:
+              <<86, 32, 6, 9, 172, 4, 212, 185, 249, 87, 184, 164, 58, 34, 167, 183, 226, 117,
+                205, 116, 11, 130, 119, 172, 224, 51, 12, 148, 90, 251, 17, 12>>
+          },
+          type: %StellarBase.XDR.ContractExecutableType{identifier: :CONTRACT_EXECUTABLE_WASM}
         }
+      },
+      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT}
+    }
+  end
+
+  @spec host_function_xdr(
+          type :: :upload_contract_wasm,
+          args :: VariableOpaque.t()
+        ) :: HostFunction.t()
+  def host_function_xdr(
+        :upload_contract_wasm,
+        %VariableOpaque{}
+      ) do
+    %StellarBase.XDR.HostFunction{
+      value: %StellarBase.XDR.VariableOpaque{
+        opaque:
+          <<0, 97, 115, 109, 1, 0, 0, 0, 1, 19, 4, 96, 1, 126, 1, 126, 96, 2, 126, 126, 1, 126,
+            96, 1, 127, 0, 96, 0, 0, 2, 37, 6, 1, 118, 1, 95, 0, 0, 1, 118, 1, 54, 0, 1, 1, 97, 1,
+            48, 0, 0, 1, 108, 1, 48, 0, 0>>
       },
       type: %StellarBase.XDR.HostFunctionType{
         identifier: :HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM
@@ -873,60 +799,13 @@ defmodule Stellar.Test.XDRFixtures do
     }
   end
 
-  @spec host_function_create_with_wasm_xdr(type :: atom(), wasm_id :: binary(), salt :: binary()) ::
-          HostFunction.t()
-  def host_function_create_with_wasm_xdr(:create, wasm_id, salt) do
-    %StellarBase.XDR.HostFunctionArgs{
-      value: %StellarBase.XDR.CreateContractArgs{
-        contract_id: %StellarBase.XDR.ContractID{
-          contract_id: %StellarBase.XDR.UInt256{
-            datum: salt
-          },
-          type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_SOURCE_ACCOUNT}
-        },
-        executable: %StellarBase.XDR.SCContractExecutable{
-          contract_executable: %StellarBase.XDR.Hash{
-            value: wasm_id
-          },
-          type: %StellarBase.XDR.SCContractExecutableType{
-            identifier: :SCCONTRACT_EXECUTABLE_WASM_REF
-          }
-        }
-      },
-      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT}
-    }
-  end
-
-  @spec host_function_create_with_asset(type :: atom()) :: HostFunction.t()
-  def host_function_create_with_asset(:create) do
-    %StellarBase.XDR.HostFunctionArgs{
-      value: %StellarBase.XDR.CreateContractArgs{
-        contract_id: %StellarBase.XDR.ContractID{
-          contract_id: %StellarBase.XDR.Asset{
-            asset: %StellarBase.XDR.Void{value: nil},
-            type: %StellarBase.XDR.AssetType{identifier: :ASSET_TYPE_NATIVE}
-          },
-          type: %StellarBase.XDR.ContractIDType{identifier: :CONTRACT_ID_FROM_ASSET}
-        },
-        executable: %StellarBase.XDR.SCContractExecutable{
-          contract_executable: %StellarBase.XDR.Void{value: nil},
-          type: %StellarBase.XDR.SCContractExecutableType{
-            identifier: :SCCONTRACT_EXECUTABLE_TOKEN
-          }
-        }
-      },
-      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT}
-    }
-  end
-
-  @spec invoke_host_function_op_xdr(functions :: list(TxHostFunction.t())) :: OperationBody.t()
-  def invoke_host_function_op_xdr(functions) do
+  @spec invoke_host_function_op_xdr(function :: TxHostFunction.t()) :: OperationBody.t()
+  def invoke_host_function_op_xdr(function) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
 
-    functions
-    |> Enum.map(&TxHostFunction.to_xdr/1)
-    |> HostFunctionList100.new()
-    |> InvokeHostFunction.new()
+    function
+    |> TxHostFunction.to_xdr()
+    |> InvokeHostFunction.new(SorobanAuthorizationEntryList.new([]))
     |> OperationBody.new(op_type)
   end
 

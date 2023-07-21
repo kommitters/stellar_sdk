@@ -40,7 +40,7 @@ defmodule Stellar.Test.Fixtures.XDR.LiquidityPools do
         10
       ) do
     %OperationBody{
-      operation: %Operations.LiquidityPoolWithdraw{
+      value: %Operations.LiquidityPoolWithdraw{
         amount: %Int64{datum: 1_000_000_000},
         min_amount_a: %Int64{datum: 200_000_000},
         min_amount_b: %Int64{datum: 100_000_000},
@@ -69,7 +69,7 @@ defmodule Stellar.Test.Fixtures.XDR.LiquidityPools do
         2.5
       ) do
     %OperationBody{
-      operation: %Operations.LiquidityPoolDeposit{
+      value: %Operations.LiquidityPoolDeposit{
         max_amount_a: %Int64{datum: 200_000_000},
         max_amount_b: %Int64{datum: 100_000_000},
         max_price: %Price{

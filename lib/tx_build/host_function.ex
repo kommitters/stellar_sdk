@@ -2,37 +2,37 @@ defmodule Stellar.TxBuild.HostFunction do
   @moduledoc """
     `HostFunction` struct definition.
   """
-  alias Stellar.TxBuild.{ContractAuth, HostFunctionArgs}
-  alias StellarBase.XDR.ContractAuthList
-  alias StellarBase.XDR.ContractAuth, as: ContractAuthXDR
-  alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
+  alias Stellar.TxBuild.{CreateContractArgs, SCVec, VariableOpaque}
+  alias StellarBase.XDR.HostFunction
+  alias StellarBase.XDR.HostFunctionType
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type args :: HostFunctionArgs.t()
-  @type contract_auth :: ContractAuth.t()
-  @type contract_auth_xdr :: ContractAuthXDR.t()
-  @type auth :: list(contract_auth()) | list(String.t())
+  @type value :: CreateContractArgs.t() | SCVec.t() | VariableOpaque.t()
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
-
+  @type type ::
+          :invoke_contract
+          | :create_contract
+          | :upload_contract_wasm
   @type t :: %__MODULE__{
-          args: args(),
-          auth: auth()
+          type: type(),
+          value: value()
         }
 
-  defstruct [:args, :auth]
+  defstruct [:type, :value]
+
+  @allowed_types ~w(invoke_contract create_contract upload_contract_wasm)a
 
   @impl true
   def new(args, opts \\ [])
 
-  def new(args, _opts) when is_list(args) do
-    function_args = Keyword.get(args, :args)
-    auth = Keyword.get(args, :auth, [])
-
-    with {:ok, args} <- validate_host_function_args(function_args),
-         {:ok, auth} <- validate_host_function_auth(auth) do
-      %__MODULE__{args: args, auth: auth}
+  def new([{type, value}], _opts) when type in @allowed_types do
+    with {:ok, _value} <- validate_host_function({type, value}) do
+      %__MODULE__{
+        type: type,
+        value: value
+      }
     end
   end
 
@@ -40,80 +40,44 @@ defmodule Stellar.TxBuild.HostFunction do
 
   @impl true
   def to_xdr(%__MODULE__{
-        args: args,
-        auth: [%ContractAuth{} | _] = auth
-      })
-      when is_list(auth) do
-    args_xdr = HostFunctionArgs.to_xdr(args)
+        type: :invoke_contract,
+        value: value
+      }) do
+    type = HostFunctionType.new(:HOST_FUNCTION_TYPE_INVOKE_CONTRACT)
 
-    contract_auth =
-      auth
-      |> Enum.map(&ContractAuth.to_xdr/1)
-      |> ContractAuthList.new()
-
-    HostFunctionXDR.new(args_xdr, contract_auth)
+    value
+    |> SCVec.to_xdr()
+    |> HostFunction.new(type)
   end
 
   def to_xdr(%__MODULE__{
-        args: args,
-        auth: auth
-      })
-      when is_list(auth) do
-    args_xdr = HostFunctionArgs.to_xdr(args)
+        type: :create_contract,
+        value: value
+      }) do
+    type = HostFunctionType.new(:HOST_FUNCTION_TYPE_CREATE_CONTRACT)
 
-    contract_auth =
-      auth
-      |> Enum.map(&decode_contract_auth/1)
-      |> ContractAuthList.new()
-
-    HostFunctionXDR.new(args_xdr, contract_auth)
+    value
+    |> CreateContractArgs.to_xdr()
+    |> HostFunction.new(type)
   end
 
-  @spec set_auth(module :: t(), auth :: auth()) :: t() | error()
-  def set_auth(%__MODULE__{} = module, auth) when is_list(auth) do
-    with {:ok, auth} <- validate_auth_strings(auth) do
-      %{module | auth: auth}
-    end
+  def to_xdr(%__MODULE__{
+        type: :upload_contract_wasm,
+        value: value
+      }) do
+    type = HostFunctionType.new(:HOST_FUNCTION_TYPE_UPLOAD_CONTRACT_WASM)
+
+    value
+    |> VariableOpaque.to_xdr()
+    |> HostFunction.new(type)
   end
 
-  defp validate_auth_strings(auth) do
-    if Enum.all?(auth, &validate_xdr_string/1),
-      do: {:ok, auth},
-      else: {:error, :invalid_auth}
-  end
+  @spec validate_host_function({type :: atom(), value :: value()}) :: validation()
+  defp validate_host_function({:invoke_contract, %SCVec{} = value}), do: {:ok, value}
+  defp validate_host_function({:create_contract, %CreateContractArgs{} = value}), do: {:ok, value}
 
-  @spec validate_xdr_string(xdr :: String.t() | nil) :: boolean()
-  defp validate_xdr_string(nil), do: true
+  defp validate_host_function({:upload_contract_wasm, %VariableOpaque{} = value}),
+    do: {:ok, value}
 
-  defp validate_xdr_string(xdr) when is_binary(xdr) do
-    case Base.decode64(xdr) do
-      {:ok, _} -> true
-      :error -> false
-    end
-  end
-
-  @spec validate_host_function_args(args :: args()) :: validation()
-  defp validate_host_function_args(%HostFunctionArgs{} = args), do: {:ok, args}
-  defp validate_host_function_args(_args), do: {:error, :invalid_args}
-
-  @spec validate_host_function_auth(auth :: auth()) :: validation()
-  defp validate_host_function_auth(auth) do
-    if Enum.all?(auth, &is_contract_auth?/1),
-      do: {:ok, auth},
-      else: {:error, :invalid_auth}
-  end
-
-  @spec is_contract_auth?(contract_auth :: contract_auth()) :: boolean()
-  defp is_contract_auth?(%ContractAuth{}), do: true
-  defp is_contract_auth?(_arg), do: false
-
-  @spec decode_contract_auth(auth :: String.t()) :: contract_auth_xdr()
-  defp decode_contract_auth(auth) do
-    {contract_auth, ""} =
-      auth
-      |> Base.decode64!()
-      |> ContractAuthXDR.decode_xdr!()
-
-    contract_auth
-  end
+  defp validate_host_function({type, _value}), do: {:error, :"invalid_#{type}"}
 end

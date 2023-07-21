@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.RevokeID do
+defmodule Stellar.TxBuild.HashIDPreimageRevokeID do
   @moduledoc """
-  `RevokeID` struct definition.
+  `HashIDPreimageRevokeID` struct definition.
   """
   import Stellar.TxBuild.Validations,
     only: [
@@ -11,7 +11,7 @@ defmodule Stellar.TxBuild.RevokeID do
       validate_asset: 1
     ]
 
-  alias StellarBase.XDR.{RevokeID, UInt32}
+  alias StellarBase.XDR.{HashIDPreimageRevokeID, UInt32}
   alias Stellar.TxBuild.{AccountID, Asset, PoolID, SequenceNumber}
 
   @type t :: %__MODULE__{
@@ -67,7 +67,7 @@ defmodule Stellar.TxBuild.RevokeID do
     liquidity_pool_id = PoolID.to_xdr(liquidity_pool_id)
     asset = Asset.to_xdr(asset)
 
-    RevokeID.new(source_account, sequence_number, op_num, liquidity_pool_id, asset)
+    HashIDPreimageRevokeID.new(source_account, sequence_number, op_num, liquidity_pool_id, asset)
   end
 
   def to_xdr(_error), do: {:error, :invalid_struct_revoke_id}

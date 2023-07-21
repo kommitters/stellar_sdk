@@ -1,158 +1,130 @@
 defmodule Stellar.TxBuild.HostFunctionTest do
   use ExUnit.Case
 
-  alias StellarBase.XDR.HostFunction, as: HostFunctionXDR
-
   alias Stellar.TxBuild.{
-    AddressWithNonce,
-    AuthorizedInvocation,
-    ContractAuth,
+    ContractExecutable,
+    ContractIDPreimage,
+    ContractIDPreimageFromAddress,
+    CreateContractArgs,
     HostFunction,
-    HostFunctionArgs,
     SCAddress,
-    SCVal
+    SCVal,
+    SCVec,
+    VariableOpaque
   }
 
   import Stellar.Test.XDRFixtures,
-    only: [
-      host_function_xdr: 4,
-      host_function_with_auth_xdr: 4
-    ]
+    only: [host_function_xdr: 2]
 
-  describe "HostFunction invoke" do
+  describe "HostFunction" do
     setup do
-      contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
-      function_name = "hello"
-      args = [SCVal.new(symbol: "world")]
+      # :invoke_contract
+      contract_address =
+        "CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y"
+        |> SCAddress.new()
+        |> (&SCVal.new(address: &1)).()
+
+      function_name = SCVal.new(symbol: "hello")
+      invoke_args = SCVec.new([contract_address, function_name, SCVal.new(symbol: "world")])
+
+      # :create_contract
+      wasm_id =
+        <<86, 32, 6, 9, 172, 4, 212, 185, 249, 87, 184, 164, 58, 34, 167, 183, 226, 117, 205, 116,
+          11, 130, 119, 172, 224, 51, 12, 148, 90, 251, 17, 12>>
+
+      contract_executable = ContractExecutable.new(wasm_ref: wasm_id)
       sc_address = SCAddress.new("GARVXS4KWSI6UQWZL2AAIB2KD4MAXG27YOE6IE64THZRSASAVR3ZPSUN")
-      address_with_nonce = AddressWithNonce.new(address: sc_address, nonce: 123)
+      # :crypto.strong_rand_bytes(32)
+      salt =
+        <<142, 226, 180, 159, 151, 224, 223, 135, 33, 210, 154, 238, 13, 199, 60, 77, 67, 167,
+          216, 125, 245, 241, 237, 114, 207, 74, 226, 98, 166, 200, 43, 89>>
 
-      authorized_invocation_1 =
-        AuthorizedInvocation.new(
-          contract_id: contract_id,
-          function_name: function_name,
-          args: args,
-          sub_invocations: []
+      from_address = ContractIDPreimageFromAddress.new(address: sc_address, salt: salt)
+      contract_id_preimage = ContractIDPreimage.new(from_address: from_address)
+
+      create_contract_args =
+        CreateContractArgs.new(
+          contract_id_preimage: contract_id_preimage,
+          contract_executable: contract_executable
         )
 
-      authorized_invocation_2 =
-        AuthorizedInvocation.new(
-          contract_id: contract_id,
-          function_name: function_name,
-          args: args,
-          sub_invocations: [authorized_invocation_1]
-        )
+      # :upload_contract_wasm
+      code =
+        <<0, 97, 115, 109, 1, 0, 0, 0, 1, 19, 4, 96, 1, 126, 1, 126, 96, 2, 126, 126, 1, 126, 96,
+          1, 127, 0, 96, 0, 0, 2, 37, 6, 1, 118, 1, 95, 0, 0, 1, 118, 1, 54, 0, 1, 1, 97, 1, 48,
+          0, 0, 1, 108, 1, 48, 0, 0>>
 
-      contract_authentication =
-        ContractAuth.new(
-          address_with_nonce: address_with_nonce,
-          authorized_invocation: authorized_invocation_2,
-          args: args
-        )
-
-      contract_auth_strs = [
-        "AAAAAQAAAAAAAAAAI1vLirSR6kLZXoAEB0ofGAubX8OJ5BPcmfMZAkCsd5cAAAAAAAAAewRhFoy7rg2pbFQ7cf1XGuxLRFSdUD+a+edoXM7bwWE8AAAABWhlbGxvAAAAAAAAAQAAAA8AAAAFd29ybGQAAAAAAAABBGEWjLuuDalsVDtx/Vca7EtEVJ1QP5r552hcztvBYTwAAAAFaGVsbG8AAAAAAAABAAAADwAAAAV3b3JsZAAAAAAAAAAAAAABAAAAEAAAAAEAAAAA"
-      ]
-
-      function_args =
-        HostFunctionArgs.new(
-          type: :invoke,
-          contract_id: contract_id,
-          function_name: function_name,
-          args: args
-        )
+      upload_contract_wasm_args = VariableOpaque.new(code)
 
       %{
-        function_args: function_args,
-        contract_authentication: contract_authentication,
-        contract_auth_strs: contract_auth_strs,
-        host_function: HostFunction.new(args: function_args),
-        host_function_with_auth:
-          HostFunction.new(args: function_args, auth: [contract_authentication]),
-        host_function_xdr: host_function_xdr(:invoke, contract_id, function_name, args),
-        host_function_with_auth_xdr:
-          host_function_with_auth_xdr(:invoke, contract_id, function_name, args)
+        invoke_args: invoke_args,
+        invoke_host_function: HostFunction.new(invoke_contract: invoke_args),
+        host_function_xdr: host_function_xdr(:invoke_contract, invoke_args),
+        create_contract_args: create_contract_args,
+        create_contract_function: HostFunction.new(create_contract: create_contract_args),
+        create_contract_xdr: host_function_xdr(:create_contract, create_contract_args),
+        upload_contract_wasm_args: upload_contract_wasm_args,
+        upload_contract_wasm_function:
+          HostFunction.new(upload_contract_wasm: upload_contract_wasm_args),
+        upload_contract_wasm_xdr:
+          host_function_xdr(:upload_contract_wasm, upload_contract_wasm_args)
       }
     end
 
-    test "new/2", %{
-      function_args: function_args
+    test "new/2 invoke_contract", %{
+      invoke_args: invoke_args
     } do
       %HostFunction{
-        args: ^function_args
-      } = HostFunction.new(args: function_args)
+        type: :invoke_contract,
+        value: ^invoke_args
+      } = HostFunction.new(invoke_contract: invoke_args)
     end
 
-    test "new/2 with auth", %{
-      function_args: function_args,
-      contract_authentication: contract_authentication
+    test "new/2 create_contract", %{
+      create_contract_args: create_contract_args
     } do
       %HostFunction{
-        args: ^function_args
-      } = HostFunction.new(args: function_args, auth: [contract_authentication])
+        type: :create_contract,
+        value: ^create_contract_args
+      } = HostFunction.new(create_contract: create_contract_args)
+    end
+
+    test "new/2 upload_contract_wasm", %{
+      upload_contract_wasm_args: upload_contract_wasm_args
+    } do
+      %HostFunction{
+        type: :upload_contract_wasm,
+        value: ^upload_contract_wasm_args
+      } = HostFunction.new(upload_contract_wasm: upload_contract_wasm_args)
     end
 
     test "new/2 invalid attributes" do
       {:error, :invalid_operation_attributes} = HostFunction.new(:invalid)
     end
 
-    test "new/2 invalid args" do
-      {:error, :invalid_args} = HostFunction.new(args: :invalid)
+    test "new/2 invalid host function value" do
+      {:error, :invalid_create_contract} = HostFunction.new(create_contract: :invalid)
     end
 
-    test "new/2 invalid auth", %{function_args: function_args} do
-      {:error, :invalid_auth} = HostFunction.new(args: function_args, auth: [123])
-    end
-
-    test "set_auth/2", %{
-      function_args: function_args,
-      host_function: host_function,
-      contract_auth_strs: contract_auth_strs
-    } do
-      %HostFunction{
-        args: ^function_args,
-        auth: ^contract_auth_strs
-      } = HostFunction.set_auth(host_function, contract_auth_strs)
-    end
-
-    test "set_auth/2 nil auth str", %{
-      function_args: function_args,
-      host_function: host_function
-    } do
-      %HostFunction{
-        args: ^function_args,
-        auth: [nil]
-      } = HostFunction.set_auth(host_function, [nil])
-    end
-
-    test "set_auth/2 invalid xdr string", %{host_function: host_function} do
-      {:error, :invalid_auth} = HostFunction.set_auth(host_function, ["invalid"])
-    end
-
-    test "to_xdr/1", %{
+    test "to_xdr/1 invoke_contract", %{
       host_function_xdr: host_function_xdr,
-      host_function: host_function
+      invoke_host_function: invoke_host_function
     } do
-      %HostFunctionXDR{args: ^host_function_xdr} = HostFunction.to_xdr(host_function)
+      ^host_function_xdr = HostFunction.to_xdr(invoke_host_function)
     end
 
-    test "to_xdr/1 with auth", %{
-      host_function_with_auth_xdr: host_function_with_auth_xdr,
-      host_function_with_auth: host_function_with_auth
+    test "to_xdr/1 create_contract", %{
+      create_contract_xdr: create_contract_xdr,
+      create_contract_function: create_contract_function
     } do
-      # %HostFunctionXDR{args: ^host_function_xdr}
-      ^host_function_with_auth_xdr = HostFunction.to_xdr(host_function_with_auth)
+      ^create_contract_xdr = HostFunction.to_xdr(create_contract_function)
     end
 
-    test "to_xdr/1 with auth strs", %{
-      host_function_with_auth_xdr: host_function_with_auth_xdr,
-      host_function: host_function,
-      contract_auth_strs: contract_auth_strs
+    test "to_xdr/1 upload_contract_wasm", %{
+      upload_contract_wasm_xdr: upload_contract_wasm_xdr,
+      upload_contract_wasm_function: upload_contract_wasm_function
     } do
-      ^host_function_with_auth_xdr =
-        host_function
-        |> HostFunction.set_auth(contract_auth_strs)
-        |> HostFunction.to_xdr()
+      ^upload_contract_wasm_xdr = HostFunction.to_xdr(upload_contract_wasm_function)
     end
   end
 end

@@ -5,7 +5,8 @@ defmodule Stellar.TxBuild.SCVal do
 
   @behaviour Stellar.TxBuild.XDR
 
-  alias Stellar.TxBuild.{SCAddress, SCMapEntry, SCStatus}
+  alias StellarBase.XDR.SCContractInstance
+  alias Stellar.TxBuild.{SCAddress, SCError, SCMapEntry}
 
   alias StellarBase.XDR.{
     Bool,
@@ -16,8 +17,8 @@ defmodule Stellar.TxBuild.SCVal do
     Int32,
     Int64,
     SCBytes,
-    SCContractExecutable,
-    SCContractExecutableType,
+    ContractExecutable,
+    ContractExecutableType,
     SCMap,
     SCNonceKey,
     SCString,
@@ -38,7 +39,7 @@ defmodule Stellar.TxBuild.SCVal do
   @type type ::
           :bool
           | :void
-          | :status
+          | :error
           | :u32
           | :i32
           | :u64
@@ -54,17 +55,17 @@ defmodule Stellar.TxBuild.SCVal do
           | :symbol
           | :vec
           | :map
-          | :contract
           | :address
-          | :ledger_key_contract
+          | :ledger_key_contract_instance
           | :ledger_key_nonce
+          | :contract_instance
 
   @type validation :: {:ok, any()} | {:error, atom()}
   @type value ::
           nil
           | integer()
           | boolean()
-          | SCStatus.t()
+          | SCError.t()
           | map()
           | binary()
           | list()
@@ -78,11 +79,13 @@ defmodule Stellar.TxBuild.SCVal do
 
   defstruct [:type, :value]
 
+  @allowed_types ~w(bool void error u32 i32 u64 i64 time_point duration u128 i128 u256 i256 bytes string symbol vec map address ledger_key_contract_instance ledger_key_nonce contract_instance)a
+
   @impl true
   def new(args, opts \\ nil)
 
   def new([{type, value}], _opts)
-      when type in ~w(bool void status u32 i32 u64 i64 time_point duration u128 i128 u256 i256 bytes string symbol vec map contract address ledger_key_contract ledger_key_nonce)a do
+      when type in @allowed_types do
     with {:ok, _value} <- validate_sc_val({type, value}) do
       %__MODULE__{
         type: type,
@@ -109,11 +112,11 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :status, value: value}) do
-    val_type = SCValType.new(:SCV_STATUS)
+  def to_xdr(%__MODULE__{type: :error, value: value}) do
+    val_type = SCValType.new(:SCV_ERROR)
 
     value
-    |> SCStatus.to_xdr()
+    |> SCError.to_xdr()
     |> SCVal.new(val_type)
   end
 
@@ -275,23 +278,10 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :contract, value: {:wasm_ref, hash}}) do
-    type = SCValType.new(:SCV_CONTRACT_EXECUTABLE)
-    contract_code = SCContractExecutableType.new(:SCCONTRACT_EXECUTABLE_WASM_REF)
+  def to_xdr(%__MODULE__{type: :ledger_key_contract_instance, value: nil}) do
+    type = SCValType.new(:SCV_LEDGER_KEY_CONTRACT_INSTANCE)
 
-    hash
-    |> Hash.new()
-    |> SCContractExecutable.new(contract_code)
-    |> SCVal.new(type)
-  end
-
-  def to_xdr(%__MODULE__{type: :contract, value: :token}) do
-    type = SCValType.new(:SCV_CONTRACT_EXECUTABLE)
-    contract_code = SCContractExecutableType.new(:SCCONTRACT_EXECUTABLE_TOKEN)
-
-    Void.new()
-    |> SCContractExecutable.new(contract_code)
-    |> SCVal.new(type)
+    SCVal.new(Void.new(), type)
   end
 
   def to_xdr(%__MODULE__{type: :address, value: value}) do
@@ -302,10 +292,24 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :ledger_key_contract, value: _value}) do
-    type = SCValType.new(:SCV_LEDGER_KEY_CONTRACT_EXECUTABLE)
+  def to_xdr(%__MODULE__{type: :contract_instance, value: {:wasm_ref, hash}}) do
+    type = SCValType.new(:SCV_CONTRACT_INSTANCE)
+    contract_code = ContractExecutableType.new(:CONTRACT_EXECUTABLE_WASM)
+
+    hash
+    |> Hash.new()
+    |> ContractExecutable.new(contract_code)
+    |> SCContractInstance.new(OptionalSCMap.new())
+    |> SCVal.new(type)
+  end
+
+  def to_xdr(%__MODULE__{type: :contract_instance, value: :token}) do
+    type = SCValType.new(:SCV_CONTRACT_INSTANCE)
+    contract_code = ContractExecutableType.new(:CONTRACT_EXECUTABLE_TOKEN)
 
     Void.new()
+    |> ContractExecutable.new(contract_code)
+    |> SCContractInstance.new(OptionalSCMap.new())
     |> SCVal.new(type)
   end
 
@@ -313,7 +317,7 @@ defmodule Stellar.TxBuild.SCVal do
     type = SCValType.new(:SCV_LEDGER_KEY_NONCE)
 
     value
-    |> SCAddress.to_xdr()
+    |> Int64.new()
     |> SCNonceKey.new()
     |> SCVal.new(type)
   end
@@ -329,7 +333,7 @@ defmodule Stellar.TxBuild.SCVal do
 
   defp validate_sc_val({:bool, value}) when is_boolean(value), do: {:ok, value}
   defp validate_sc_val({:void, _value}), do: {:ok, nil}
-  defp validate_sc_val({:status, %SCStatus{} = value}), do: {:ok, value}
+  defp validate_sc_val({:error, %SCError{} = value}), do: {:ok, value}
 
   defp validate_sc_val({type, %{lo: lo, hi: hi} = value})
        when type in ~w(u128 i128)a and is_integer(lo) and is_integer(hi),
@@ -360,14 +364,14 @@ defmodule Stellar.TxBuild.SCVal do
       else: {:error, :invalid_map}
   end
 
-  defp validate_sc_val({:contract, :token}), do: {:ok, :token}
+  defp validate_sc_val({:contract_instance, :token}), do: {:ok, :token}
 
-  defp validate_sc_val({:contract, {:wasm_ref, hash} = value}) when is_binary(hash),
+  defp validate_sc_val({:contract_instance, {:wasm_ref, hash} = value}) when is_binary(hash),
     do: {:ok, value}
 
   defp validate_sc_val({:address, %SCAddress{} = value}), do: {:ok, value}
-  defp validate_sc_val({:ledger_key_contract, _value}), do: {:ok, nil}
-  defp validate_sc_val({:ledger_key_nonce, %SCAddress{} = value}), do: {:ok, value}
+  defp validate_sc_val({:ledger_key_contract_instance, _value}), do: {:ok, nil}
+  defp validate_sc_val({:ledger_key_nonce, value}) when is_integer(value), do: {:ok, value}
   defp validate_sc_val({type, _value}), do: {:error, :"invalid_#{type}"}
 
   @spec is_map_entry?(value :: any()) :: boolean()

@@ -1,7 +1,7 @@
-defmodule Stellar.TxBuild.RevokeIDTest do
+defmodule Stellar.TxBuild.HashIDPreimageRevokeIDTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.RevokeID, as: TxRevokeID
+  alias Stellar.TxBuild.HashIDPreimageRevokeID, as: TxRevokeID
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
   alias Stellar.TxBuild.PoolID, as: TxPoolID
   alias Stellar.TxBuild.Asset, as: TxAsset
@@ -14,7 +14,7 @@ defmodule Stellar.TxBuild.RevokeIDTest do
     PublicKey,
     PublicKeyType,
     PoolID,
-    RevokeID,
+    HashIDPreimageRevokeID,
     SequenceNumber,
     UInt32,
     UInt256,
@@ -76,7 +76,7 @@ defmodule Stellar.TxBuild.RevokeIDTest do
     public_key: public_key,
     pool_id_value: pool_id_value
   } do
-    %RevokeID{
+    %HashIDPreimageRevokeID{
       source_account: %AccountID{
         account_id: %PublicKey{
           public_key: %UInt256{
@@ -87,7 +87,7 @@ defmodule Stellar.TxBuild.RevokeIDTest do
           type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
         }
       },
-      sequence_number: %SequenceNumber{sequence_number: 123},
+      seq_num: %SequenceNumber{sequence_number: 123},
       op_num: %UInt32{datum: 123},
       liquidity_pool_id: %PoolID{
         value:

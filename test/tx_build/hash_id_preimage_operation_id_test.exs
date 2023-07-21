@@ -1,9 +1,9 @@
-defmodule Stellar.TxBuild.OperationIDTest do
+defmodule Stellar.TxBuild.HashIDPreimageOperationIDTest do
   use ExUnit.Case
 
   import Stellar.Test.XDRFixtures, only: [operation_id_xdr: 3]
 
-  alias Stellar.TxBuild.OperationID, as: TxOperationID
+  alias Stellar.TxBuild.HashIDPreimageOperationID, as: TxOperationID
   alias Stellar.TxBuild.AccountID, as: TxAccountID
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
 
