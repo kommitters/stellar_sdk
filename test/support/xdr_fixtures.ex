@@ -2,12 +2,10 @@ defmodule Stellar.Test.XDRFixtures do
   @moduledoc """
   Stellar's XDR data for test constructions.
   """
-  alias StellarBase.XDR.SorobanAuthorizationEntryList
-  alias Stellar.TxBuild.VariableOpaque
-  alias Stellar.TxBuild.CreateContractArgs
   alias Stellar.KeyPair
 
   alias Stellar.TxBuild.{
+    CreateContractArgs,
     TransactionSignature,
     SignerKey,
     SorobanAuthorizedInvocation,
@@ -67,6 +65,7 @@ defmodule Stellar.Test.XDRFixtures do
     Signature,
     SignatureHint,
     SourceAccountContractID,
+    SorobanAuthorizationEntryList,
     String28,
     String32,
     String64,
@@ -780,12 +779,13 @@ defmodule Stellar.Test.XDRFixtures do
 
   @spec host_function_xdr(
           type :: :upload_contract_wasm,
-          args :: VariableOpaque.t()
+          args :: binary()
         ) :: HostFunction.t()
   def host_function_xdr(
         :upload_contract_wasm,
-        %VariableOpaque{}
-      ) do
+        variable_opaque
+      )
+      when is_binary(variable_opaque) do
     %StellarBase.XDR.HostFunction{
       value: %StellarBase.XDR.VariableOpaque{
         opaque:

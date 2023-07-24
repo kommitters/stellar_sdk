@@ -9,8 +9,7 @@ defmodule Stellar.TxBuild.HostFunctionTest do
     HostFunction,
     SCAddress,
     SCVal,
-    SCVec,
-    VariableOpaque
+    SCVec
   }
 
   import Stellar.Test.XDRFixtures,
@@ -54,7 +53,7 @@ defmodule Stellar.TxBuild.HostFunctionTest do
           1, 127, 0, 96, 0, 0, 2, 37, 6, 1, 118, 1, 95, 0, 0, 1, 118, 1, 54, 0, 1, 1, 97, 1, 48,
           0, 0, 1, 108, 1, 48, 0, 0>>
 
-      upload_contract_wasm_args = VariableOpaque.new(code)
+      upload_contract_wasm_args = code
 
       %{
         invoke_args: invoke_args,
