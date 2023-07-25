@@ -6,7 +6,7 @@ defmodule Stellar.TxBuild.AccountMerge do
   import Stellar.TxBuild.Validations, only: [validate_account: 1, validate_optional_account: 1]
 
   alias Stellar.TxBuild.{Account, OptionalAccount}
-  alias StellarBase.XDR.{OperationBody, OperationType, Operations.AccountMerge}
+  alias StellarBase.XDR.{OperationBody, OperationType}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -35,7 +35,6 @@ defmodule Stellar.TxBuild.AccountMerge do
 
     destination
     |> Account.to_xdr()
-    |> AccountMerge.new()
     |> OperationBody.new(op_type)
   end
 end

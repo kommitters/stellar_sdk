@@ -5,40 +5,36 @@ defmodule Stellar.TxBuild.HashIDPreimage do
   alias StellarBase.XDR.{EnvelopeType, HashIDPreimage}
 
   alias Stellar.TxBuild.{
-    FromAsset,
-    HashIDPreimageCreateContractArgs,
-    HashIDPreimageContractAuth,
-    OperationID,
-    RevokeID,
-    Ed25519ContractID,
-    StructContractID,
-    SourceAccountContractID
+    HashIDPreimageContractID,
+    HashIDPreimageSorobanAuthorization,
+    HashIDPreimageOperationID,
+    HashIDPreimageRevokeID
   }
 
   @behaviour Stellar.TxBuild.XDR
 
   @type hash_id ::
-          OperationID.t()
-          | RevokeID.t()
-          | Ed25519ContractID.t()
-          | StructContractID.t()
-          | FromAsset.t()
-          | SourceAccountContractID.t()
-          | HashIDPreimageCreateContractArgs.t()
-          | HashIDPreimageContractAuth.t()
-
-  @allowed_types ~w(op_id pool_revoke_op_id contract_id_from_ed25519 contract_id_from_contract contract_id_from_asset contact_id_from_source_acc create_contract_args contract_auth)a
-
+          HashIDPreimageContractID.t()
+          | HashIDPreimageOperationID.t()
+          | HashIDPreimageRevokeID.t()
+          | HashIDPreimageSorobanAuthorization.t()
   @type validation :: {:ok, any()} | {:error, atom()}
-  @type t :: %__MODULE__{type: String.t(), value: hash_id()}
+  @type type ::
+          :op_id
+          | :pool_revoke_op_id
+          | :contract_id
+          | :soroban_auth
+  @type t :: %__MODULE__{type: type(), value: hash_id()}
 
   defstruct [:type, :value]
+
+  @allowed_types ~w(op_id pool_revoke_op_id contract_id soroban_auth)a
 
   @impl true
   def new(args, opts \\ nil)
 
   def new([{type, value}], _opts) when type in @allowed_types do
-    with {:ok, _value} <- validate_hash_id_preimage({type, value}) do
+    with {:ok, value} <- validate_hash_id_preimage({type, value}) do
       %__MODULE__{
         type: type,
         value: value
@@ -51,116 +47,58 @@ defmodule Stellar.TxBuild.HashIDPreimage do
   @impl true
   def to_xdr(%__MODULE__{
         type: :op_id,
-        value: %OperationID{} = value
+        value: %HashIDPreimageOperationID{} = value
       }) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_OP_ID)
 
     value
-    |> OperationID.to_xdr()
+    |> HashIDPreimageOperationID.to_xdr()
     |> HashIDPreimage.new(envelope_type)
   end
 
   def to_xdr(%__MODULE__{
         type: :pool_revoke_op_id,
-        value: %RevokeID{} = value
+        value: %HashIDPreimageRevokeID{} = value
       }) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_POOL_REVOKE_OP_ID)
 
     value
-    |> RevokeID.to_xdr()
+    |> HashIDPreimageRevokeID.to_xdr()
     |> HashIDPreimage.new(envelope_type)
   end
 
   def to_xdr(%__MODULE__{
-        type: :contract_id_from_ed25519,
-        value: %Ed25519ContractID{} = value
+        type: :contract_id,
+        value: %HashIDPreimageContractID{} = value
       }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519)
+    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_ID)
 
     value
-    |> Ed25519ContractID.to_xdr()
+    |> HashIDPreimageContractID.to_xdr()
     |> HashIDPreimage.new(envelope_type)
   end
 
   def to_xdr(%__MODULE__{
-        type: :contract_id_from_contract,
-        value: %StructContractID{} = value
+        type: :soroban_auth,
+        value: %HashIDPreimageSorobanAuthorization{} = value
       }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_POOL_REVOKE_OP_ID)
+    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_SOROBAN_AUTHORIZATION)
 
     value
-    |> StructContractID.to_xdr()
-    |> HashIDPreimage.new(envelope_type)
-  end
-
-  def to_xdr(%__MODULE__{
-        type: :contract_id_from_asset,
-        value: %FromAsset{} = value
-      }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET)
-
-    value
-    |> FromAsset.to_xdr()
-    |> HashIDPreimage.new(envelope_type)
-  end
-
-  def to_xdr(%__MODULE__{
-        type: :contact_id_from_source_acc,
-        value: %SourceAccountContractID{} = value
-      }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT)
-
-    value
-    |> SourceAccountContractID.to_xdr()
-    |> HashIDPreimage.new(envelope_type)
-  end
-
-  def to_xdr(%__MODULE__{
-        type: :create_contract_args,
-        value: %HashIDPreimageCreateContractArgs{} = value
-      }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CREATE_CONTRACT_ARGS)
-
-    value
-    |> HashIDPreimageCreateContractArgs.to_xdr()
-    |> HashIDPreimage.new(envelope_type)
-  end
-
-  def to_xdr(%__MODULE__{
-        type: :contract_auth,
-        value: %HashIDPreimageContractAuth{} = value
-      }) do
-    envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_CONTRACT_AUTH)
-
-    value
-    |> HashIDPreimageContractAuth.to_xdr()
+    |> HashIDPreimageSorobanAuthorization.to_xdr()
     |> HashIDPreimage.new(envelope_type)
   end
 
   @spec validate_hash_id_preimage({atom(), hash_id()}) :: validation()
-  defp validate_hash_id_preimage({:op_id, %OperationID{} = value}), do: {:ok, value}
-  defp validate_hash_id_preimage({:pool_revoke_op_id, %RevokeID{} = value}), do: {:ok, value}
+  defp validate_hash_id_preimage({:op_id, %HashIDPreimageOperationID{} = value}), do: {:ok, value}
 
-  defp validate_hash_id_preimage({:contract_id_from_ed25519, %Ed25519ContractID{} = value}),
+  defp validate_hash_id_preimage({:pool_revoke_op_id, %HashIDPreimageRevokeID{} = value}),
     do: {:ok, value}
 
-  defp validate_hash_id_preimage({:contract_id_from_contract, %StructContractID{} = value}),
+  defp validate_hash_id_preimage({:contract_id, %HashIDPreimageContractID{} = value}),
     do: {:ok, value}
 
-  defp validate_hash_id_preimage({:contract_id_from_asset, %FromAsset{} = value}),
-    do: {:ok, value}
-
-  defp validate_hash_id_preimage(
-         {:contact_id_from_source_acc, %SourceAccountContractID{} = value}
-       ),
-       do: {:ok, value}
-
-  defp validate_hash_id_preimage(
-         {:create_contract_args, %HashIDPreimageCreateContractArgs{} = value}
-       ),
-       do: {:ok, value}
-
-  defp validate_hash_id_preimage({:contract_auth, %HashIDPreimageContractAuth{} = value}),
+  defp validate_hash_id_preimage({:soroban_auth, %HashIDPreimageSorobanAuthorization{} = value}),
     do: {:ok, value}
 
   defp validate_hash_id_preimage({type, _value}), do: {:error, :"invalid_#{type}"}

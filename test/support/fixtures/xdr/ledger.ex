@@ -352,7 +352,7 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
         account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
       ) do
     %StellarBase.XDR.OperationBody{
-      operation: %StellarBase.XDR.Operations.RevokeSponsorship{
+      value: %StellarBase.XDR.Operations.RevokeSponsorship{
         sponsorship: %StellarBase.XDR.LedgerKey{
           entry: %StellarBase.XDR.Account{
             account_id: %StellarBase.XDR.AccountID{
@@ -379,7 +379,7 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
         ed25519: "GDAE7O3YJMC7COEZLPJY6OY3P6WGHSHA3QZH2B456JXV4VDEJRAUSA35"
       ) do
     %StellarBase.XDR.OperationBody{
-      operation: %StellarBase.XDR.Operations.RevokeSponsorship{
+      value: %StellarBase.XDR.Operations.RevokeSponsorship{
         sponsorship: %StellarBase.XDR.RevokeSponsorshipSigner{
           account_id: %StellarBase.XDR.AccountID{
             account_id: %StellarBase.XDR.PublicKey{

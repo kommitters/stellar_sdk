@@ -432,7 +432,7 @@ defmodule Stellar.Test.Fixtures.XDR.Predicates do
         }
       ) do
     %OperationBody{
-      operation: %CreateClaimableBalance{
+      value: %CreateClaimableBalance{
         amount: %Int64{datum: 1_000_000_000},
         asset: %Asset{
           asset: %AlphaNum4{

@@ -43,7 +43,7 @@ defmodule Stellar.Test.Fixtures.XDR.Trustline do
         []
       ) do
     %OperationBody{
-      operation: %SetTrustLineFlags{
+      value: %SetTrustLineFlags{
         asset: %Asset{
           asset: %AlphaNum4{
             asset_code: %AssetCode4{code: "BTCN", length: 4},
