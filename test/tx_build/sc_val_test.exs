@@ -1,9 +1,11 @@
 defmodule Stellar.TxBuild.SCValTest do
   use ExUnit.Case
 
+  alias StellarBase.XDR.Int64
+
   alias Stellar.TxBuild.{
     SCAddress,
-    SCStatus,
+    SCError,
     SCVal,
     SCMapEntry
   }
@@ -53,11 +55,11 @@ defmodule Stellar.TxBuild.SCValTest do
       %{type: :symbol, value: "symbol"},
       %{type: :vec, value: [sc_val]},
       %{type: :map, value: [sc_map_entry]},
-      %{type: :contract, value: :token},
-      %{type: :contract, value: {:wasm_ref, "hash"}},
       %{type: :address, value: sc_address},
-      %{type: :ledger_key_contract, value: nil},
-      %{type: :ledger_key_nonce, value: sc_address}
+      %{type: :ledger_key_contract_instance, value: nil},
+      %{type: :ledger_key_nonce, value: 132_131},
+      %{type: :contract_instance, value: :token},
+      %{type: :contract_instance, value: {:wasm_ref, "hash"}}
     ]
 
     invalid_discriminants = [
@@ -77,22 +79,22 @@ defmodule Stellar.TxBuild.SCValTest do
       %{type: :symbol, value: :symbol},
       %{type: :vec, value: [:sc_val]},
       %{type: :map, value: [:sc_map_entry]},
-      %{type: :contract, value: :invalid},
-      %{type: :contract, value: {:wasm_ref, :invalid}},
       %{type: :address, value: :invalid},
-      %{type: :ledger_key_nonce, value: :invalid}
+      %{type: :ledger_key_nonce, value: :invalid},
+      %{type: :contract_instance, value: :invalid}
     ]
 
-    sc_status_discriminants = [
-      %{sc_status: SCStatus.new(ok: nil)},
-      %{sc_status: SCStatus.new(unknown_error: :UNKNOWN_ERROR_GENERAL)},
-      %{sc_status: SCStatus.new(host_value_error: :HOST_VALUE_UNKNOWN_ERROR)},
-      %{sc_status: SCStatus.new(host_object_error: :HOST_OBJECT_UNKNOWN_ERROR)},
-      %{sc_status: SCStatus.new(host_function_error: :HOST_FN_UNKNOWN_ERROR)},
-      %{sc_status: SCStatus.new(host_storage_error: :HOST_STORAGE_UNKNOWN_ERROR)},
-      %{sc_status: SCStatus.new(vm_error: :VM_UNKNOWN)},
-      %{sc_status: SCStatus.new(contract_error: 4_294_967_295)},
-      %{sc_status: SCStatus.new(host_auth_error: :HOST_AUTH_UNKNOWN_ERROR)}
+    sc_error_discriminants = [
+      %{sc_error: SCError.new(contract: :arith_domain)},
+      %{sc_error: SCError.new(wasm_vm: :index_bounds)},
+      %{sc_error: SCError.new(context: :invalid_input)},
+      %{sc_error: SCError.new(storage: :missing_value)},
+      %{sc_error: SCError.new(object: :existing_value)},
+      %{sc_error: SCError.new(crypto: :exceeded_limit)},
+      %{sc_error: SCError.new(events: :invalid_action)},
+      %{sc_error: SCError.new(budget: :internal_error)},
+      %{sc_error: SCError.new(code: :unexpected_type)},
+      %{sc_error: SCError.new(auth: :unexpected_size)}
     ]
 
     xdr_discriminants = [
@@ -104,15 +106,13 @@ defmodule Stellar.TxBuild.SCValTest do
       },
       %{val_type: :SCV_VOID, module: %StellarBase.XDR.Void{value: nil}, type: :void, value: nil},
       %{
-        val_type: :SCV_STATUS,
-        module: %StellarBase.XDR.SCStatus{
-          code: %StellarBase.XDR.SCUnknownErrorCode{
-            identifier: :UNKNOWN_ERROR_GENERAL
-          },
-          type: %StellarBase.XDR.SCStatusType{identifier: :SST_UNKNOWN_ERROR}
+        val_type: :SCV_ERROR,
+        module: %StellarBase.XDR.SCError{
+          type: %StellarBase.XDR.SCErrorType{identifier: :SCE_CONTRACT},
+          code: %StellarBase.XDR.SCErrorCode{identifier: :SCEC_ARITH_DOMAIN}
         },
-        type: :status,
-        value: SCStatus.new(unknown_error: :UNKNOWN_ERROR_GENERAL)
+        type: :error,
+        value: SCError.new(contract: :arith_domain)
       },
       %{val_type: :SCV_U32, module: %StellarBase.XDR.UInt32{datum: 123}, type: :u32, value: 123},
       %{val_type: :SCV_I32, module: %StellarBase.XDR.Int32{datum: 123}, type: :i32, value: 123},
@@ -198,7 +198,7 @@ defmodule Stellar.TxBuild.SCValTest do
         val_type: :SCV_VEC,
         module: %StellarBase.XDR.OptionalSCVec{
           sc_vec: %StellarBase.XDR.SCVec{
-            sc_vals: [
+            items: [
               %StellarBase.XDR.SCVal{
                 value: %StellarBase.XDR.Int32{datum: 123},
                 type: %StellarBase.XDR.SCValType{identifier: :SCV_I32}
@@ -219,7 +219,7 @@ defmodule Stellar.TxBuild.SCValTest do
         val_type: :SCV_MAP,
         module: %StellarBase.XDR.OptionalSCMap{
           sc_map: %StellarBase.XDR.SCMap{
-            scmap_entries: [
+            items: [
               %StellarBase.XDR.SCMapEntry{
                 key: %StellarBase.XDR.SCVal{
                   value: %StellarBase.XDR.SCSymbol{value: "sc_val_key"},
@@ -237,44 +237,50 @@ defmodule Stellar.TxBuild.SCValTest do
         value: [sc_map_entry]
       },
       %{
-        val_type: :SCV_CONTRACT_EXECUTABLE,
-        module: %StellarBase.XDR.SCContractExecutable{
-          contract_executable: %StellarBase.XDR.Hash{value: "hash"},
-          type: %StellarBase.XDR.SCContractExecutableType{
-            identifier: :SCCONTRACT_EXECUTABLE_WASM_REF
-          }
+        val_type: :SCV_CONTRACT_INSTANCE,
+        module: %StellarBase.XDR.SCContractInstance{
+          executable: %StellarBase.XDR.ContractExecutable{
+            value: %StellarBase.XDR.Hash{value: "hash"},
+            type: %StellarBase.XDR.ContractExecutableType{
+              identifier: :CONTRACT_EXECUTABLE_WASM
+            }
+          },
+          storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
         },
-        type: :contract,
+        type: :contract_instance,
         value: {:wasm_ref, "hash"}
       },
       %{
-        val_type: :SCV_CONTRACT_EXECUTABLE,
-        module: %StellarBase.XDR.SCContractExecutable{
-          contract_executable: %StellarBase.XDR.Void{value: nil},
-          type: %StellarBase.XDR.SCContractExecutableType{
-            identifier: :SCCONTRACT_EXECUTABLE_TOKEN
-          }
+        val_type: :SCV_CONTRACT_INSTANCE,
+        module: %StellarBase.XDR.SCContractInstance{
+          executable: %StellarBase.XDR.ContractExecutable{
+            value: %StellarBase.XDR.Void{value: nil},
+            type: %StellarBase.XDR.ContractExecutableType{
+              identifier: :CONTRACT_EXECUTABLE_TOKEN
+            }
+          },
+          storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
         },
-        type: :contract,
+        type: :contract_instance,
         value: :token
       },
       %{val_type: :SCV_ADDRESS, module: sc_address_xdr, type: :address, value: sc_address},
       %{
-        val_type: :SCV_LEDGER_KEY_CONTRACT_EXECUTABLE,
+        val_type: :SCV_LEDGER_KEY_CONTRACT_INSTANCE,
         module: %StellarBase.XDR.Void{value: nil},
-        type: :ledger_key_contract,
+        type: :ledger_key_contract_instance,
         value: nil
       },
       %{
         val_type: :SCV_LEDGER_KEY_NONCE,
-        module: %StellarBase.XDR.SCNonceKey{nonce_address: sc_address_xdr},
+        module: %StellarBase.XDR.SCNonceKey{nonce: Int64.new(123_654)},
         type: :ledger_key_nonce,
-        value: sc_address
+        value: 123_654
       }
     ]
 
     %{
-      sc_status_discriminants: sc_status_discriminants,
+      sc_error_discriminants: sc_error_discriminants,
       discriminants: discriminants,
       invalid_discriminants: invalid_discriminants,
       xdr_discriminants: xdr_discriminants
@@ -298,9 +304,9 @@ defmodule Stellar.TxBuild.SCValTest do
     end
   end
 
-  test "new/1 when type is status", %{sc_status_discriminants: sc_status_discriminants} do
-    for %{sc_status: sc_status} <- sc_status_discriminants do
-      %SCVal{type: :status, value: ^sc_status} = SCVal.new(status: sc_status)
+  test "new/1 when type is error", %{sc_error_discriminants: sc_error_discriminants} do
+    for %{sc_error: sc_error} <- sc_error_discriminants do
+      %SCVal{type: :error, value: ^sc_error} = SCVal.new(error: sc_error)
     end
   end
 

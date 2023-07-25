@@ -17,14 +17,15 @@ defmodule Stellar.TxBuild.Validations do
     OptionalWeight,
     OptionalSigner,
     OptionalString32,
-    OptionalAddressWithNonce,
     PoolID,
     Price,
     SequenceNumber,
     Signer,
     String32,
     Weight,
-    SCVal
+    SCAddress,
+    SCVal,
+    SCVec
   }
 
   @type account_id :: String.t()
@@ -196,14 +197,6 @@ defmodule Stellar.TxBuild.Validations do
 
   def validate_contract_id({field, _contract_id}), do: {:error, :"invalid_#{field}"}
 
-  @spec validate_optional_address_with_nonce(component :: component()) :: validation()
-  def validate_optional_address_with_nonce({field, value}) do
-    case OptionalAddressWithNonce.new(value) do
-      %OptionalAddressWithNonce{} = opt_address_with_nonce -> {:ok, opt_address_with_nonce}
-      {:error, _reason} -> {:error, :"invalid_#{field}"}
-    end
-  end
-
   @spec validate_string(tuple()) :: validation()
   def validate_string({_type, string}) when is_binary(string), do: {:ok, string}
   def validate_string({type, _string}), do: {:error, :"invalid_#{type}"}
@@ -213,4 +206,13 @@ defmodule Stellar.TxBuild.Validations do
     do: {:ok, value}
 
   def validate_sequence_number({field, _}), do: {:error, :"invalid_#{field}"}
+
+  @spec validate_address(address :: SCAddress.t()) :: validation()
+  def validate_address(%SCAddress{} = address), do: {:ok, address}
+
+  def validate_address(_address), do: {:error, :invalid_address}
+
+  @spec validate_vec(args :: SCVec.t()) :: validation()
+  def validate_vec(%SCVec{} = args), do: {:ok, args}
+  def validate_vec(_args), do: {:error, :invalid_args}
 end

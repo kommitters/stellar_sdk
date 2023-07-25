@@ -333,7 +333,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "set_soroban_data/2", %{tx_build: tx_build} do
     soroban_data =
-      "AAAAAgAAAAZQma4vqEU8Njqacc34GYyiWNEvpEu13GiuAiVZX0YdNwAAABQAAAAHRhmB7Imi4CwJhmzp1r/d76UShPJrO5PSHOV2Z9tPbE8AAAAAABJ8KwAAE3AAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+      "AAAAAAAAAAEAAAAHmDXys1KuBimD87u2AiUG/jb5CqOkQW/qASpb6gMVRlsAAAAAAAAAAQAAAAYAAAABZ+A/h5d/0pJnw7wmIzptCvWoX0md87QkHN68pAOfYjgAAAAUAAAAAQAAAAAANwsUAAAUmAAAAQQAAAMcAAAAAAAAAJw="
 
     {soroban_xdr_data, ""} =
       soroban_data |> Base.decode64!() |> SorobanTransactionData.decode_xdr!()
@@ -352,7 +352,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "set_soroban_data/2 piping_error" do
     soroban_data =
-      "AAAAAgAAAAZQma4vqEU8Njqacc34GYyiWNEvpEu13GiuAiVZX0YdNwAAABQAAAAHRhmB7Imi4CwJhmzp1r/d76UShPJrO5PSHOV2Z9tPbE8AAAAAABJ8KwAAE3AAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+      "AAAAAAAAAAEAAAAHmDXys1KuBimD87u2AiUG/jb5CqOkQW/qASpb6gMVRlsAAAAAAAAAAQAAAAYAAAABZ+A/h5d/0pJnw7wmIzptCvWoX0md87QkHN68pAOfYjgAAAAUAAAAAQAAAAAANwsUAAAUmAAAAQQAAAMcAAAAAAAAAJw="
 
     {soroban_xdr_data, ""} =
       soroban_data |> Base.decode64!() |> SorobanTransactionData.decode_xdr!()

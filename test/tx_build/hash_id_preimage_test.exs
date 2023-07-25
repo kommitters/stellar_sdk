@@ -1,97 +1,89 @@
 defmodule Stellar.TxBuild.HashIDPreimageTest do
   use ExUnit.Case
 
+  alias Stellar.TxBuild.SCAddress, as: TxSCAddress
+  alias Stellar.TxBuild.SorobanAuthorizedContractFunction, as: TxSorobanAuthorizedContractFunction
+  alias Stellar.TxBuild.SorobanAuthorizedFunction, as: TxSorobanAuthorizedFunction
+  alias Stellar.TxBuild.SorobanAuthorizedInvocation, as: TxSorobanAuthorizedInvocation
+
+  alias Stellar.TxBuild.HashIDPreimageSorobanAuthorization,
+    as: TxHashIDPreimageSorobanAuthorization
+
+  alias Stellar.TxBuild.ContractIDPreimage, as: TxContactIDPreimage
+  alias Stellar.TxBuild.Asset, as: TxAsset
   alias Stellar.TxBuild.HashIDPreimage, as: TxHashIDPreimage
-  alias Stellar.TxBuild.AuthorizedInvocation, as: TxAuthorizedInvocation
-  alias Stellar.TxBuild.Ed25519ContractID, as: TxEd25519ContractID
-  alias Stellar.TxBuild.FromAsset, as: TxFromAsset
-  alias Stellar.TxBuild.HashIDPreimageContractAuth, as: TxHashIDPreimageContractAuth
-  alias Stellar.TxBuild.HashIDPreimageCreateContractArgs, as: TxHashIDPreimageCreateContractArgs
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
-  alias Stellar.TxBuild.SourceAccountContractID, as: TxSourceAccountContractID
-  alias Stellar.TxBuild.StructContractID, as: TxStructContractID
-  alias Stellar.TxBuild.SCContractExecutable, as: TxSCContractExecutable
   alias Stellar.TxBuild.SCVal, as: TxSCVal
-  alias Stellar.TxBuild.OperationID, as: TxOperationID
-  alias Stellar.TxBuild.RevokeID, as: TxRevokeID
+  alias Stellar.TxBuild.SCVec, as: TxSCVec
+  alias Stellar.TxBuild.HashIDPreimageOperationID, as: TxOperationID
+  alias Stellar.TxBuild.HashIDPreimageRevokeID, as: TxRevokeID
+  alias Stellar.TxBuild.HashIDPreimageContractID, as: TxHashIDPreimageContractID
 
   alias StellarBase.XDR.{
     AccountID,
     Asset,
     AssetType,
-    AuthorizedInvocation,
-    AuthorizedInvocationList,
-    Ed25519ContractID,
+    ContractIDPreimage,
+    ContractIDPreimageType,
     EnvelopeType,
-    FromAsset,
     Hash,
     HashIDPreimage,
-    HashIDPreimageContractAuth,
-    HashIDPreimageCreateContractArgs,
+    HashIDPreimageContractID,
     Int32,
-    OperationID,
+    HashIDPreimageOperationID,
     PublicKey,
     PublicKeyType,
     PoolID,
-    RevokeID,
-    SourceAccountContractID,
+    HashIDPreimageRevokeID,
+    SorobanAuthorizedContractFunction,
+    SorobanAuthorizedFunction,
+    SorobanAuthorizedFunctionType,
+    SorobanAuthorizedInvocation,
+    SorobanAuthorizedInvocationList,
+    HashIDPreimageSorobanAuthorization,
     SequenceNumber,
-    StructContractID,
-    SCContractExecutable,
-    SCContractExecutableType,
+    SCAddress,
+    SCAddressType,
     SCVal,
     SCValType,
     SCVec,
     SCSymbol,
     UInt256,
     UInt32,
-    UInt64,
+    Int64,
     Void
   }
 
   setup do
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
 
-    # OperationID
+    # HashIDPreimageOperationID
     sequence_number = TxSequenceNumber.new(123_456_789)
     op_num = 123
 
-    # RevokeID
+    # HashIDPreimageRevokeID
     pool_id_value = "929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072"
     asset = :native
 
-    # Ed25519ContractID
+    # HashIDPreimageContractID
     network_id = "network_id"
-    ed25519 = 456
-    salt = 456
+    contract_id_preimage = TxContactIDPreimage.new(from_asset: TxAsset.new(:native))
 
-    # StructContractID
-    contract_id = "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
-
-    # HashIDPreimageCreateContractArgs
-    wasm_ref_sc_contract_executable = TxSCContractExecutable.new(wasm_ref: "wasm_ref")
-    token_sc_contract_executable = TxSCContractExecutable.new(:token)
-
-    # HashIDPreimageContractAuth
-    nonce = 987
+    # SorobanAuthorizedInvocation
+    contract_address = TxSCAddress.new("CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y")
     function_name = "function_name"
-    args = [TxSCVal.new(i32: 654)]
+    args = TxSCVec.new([TxSCVal.new(i32: 654)])
 
-    invocation_1 =
-      TxAuthorizedInvocation.new(
-        contract_id: contract_id,
+    contract_function =
+      TxSorobanAuthorizedContractFunction.new(
+        contract_address: contract_address,
         function_name: function_name,
-        args: args,
-        sub_invocations: []
+        args: args
       )
 
-    invocation_2 =
-      TxAuthorizedInvocation.new(
-        contract_id: contract_id,
-        function_name: function_name,
-        args: args,
-        sub_invocations: [invocation_1]
-      )
+    function = TxSorobanAuthorizedFunction.new(contract_fn: contract_function)
+
+    invocation = TxSorobanAuthorizedInvocation.new(function: function, sub_invocations: [])
 
     %{
       operation_id:
@@ -108,34 +100,17 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
           liquidity_pool_id: pool_id_value,
           asset: asset
         ),
-      ed25519_contract_id:
-        TxEd25519ContractID.new(network_id: network_id, ed25519: ed25519, salt: salt),
-      struct_contract_id:
-        TxStructContractID.new(network_id: network_id, contract_id: contract_id, salt: salt),
-      from_asset: TxFromAsset.new(network_id: network_id, asset: asset),
-      source_account_contract_id:
-        TxSourceAccountContractID.new(
+      contract_id:
+        TxHashIDPreimageContractID.new(
           network_id: network_id,
-          source_account: public_key,
-          salt: salt
+          contract_id_preimage: contract_id_preimage
         ),
-      hash_id_preimage_create_contract_arg_wasm_ref:
-        TxHashIDPreimageCreateContractArgs.new(
+      soroban_auth:
+        TxHashIDPreimageSorobanAuthorization.new(
           network_id: network_id,
-          executable: wasm_ref_sc_contract_executable,
-          salt: salt
-        ),
-      hash_id_preimage_create_contract_arg_token:
-        TxHashIDPreimageCreateContractArgs.new(
-          network_id: network_id,
-          executable: token_sc_contract_executable,
-          salt: salt
-        ),
-      hash_id_preimage_contract_auth:
-        TxHashIDPreimageContractAuth.new(
-          network_id: network_id,
-          nonce: nonce,
-          invocation: invocation_2
+          nonce: 123_185,
+          signature_expiration_ledger: 123_541,
+          invocation: invocation
         )
     }
   end
@@ -158,87 +133,24 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     {:error, :invalid_pool_revoke_op_id} = TxHashIDPreimage.new(pool_revoke_op_id: :wrong_value)
   end
 
-  test "new/1 when type is contract_id_from_ed25519", %{ed25519_contract_id: ed25519_contract_id} do
-    %TxHashIDPreimage{type: :contract_id_from_ed25519, value: ^ed25519_contract_id} =
-      TxHashIDPreimage.new(contract_id_from_ed25519: ed25519_contract_id)
+  test "new/1 when type is contract_id", %{contract_id: contract_id} do
+    %TxHashIDPreimage{type: :contract_id, value: ^contract_id} =
+      TxHashIDPreimage.new(contract_id: contract_id)
   end
 
-  test "new/1 when contract_id_from_ed25519 value is wrong" do
-    {:error, :invalid_contract_id_from_ed25519} =
-      TxHashIDPreimage.new(contract_id_from_ed25519: :wrong_value)
-  end
-
-  test "new/1 when type is contract_id_from_contract", %{struct_contract_id: struct_contract_id} do
-    %TxHashIDPreimage{type: :contract_id_from_contract, value: ^struct_contract_id} =
-      TxHashIDPreimage.new(contract_id_from_contract: struct_contract_id)
-  end
-
-  test "new/1 when contract_id_from_contract value is wrong" do
-    {:error, :invalid_contract_id_from_contract} =
-      TxHashIDPreimage.new(contract_id_from_contract: :wrong_value)
-  end
-
-  test "new/1 when type is contract_id_from_asset", %{from_asset: from_asset} do
-    %TxHashIDPreimage{type: :contract_id_from_asset, value: ^from_asset} =
-      TxHashIDPreimage.new(contract_id_from_asset: from_asset)
-  end
-
-  test "new/1 when contract_id_from_asset value is wrong" do
-    {:error, :invalid_contract_id_from_asset} =
-      TxHashIDPreimage.new(contract_id_from_asset: :wrong_value)
-  end
-
-  test "new/1 when type is contact_id_from_source_acc", %{
-    source_account_contract_id: source_account_contract_id
-  } do
-    %TxHashIDPreimage{type: :contact_id_from_source_acc, value: ^source_account_contract_id} =
-      TxHashIDPreimage.new(contact_id_from_source_acc: source_account_contract_id)
+  test "new/1 when contract_id value is wrong" do
+    {:error, :invalid_contract_id} = TxHashIDPreimage.new(contract_id: :wrong_value)
   end
 
   test "new/1 with invalid args" do
     {:error, :invalid_hash_id_preimage_type} = TxHashIDPreimage.new("invalid_args")
   end
 
-  test "new/1 when contact_id_from_source_acc value is wrong" do
-    {:error, :invalid_contact_id_from_source_acc} =
-      TxHashIDPreimage.new(contact_id_from_source_acc: :wrong_value)
-  end
-
-  test "new/1 when type is create_contract_args and the code is wasm_ref", %{
-    hash_id_preimage_create_contract_arg_wasm_ref: hash_id_preimage_create_contract_arg
-  } do
-    %TxHashIDPreimage{type: :create_contract_args, value: ^hash_id_preimage_create_contract_arg} =
-      TxHashIDPreimage.new(create_contract_args: hash_id_preimage_create_contract_arg)
-  end
-
-  test "new/1 when type is create_contract_args and the code is token", %{
-    hash_id_preimage_create_contract_arg_token: hash_id_preimage_create_contract_arg
-  } do
-    %TxHashIDPreimage{type: :create_contract_args, value: ^hash_id_preimage_create_contract_arg} =
-      TxHashIDPreimage.new(create_contract_args: hash_id_preimage_create_contract_arg)
-  end
-
-  test "new/1 when create_contract_args value is wrong" do
-    {:error, :invalid_create_contract_args} =
-      TxHashIDPreimage.new(create_contract_args: :wrong_value)
-  end
-
-  test "new/1 when type is contract_auth", %{
-    hash_id_preimage_contract_auth: hash_id_preimage_contract_auth
-  } do
-    %TxHashIDPreimage{type: :contract_auth, value: ^hash_id_preimage_contract_auth} =
-      TxHashIDPreimage.new(contract_auth: hash_id_preimage_contract_auth)
-  end
-
-  test "new/1 when contract_auth value is wrong" do
-    {:error, :invalid_contract_auth} = TxHashIDPreimage.new(contract_auth: :wrong_value)
-  end
-
   test "to_xdr/1 when type is op_id", %{operation_id: operation_id} do
     %HashIDPreimage{
-      hash_id: %OperationID{
+      value: %HashIDPreimageOperationID{
         op_num: %UInt32{datum: 123},
-        sequence_number: %SequenceNumber{sequence_number: 123_456_789},
+        seq_num: %SequenceNumber{sequence_number: 123_456_789},
         source_account: %AccountID{
           account_id: %PublicKey{
             public_key: %UInt256{
@@ -258,7 +170,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
 
   test "to_xdr/1 when type is pool_revoke_op_id", %{revoke_id: revoke_id} do
     %HashIDPreimage{
-      hash_id: %RevokeID{
+      value: %HashIDPreimageRevokeID{
         source_account: %AccountID{
           account_id: %PublicKey{
             public_key: %UInt256{
@@ -269,7 +181,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
             type: %PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
           }
         },
-        sequence_number: %SequenceNumber{sequence_number: 123_456_789},
+        seq_num: %SequenceNumber{sequence_number: 123_456_789},
         op_num: %UInt32{datum: 123},
         liquidity_pool_id: %PoolID{
           value:
@@ -287,153 +199,69 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
       |> TxHashIDPreimage.to_xdr()
   end
 
-  test "to_xdr/1 when type is contract_id_from_ed25519", %{
-    ed25519_contract_id: ed25519_contract_id
-  } do
+  test "to_xdr/1 when type is contract_id", %{contract_id: contract_id} do
     %HashIDPreimage{
-      hash_id: %Ed25519ContractID{
-        ed25519: %UInt256{datum: 456},
+      value: %HashIDPreimageContractID{
         network_id: %Hash{value: "network_id"},
-        salt: %UInt256{datum: 456}
-      },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_CONTRACT_ID_FROM_ED25519
-      }
-    } =
-      TxHashIDPreimage.new(contract_id_from_ed25519: ed25519_contract_id)
-      |> TxHashIDPreimage.to_xdr()
-  end
-
-  test "to_xdr/1 when type is contract_id_from_contract", %{
-    struct_contract_id: struct_contract_id
-  } do
-    %HashIDPreimage{
-      hash_id: %StructContractID{
-        network_id: %Hash{value: "network_id"},
-        contract_id: %Hash{
-          value: "0461168cbbae0da96c543b71fd571aec4b44549d503f9af9e7685ccedbc1613c"
-        },
-        salt: %UInt256{datum: 456}
-      },
-      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_POOL_REVOKE_OP_ID}
-    } =
-      TxHashIDPreimage.new(contract_id_from_contract: struct_contract_id)
-      |> TxHashIDPreimage.to_xdr()
-  end
-
-  test "to_xdr/1 when type is contract_id_from_asset", %{from_asset: from_asset} do
-    %HashIDPreimage{
-      hash_id: %FromAsset{
-        network_id: %Hash{value: "network_id"},
-        asset: %Asset{
-          asset: %Void{value: nil},
-          type: %AssetType{identifier: :ASSET_TYPE_NATIVE}
-        }
-      },
-      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_CONTRACT_ID_FROM_ASSET}
-    } =
-      TxHashIDPreimage.new(contract_id_from_asset: from_asset)
-      |> TxHashIDPreimage.to_xdr()
-  end
-
-  test "to_xdr/1 when type is contact_id_from_source_acc", %{
-    source_account_contract_id: source_account_contract_id
-  } do
-    %HashIDPreimage{
-      hash_id: %SourceAccountContractID{
-        network_id: %Hash{value: "network_id"},
-        salt: %UInt256{datum: 456},
-        source_account: %AccountID{
-          account_id: %PublicKey{
-            public_key: %UInt256{
-              datum:
-                <<124, 84, 92, 174, 34, 185, 234, 132, 96, 55, 105, 43, 197, 74, 26, 112, 87, 6,
-                  25, 27, 0, 247, 99, 30, 96, 184, 166, 70, 114, 125, 104, 125>>
-            },
-            type: %PublicKeyType{
-              identifier: :PUBLIC_KEY_TYPE_ED25519
-            }
+        contract_id_preimage: %ContractIDPreimage{
+          value: %Asset{
+            asset: %Void{value: nil},
+            type: %AssetType{identifier: :ASSET_TYPE_NATIVE}
+          },
+          type: %ContractIDPreimageType{
+            identifier: :CONTRACT_ID_PREIMAGE_FROM_ASSET
           }
         }
       },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_CONTRACT_ID_FROM_SOURCE_ACCOUNT
-      }
+      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_CONTRACT_ID}
     } =
-      TxHashIDPreimage.new(contact_id_from_source_acc: source_account_contract_id)
+      TxHashIDPreimage.new(contract_id: contract_id)
       |> TxHashIDPreimage.to_xdr()
   end
 
-  test "to_xdr/1 when type is create_contract_args", %{
-    hash_id_preimage_create_contract_arg_token: hash_id_preimage_create_contract_arg
-  } do
+  test "to_xdr/1 when type is soroban_auth", %{soroban_auth: soroban_auth} do
     %HashIDPreimage{
-      hash_id: %HashIDPreimageCreateContractArgs{
+      value: %HashIDPreimageSorobanAuthorization{
         network_id: %Hash{value: "network_id"},
-        salt: %UInt256{datum: 456},
-        executable: %SCContractExecutable{
-          contract_executable: %Void{value: nil},
-          type: %SCContractExecutableType{
-            identifier: :SCCONTRACT_EXECUTABLE_TOKEN
-          }
-        }
-      },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_CREATE_CONTRACT_ARGS
-      }
-    } =
-      TxHashIDPreimage.new(create_contract_args: hash_id_preimage_create_contract_arg)
-      |> TxHashIDPreimage.to_xdr()
-  end
-
-  test "to_xdr/1 when type is contract_auth", %{
-    hash_id_preimage_contract_auth: hash_id_preimage_contract_auth
-  } do
-    %HashIDPreimage{
-      hash_id: %HashIDPreimageContractAuth{
-        network_id: %Hash{value: "network_id"},
-        nonce: %UInt64{datum: 987},
-        invocation: %AuthorizedInvocation{
-          contract_id: %Hash{
-            value:
-              <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68, 84,
-                157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-          },
-          function_name: %SCSymbol{value: "function_name"},
-          args: %SCVec{
-            sc_vals: [
-              %SCVal{
-                value: %Int32{datum: 654},
-                type: %SCValType{identifier: :SCV_I32}
-              }
-            ]
-          },
-          sub_invocations: %AuthorizedInvocationList{
-            sub_invocations: [
-              %AuthorizedInvocation{
-                contract_id: %Hash{
+        nonce: %Int64{datum: 123_185},
+        signature_expiration_ledger: %UInt32{datum: 123_541},
+        invocation: %SorobanAuthorizedInvocation{
+          function: %SorobanAuthorizedFunction{
+            value: %SorobanAuthorizedContractFunction{
+              contract_address: %SCAddress{
+                sc_address: %Hash{
                   value:
                     <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
                       68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
                 },
-                function_name: %SCSymbol{value: "function_name"},
-                args: %SCVec{
-                  sc_vals: [
-                    %SCVal{
-                      value: %Int32{datum: 654},
-                      type: %SCValType{identifier: :SCV_I32}
-                    }
-                  ]
-                },
-                sub_invocations: %AuthorizedInvocationList{sub_invocations: []}
+                type: %SCAddressType{
+                  identifier: :SC_ADDRESS_TYPE_CONTRACT
+                }
+              },
+              function_name: %SCSymbol{value: "function_name"},
+              args: %SCVec{
+                items: [
+                  %SCVal{
+                    value: %Int32{datum: 654},
+                    type: %SCValType{identifier: :SCV_I32}
+                  }
+                ]
               }
-            ]
+            },
+            type: %SorobanAuthorizedFunctionType{
+              identifier: :SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN
+            }
+          },
+          sub_invocations: %SorobanAuthorizedInvocationList{
+            items: []
           }
         }
       },
-      type: %EnvelopeType{identifier: :ENVELOPE_TYPE_CONTRACT_AUTH}
+      type: %EnvelopeType{
+        identifier: :ENVELOPE_TYPE_SOROBAN_AUTHORIZATION
+      }
     } =
-      TxHashIDPreimage.new(contract_auth: hash_id_preimage_contract_auth)
+      TxHashIDPreimage.new(soroban_auth: soroban_auth)
       |> TxHashIDPreimage.to_xdr()
   end
 end

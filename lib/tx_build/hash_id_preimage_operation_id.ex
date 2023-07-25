@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.OperationID do
+defmodule Stellar.TxBuild.HashIDPreimageOperationID do
   @moduledoc """
-  `OperationID` struct definition.
+  `HashIDPreimageOperationID` struct definition.
   """
   import Stellar.TxBuild.Validations,
     only: [
@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.OperationID do
     ]
 
   alias Stellar.TxBuild.{AccountID, SequenceNumber}
-  alias StellarBase.XDR.{OperationID, UInt32}
+  alias StellarBase.XDR.{HashIDPreimageOperationID, UInt32}
 
   @type t :: %__MODULE__{
           source_account: AccountID.t(),
@@ -53,7 +53,7 @@ defmodule Stellar.TxBuild.OperationID do
     sequence_number = SequenceNumber.to_xdr(sequence_number)
     op_num = UInt32.new(op_num)
 
-    OperationID.new(source_account, sequence_number, op_num)
+    HashIDPreimageOperationID.new(source_account, sequence_number, op_num)
   end
 
   def to_xdr(_error), do: {:error, :invalid_struct_operation_id}

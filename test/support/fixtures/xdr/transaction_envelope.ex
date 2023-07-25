@@ -70,7 +70,7 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
                   source_account: nil
                 },
                 body: %OperationBody{
-                  operation: %Operations.CreateAccount{
+                  value: %Operations.CreateAccount{
                     destination: %AccountID{
                       account_id: %PublicKey{
                         public_key: %UInt256{
@@ -154,7 +154,7 @@ defmodule Stellar.Test.Fixtures.XDR.TransactionEnvelope do
                   source_account: nil
                 },
                 body: %OperationBody{
-                  operation: %Operations.CreateAccount{
+                  value: %Operations.CreateAccount{
                     destination: %AccountID{
                       account_id: %PublicKey{
                         public_key: %UInt256{
