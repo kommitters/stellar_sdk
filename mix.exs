@@ -44,7 +44,7 @@ defmodule Stellar.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:excoveralls, "~> 0.16", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.29", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.30", only: :dev, runtime: false}
     ]
   end
 
