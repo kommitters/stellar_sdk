@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.16.0 (25.07.2023)
+
+* Add support for contract function invocation with Soroban Preview 10.
+* Update all dependencies.
+
 ## 0.15.1 (13.06.2023)
 
 * Fix `SCAddress` contract type.
