@@ -63,7 +63,6 @@ defmodule Stellar.TxBuild.InvokeHostFunction do
         auths: [%SorobanAuthorizationEntry{} | _] = auths
       }) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
-    SCEC_INTERNAL_ERROR
 
     auth =
       auths
