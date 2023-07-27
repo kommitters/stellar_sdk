@@ -31,7 +31,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.16.0"}
+    {:stellar_sdk, "~> 0.16.1"}
   ]
 end
 ```

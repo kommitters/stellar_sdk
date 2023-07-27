@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0 (27.07.2023)
+
+* Update stellar base dependency.
+
 ## 0.16.0 (25.07.2023)
 
 * Add support for contract function invocation with Soroban Preview 10.
