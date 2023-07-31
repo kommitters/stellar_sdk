@@ -212,11 +212,10 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
        ) do
     {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
     raw_public_key = KeyPair.raw_public_key(public_key)
-    network_id = network_id_xdr()
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_SOROBAN_AUTHORIZATION)
 
     signature =
-      network_id
+      network_id_xdr()
       |> Hash.new()
       |> HashIDPreimageSorobanAuthorizationXDR.new(
         nonce,
