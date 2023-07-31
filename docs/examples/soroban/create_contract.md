@@ -1,4 +1,5 @@
 # Create Contract
+
 > **Warning**
 > Please note that Soroban is still under development, so breaking changes may occur.
 
@@ -13,26 +14,36 @@ There are two types of contract creations:
 alias Stellar.TxBuild.{
   Account,
   BaseFee,
-  InvokeHostFunction,
+  ContractExecutable,
+  ContractIDPreimage,
+  ContractIDPreimageFromAddress,
+  CreateContractArgs,
   HostFunction,
-  HostFunctionArgs,
+  InvokeHostFunction,
   SequenceNumber,
-  Signature
+  Signature,
+  SCAddress
 }
 
 alias Stellar.Horizon.Accounts
 
-wasm_id = <<some binary here>>
+wasm_ref = <<some binary here>>
+address = SCAddress.new("GDEU46HFMHBHCSFA3K336I3MJSBZCWVI3LUGSNL6AF2BW2Q2XR7NNAPM")
+salt = :crypto.strong_rand_bytes(32)
 
-function_args =
-  HostFunctionArgs.new(
-    type: :create,
-    wasm_id: wasm_id
+address_preimage = ContractIDPreimageFromAddress.new(address: address, salt: salt)
+contract_id_preimage = ContractIDPreimage.new(from_address: address_preimage)
+contract_executable = ContractExecutable.new(wasm_ref: wasm_ref)
+
+create_contract_args =
+  CreateContractArgs.new(
+    contract_id_preimage: contract_id_preimage,
+    contract_executable: contract_executable
   )
 
-function = HostFunction.new(args: function_args)
+host_function = HostFunction.new(create_contract: create_contract_args)
 
-invoke_host_function_op = InvokeHostFunction.new(functions: [function])
+invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 keypair =
   {public_key, _secret} =
@@ -54,9 +65,9 @@ source_account
 
 # Simulate Transaction
 soroban_data =
-  "AAAAAQAAAAdw47HdjY6bhECndnofWxQ6D1mDQaYxvykdKi4f7bz4ygAAAAEAAAAGSCB+H17w48TbOf0PtCgDnGu0zOOzuVjMYSzmMYZOD0kAAAAUAAFCiwAAQ1QAAACAAAAAqAAAAAAAAAAhAAAAAA=="
+  "AAAAAAAAAAEAAAAHuoVwkiq7sFT5+6wPecWIC3zW3SXzDactjjMN9VUNzQIAAAAAAAAAAQAAAAYAAAABet+3VCiKSYoZDd/Ce32Dtp9tYwNFc64V/QfdZUJm4boAAAAUAAAAAQAAAAAAAX/UAAACyAAAAKQAAADYAAAAAAAAACs="
 
-min_resource_fee = 54439
+min_resource_fee = 38_733
 fee = BaseFee.new(min_resource_fee + 100)
 
 # Use the XDR generated here to send it to the futurenet
@@ -78,9 +89,11 @@ alias Stellar.TxBuild.{
   Account,
   Asset,
   BaseFee,
-  InvokeHostFunction,
+  CreateContractArgs,
+  ContractIDPreimage,
+  ContractExecutable,
   HostFunction,
-  HostFunctionArgs,
+  InvokeHostFunction,
   SequenceNumber,
   Signature
 }
@@ -91,15 +104,18 @@ keypair = {public_key, _secret} = Stellar.KeyPair.from_secret_seed("SCA...3EK")
 
 asset = Asset.new(code: :ABC, issuer: public_key)
 
-function_args =
-  HostFunctionArgs.new(
-    type: :create,
-    asset: asset
+contract_id_preimage = ContractIDPreimage.new(from_asset: asset)
+    contract_executable = ContractExecutable.new(:token)
+
+create_contract_args =
+  CreateContractArgs.new(
+    contract_id_preimage: contract_id_preimage,
+    contract_executable: contract_executable
   )
 
-function = HostFunction.new(args: function_args)
+host_function = HostFunction.new(create_contract: create_contract_args)
 
-invoke_host_function_op = InvokeHostFunction.new(functions: [function])
+invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 source_account = Account.new(public_key)
 
@@ -115,9 +131,9 @@ source_account
 |> Stellar.TxBuild.envelope()
 
 soroban_data =
-  "AAAAAAAAAAQAAAAGy7BJuM4i1Q0rEQ2fd0X9qJqvJugM2lEpbY21qRJAzmsAAAAPAAAACE1FVEFEQVRBAAAABsuwSbjOItUNKxENn3dF/aiaryboDNpRKW2NtakSQM5rAAAAEAAAAAEAAAABAAAADwAAAAVBZG1pbgAAAAAAAAbLsEm4ziLVDSsRDZ93Rf2omq8m6AzaUSltjbWpEkDOawAAABAAAAABAAAAAQAAAA8AAAAJQXNzZXRJbmZvAAAAAAAABsuwSbjOItUNKxENn3dF/aiaryboDNpRKW2NtakSQM5rAAAAFAAD2ZUAAADgAAADFAAAA/QAAAAAAAAAxgAAAAA="
+  "AAAAAAAAAAAAAAABAAAABgAAAAH3mbzcS3de+8X2xbTs9y5hcKA2c5Nvip1EIroM6x+eqAAAABQAAAABAAAAAAAEIzgAAAA0AAACGAAAA0gAAAAAAAAApQ=="
 
-min_resource_fee = 12_7568
+min_resource_fee = 36_155
 fee = BaseFee.new(min_resource_fee + 100)
 
 # Use the XDR generated here to send it to the futurenet
