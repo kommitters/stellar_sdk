@@ -133,7 +133,8 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
       xdr_with_auth: xdr_with_auth
     } do
       ^xdr_with_auth =
-        InvokeHostFunction.new(host_function: host_function, auths: auths)
+        [host_function: host_function, auths: auths]
+        |> InvokeHostFunction.new()
         |> InvokeHostFunction.to_xdr()
     end
   end

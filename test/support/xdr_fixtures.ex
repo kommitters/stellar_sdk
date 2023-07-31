@@ -816,11 +816,15 @@ defmodule Stellar.Test.XDRFixtures do
         ) :: OperationBody.t()
   def invoke_host_function_op_xdr(function, auths) do
     op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
-    auths = Enum.map(auths, &TxSorobanAuthorizationEntry.to_xdr/1)
+
+    auths =
+      auths
+      |> Enum.map(&TxSorobanAuthorizationEntry.to_xdr/1)
+      |> SorobanAuthorizationEntryList.new()
 
     function
     |> TxHostFunction.to_xdr()
-    |> InvokeHostFunction.new(SorobanAuthorizationEntryList.new(auths))
+    |> InvokeHostFunction.new(auths)
     |> OperationBody.new(op_type)
   end
 

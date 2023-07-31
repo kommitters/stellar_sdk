@@ -12,7 +12,6 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
   alias StellarBase.XDR.SorobanAddressCredentials, as: SorobanAddressCredentialsXDR
   alias StellarBase.XDR.SorobanAuthorizedInvocation, as: SorobanAuthorizedInvocationXDR
   alias StellarBase.XDR.{EnvelopeType, Hash, Int64, SorobanAuthorizationEntry, UInt32}
-
   alias Stellar.{KeyPair, Network}
 
   alias Stellar.TxBuild.{
@@ -32,7 +31,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
   @type validation :: {:ok, any()} | error()
   @type base_64 :: String.t()
   @type secret_key :: String.t()
-  @type signed_authorization :: String.t()
+  @type sign_authorization :: String.t()
   @type latest_ledger :: non_neg_integer()
   @type credentials :: SorobanCredentials.t()
   @type root_invocation :: SorobanAuthorizedInvocation.t()
@@ -138,7 +137,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
           base_64 :: base_64(),
           secret_key :: secret_key(),
           latest_ledger :: latest_ledger()
-        ) :: signed_authorization() | error()
+        ) :: sign_authorization() | error()
   def sign_xdr(base_64, secret_key, latest_ledger)
       when is_binary(base_64) and is_binary(secret_key) and is_integer(latest_ledger) do
     {%SorobanAuthorizationEntry{
@@ -159,21 +158,18 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
     signature_expiration_ledger = UInt32.new(latest_ledger + 3)
 
     signature_args =
-      build_signature_args_from_xdr(
-        nonce,
+      nonce
+      |> build_signature_args_from_xdr(
         signature_expiration_ledger,
         root_invocation,
         secret_key
       )
-
-    signature_xdr_val =
-      signature_args
       |> SCVal.to_xdr()
       |> (&SCVecXDR.new([&1])).()
 
     soroban_address_credentials = %{
       soroban_address_credentials
-      | signature_args: signature_xdr_val,
+      | signature_args: signature_args,
         signature_expiration_ledger: signature_expiration_ledger
     }
 
