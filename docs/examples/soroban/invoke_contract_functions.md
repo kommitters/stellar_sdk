@@ -1,4 +1,5 @@
 # Invoke Contract Function
+
 > **Warning**
 > Please note that Soroban is still under development, so breaking changes may occur.
 
@@ -133,19 +134,15 @@ source_account
 |> Stellar.TxBuild.envelope()
 ```
 
-### With Stellar Account Authorization (WIP: Preview 10 support)
+### With Stellar Account Authorization
 
 ```elixir
 alias StellarBase.XDR.{SorobanResources, SorobanTransactionData, UInt32}
 
 alias Stellar.TxBuild.{
-  ContractAuth,
-  AddressWithNonce,
-  AuthorizedInvocation,
   BaseFee,
   InvokeHostFunction,
   HostFunction,
-  HostFunctionArgs,
   SCVal,
   SCAddress,
   SequenceNumber,
@@ -155,8 +152,11 @@ alias Stellar.TxBuild.{
 alias Stellar.Horizon.Accounts
 alias Stellar.KeyPair
 
-contract_id = "8367a1324fdbb56d41e6a6cea2364e389e9f4e17d3ebea810d7bdeca663c2cd5"
-function_name = "inc"
+contract_address =
+  "CAMGSYINVVL6WP3Q5WPNL7FS4GZP37TWV7MKIRQF5QMYLK3N2SW4P3RC"
+  |> SCAddress.new()
+  |> (&SCVal.new(address: &1)).()
+function_name = SCVal.new(symbol: "inc")
 
 ## invoker
 {public_key, secret_key} =
@@ -169,45 +169,25 @@ keypair2 =
 
 address_type = SCAddress.new(public_key)
 address = SCVal.new(address: address_type)
-args = [address, SCVal.new(u128: %{hi: 0, lo: 2})]
 
-function_args =
-  HostFunctionArgs.new(
-    type: :invoke,
-    contract_id: contract_id,
-    function_name: function_name,
-    args: args
-  )
+args =
+  SCVec.new([
+    contract_address,
+    function_name,
+    address,
+    SCVal.new(u128: %{hi: 0, lo: 2})
+  ])
 
-auth_invocation =
-  AuthorizedInvocation.new(
-    contract_id: contract_id,
-    function_name: function_name,
-    args: args,
-    sub_invocations: []
-  )
+host_function = HostFunction.new(invoke_contract: args)
 
-# Nonce increment by 1 each successfully contract call
-address_with_nonce = AddressWithNonce.new(address: address_type, nonce: 0)
-
-contract_auth =
-  ContractAuth.new(
-    address_with_nonce: address_with_nonce,
-    authorized_invocation: auth_invocation
-  )
-  |> ContractAuth.sign(secret_key)
-
-function = HostFunction.new(args: function_args, auth: [contract_auth])
-
-invoke_host_function_op =
-  InvokeHostFunction.new(functions: [function], source_account: public_key_2)
+invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 source_account = Stellar.TxBuild.Account.new(public_key_2)
-{:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
+{:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key_2)
 sequence_number = SequenceNumber.new(seq_num)
 signature = Stellar.TxBuild.Signature.new(keypair2)
 
-# Use this XDR to simulate the transaction and get the soroban_data and min_resource_fee
+# Use this XDR to simulate the transaction and get the soroban_data, the invoke_host_function auth and the min_resource_fee
 source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
 |> Stellar.TxBuild.add_operation(invoke_host_function_op)
@@ -218,9 +198,18 @@ source_account
    resources: %SorobanResources{instructions: %UInt32{datum: datum}} = resources
  } = soroban_data,
  ""} =
-  "AAAAAwAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAGg2ehMk/btW1B5qbOojZOOJ6fThfT6+qBDXveymY8LNUAAAAUAAAAB0YZgeyJouAsCYZs6da/3e+lEoTyazuT0hzldmfbT2xPAAAAAgAAAAaDZ6EyT9u1bUHmps6iNk44np9OF9Pr6oENe97KZjws1QAAABAAAAABAAAAAgAAAA8AAAAHQ291bnRlcgAAAAATAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1gAAAAaDZ6EyT9u1bUHmps6iNk44np9OF9Pr6oENe97KZjws1QAAABUAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WABQR1AAAFLAAAAGoAAACZAAAAAAAAAB4AAAAAA=="
+  "AAAAAAAAAAIAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAAB5g18rNSrgYpg/O7tgIlBv42+QqjpEFv6gEqW+oDFUZbAAAAAAAAAAIAAAAGAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1gAAABU69WqNb/7SRQAAAAAAAAAAAAAABgAAAAEYaWENrVfrP3DtntX8suGy/f52r9ikRgXsGYWrbdStxwAAABQAAAABAAAAAAA4FMMAABWQAAABmAAAA/AAAAAAAAAAxQ=="
 |> Base.decode64!()
 |> SorobanTransactionData.decode_xdr!()
+
+# Use the Soroban RPC `getLatestLedger` endpoint to obtain this number.
+# This number needs to be in the same ledger when sending the transaction envelope to the `sendTransaction` endpoint, otherwise the function invocation would fail.
+latest_ledger = 164_265
+
+auth_xdr = "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftY69WqNb/7SRQAAAAAAAAAAAAAAAAAAAAEYaWENrVfrP3DtntX8suGy/f52r9ikRgXsGYWrbdStxwAAAANpbmMAAAAAAgAAABIAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAACQAAAAAAAAAAAAAAAAAAAAIAAAAA"
+
+auth = SorobanAuthorizationEntry.sign_xdr(auth_xdr, secret_key, latest_ledger)
+invoke_host_function_op = InvokeHostFunction.set_auth(invoke_host_function_op, [auth])
 
 # Needed calculations since simulate_transaction returns soroban_data
 # with wrong calculated instructions value because there are two signers
@@ -229,7 +218,7 @@ new_resources = %{resources | instructions: new_instructions}
 soroban_data = %{soroban_data | resources: new_resources}
 
 # Arbitrary additional fee(10_000)
-min_resource_fee = 97_397 + 10_000
+min_resource_fee = 115_070 + 10_000
 fee = BaseFee.new(min_resource_fee + 100)
 
 # Use the XDR generated here to send it to the futurenet
