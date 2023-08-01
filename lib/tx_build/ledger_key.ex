@@ -2,12 +2,32 @@ defmodule Stellar.TxBuild.LedgerKey do
   @moduledoc """
   `LedgerKey` struct definition.
   """
+
   alias StellarBase.XDR.{LedgerEntryType, LedgerKey}
-  alias Stellar.TxBuild.Ledger.{Account, ClaimableBalance, Data, LiquidityPool, Offer, Trustline}
+
+  alias Stellar.TxBuild.Ledger.{
+    Account,
+    ClaimableBalance,
+    Data,
+    LedgerKeyContractCode,
+    LedgerKeyContractData,
+    LiquidityPool,
+    Offer,
+    Trustline
+  }
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type type :: :account | :trustline | :offer | :data | :claimable_balance | :liquidity_pool
+  @type type ::
+          :account
+          | :trustline
+          | :offer
+          | :data
+          | :claimable_balance
+          | :liquidity_pool
+          | :contract_data
+          | :contract_code
+
   @type entry ::
           Account.t()
           | ClaimableBalance.t()
@@ -15,6 +35,8 @@ defmodule Stellar.TxBuild.LedgerKey do
           | LiquidityPool.t()
           | Offer.t()
           | Trustline.t()
+          | LedgerKeyContractData.t()
+          | LedgerKeyContractCode.t()
 
   @type t :: %__MODULE__{type: type(), entry: entry()}
 
@@ -74,6 +96,32 @@ defmodule Stellar.TxBuild.LedgerKey do
     end
   end
 
+  def new(
+        {:contract_data, args},
+        _opts
+      ) do
+    case LedgerKeyContractData.new(args) do
+      %LedgerKeyContractData{} = contract_data ->
+        %__MODULE__{type: :contract_data, entry: contract_data}
+
+      _error ->
+        {:error, :invalid_contract_data}
+    end
+  end
+
+  def new(
+        {:contract_code, args},
+        _opts
+      ) do
+    case LedgerKeyContractCode.new(args) do
+      %LedgerKeyContractCode{} = contract_code ->
+        %__MODULE__{type: :contract_code, entry: contract_code}
+
+      _error ->
+        {:error, :invalid_contract_data}
+    end
+  end
+
   def new(_args, _opts), do: {:error, :invalid_ledger_key}
 
   @impl true
@@ -92,4 +140,6 @@ defmodule Stellar.TxBuild.LedgerKey do
   defp ledger_entry_type(:data), do: LedgerEntryType.new(:DATA)
   defp ledger_entry_type(:claimable_balance), do: LedgerEntryType.new(:CLAIMABLE_BALANCE)
   defp ledger_entry_type(:liquidity_pool), do: LedgerEntryType.new(:LIQUIDITY_POOL)
+  defp ledger_entry_type(:contract_data), do: LedgerEntryType.new(:CONTRACT_DATA)
+  defp ledger_entry_type(:contract_code), do: LedgerEntryType.new(:CONTRACT_CODE)
 end
