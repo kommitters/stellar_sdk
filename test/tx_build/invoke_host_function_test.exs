@@ -14,7 +14,8 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     SorobanAuthorizationEntry
   }
 
-  import Stellar.Test.XDRFixtures, only: [invoke_host_function_op_xdr: 1]
+  import Stellar.Test.XDRFixtures,
+    only: [invoke_host_function_op_xdr: 1, invoke_host_function_op_xdr: 2]
 
   describe "InvokeHostFunction" do
     setup do
@@ -57,7 +58,8 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         invoke_host_function_op: invoke_host_function_op,
         auths: auths,
         base_64_auths: base_64_auths,
-        xdr: invoke_host_function_op_xdr(host_function)
+        xdr: invoke_host_function_op_xdr(host_function),
+        xdr_with_auth: invoke_host_function_op_xdr(host_function, auths)
       }
     end
 
@@ -114,11 +116,26 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         |> InvokeHostFunction.set_auth(:invalid)
     end
 
+    test "new/2 with invalid attributes" do
+      {:error, :invalid_operation_attributes} = InvokeHostFunction.new(:invalid)
+    end
+
     test "to_xdr/1", %{
       invoke_host_function_op: invoke_host_function_op,
       xdr: xdr
     } do
       ^xdr = InvokeHostFunction.to_xdr(invoke_host_function_op)
+    end
+
+    test "to_xdr/2 with auth entry list", %{
+      host_function: host_function,
+      auths: auths,
+      xdr_with_auth: xdr_with_auth
+    } do
+      ^xdr_with_auth =
+        [host_function: host_function, auths: auths]
+        |> InvokeHostFunction.new()
+        |> InvokeHostFunction.to_xdr()
     end
   end
 end
