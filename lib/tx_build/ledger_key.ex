@@ -118,7 +118,7 @@ defmodule Stellar.TxBuild.LedgerKey do
         %__MODULE__{type: :contract_code, entry: contract_code}
 
       _error ->
-        {:error, :invalid_contract_data}
+        {:error, :invalid_contract_code}
     end
   end
 

@@ -21,7 +21,7 @@ defmodule Stellar.TxBuild.LedgerFootprint do
   defstruct [:read_only, :read_write]
 
   @impl true
-  def new(args, opts \\ [])
+  def new(args \\ [], opts \\ [])
 
   def new(args, _opts) when is_list(args) do
     read_only = Keyword.get(args, :read_only, [])
