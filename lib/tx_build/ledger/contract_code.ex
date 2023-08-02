@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.Ledger.LedgerKeyContractCode do
+defmodule Stellar.TxBuild.Ledger.ContractCode do
   @moduledoc """
-  `LedgerKeyContractCode` struct definition.
+  `ContractCode` struct definition.
   """
 
   alias StellarBase.XDR.{ContractEntryBodyType, Hash, LedgerKeyContractCode}

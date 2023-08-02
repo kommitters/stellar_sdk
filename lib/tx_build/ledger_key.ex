@@ -9,8 +9,8 @@ defmodule Stellar.TxBuild.LedgerKey do
     Account,
     ClaimableBalance,
     Data,
-    LedgerKeyContractCode,
-    LedgerKeyContractData,
+    ContractCode,
+    ContractData,
     LiquidityPool,
     Offer,
     Trustline
@@ -35,8 +35,8 @@ defmodule Stellar.TxBuild.LedgerKey do
           | LiquidityPool.t()
           | Offer.t()
           | Trustline.t()
-          | LedgerKeyContractData.t()
-          | LedgerKeyContractCode.t()
+          | ContractData.t()
+          | ContractCode.t()
 
   @type t :: %__MODULE__{type: type(), entry: entry()}
 
@@ -100,8 +100,8 @@ defmodule Stellar.TxBuild.LedgerKey do
         {:contract_data, args},
         _opts
       ) do
-    case LedgerKeyContractData.new(args) do
-      %LedgerKeyContractData{} = contract_data ->
+    case ContractData.new(args) do
+      %ContractData{} = contract_data ->
         %__MODULE__{type: :contract_data, entry: contract_data}
 
       _error ->
@@ -113,8 +113,8 @@ defmodule Stellar.TxBuild.LedgerKey do
         {:contract_code, args},
         _opts
       ) do
-    case LedgerKeyContractCode.new(args) do
-      %LedgerKeyContractCode{} = contract_code ->
+    case ContractCode.new(args) do
+      %ContractCode{} = contract_code ->
         %__MODULE__{type: :contract_code, entry: contract_code}
 
       _error ->

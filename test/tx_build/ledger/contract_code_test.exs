@@ -1,7 +1,7 @@
-defmodule Stellar.TxBuild.Ledger.LedgerKeyContractCodeTest do
+defmodule Stellar.TxBuild.Ledger.ContractCodeTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.Ledger.LedgerKeyContractCode
+  alias Stellar.TxBuild.Ledger.ContractCode
 
   setup do
     hash = "ABC123"
@@ -16,17 +16,17 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractCodeTest do
   end
 
   test "new/1 data_entry", %{hash: hash, body_type_data_entry: body_type} do
-    %LedgerKeyContractCode{hash: ^hash, body_type: ^body_type} =
-      LedgerKeyContractCode.new(hash: hash, body_type: body_type)
+    %ContractCode{hash: ^hash, body_type: ^body_type} =
+      ContractCode.new(hash: hash, body_type: body_type)
   end
 
   test "new/1 expiration_ext", %{hash: hash, body_type_expiration_ext: body_type} do
-    %LedgerKeyContractCode{hash: ^hash, body_type: ^body_type} =
-      LedgerKeyContractCode.new([{:hash, hash}, {:body_type, body_type}])
+    %ContractCode{hash: ^hash, body_type: ^body_type} =
+      ContractCode.new([{:hash, hash}, {:body_type, body_type}])
   end
 
   test "new/1 with invalid args" do
-    {:error, :invalid_ledger_key_args} = LedgerKeyContractCode.new("ABC", "ABC")
+    {:error, :invalid_ledger_key_args} = ContractCode.new("ABC", "ABC")
   end
 
   test "to_xdr/1 data_entry", %{hash: hash, body_type_data_entry: body_type} do
@@ -35,8 +35,8 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractCodeTest do
       body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
     } =
       [{:hash, hash}, {:body_type, body_type}]
-      |> LedgerKeyContractCode.new()
-      |> LedgerKeyContractCode.to_xdr()
+      |> ContractCode.new()
+      |> ContractCode.to_xdr()
   end
 
   test "to_xdr/1 expiration_ext", %{hash: hash, body_type_expiration_ext: body_type} do
@@ -45,11 +45,11 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractCodeTest do
       body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :EXPIRATION_EXTENSION}
     } =
       [{:hash, hash}, {:body_type, body_type}]
-      |> LedgerKeyContractCode.new()
-      |> LedgerKeyContractCode.to_xdr()
+      |> ContractCode.new()
+      |> ContractCode.to_xdr()
   end
 
   test "to_xdr/1 with invalid struct" do
-    {:error, :invalid_struct} = LedgerKeyContractCode.to_xdr(%{})
+    {:error, :invalid_struct} = ContractCode.to_xdr(%{})
   end
 end

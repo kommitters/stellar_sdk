@@ -1,10 +1,13 @@
 # Bump Footprint Expiration
+Soroban smart contracts have an expiration time and they should subsidize the shared state lifetime extension fees by manually submitting bump operations, the `BumpFootprintExpirationOp` is used to extend a smart contract lifetime.
+
+In this example, we will bump the contract instance of an already deployed contract in the network, adding 1000 ledgers to it.
 
 > **Warning**
 > Please note that Soroban is still under development, so breaking changes may occur.
 
 > **Note**
-> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to achieve the contract upload.
+> All this actions require to use `simulateTransaction` and `sendTransaction` RPC endpoints when specified in the code comments to achieve the bump footprint expiration.
 
 ```elixir
 alias Stellar.TxBuild.{
@@ -16,6 +19,7 @@ alias Stellar.TxBuild.{
   SCVal,
   SequenceNumber,
   Signature,
+  SorobanResources,
   SorobanTransactionData
 }
 
@@ -45,13 +49,14 @@ contract_code = LedgerKey.new({:contract_code, [hash: hash, body_type: :data_ent
 footprint = LedgerFootprint.new(read_only: [contract_data, contract_code])
 
 soroban_data =
-TxSorobanResources.new(
+[
   footprint: footprint,
   instructions: 0,
   read_bytes: 0,
   write_bytes: 0,
   extended_meta_data_size_bytes: 0
-)
+]
+|> SorobanResources.new()
 |> (&SorobanTransactionData.new(resources: &1, refundable_fee: 0)).()
 |> SorobanTransactionData.to_xdr()
 

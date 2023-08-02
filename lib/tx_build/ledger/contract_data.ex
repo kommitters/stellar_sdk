@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.Ledger.LedgerKeyContractData do
+defmodule Stellar.TxBuild.Ledger.ContractData do
   @moduledoc """
-  `LedgerKeyContractData` struct definition.
+  `ContractData` struct definition.
   """
 
   import Stellar.TxBuild.Validations,

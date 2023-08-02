@@ -1,8 +1,8 @@
-defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
+defmodule Stellar.TxBuild.Ledger.ContractDataTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.SCAddress
-  alias Stellar.TxBuild.Ledger.LedgerKeyContractData
+  alias Stellar.TxBuild.Ledger.ContractData
 
   setup do
     contract = SCAddress.new("CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN")
@@ -28,13 +28,13 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
     durability_temporary: durability,
     body_type_data_entry: body_type
   } do
-    %LedgerKeyContractData{
+    %ContractData{
       contract: ^contract,
       key: ^key,
       durability: ^durability,
       body_type: ^body_type
     } =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: contract,
         key: key,
         durability: durability,
@@ -48,13 +48,13 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
     durability_persistent: durability,
     body_type_expiration_ext: body_type
   } do
-    %LedgerKeyContractData{
+    %ContractData{
       contract: ^contract,
       key: ^key,
       durability: ^durability,
       body_type: ^body_type
     } =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: contract,
         key: key,
         durability: durability,
@@ -64,7 +64,7 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
 
   test "new/1 with invalid args" do
     {:error, :invalid_ledger_key_args} =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: "ABC",
         key: "ABC",
         durability: "invalid_durability",
@@ -78,7 +78,7 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
     body_type_expiration_ext: body_type
   } do
     {:error, :invalid_key} =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: contract,
         key: "invalid_key",
         durability: durability,
@@ -108,13 +108,13 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
       durability: %StellarBase.XDR.ContractDataDurability{identifier: :TEMPORARY},
       body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
     } =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: contract,
         key: key,
         durability: durability,
         body_type: body_type
       )
-      |> LedgerKeyContractData.to_xdr()
+      |> ContractData.to_xdr()
   end
 
   test "to_xdr/1 expiration_ext", %{
@@ -139,16 +139,16 @@ defmodule Stellar.TxBuild.Ledger.LedgerKeyContractDataTest do
       durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT},
       body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :EXPIRATION_EXTENSION}
     } =
-      LedgerKeyContractData.new(
+      ContractData.new(
         contract: contract,
         key: key,
         durability: durability,
         body_type: body_type
       )
-      |> LedgerKeyContractData.to_xdr()
+      |> ContractData.to_xdr()
   end
 
   test "to_xdr/1 with invalid struct" do
-    {:error, :invalid_struct} = LedgerKeyContractData.to_xdr(%{})
+    {:error, :invalid_struct} = ContractData.to_xdr(%{})
   end
 end

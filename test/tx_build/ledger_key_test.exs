@@ -8,8 +8,8 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
     Account,
     ClaimableBalance,
     Data,
-    LedgerKeyContractCode,
-    LedgerKeyContractData,
+    ContractCode,
+    ContractData,
     LiquidityPool,
     Offer,
     Trustline
@@ -200,7 +200,7 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
       body_type = :data_entry
 
       contract_data =
-        LedgerKeyContractData.new(
+        ContractData.new(
           contract: contract,
           key: key,
           durability: durability,
@@ -242,7 +242,7 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
       hash = "ABC123"
       body_type = :data_entry
 
-      contract_code = LedgerKeyContractCode.new(hash: hash, body_type: body_type)
+      contract_code = ContractCode.new(hash: hash, body_type: body_type)
 
       contract_code_args = [hash: hash, body_type: body_type]
 
