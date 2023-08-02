@@ -5,6 +5,7 @@ defmodule Stellar.TxBuild.Operation do
 
   alias Stellar.TxBuild.{
     AccountMerge,
+    BumpFootprintExpiration,
     BumpSequence,
     BeginSponsoringFutureReserves,
     ChangeTrust,
@@ -58,6 +59,7 @@ defmodule Stellar.TxBuild.Operation do
           | SetOptions.t()
           | SetTrustlineFlags.t()
           | InvokeHostFunction.t()
+          | BumpFootprintExpiration.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -86,6 +88,7 @@ defmodule Stellar.TxBuild.Operation do
   defp validate_operation(%{__struct__: op_type} = op_body) do
     op_types = [
       AccountMerge,
+      BumpFootprintExpiration,
       BumpSequence,
       BeginSponsoringFutureReserves,
       ChangeTrust,

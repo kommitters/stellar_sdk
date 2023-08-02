@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild.SorobanTransactionData do
         ],
         _opts
       )
-      when is_integer(refundable_fee) and refundable_fee > 0 do
+      when is_integer(refundable_fee) and refundable_fee >= 0 do
     with {:ok, resources} <- validate_resources(resources) do
       %__MODULE__{
         resources: resources,
