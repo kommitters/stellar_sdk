@@ -1,5 +1,10 @@
 # Bump Footprint Expiration
-Soroban smart contracts have an expiration time and they should subsidize the shared state lifetime extension fees by manually submitting bump operations, the `BumpFootprintExpirationOp` is used to extend a smart contract lifetime.
+The `BumpFootprintExpirationOp` operation is used to extend a contract data entry's lifetime.
+
+A contract instance, wasm hash, and data storage entry (persistent/instance/temporary) can expire, so you can use this bump operation to extend its lifetime.
+Read more about it:
+- https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#bumpfootprintexpirationop
+- https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html
 
 In this example, we will bump the contract instance of an already deployed contract in the network, adding 1000 ledgers to it.
 
@@ -15,7 +20,7 @@ alias Stellar.TxBuild.{
   BaseFee,
   BumpFootprintExpiration,
   LedgerKey,
-  SCAddress
+  SCAddress,
   SCVal,
   SequenceNumber,
   Signature,
