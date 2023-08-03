@@ -16,3 +16,4 @@
 * [Upload Contract Code (WASM)](/docs/examples/soroban/upload_contract_code.md)
 * [Create Contract](/docs/examples/soroban/create_contract.md)
 * [Invoke Contract Function](/docs/examples/soroban/invoke_contract_functions.md)
+* [Bump Footprint Expiration](/docs/examples/soroban/bump_footprint_expiration.md)

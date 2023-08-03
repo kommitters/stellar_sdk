@@ -347,6 +347,40 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
     }
   end
 
+  @spec ledger_key_contract_data() :: LedgerKey.t()
+  def ledger_key_contract_data do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.LedgerKeyContractData{
+        contract: %StellarBase.XDR.SCAddress{
+          sc_address: %StellarBase.XDR.Hash{
+            value:
+              <<136, 199, 21, 221, 153, 62, 83, 56, 9, 112, 55, 17, 157, 226, 244, 109, 177, 22,
+                241, 170, 12, 226, 193, 229, 39, 50, 103, 40, 26, 129, 1, 237>>
+          },
+          type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
+        },
+        key: %StellarBase.XDR.SCVal{
+          value: %StellarBase.XDR.Void{value: nil},
+          type: %StellarBase.XDR.SCValType{identifier: :SCV_LEDGER_KEY_CONTRACT_INSTANCE}
+        },
+        durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT},
+        body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_DATA}
+    }
+  end
+
+  @spec ledger_key_contract_code() :: LedgerKey.t()
+  def ledger_key_contract_code do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.LedgerKeyContractCode{
+        hash: %StellarBase.XDR.Hash{value: "ABC123"},
+        body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
+    }
+  end
+
   @spec revoke_sponsorship(type :: atom(), args :: Keyword.t()) :: RevokeSponsorship.t()
   def revoke_sponsorship(:account,
         account_id: "GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"
