@@ -18,6 +18,7 @@ defmodule Stellar.Test.XDRFixtures do
   alias Stellar.TxBuild.Asset, as: TxAsset
   alias Stellar.TxBuild.AccountID, as: TxAccountID
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
+  alias Stellar.TxBuild.SorobanAuthorizationEntry, as: TxSorobanAuthorizationEntry
 
   alias StellarBase.XDR.{
     AccountID,
@@ -806,6 +807,24 @@ defmodule Stellar.Test.XDRFixtures do
     function
     |> TxHostFunction.to_xdr()
     |> InvokeHostFunction.new(SorobanAuthorizationEntryList.new([]))
+    |> OperationBody.new(op_type)
+  end
+
+  @spec invoke_host_function_op_xdr(
+          function :: TxHostFunction.t(),
+          auths :: list(TxSorobanAuthorizationEntry.t())
+        ) :: OperationBody.t()
+  def invoke_host_function_op_xdr(function, auths) do
+    op_type = OperationType.new(:INVOKE_HOST_FUNCTION)
+
+    auths =
+      auths
+      |> Enum.map(&TxSorobanAuthorizationEntry.to_xdr/1)
+      |> SorobanAuthorizationEntryList.new()
+
+    function
+    |> TxHostFunction.to_xdr()
+    |> InvokeHostFunction.new(auths)
     |> OperationBody.new(op_type)
   end
 

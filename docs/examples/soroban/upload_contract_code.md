@@ -1,4 +1,5 @@
 # Upload Contract Code (WASM)
+
 > **Warning**
 > Please note that Soroban is still under development, so breaking changes may occur.
 
@@ -11,7 +12,6 @@ alias Stellar.TxBuild.{
   BaseFee,
   InvokeHostFunction,
   HostFunction,
-  HostFunctionArgs,
   SequenceNumber,
   Signature
 }
@@ -22,15 +22,9 @@ alias Stellar.KeyPair
 # read file
 {:ok, code} = File.read("file_path/file.wasm")
 
-function_args =
-  HostFunctionArgs.new(
-    type: :upload,
-    code: code
-  )
+host_function = HostFunction.new(upload_contract_wasm: code)
 
-function = HostFunction.new(args: function_args)
-
-invoke_host_function_op = InvokeHostFunction.new(functions: [function])
+invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 keypair =
   {public_key, _secret} =
@@ -51,9 +45,9 @@ source_account
 
 # Simulate Transaction
 soroban_data =
-  "AAAAAQAAAAe7u0W71jGn1HRVU31RHkxALif4ynfRG6iiRh4VcL5wGgAAAAAAAUBLAAACSAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  "AAAAAAAAAAEAAAAHuoVwkiq7sFT5+6wPecWIC3zW3SXzDactjjMN9VUNzQIAAAAAAAAAAAABSTcAAAKUAAAAAAAAAAAAAAAAAAAAAA=="
 
-min_resource_fee = 8552
+min_resource_fee = 8800
 fee = BaseFee.new(min_resource_fee + 100)
 
 # Use the XDR generated here to send it to the futurenet
