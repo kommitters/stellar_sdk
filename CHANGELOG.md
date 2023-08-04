@@ -1,6 +1,15 @@
 # Changelog
 
-## 0.16.0 (27.07.2023)
+## 0.17.0 (04.08.2023)
+
+* Finish Soroban Preview 10 Support:
+  * Support authorized invocation with different accounts.
+  * Support Upload Contract WASM.
+  * Support Create Contract.
+  * Support RestoreFootprint operation.
+  * Support BumpFootprintExpiration operation.
+
+## 0.16.1 (27.07.2023)
 
 * Update stellar base dependency.
 
