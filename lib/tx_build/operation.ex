@@ -25,6 +25,7 @@ defmodule Stellar.TxBuild.Operation do
     Payment,
     PathPaymentStrictSend,
     PathPaymentStrictReceive,
+    RestoreFootprint,
     RevokeSponsorship,
     SetOptions,
     SetTrustlineFlags,
@@ -60,6 +61,7 @@ defmodule Stellar.TxBuild.Operation do
           | SetTrustlineFlags.t()
           | InvokeHostFunction.t()
           | BumpFootprintExpiration.t()
+          | RestoreFootprint.t()
 
   @type t :: %__MODULE__{body: operation(), source_account: OptionalAccount.t()}
 
@@ -107,6 +109,7 @@ defmodule Stellar.TxBuild.Operation do
       Payment,
       PathPaymentStrictReceive,
       PathPaymentStrictSend,
+      RestoreFootprint,
       RevokeSponsorship,
       SetOptions,
       SetTrustlineFlags,
