@@ -1,5 +1,5 @@
 # Restore Footprint
-The `RestoreFootprint` operation is used to restore a contract data entry's.The restored entry will have its expiration ledger bumped to the minimums the network allows for newly created entries, which is 4096 + current ledger for persistent entries, and 16 + current ledger for temporary entries.
+The `RestoreFootprint` operation is used to restore a contract data entry's. The restored entry will have its expiration ledger bumped to the [minimums](https://github.com/stellar/stellar-core/blob/2109a168a895349f87b502ae3d182380b378fa47/src/ledger/NetworkConfig.h#L77-L78) the network allows for newly created entries, which is 4096 + current ledger for persistent entries, and 16 + current ledger for temporary entries.
 
 A contract instance, wasm hash, and data storage entry (persistent/instance/temporary) can expire, so in case you need any of these already expired info, you can use this restore for it.
 Read more about it:
