@@ -6,7 +6,7 @@ Read more about it:
 - https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#bumpfootprintexpirationop
 - https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html
 
-In this example, we will bump the contract instance of an already deployed contract in the network, adding 1000 ledgers to it.
+In this example, we will bump the contract instance and the wasm of an already deployed contract in the network, adding 1000 ledgers to it.
 
 > **Warning**
 > Please note that Soroban is still under development, so breaking changes may occur.
@@ -28,8 +28,6 @@ alias Stellar.TxBuild.{
   SorobanTransactionData
 }
 
-alias Stellar.KeyPair
-
 contract_address = "CAMGSYINVVL6WP3Q5WPNL7FS4GZP37TWV7MKIRQF5QMYLK3N2SW4P3RC"
 contract_sc_address = SCAddress.new(contract_address)
 key = SCVal.new(ledger_key_contract_instance: nil)
@@ -49,7 +47,7 @@ contract_data =
      ]}
   )
 
-hash= StellarBase.StrKey.decode!(contract_address, :contract)
+hash = Base.decode16!("067eb7ba419edd3e946e08eb17a81fbe1e850e690ed7692160875c2b65b45f21", case: :lower)
 contract_code = LedgerKey.new({:contract_code, [hash: hash, body_type: :data_entry]})
 footprint = LedgerFootprint.new(read_only: [contract_data, contract_code])
 
