@@ -75,9 +75,7 @@ defmodule Stellar.TxBuild.Ledger.ContractData do
   def to_xdr(_struct), do: {:error, :invalid_struct}
 
   @spec validate_sc_val_ledger_instance(key :: key()) :: validation()
-  defp validate_sc_val_ledger_instance(%SCVal{type: :ledger_key_contract_instance} = key),
-    do: {:ok, key}
-
+  defp validate_sc_val_ledger_instance(%SCVal{} = key), do: {:ok, key}
   defp validate_sc_val_ledger_instance(_key), do: {:error, :invalid_key}
 
   @spec durability_to_xdr(atom()) :: ContractDataDurability.t()
