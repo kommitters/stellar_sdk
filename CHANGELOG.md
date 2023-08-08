@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.17.1 (08.08.2023)
+
+* Allow contract_data key to be any type of `SCVal`
+
 ## 0.17.0 (04.08.2023)
 
 * Finish Soroban Preview 10 Support:
