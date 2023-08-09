@@ -322,6 +322,189 @@ defmodule Stellar.TxBuild.SCVal do
     |> SCVal.new(type)
   end
 
+  @spec to_native_from_xdr(xdr :: String.t()) :: any
+  def to_native_from_xdr(xdr) when is_binary(xdr) do
+    with {:ok, decoded_xdr} <- validate_base64(xdr),
+         {:ok, {scval, _rest}} <- validate_xdr_decoding(decoded_xdr) do
+      to_native(scval)
+    end
+  end
+
+  def to_native_from_xdr(_xdr), do: {:error, :invalid_XDR}
+
+  @spec to_native(SCVal.t()) :: any
+  def to_native(%SCVal{
+        value: %StellarBase.XDR.SCSymbol{value: value},
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+      }),
+      do: value
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_VEC},
+        value: %StellarBase.XDR.OptionalSCVec{
+          sc_vec: %StellarBase.XDR.SCVec{
+            items: items
+          }
+        }
+      }) do
+    Enum.map(items, &to_native/1)
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_VEC},
+        value: %StellarBase.XDR.OptionalSCVec{
+          sc_vec: nil
+        }
+      }),
+      do: []
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_TIMEPOINT},
+        value: %StellarBase.XDR.TimePoint{value: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_DURATION},
+        value: %StellarBase.XDR.Duration{value: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_VOID},
+        value: _value
+      }) do
+    nil
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_BOOL},
+        value: %StellarBase.XDR.Bool{value: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_U128},
+        value: %StellarBase.XDR.UInt128Parts{
+          hi: %StellarBase.XDR.UInt64{datum: hi_value},
+          lo: %StellarBase.XDR.UInt64{datum: lo_value}
+        }
+      }) do
+    {hi_value, lo_value}
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_U64},
+        value: %StellarBase.XDR.UInt64{datum: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_I64},
+        value: %StellarBase.XDR.Int64{datum: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_U32},
+        value: %StellarBase.XDR.UInt32{datum: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_I32},
+        value: %StellarBase.XDR.Int32{datum: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_I128},
+        value: %StellarBase.XDR.Int128Parts{
+          hi: %StellarBase.XDR.Int64{datum: hi_value},
+          lo: %StellarBase.XDR.UInt64{datum: lo_value}
+        }
+      }) do
+    {hi_value, lo_value}
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_U256},
+        value: %StellarBase.XDR.UInt256Parts{
+          hi_hi: %StellarBase.XDR.UInt64{datum: hi_hi_value},
+          hi_lo: %StellarBase.XDR.UInt64{datum: hi_lo_value},
+          lo_hi: %StellarBase.XDR.UInt64{datum: lo_hi_value},
+          lo_lo: %StellarBase.XDR.UInt64{datum: lo_lo_value}
+        }
+      }) do
+    {hi_hi_value, hi_lo_value, lo_hi_value, lo_lo_value}
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_I256},
+        value: %StellarBase.XDR.Int256Parts{
+          hi_hi: %StellarBase.XDR.Int64{datum: hi_hi_value},
+          hi_lo: %StellarBase.XDR.UInt64{datum: hi_lo_value},
+          lo_hi: %StellarBase.XDR.UInt64{datum: lo_hi_value},
+          lo_lo: %StellarBase.XDR.UInt64{datum: lo_lo_value}
+        }
+      }) do
+    {hi_hi_value, hi_lo_value, lo_hi_value, lo_lo_value}
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_BYTES},
+        value: %StellarBase.XDR.SCBytes{value: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_STRING},
+        value: %StellarBase.XDR.SCString{value: value}
+      }) do
+    value
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_MAP},
+        value: %StellarBase.XDR.OptionalSCMap{
+          sc_map: %StellarBase.XDR.SCMap{
+            items: items
+          }
+        }
+      }) do
+    Enum.reduce(items, %{}, fn entry, acc ->
+      {key, val} = map_entry_to_native(entry)
+      Map.put(acc, key, val)
+    end)
+  end
+
+  @spec validate_base64(xdr :: String.t()) :: validation()
+  defp validate_base64(xdr) when is_binary(xdr) do
+    case Base.decode64(xdr) do
+      {:ok, decoded_xdr} -> {:ok, decoded_xdr}
+      _ -> {:error, :invalid_base64}
+    end
+  end
+
+  @spec validate_xdr_decoding(decoded_xdr :: binary()) :: validation()
+  defp validate_xdr_decoding(decoded_xdr) do
+    case SCVal.decode_xdr(decoded_xdr) do
+      {:ok, result} -> {:ok, result}
+      _ -> {:error, :invalid_XDR}
+    end
+  end
+
+  defp map_entry_to_native(%StellarBase.XDR.SCMapEntry{key: key, val: val}),
+    do: {to_native(key), to_native(val)}
+
   @spec validate_sc_val(tuple :: tuple()) :: validation()
   defp validate_sc_val({type, value})
        when type in ~w(u32 u64 time_point duration)a and is_integer(value) and value >= 0,
