@@ -6,9 +6,8 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
 
   setup do
     hash = "ABC123"
-    body_type = :data_entry
 
-    contract_code_args = [hash: hash, body_type: body_type]
+    contract_code_args = [hash: hash]
     read_only = [LedgerKey.new({:contract_code, contract_code_args})]
 
     read_write = [
@@ -20,15 +19,13 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
     instructions = 1000
     read_bytes = 1024
     write_bytes = 512
-    extended_meta_data_size_bytes = 256
 
     resources =
       SorobanResources.new(
         footprint: footprint,
         instructions: instructions,
         read_bytes: read_bytes,
-        write_bytes: write_bytes,
-        extended_meta_data_size_bytes: extended_meta_data_size_bytes
+        write_bytes: write_bytes
       )
 
     refundable_fee = 100
@@ -47,8 +44,7 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
             ledger_keys: [
               %StellarBase.XDR.LedgerKey{
                 entry: %StellarBase.XDR.LedgerKeyContractCode{
-                  hash: %StellarBase.XDR.Hash{value: "ABC123"},
-                  body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+                  hash: %StellarBase.XDR.Hash{value: "ABC123"}
                 },
                 type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
               }
@@ -58,15 +54,13 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
             ledger_keys: [
               %StellarBase.XDR.LedgerKey{
                 entry: %StellarBase.XDR.LedgerKeyContractCode{
-                  hash: %StellarBase.XDR.Hash{value: "ABC123"},
-                  body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+                  hash: %StellarBase.XDR.Hash{value: "ABC123"}
                 },
                 type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
               },
               %StellarBase.XDR.LedgerKey{
                 entry: %StellarBase.XDR.LedgerKeyContractCode{
-                  hash: %StellarBase.XDR.Hash{value: "ABC123"},
-                  body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+                  hash: %StellarBase.XDR.Hash{value: "ABC123"}
                 },
                 type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
               }
@@ -75,8 +69,7 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
         },
         instructions: %StellarBase.XDR.UInt32{datum: 1000},
         read_bytes: %StellarBase.XDR.UInt32{datum: 1024},
-        write_bytes: %StellarBase.XDR.UInt32{datum: 512},
-        extended_meta_data_size_bytes: %StellarBase.XDR.UInt32{datum: 256}
+        write_bytes: %StellarBase.XDR.UInt32{datum: 512}
       },
       refundable_fee: %StellarBase.XDR.Int64{datum: 100}
     }

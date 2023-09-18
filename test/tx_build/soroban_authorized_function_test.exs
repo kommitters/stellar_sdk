@@ -9,7 +9,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
     ContractIDPreimageFromAddress,
     SCAddress,
     ContractExecutable,
-    SorobanAuthorizedContractFunction,
+    InvokeContractArgs,
     SorobanAuthorizedFunction
   }
 
@@ -21,7 +21,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
     function_name = "hello"
 
     contract_fn =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args
@@ -60,7 +60,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
     xdr_discriminants = [
       %{
         xdr: %StellarBase.XDR.SorobanAuthorizedFunction{
-          value: %StellarBase.XDR.SorobanAuthorizedContractFunction{
+          value: %StellarBase.XDR.InvokeContractArgs{
             contract_address: %StellarBase.XDR.SCAddress{
               sc_address: %StellarBase.XDR.Hash{
                 value:
@@ -70,7 +70,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
               type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
             },
             function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-            args: %StellarBase.XDR.SCVec{
+            args: %StellarBase.XDR.SCValList{
               items: [
                 %StellarBase.XDR.SCVal{
                   value: %StellarBase.XDR.SCSymbol{value: "dev"},

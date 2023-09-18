@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.SCVec do
   `ScVec` struct definition.
   """
   alias Stellar.TxBuild.SCVal
-  alias StellarBase.XDR.SCVec
+  alias StellarBase.XDR.SCValList
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -30,14 +30,8 @@ defmodule Stellar.TxBuild.SCVec do
   def to_xdr(%__MODULE__{items: items}) do
     items
     |> Enum.map(&SCVal.to_xdr/1)
-    |> SCVec.new()
+    |> SCValList.new()
   end
-
-  @spec append_sc_val(t(), item :: SCVal.t()) :: t() | error()
-  def append_sc_val(%__MODULE__{items: items} = module, %SCVal{} = item),
-    do: %{module | items: items ++ [item]}
-
-  def append_sc_val(_module, _item), do: {:error, :invalid_item}
 
   @spec validate_vec_items(items :: items()) :: validation()
   defp validate_vec_items(items) do

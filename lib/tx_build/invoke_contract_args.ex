@@ -1,12 +1,12 @@
-defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
+defmodule Stellar.TxBuild.InvokeContractArgs do
   @moduledoc """
-  `SorobanAuthorizedContractFunction` struct definition.
+  `InvokeContractArgs` struct definition.
   """
 
   import Stellar.TxBuild.Validations,
     only: [validate_vec: 1, validate_address: 1]
 
-  alias StellarBase.XDR.{SorobanAuthorizedContractFunction, SCSymbol}
+  alias StellarBase.XDR.{InvokeContractArgs, SCSymbol}
   alias Stellar.TxBuild.{SCAddress, SCVec}
 
   @behaviour Stellar.TxBuild.XDR
@@ -57,7 +57,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
 
     contract_address
     |> SCAddress.to_xdr()
-    |> SorobanAuthorizedContractFunction.new(function_name, args)
+    |> InvokeContractArgs.new(function_name, args)
   end
 
   def to_xdr(_struct), do: {:error, :invalid_struct}

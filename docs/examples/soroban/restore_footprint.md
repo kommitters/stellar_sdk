@@ -1,8 +1,10 @@
 # Restore Footprint
-The `RestoreFootprint` operation is used to restore a contract data entry's. The restored entry will have its expiration ledger bumped to the [minimums](https://github.com/stellar/stellar-core/blob/2109a168a895349f87b502ae3d182380b378fa47/src/ledger/NetworkConfig.h#L77-L78) the network allows for newly created entries, which is 4096 + current ledger for persistent entries, and 16 + current ledger for temporary entries.
 
-A contract instance, wasm hash, and data storage entry (persistent/instance/temporary) can expire, so in case you need any of these already expired info, you can use this restore for it.
+The `RestoreFootprint` operation is used to restore a contract data entry's. The restored entry will have its expiration ledger bumped to the [minimums](https://github.com/stellar/stellar-core/blob/2109a168a895349f87b502ae3d182380b378fa47/src/ledger/NetworkConfig.h#L77-L78) the network allows for newly created entries, which is 4096 + current ledger for persistent entries.
+
+A contract instance, wasm hash, and data storage entry (persistent/instance) can expire, so in case you need any of these already expired info, you can use this restore for it.
 Read more about it:
+
 - https://soroban.stellar.org/docs/fundamentals-and-concepts/state-expiration#restorefootprintop
 - https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html
 
@@ -43,8 +45,7 @@ contract_data =
      [
        contract: contract_sc_address,
        key: key,
-       durability: :persistent,
-       body_type: :data_entry
+       durability: :persistent
      ]}
   )
 
@@ -55,8 +56,7 @@ soroban_data =
   footprint: footprint,
   instructions: 0,
   read_bytes: 0,
-  write_bytes: 0,
-  extended_meta_data_size_bytes: 0
+  write_bytes: 0
 ]
 |> SorobanResources.new()
 |> (&SorobanTransactionData.new(resources: &1, refundable_fee: 0)).()

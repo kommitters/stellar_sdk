@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.SCAddress, as: TxSCAddress
-  alias Stellar.TxBuild.SorobanAuthorizedContractFunction, as: TxSorobanAuthorizedContractFunction
+  alias Stellar.TxBuild.InvokeContractArgs, as: TxSorobanAuthorizedContractFunction
   alias Stellar.TxBuild.SorobanAuthorizedFunction, as: TxSorobanAuthorizedFunction
   alias Stellar.TxBuild.SorobanAuthorizedInvocation, as: TxSorobanAuthorizedInvocation
 
@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     PublicKeyType,
     PoolID,
     HashIDPreimageRevokeID,
-    SorobanAuthorizedContractFunction,
+    InvokeContractArgs,
     SorobanAuthorizedFunction,
     SorobanAuthorizedFunctionType,
     SorobanAuthorizedInvocation,
@@ -45,8 +45,8 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     SCAddress,
     SCAddressType,
     SCVal,
+    SCValList,
     SCValType,
-    SCVec,
     SCSymbol,
     UInt256,
     UInt32,
@@ -227,19 +227,17 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
         signature_expiration_ledger: %UInt32{datum: 123_541},
         invocation: %SorobanAuthorizedInvocation{
           function: %SorobanAuthorizedFunction{
-            value: %SorobanAuthorizedContractFunction{
+            value: %InvokeContractArgs{
               contract_address: %SCAddress{
                 sc_address: %Hash{
                   value:
                     <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75,
                       68, 84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
                 },
-                type: %SCAddressType{
-                  identifier: :SC_ADDRESS_TYPE_CONTRACT
-                }
+                type: %SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
               },
               function_name: %SCSymbol{value: "function_name"},
-              args: %SCVec{
+              args: %SCValList{
                 items: [
                   %SCVal{
                     value: %Int32{datum: 654},
@@ -252,14 +250,10 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
               identifier: :SOROBAN_AUTHORIZED_FUNCTION_TYPE_CONTRACT_FN
             }
           },
-          sub_invocations: %SorobanAuthorizedInvocationList{
-            items: []
-          }
+          sub_invocations: %SorobanAuthorizedInvocationList{items: []}
         }
       },
-      type: %EnvelopeType{
-        identifier: :ENVELOPE_TYPE_SOROBAN_AUTHORIZATION
-      }
+      type: %StellarBase.XDR.EnvelopeType{identifier: :ENVELOPE_TYPE_SOROBAN_AUTHORIZATION}
     } =
       TxHashIDPreimage.new(soroban_auth: soroban_auth)
       |> TxHashIDPreimage.to_xdr()

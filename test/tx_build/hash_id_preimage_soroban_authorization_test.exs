@@ -8,7 +8,7 @@ defmodule Stellar.TxBuild.HashIDPreimageSorobanAuthorizationTest do
     SCVec,
     SCVal,
     SCAddress,
-    SorobanAuthorizedContractFunction,
+    InvokeContractArgs,
     SorobanAuthorizedFunction,
     SorobanAuthorizedInvocation
   }
@@ -21,7 +21,7 @@ defmodule Stellar.TxBuild.HashIDPreimageSorobanAuthorizationTest do
     function_name = "hello"
 
     contract_fn =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args

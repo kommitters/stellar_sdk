@@ -67,6 +67,11 @@ source_account
 soroban_data =
   "AAAAAAAAAAEAAAAHuoVwkiq7sFT5+6wPecWIC3zW3SXzDactjjMN9VUNzQIAAAAAAAAAAQAAAAYAAAABet+3VCiKSYoZDd/Ce32Dtp9tYwNFc64V/QfdZUJm4boAAAAUAAAAAQAAAAAAAX/UAAACyAAAAKQAAADYAAAAAAAAACs="
 
+auth = [
+  "AAAAAAAAAAEAAAAAAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1t3O7skFonbhP9PT+l5IGaavsMV+AyUtQF88+kCpS/YbAAAAAIw32Y19ZRfshxeO+Nw4BNSkE0ZhibcEWId4SVzs0PZPAAAAAA=="
+]
+
+invoke_host_function_op = InvokeHostFunction.set_auth(invoke_host_function_op, auth)
 min_resource_fee = 38_733
 fee = BaseFee.new(min_resource_fee + 100)
 

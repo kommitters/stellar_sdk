@@ -1,10 +1,10 @@
-defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
+defmodule Stellar.TxBuild.InvokeContractArgsTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.SCAddress
   alias Stellar.TxBuild.SCVec
   alias Stellar.TxBuild.SCVal
-  alias Stellar.TxBuild.SorobanAuthorizedContractFunction
+  alias Stellar.TxBuild.InvokeContractArgs
 
   setup do
     fn_args = SCVec.new([SCVal.new(symbol: "dev")])
@@ -14,13 +14,13 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
     function_name = "hello"
 
     contract_fn =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args
       )
 
-    xdr = %StellarBase.XDR.SorobanAuthorizedContractFunction{
+    xdr = %StellarBase.XDR.InvokeContractArgs{
       contract_address: %StellarBase.XDR.SCAddress{
         sc_address: %StellarBase.XDR.Hash{
           value:
@@ -30,7 +30,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
         type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
       },
       function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-      args: %StellarBase.XDR.SCVec{
+      args: %StellarBase.XDR.SCValList{
         items: [
           %StellarBase.XDR.SCVal{
             value: %StellarBase.XDR.SCSymbol{value: "dev"},
@@ -54,12 +54,12 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
     function_name: function_name,
     fn_args: fn_args
   } do
-    %SorobanAuthorizedContractFunction{
+    %InvokeContractArgs{
       contract_address: ^contract_address,
       function_name: ^function_name,
       args: ^fn_args
     } =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args
@@ -71,7 +71,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
     fn_args: fn_args
   } do
     {:error, :invalid_address} =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: :invalid,
         function_name: function_name,
         args: fn_args
@@ -83,7 +83,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
     fn_args: fn_args
   } do
     {:error, :invalid_function_name} =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: :invalid,
         args: fn_args
@@ -95,7 +95,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
     function_name: function_name
   } do
     {:error, :invalid_args} =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: :invalid
@@ -103,15 +103,14 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunctionTest do
   end
 
   test "new/2 with invalid args" do
-    {:error, :invalid_soroban_auth_contract_function_args} =
-      SorobanAuthorizedContractFunction.new(:invalid)
+    {:error, :invalid_soroban_auth_contract_function_args} = InvokeContractArgs.new(:invalid)
   end
 
   test "to_xdr/1", %{contract_fn: contract_fn, xdr: xdr} do
-    ^xdr = SorobanAuthorizedContractFunction.to_xdr(contract_fn)
+    ^xdr = InvokeContractArgs.to_xdr(contract_fn)
   end
 
   test "to_xdr/1 error" do
-    {:error, :invalid_struct} = SorobanAuthorizedContractFunction.to_xdr(:invalid)
+    {:error, :invalid_struct} = InvokeContractArgs.to_xdr(:invalid)
   end
 end

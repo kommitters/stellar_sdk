@@ -3,14 +3,14 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunction do
   `SorobanAuthorizedFunction` struct definition.
   """
   alias StellarBase.XDR.{SorobanAuthorizedFunction, SorobanAuthorizedFunctionType}
-  alias Stellar.TxBuild.{CreateContractArgs, SorobanAuthorizedContractFunction}
+  alias Stellar.TxBuild.{CreateContractArgs, InvokeContractArgs}
 
   @behaviour Stellar.TxBuild.XDR
 
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
   @type type :: :contract_fn | :create_contract_host_fn
-  @type value :: CreateContractArgs.t() | SorobanAuthorizedContractFunction.t()
+  @type value :: CreateContractArgs.t() | InvokeContractArgs.t()
   @type t :: %__MODULE__{type: type(), value: value()}
 
   defstruct [:type, :value]
@@ -33,7 +33,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunction do
     type = SorobanAuthorizedFunctionType.new()
 
     value
-    |> SorobanAuthorizedContractFunction.to_xdr()
+    |> InvokeContractArgs.to_xdr()
     |> SorobanAuthorizedFunction.new(type)
   end
 
@@ -49,10 +49,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunction do
   def to_xdr(_struct), do: {:error, :invalid_struct}
 
   @spec validate_soroban_auth_function(tuple()) :: validation()
-  defp validate_soroban_auth_function(
-         {:contract_fn, %SorobanAuthorizedContractFunction{} = value}
-       ),
-       do: {:ok, value}
+  defp validate_soroban_auth_function({:contract_fn, %InvokeContractArgs{} = value}),
+    do: {:ok, value}
 
   defp validate_soroban_auth_function({:create_contract_host_fn, %CreateContractArgs{} = value}),
     do: {:ok, value}
