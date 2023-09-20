@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
   """
 
   import Stellar.TxBuild.Validations,
-    only: [validate_sc_vals: 1, validate_vec: 1, validate_address: 1]
+    only: [validate_sc_vals: 1, validate_address: 1]
 
   alias StellarBase.XDR.{InvokeContractArgs, SCSymbol}
   alias Stellar.TxBuild.{SCAddress, SCVec}
