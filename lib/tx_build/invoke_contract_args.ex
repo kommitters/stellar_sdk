@@ -7,7 +7,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
     only: [validate_sc_vals: 1, validate_address: 1]
 
   alias StellarBase.XDR.{InvokeContractArgs, SCSymbol}
-  alias Stellar.TxBuild.{SCAddress, SCVec}
+  alias Stellar.TxBuild.{SCAddress, SCVal, SCVec}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
   @type validation :: {:ok, any()} | error()
   @type contract_address :: SCAddress.t()
   @type function_name :: String.t()
-  @type args :: list(SCVec.t())
+  @type args :: list(SCVal.t())
 
   @type t :: %__MODULE__{
           contract_address: contract_address(),
