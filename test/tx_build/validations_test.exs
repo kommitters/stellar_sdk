@@ -15,7 +15,8 @@ defmodule Stellar.TxBuild.ValidationsTest do
     SCAddress,
     SequenceNumber,
     PoolID,
-    Price
+    Price,
+    SCVal
   }
 
   setup do
@@ -165,5 +166,39 @@ defmodule Stellar.TxBuild.ValidationsTest do
 
   test "validate_vec error" do
     {:error, :invalid_args} = Validations.validate_vec(:invalid)
+  end
+
+  test "validate_sc_vals/1" do
+    sc_val = %SCVal{type: :int64, value: 42}
+    {:ok, [%SCVal{type: :int64, value: 42}]} = Validations.validate_sc_vals({:vals, [sc_val]})
+  end
+
+  test "validate_sc_vals/1 error invalid vals" do
+    {:error, :invalid_vals} = Validations.validate_sc_vals({:vals, ["invalid"]})
+  end
+
+  test "validate_sc_vals/1 error no list" do
+    {:error, :invalid_vals} = Validations.validate_sc_vals({:vals, :invalid})
+  end
+
+  test "validate_contract_id/1" do
+    contract_id = "26a7dec13192736d5ba23c2052fa149021601fc264bc4311fece431ffd388a5c"
+    {:ok, ^contract_id} = Validations.validate_contract_id({:contract_id, contract_id})
+  end
+
+  test "validate_contract_id/1 error binary size" do
+    {:error, :invalid_contract_id} = Validations.validate_contract_id({:contract_id, "invalid"})
+  end
+
+  test "validate_contract_id/1 error no binary" do
+    {:error, :invalid_contract_id} = Validations.validate_contract_id({:contract_id, 123})
+  end
+
+  test "validate_string/1" do
+    {:ok, "Hello, World!"} = Validations.validate_string({:str, "Hello, World!"})
+  end
+
+  test "validate_string/1 error" do
+    {:error, :invalid_str} = Validations.validate_string({:str, 123})
   end
 end

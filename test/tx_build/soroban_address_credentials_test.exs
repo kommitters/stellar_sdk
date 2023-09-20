@@ -1,14 +1,15 @@
 defmodule Stellar.TxBuild.SorobanAddressCredentialsTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.SCVal
-  alias Stellar.TxBuild.SCVec
-  alias Stellar.TxBuild.SCAddress
-  alias Stellar.TxBuild.SorobanAddressCredentials
+  alias Stellar.TxBuild.{
+    SCAddress,
+    SCVal,
+    SorobanAddressCredentials
+  }
 
   setup do
     address = SCAddress.new("GBNDWIM7DPYZJ2RLJ3IESXBIO4C2SVF6PWZXS3DLODJSBQWBMKY5U4M3")
-    signature_args = SCVec.new([SCVal.new(symbol: "dev")])
+    signature = SCVal.new(symbol: "dev")
     nonce = 544_841
     signature_expiration_ledger = 106_977
 
@@ -28,25 +29,21 @@ defmodule Stellar.TxBuild.SorobanAddressCredentialsTest do
       },
       nonce: %StellarBase.XDR.Int64{datum: 544_841},
       signature_expiration_ledger: %StellarBase.XDR.UInt32{datum: 106_977},
-      signature_args: %StellarBase.XDR.SCVec{
-        items: [
-          %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.SCSymbol{value: "dev"},
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-          }
-        ]
+      signature: %StellarBase.XDR.SCVal{
+        value: %StellarBase.XDR.SCSymbol{value: "dev"},
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
       }
     }
 
     %{
       address: address,
-      signature_args: signature_args,
+      signature: signature,
       nonce: nonce,
       signature_expiration_ledger: signature_expiration_ledger,
       soroban_address_credentials:
         SorobanAddressCredentials.new(
           address: address,
-          signature_args: signature_args,
+          signature: signature,
           nonce: nonce,
           signature_expiration_ledger: signature_expiration_ledger
         ),
@@ -56,47 +53,47 @@ defmodule Stellar.TxBuild.SorobanAddressCredentialsTest do
 
   test "new/2", %{
     address: address,
-    signature_args: signature_args,
+    signature: signature,
     nonce: nonce,
     signature_expiration_ledger: signature_expiration_ledger
   } do
     %SorobanAddressCredentials{
       address: ^address,
-      signature_args: ^signature_args,
+      signature: ^signature,
       nonce: ^nonce,
       signature_expiration_ledger: ^signature_expiration_ledger
     } =
       SorobanAddressCredentials.new(
         address: address,
-        signature_args: signature_args,
+        signature: signature,
         nonce: nonce,
         signature_expiration_ledger: signature_expiration_ledger
       )
   end
 
   test "new/2 with invalid address", %{
-    signature_args: signature_args,
+    signature: signature,
     nonce: nonce,
     signature_expiration_ledger: signature_expiration_ledger
   } do
     {:error, :invalid_address} =
       SorobanAddressCredentials.new(
         address: :invalid,
-        signature_args: signature_args,
+        signature: signature,
         nonce: nonce,
         signature_expiration_ledger: signature_expiration_ledger
       )
   end
 
-  test "new/2 with invalid signature_args", %{
+  test "new/2 with invalid signature", %{
     address: address,
     nonce: nonce,
     signature_expiration_ledger: signature_expiration_ledger
   } do
-    {:error, :invalid_args} =
+    {:error, :invalid_sc_val} =
       SorobanAddressCredentials.new(
         address: address,
-        signature_args: :invalid,
+        signature: :invalid,
         nonce: nonce,
         signature_expiration_ledger: signature_expiration_ledger
       )
@@ -104,13 +101,13 @@ defmodule Stellar.TxBuild.SorobanAddressCredentialsTest do
 
   test "new/2 with invalid nonce", %{
     address: address,
-    signature_args: signature_args,
+    signature: signature,
     signature_expiration_ledger: signature_expiration_ledger
   } do
     {:error, :invalid_nonce} =
       SorobanAddressCredentials.new(
         address: address,
-        signature_args: signature_args,
+        signature: signature,
         nonce: :invalid,
         signature_expiration_ledger: signature_expiration_ledger
       )
@@ -118,13 +115,13 @@ defmodule Stellar.TxBuild.SorobanAddressCredentialsTest do
 
   test "new/2 with invalid signature_expiration_ledger", %{
     address: address,
-    signature_args: signature_args,
+    signature: signature,
     nonce: nonce
   } do
     {:error, :invalid_signature_expiration_ledger} =
       SorobanAddressCredentials.new(
         address: address,
-        signature_args: signature_args,
+        signature: signature,
         nonce: nonce,
         signature_expiration_ledger: :invalid
       )

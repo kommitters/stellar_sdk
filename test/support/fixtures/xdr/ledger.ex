@@ -363,8 +363,7 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
           value: %StellarBase.XDR.Void{value: nil},
           type: %StellarBase.XDR.SCValType{identifier: :SCV_LEDGER_KEY_CONTRACT_INSTANCE}
         },
-        durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT},
-        body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+        durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT}
       },
       type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_DATA}
     }
@@ -374,10 +373,29 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
   def ledger_key_contract_code do
     %StellarBase.XDR.LedgerKey{
       entry: %StellarBase.XDR.LedgerKeyContractCode{
-        hash: %StellarBase.XDR.Hash{value: "ABC123"},
-        body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+        hash: %StellarBase.XDR.Hash{value: "ABC123"}
       },
       type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
+    }
+  end
+
+  @spec ledger_key_config_setting() :: LedgerKey.t()
+  def ledger_key_config_setting do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.LedgerKeyConfigSetting{
+        config_setting_id: %StellarBase.XDR.ConfigSettingID{identifier: :MAX_SIZE_BYTES}
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :CONFIG_SETTING}
+    }
+  end
+
+  @spec ledger_key_expiration() :: LedgerKey.t()
+  def ledger_key_expiration do
+    %StellarBase.XDR.LedgerKey{
+      entry: %StellarBase.XDR.LedgerKeyExpiration{
+        key_hash: %StellarBase.XDR.Hash{value: "ABC123"}
+      },
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :EXPIRATION}
     }
   end
 

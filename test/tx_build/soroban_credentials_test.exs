@@ -2,7 +2,6 @@ defmodule Stellar.TxBuild.SorobanCredentialsTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.{
-    SCVec,
     SCVal,
     SorobanCredentials,
     SCAddress,
@@ -11,14 +10,14 @@ defmodule Stellar.TxBuild.SorobanCredentialsTest do
 
   setup do
     address = SCAddress.new("GBNDWIM7DPYZJ2RLJ3IESXBIO4C2SVF6PWZXS3DLODJSBQWBMKY5U4M3")
-    signature_args = SCVec.new([SCVal.new(symbol: "dev")])
+    signature = SCVal.new(symbol: "dev")
 
     soroban_address_credentials =
       SorobanAddressCredentials.new(
         address: address,
         nonce: 123_135,
         signature_expiration_ledger: 123_515,
-        signature_args: signature_args
+        signature: signature
       )
 
     discriminants = [
@@ -53,27 +52,19 @@ defmodule Stellar.TxBuild.SorobanCredentialsTest do
                       <<90, 59, 33, 159, 27, 241, 148, 234, 43, 78, 208, 73, 92, 40, 119, 5, 169,
                         84, 190, 125, 179, 121, 108, 107, 112, 211, 32, 194, 193, 98, 177, 218>>
                   },
-                  type: %StellarBase.XDR.PublicKeyType{
-                    identifier: :PUBLIC_KEY_TYPE_ED25519
-                  }
+                  type: %StellarBase.XDR.PublicKeyType{identifier: :PUBLIC_KEY_TYPE_ED25519}
                 }
               },
               type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
             },
             nonce: %StellarBase.XDR.Int64{datum: 123_135},
             signature_expiration_ledger: %StellarBase.XDR.UInt32{datum: 123_515},
-            signature_args: %StellarBase.XDR.SCVec{
-              items: [
-                %StellarBase.XDR.SCVal{
-                  value: %StellarBase.XDR.SCSymbol{value: "dev"},
-                  type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-                }
-              ]
+            signature: %StellarBase.XDR.SCVal{
+              value: %StellarBase.XDR.SCSymbol{value: "dev"},
+              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
             }
           },
-          type: %StellarBase.XDR.SorobanCredentialsType{
-            identifier: :SOROBAN_CREDENTIALS_ADDRESS
-          }
+          type: %StellarBase.XDR.SorobanCredentialsType{identifier: :SOROBAN_CREDENTIALS_ADDRESS}
         },
         type: :address,
         value: soroban_address_credentials

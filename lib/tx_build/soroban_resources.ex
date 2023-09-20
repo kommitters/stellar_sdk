@@ -13,22 +13,19 @@ defmodule Stellar.TxBuild.SorobanResources do
   @type instructions :: integer()
   @type read_bytes :: integer()
   @type write_bytes :: integer()
-  @type extended_meta_data_size_bytes :: integer()
 
   @type t :: %__MODULE__{
           footprint: footprint(),
           instructions: instructions(),
           read_bytes: read_bytes(),
-          write_bytes: write_bytes(),
-          extended_meta_data_size_bytes: extended_meta_data_size_bytes()
+          write_bytes: write_bytes()
         }
 
   defstruct [
     :footprint,
     :instructions,
     :read_bytes,
-    :write_bytes,
-    :extended_meta_data_size_bytes
+    :write_bytes
   ]
 
   @impl true
@@ -39,20 +36,17 @@ defmodule Stellar.TxBuild.SorobanResources do
           {:footprint, footprint},
           {:instructions, instructions},
           {:read_bytes, read_bytes},
-          {:write_bytes, write_bytes},
-          {:extended_meta_data_size_bytes, extended_meta_data_size_bytes}
+          {:write_bytes, write_bytes}
         ],
         _opts
       )
-      when is_integer(instructions) and is_integer(read_bytes) and is_integer(write_bytes) and
-             is_integer(extended_meta_data_size_bytes) do
+      when is_integer(instructions) and is_integer(read_bytes) and is_integer(write_bytes) do
     with {:ok, footprint} <- validate_footprint(footprint) do
       %__MODULE__{
         footprint: footprint,
         instructions: instructions,
         read_bytes: read_bytes,
-        write_bytes: write_bytes,
-        extended_meta_data_size_bytes: extended_meta_data_size_bytes
+        write_bytes: write_bytes
       }
     end
   end
@@ -64,21 +58,18 @@ defmodule Stellar.TxBuild.SorobanResources do
         footprint: footprint,
         instructions: instructions,
         read_bytes: read_bytes,
-        write_bytes: write_bytes,
-        extended_meta_data_size_bytes: extended_meta_data_size_bytes
+        write_bytes: write_bytes
       }) do
     instructions = UInt32.new(instructions)
     read_bytes = UInt32.new(read_bytes)
     write_bytes = UInt32.new(write_bytes)
-    extended_meta_data_size_bytes = UInt32.new(extended_meta_data_size_bytes)
 
     footprint
     |> LedgerFootprint.to_xdr()
     |> SorobanResources.new(
       instructions,
       read_bytes,
-      write_bytes,
-      extended_meta_data_size_bytes
+      write_bytes
     )
   end
 

@@ -93,7 +93,7 @@ defmodule Stellar.TxBuild.SCValTest do
       %{sc_error: SCError.new(crypto: :exceeded_limit)},
       %{sc_error: SCError.new(events: :invalid_action)},
       %{sc_error: SCError.new(budget: :internal_error)},
-      %{sc_error: SCError.new(code: :unexpected_type)},
+      %{sc_error: SCError.new(value: :unexpected_type)},
       %{sc_error: SCError.new(auth: :unexpected_size)}
     ]
 
@@ -109,7 +109,7 @@ defmodule Stellar.TxBuild.SCValTest do
         val_type: :SCV_ERROR,
         module: %StellarBase.XDR.SCError{
           type: %StellarBase.XDR.SCErrorType{identifier: :SCE_CONTRACT},
-          code: %StellarBase.XDR.SCErrorCode{identifier: :SCEC_ARITH_DOMAIN}
+          value: %StellarBase.XDR.SCErrorCode{identifier: :SCEC_ARITH_DOMAIN}
         },
         type: :error,
         value: SCError.new(contract: :arith_domain)

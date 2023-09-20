@@ -26,9 +26,7 @@ host_function = HostFunction.new(upload_contract_wasm: code)
 
 invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
-keypair =
-  {public_key, _secret} =
-  Stellar.KeyPair.from_secret_seed("SDRD4CSRGPWUIPRDS5O3CJBNJME5XVGWNI677MZDD4OD2ZL2R6K5IQ24")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SDR...Q24")
 
 source_account = Account.new(public_key)
 

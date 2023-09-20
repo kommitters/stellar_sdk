@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.17.1"
+  @version "0.18.0"
 
   def project do
     [
@@ -37,7 +37,7 @@ defmodule Stellar.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, "~> 0.13"},
+      {:stellar_base, "~> 0.14"},
       {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17"},
       {:jason, "~> 1.0"},

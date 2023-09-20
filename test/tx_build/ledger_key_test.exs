@@ -2,14 +2,16 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
   use ExUnit.Case
 
   alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
-  alias Stellar.TxBuild.{LedgerKey, SCAddress, SCVal}
+  alias Stellar.TxBuild.{ConfigSettingID, LedgerKey, SCAddress, SCVal}
 
   alias Stellar.TxBuild.Ledger.{
     Account,
     ClaimableBalance,
+    ConfigSetting,
     Data,
     ContractCode,
     ContractData,
+    Expiration,
     LiquidityPool,
     Offer,
     Trustline
@@ -197,21 +199,18 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
       contract = SCAddress.new("CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN")
       key = SCVal.new(ledger_key_contract_instance: nil)
       durability = :persistent
-      body_type = :data_entry
 
       contract_data =
         ContractData.new(
           contract: contract,
           key: key,
-          durability: durability,
-          body_type: body_type
+          durability: durability
         )
 
       contract_data_args = [
         contract: contract,
         key: key,
-        durability: durability,
-        body_type: body_type
+        durability: durability
       ]
 
       %{
@@ -240,11 +239,10 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
   describe "contract_code" do
     setup do
       hash = "ABC123"
-      body_type = :data_entry
 
-      contract_code = ContractCode.new(hash: hash, body_type: body_type)
+      contract_code = ContractCode.new(hash: hash)
 
-      contract_code_args = [hash: hash, body_type: body_type]
+      contract_code_args = [hash: hash]
 
       %{
         contract_code: contract_code,
@@ -266,6 +264,60 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
       ^xdr =
         LedgerKey.new({:contract_code, contract_code_args})
         |> LedgerKey.to_xdr()
+    end
+  end
+
+  describe "config_setting" do
+    setup do
+      config_setting_arg = :max_size
+
+      %{
+        config_setting_arg: config_setting_arg,
+        xdr: XDRFixtures.ledger_key_config_setting()
+      }
+    end
+
+    test "new/2", %{config_setting_arg: config_setting_arg} do
+      %LedgerKey{
+        type: :config_setting,
+        entry: %ConfigSetting{
+          config_setting_id: %ConfigSettingID{identifier: :max_size}
+        }
+      } = LedgerKey.new({:config_setting, config_setting_arg})
+    end
+
+    test "new/2 with invalid attributes" do
+      {:error, :invalid_config_setting} = LedgerKey.new({:config_setting, "invalid"})
+    end
+
+    test "to_xdr/1", %{config_setting_arg: config_setting_arg, xdr: xdr} do
+      ^xdr =
+        LedgerKey.new({:config_setting, config_setting_arg})
+        |> LedgerKey.to_xdr()
+    end
+  end
+
+  describe "expiration" do
+    setup do
+      hash = "ABC123"
+
+      %{
+        hash: hash,
+        expiration_entry: Expiration.new(hash),
+        xdr: XDRFixtures.ledger_key_expiration()
+      }
+    end
+
+    test "new/2", %{hash: hash, expiration_entry: expiration_entry} do
+      %LedgerKey{entry: ^expiration_entry, type: :expiration} = LedgerKey.new({:expiration, hash})
+    end
+
+    test "new/2 with_invalid_attributes" do
+      {:error, :invalid_expiration} = LedgerKey.new({:expiration, 123})
+    end
+
+    test "to_xdr/1", %{hash: hash, xdr: xdr} do
+      ^xdr = LedgerKey.new({:expiration, hash}) |> LedgerKey.to_xdr()
     end
   end
 end

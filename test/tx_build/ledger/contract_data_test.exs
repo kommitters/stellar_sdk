@@ -9,56 +9,46 @@ defmodule Stellar.TxBuild.Ledger.ContractDataTest do
     key = %Stellar.TxBuild.SCVal{type: :ledger_key_contract_instance}
     durability_temporary = :temporary
     durability_persistent = :persistent
-    body_type_data_entry = :data_entry
-    body_type_expiration_ext = :expiration_ext
 
     %{
       contract: contract,
       key: key,
       durability_temporary: durability_temporary,
-      durability_persistent: durability_persistent,
-      body_type_data_entry: body_type_data_entry,
-      body_type_expiration_ext: body_type_expiration_ext
+      durability_persistent: durability_persistent
     }
   end
 
   test "new/1 data_entry", %{
     contract: contract,
     key: key,
-    durability_temporary: durability,
-    body_type_data_entry: body_type
+    durability_temporary: durability
   } do
     %ContractData{
       contract: ^contract,
       key: ^key,
-      durability: ^durability,
-      body_type: ^body_type
+      durability: ^durability
     } =
       ContractData.new(
         contract: contract,
         key: key,
-        durability: durability,
-        body_type: body_type
+        durability: durability
       )
   end
 
   test "new/1 expiration_ext", %{
     contract: contract,
     key: key,
-    durability_persistent: durability,
-    body_type_expiration_ext: body_type
+    durability_persistent: durability
   } do
     %ContractData{
       contract: ^contract,
       key: ^key,
-      durability: ^durability,
-      body_type: ^body_type
+      durability: ^durability
     } =
       ContractData.new(
         contract: contract,
         key: key,
-        durability: durability,
-        body_type: body_type
+        durability: durability
       )
   end
 
@@ -74,23 +64,20 @@ defmodule Stellar.TxBuild.Ledger.ContractDataTest do
 
   test "new/1 with invalid key", %{
     contract: contract,
-    durability_persistent: durability,
-    body_type_expiration_ext: body_type
+    durability_persistent: durability
   } do
     {:error, :invalid_key} =
       ContractData.new(
         contract: contract,
         key: "invalid_key",
-        durability: durability,
-        body_type: body_type
+        durability: durability
       )
   end
 
   test "to_xdr/1 data_entry", %{
     contract: contract,
     key: key,
-    durability_temporary: durability,
-    body_type_data_entry: body_type
+    durability_temporary: durability
   } do
     %StellarBase.XDR.LedgerKeyContractData{
       contract: %StellarBase.XDR.SCAddress{
@@ -105,14 +92,12 @@ defmodule Stellar.TxBuild.Ledger.ContractDataTest do
         value: %StellarBase.XDR.Void{value: nil},
         type: %StellarBase.XDR.SCValType{identifier: :SCV_LEDGER_KEY_CONTRACT_INSTANCE}
       },
-      durability: %StellarBase.XDR.ContractDataDurability{identifier: :TEMPORARY},
-      body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+      durability: %StellarBase.XDR.ContractDataDurability{identifier: :TEMPORARY}
     } =
       ContractData.new(
         contract: contract,
         key: key,
-        durability: durability,
-        body_type: body_type
+        durability: durability
       )
       |> ContractData.to_xdr()
   end
@@ -120,8 +105,7 @@ defmodule Stellar.TxBuild.Ledger.ContractDataTest do
   test "to_xdr/1 expiration_ext", %{
     contract: contract,
     key: key,
-    durability_persistent: durability,
-    body_type_expiration_ext: body_type
+    durability_persistent: durability
   } do
     %StellarBase.XDR.LedgerKeyContractData{
       contract: %StellarBase.XDR.SCAddress{
@@ -136,14 +120,12 @@ defmodule Stellar.TxBuild.Ledger.ContractDataTest do
         value: %StellarBase.XDR.Void{value: nil},
         type: %StellarBase.XDR.SCValType{identifier: :SCV_LEDGER_KEY_CONTRACT_INSTANCE}
       },
-      durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT},
-      body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :EXPIRATION_EXTENSION}
+      durability: %StellarBase.XDR.ContractDataDurability{identifier: :PERSISTENT}
     } =
       ContractData.new(
         contract: contract,
         key: key,
-        durability: durability,
-        body_type: body_type
+        durability: durability
       )
       |> ContractData.to_xdr()
   end
