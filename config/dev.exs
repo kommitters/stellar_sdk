@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :stellar_sdk, network: :future
+config :stellar_sdk, network: :test
