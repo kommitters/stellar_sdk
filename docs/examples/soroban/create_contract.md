@@ -25,6 +25,7 @@ alias Stellar.TxBuild.{
   SCAddress
 }
 
+alias Stellar.KeyPair
 alias Stellar.Horizon.Accounts
 
 wasm_ref = <<some binary here>>
@@ -47,7 +48,7 @@ invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 keypair =
   {public_key, _secret} =
-  Stellar.KeyPair.from_secret_seed("SC5J4N7JTTWK6QS34OFEX67PB7X2UDLZMOPX2ORA5KTPQHFCESBKZ46D")
+  KeyPair.from_secret_seed("SC5J4N7JTTWK6QS34OFEX67PB7X2UDLZMOPX2ORA5KTPQHFCESBKZ46D")
 
 source_account = Account.new(public_key)
 
@@ -103,9 +104,10 @@ alias Stellar.TxBuild.{
   Signature
 }
 
+alias Stellar.KeyPair
 alias Stellar.Horizon.Accounts
 
-keypair = {public_key, _secret} = Stellar.KeyPair.from_secret_seed("SCA...3EK")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SCA...3EK")
 
 asset = Asset.new(code: :ABC, issuer: public_key)
 

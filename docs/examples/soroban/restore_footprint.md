@@ -20,6 +20,7 @@ In this example, we will restore a contract instance of an already expired contr
 alias Stellar.TxBuild.{
   Account,
   BaseFee,
+  LedgerFootprint,
   LedgerKey,
   RestoreFootprint,
   SCAddress,
@@ -30,14 +31,13 @@ alias Stellar.TxBuild.{
   SorobanTransactionData
 }
 
+alias Stellar.Horizon.Accounts
 alias Stellar.KeyPair
 
 contract_sc_address = SCAddress.new("CAMGSYINVVL6WP3Q5WPNL7FS4GZP37TWV7MKIRQF5QMYLK3N2SW4P3RC")
 key = SCVal.new(ledger_key_contract_instance: nil)
 
-keypair =
-  {public_key, _secret} =
-  Stellar.KeyPair.from_secret_seed("SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SCA...3EK")
 
 contract_data =
   LedgerKey.new(

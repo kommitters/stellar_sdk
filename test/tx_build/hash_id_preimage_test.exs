@@ -14,7 +14,6 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
   alias Stellar.TxBuild.HashIDPreimage, as: TxHashIDPreimage
   alias Stellar.TxBuild.SequenceNumber, as: TxSequenceNumber
   alias Stellar.TxBuild.SCVal, as: TxSCVal
-  alias Stellar.TxBuild.SCVec, as: TxSCVec
   alias Stellar.TxBuild.HashIDPreimageOperationID, as: TxOperationID
   alias Stellar.TxBuild.HashIDPreimageRevokeID, as: TxRevokeID
   alias Stellar.TxBuild.HashIDPreimageContractID, as: TxHashIDPreimageContractID
@@ -72,7 +71,7 @@ defmodule Stellar.TxBuild.HashIDPreimageTest do
     # SorobanAuthorizedInvocation
     contract_address = TxSCAddress.new("CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y")
     function_name = "function_name"
-    args = TxSCVec.new([TxSCVal.new(i32: 654)])
+    args = [TxSCVal.new(i32: 654)]
 
     contract_function =
       TxSorobanAuthorizedContractFunction.new(

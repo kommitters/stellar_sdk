@@ -6,7 +6,6 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
     InvokeHostFunction,
     SCAddress,
     SCVal,
-    SCVec,
     InvokeContractArgs,
     SorobanAuthorizedFunction,
     SorobanAuthorizedInvocation,
@@ -23,7 +22,7 @@ defmodule Stellar.TxBuild.InvokeHostFunctionTest do
         SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 
       function_name = "hello"
-      fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+      fn_args = [SCVal.new(symbol: "dev")]
 
       contract_fn =
         InvokeContractArgs.new(

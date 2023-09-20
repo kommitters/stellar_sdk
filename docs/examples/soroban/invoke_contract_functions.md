@@ -17,10 +17,11 @@ There are three ways to perform a contract function invocation:
 alias Stellar.TxBuild.{
   Account,
   BaseFee,
+  InvokeContractArgs,
   InvokeHostFunction,
   HostFunction,
+  SCAddress,
   SCVal,
-  SCVec,
   SequenceNumber,
   Signature
 }
@@ -35,12 +36,12 @@ args =
   InvokeContractArgs.new(
     contract_address: contract_address,
     function_name: function_name,
-    args: SCVec.new([SCVal.new(string: "dev")])
+    args: [SCVal.new(string: "dev")]
   )
 
 host_function = HostFunction.new(invoke_contract: args)
 invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
-keypair = {public_key, _secret} = Stellar.KeyPair.from_secret_seed("SDR...Q24")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SDR...Q24")
 source_account = Account.new(public_key)
 {:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
 sequence_number = SequenceNumber.new(seq_num)
@@ -78,10 +79,12 @@ source_account
 
 ```elixir
 alias Stellar.TxBuild.{
+  Account,
+  BaseFee,
+  InvokeContractArgs,
   InvokeHostFunction,
   HostFunction,
   SCVal,
-  SCVec,
   SCAddress,
   SequenceNumber,
   Signature
@@ -93,7 +96,7 @@ alias Stellar.KeyPair
 contract_address = SCAddress.new("CAMGSYINVVL6WP3Q5WPNL7FS4GZP37TWV7MKIRQF5QMYLK3N2SW4P3RC")
 
 function_name = "inc"
-keypair = {public_key, _secret} = Stellar.KeyPair.from_secret_seed("SDR...Q24")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SDR...Q24")
 address_type = SCAddress.new(public_key)
 address = SCVal.new(address: address_type)
 
@@ -101,15 +104,15 @@ args =
   InvokeContractArgs.new(
     contract_address: contract_address,
     function_name: function_name,
-    args: SCVec.new([address, SCVal.new(u128: %{hi: 0, lo: 2})])
+    args: [address, SCVal.new(u128: %{hi: 0, lo: 2})]
   )
 
 host_function = HostFunction.new(invoke_contract: args)
 invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
-source_account = Stellar.TxBuild.Account.new(public_key)
+source_account = Account.new(public_key)
 {:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
 sequence_number = SequenceNumber.new(seq_num)
-signature = Stellar.TxBuild.Signature.new(keypair)
+signature = Signature.new(keypair)
 
 # Use this XDR to simulate the transaction and get the soroban_data, the invoke_host_function auth
 # and the min_resource_fee
@@ -149,7 +152,9 @@ source_account
 alias StellarBase.XDR.{SorobanResources, SorobanTransactionData, UInt32}
 
 alias Stellar.TxBuild.{
+  Account,
   BaseFee,
+  InvokeContractArgs,
   InvokeHostFunction,
   HostFunction,
   SCVal,
@@ -166,13 +171,12 @@ contract_address = SCAddress.new("CAMGSYINVVL6WP3Q5WPNL7FS4GZP37TWV7MKIRQF5QMYLK
 function_name = "inc"
 
 ## invoker
-{invoker_public_key, invoker_secret_key} =
-  KeyPair.from_secret_seed("SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK")
+{invoker_public_key, invoker_secret_key} = KeyPair.from_secret_seed("SCA...3EK")
 
 ## submitter
 submitter_keypair =
-  {submitter_public_key, _submitter_secret_key} =
-  KeyPair.from_secret_seed("SDRD4CSRGPWUIPRDS5O3CJBNJME5XVGWNI677MZDD4OD2ZL2R6K5IQ24")
+  {submitter_public_key, _submitter_secret_key} = KeyPair.from_secret_seed("SDR...Q24")
+
 
 address_type = SCAddress.new(invoker_public_key)
 address = SCVal.new(address: address_type)
@@ -188,10 +192,10 @@ host_function = HostFunction.new(invoke_contract: args)
 
 invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
-source_account = Stellar.TxBuild.Account.new(submitter_public_key)
+source_account = Account.new(submitter_public_key)
 {:ok, seq_num} = Accounts.fetch_next_sequence_number(submitter_public_key)
 sequence_number = SequenceNumber.new(seq_num)
-signature = Stellar.TxBuild.Signature.new(submitter_keypair)
+signature = Signature.new(submitter_keypair)
 
 # Use this XDR to simulate the transaction and get the soroban_data, the invoke_host_function auth and the min_resource_fee
 source_account

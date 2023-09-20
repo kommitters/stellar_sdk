@@ -9,8 +9,7 @@ defmodule Stellar.TxBuild.HostFunctionTest do
     HostFunction,
     InvokeContractArgs,
     SCAddress,
-    SCVal,
-    SCVec
+    SCVal
   }
 
   import Stellar.Test.XDRFixtures,
@@ -22,7 +21,7 @@ defmodule Stellar.TxBuild.HostFunctionTest do
       contract_address = SCAddress.new("CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y")
 
       function_name = "hello"
-      args = SCVec.new([SCVal.new(symbol: "world")])
+      args = [SCVal.new(symbol: "world")]
 
       invoke_args =
         InvokeContractArgs.new(

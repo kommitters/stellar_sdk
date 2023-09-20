@@ -21,6 +21,7 @@ alias Stellar.TxBuild.{
   Account,
   BaseFee,
   BumpFootprintExpiration,
+  LedgerFootprint,
   LedgerKey,
   SCAddress,
   SCVal,
@@ -30,13 +31,15 @@ alias Stellar.TxBuild.{
   SorobanTransactionData
 }
 
+alias Stellar.Horizon.Accounts
+alias Stellar.KeyPair
+
 contract_address = "CCNVHP2UAOJAICTQUDSRVZDCB5OJKGQNOJFPOXINELWQHGX33EG34NV2"
 contract_sc_address = SCAddress.new(contract_address)
 key = SCVal.new(ledger_key_contract_instance: nil)
 
 keypair =
-  {public_key, _secret} =
-  Stellar.KeyPair.from_secret_seed("SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK")
+  {public_key, _secret} = KeyPair.from_secret_seed("SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK")
 
 contract_data =
   LedgerKey.new(

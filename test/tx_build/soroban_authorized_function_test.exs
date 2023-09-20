@@ -2,7 +2,6 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.{
-    SCVec,
     SCVal,
     CreateContractArgs,
     ContractIDPreimage,
@@ -14,7 +13,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedFunctionTest do
   }
 
   setup do
-    fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+    fn_args = [SCVal.new(symbol: "dev")]
 
     contract_address = SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 

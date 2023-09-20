@@ -1,13 +1,10 @@
 defmodule Stellar.TxBuild.InvokeContractArgsTest do
   use ExUnit.Case
 
-  alias Stellar.TxBuild.SCAddress
-  alias Stellar.TxBuild.SCVec
-  alias Stellar.TxBuild.SCVal
-  alias Stellar.TxBuild.InvokeContractArgs
+  alias Stellar.TxBuild.{InvokeContractArgs, SCAddress, SCVal}
 
   setup do
-    fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+    fn_args = [SCVal.new(symbol: "dev")]
 
     contract_address = SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 
@@ -94,7 +91,7 @@ defmodule Stellar.TxBuild.InvokeContractArgsTest do
     contract_address: contract_address,
     function_name: function_name
   } do
-    {:error, :invalid_args} =
+    {:error, :invalid_vals} =
       InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,

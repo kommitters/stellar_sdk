@@ -5,7 +5,6 @@ defmodule Stellar.TxBuild.HashIDPreimageSorobanAuthorizationTest do
 
   alias Stellar.TxBuild.{
     HashIDPreimageSorobanAuthorization,
-    SCVec,
     SCVal,
     SCAddress,
     InvokeContractArgs,
@@ -14,7 +13,7 @@ defmodule Stellar.TxBuild.HashIDPreimageSorobanAuthorizationTest do
   }
 
   setup do
-    fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+    fn_args = [SCVal.new(symbol: "dev")]
 
     contract_address = SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 

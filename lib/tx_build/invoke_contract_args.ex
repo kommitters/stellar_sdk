@@ -4,7 +4,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
   """
 
   import Stellar.TxBuild.Validations,
-    only: [validate_vec: 1, validate_address: 1]
+    only: [validate_sc_vals: 1, validate_vec: 1, validate_address: 1]
 
   alias StellarBase.XDR.{InvokeContractArgs, SCSymbol}
   alias Stellar.TxBuild.{SCAddress, SCVec}
@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
   @type validation :: {:ok, any()} | error()
   @type contract_address :: SCAddress.t()
   @type function_name :: String.t()
-  @type args :: SCVec.t()
+  @type args :: list(SCVec.t())
 
   @type t :: %__MODULE__{
           contract_address: contract_address(),
@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
 
     with {:ok, contract_address} <- validate_address(contract_address),
          {:ok, function_name} <- validate_function_name(function_name),
-         {:ok, function_args} <- validate_vec(function_args) do
+         {:ok, function_args} <- validate_sc_vals({:vals, function_args}) do
       %__MODULE__{
         contract_address: contract_address,
         function_name: function_name,
@@ -53,7 +53,11 @@ defmodule Stellar.TxBuild.InvokeContractArgs do
         args: args
       }) do
     function_name = SCSymbol.new(function_name)
-    args = SCVec.to_xdr(args)
+
+    args =
+      args
+      |> SCVec.new()
+      |> SCVec.to_xdr()
 
     contract_address
     |> SCAddress.to_xdr()
