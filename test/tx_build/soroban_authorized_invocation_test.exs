@@ -2,23 +2,22 @@ defmodule Stellar.TxBuild.SorobanAuthorizedInvocationTest do
   use ExUnit.Case
 
   alias Stellar.TxBuild.{
-    SCVec,
     SCVal,
     SCAddress,
-    SorobanAuthorizedContractFunction,
+    InvokeContractArgs,
     SorobanAuthorizedFunction,
     SorobanAuthorizedInvocation
   }
 
   setup do
-    fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+    fn_args = [SCVal.new(symbol: "dev")]
 
     contract_address = SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 
     function_name = "hello"
 
     contract_fn =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args
@@ -32,7 +31,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedInvocationTest do
 
     auth_invocation_xdr = %StellarBase.XDR.SorobanAuthorizedInvocation{
       function: %StellarBase.XDR.SorobanAuthorizedFunction{
-        value: %StellarBase.XDR.SorobanAuthorizedContractFunction{
+        value: %StellarBase.XDR.InvokeContractArgs{
           contract_address: %StellarBase.XDR.SCAddress{
             sc_address: %StellarBase.XDR.Hash{
               value:
@@ -42,7 +41,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedInvocationTest do
             type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
           },
           function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-          args: %StellarBase.XDR.SCVec{
+          args: %StellarBase.XDR.SCValList{
             items: [
               %StellarBase.XDR.SCVal{
                 value: %StellarBase.XDR.SCSymbol{value: "dev"},

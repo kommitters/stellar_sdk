@@ -90,6 +90,8 @@ defmodule Stellar.Test.Fixtures.XDR do
   defdelegate ledger_key_liquidity_pool(liquidity_pool_id), to: Ledger
   defdelegate ledger_key_contract_data(), to: Ledger
   defdelegate ledger_key_contract_code(), to: Ledger
+  defdelegate ledger_key_config_setting(), to: Ledger
+  defdelegate ledger_key_expiration(), to: Ledger
 
   defdelegate revoke_sponsorship(type, attrs), to: Ledger
 end

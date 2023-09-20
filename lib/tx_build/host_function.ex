@@ -2,12 +2,12 @@ defmodule Stellar.TxBuild.HostFunction do
   @moduledoc """
     `HostFunction` struct definition.
   """
-  alias Stellar.TxBuild.{CreateContractArgs, SCVec}
+  alias Stellar.TxBuild.{CreateContractArgs, InvokeContractArgs}
   alias StellarBase.XDR.{HostFunction, HostFunctionType, VariableOpaque}
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type value :: CreateContractArgs.t() | SCVec.t() | binary()
+  @type value :: CreateContractArgs.t() | InvokeContractArgs.t() | binary()
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
   @type type ::
@@ -45,7 +45,7 @@ defmodule Stellar.TxBuild.HostFunction do
     type = HostFunctionType.new(:HOST_FUNCTION_TYPE_INVOKE_CONTRACT)
 
     value
-    |> SCVec.to_xdr()
+    |> InvokeContractArgs.to_xdr()
     |> HostFunction.new(type)
   end
 
@@ -72,7 +72,7 @@ defmodule Stellar.TxBuild.HostFunction do
   end
 
   @spec validate_host_function({type :: atom(), value :: value()}) :: validation()
-  defp validate_host_function({:invoke_contract, %SCVec{} = value}), do: {:ok, value}
+  defp validate_host_function({:invoke_contract, %InvokeContractArgs{} = value}), do: {:ok, value}
   defp validate_host_function({:create_contract, %CreateContractArgs{} = value}), do: {:ok, value}
 
   defp validate_host_function({:upload_contract_wasm, value}) when is_binary(value),

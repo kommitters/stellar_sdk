@@ -5,24 +5,23 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
     SCAddress,
     SCMapEntry,
     SCVal,
-    SCVec,
     SorobanAddressCredentials,
     SorobanAuthorizedInvocation,
     SorobanAuthorizedFunction,
-    SorobanAuthorizedContractFunction,
+    InvokeContractArgs,
     SorobanAuthorizationEntry,
     SorobanCredentials
   }
 
   setup do
-    fn_args = SCVec.new([SCVal.new(symbol: "dev")])
+    fn_args = [SCVal.new(symbol: "dev")]
 
     contract_address = SCAddress.new("CBT6AP4HS575FETHYO6CMIZ2NUFPLKC7JGO7HNBEDTPLZJADT5RDRZP4")
 
     function_name = "hello"
 
     contract_fn =
-      SorobanAuthorizedContractFunction.new(
+      InvokeContractArgs.new(
         contract_address: contract_address,
         function_name: function_name,
         args: fn_args
@@ -47,7 +46,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
       },
       root_invocation: %StellarBase.XDR.SorobanAuthorizedInvocation{
         function: %StellarBase.XDR.SorobanAuthorizedFunction{
-          value: %StellarBase.XDR.SorobanAuthorizedContractFunction{
+          value: %StellarBase.XDR.InvokeContractArgs{
             contract_address: %StellarBase.XDR.SCAddress{
               sc_address: %StellarBase.XDR.Hash{
                 value:
@@ -57,7 +56,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
               type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
             },
             function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
-            args: %StellarBase.XDR.SCVec{
+            args: %StellarBase.XDR.SCValList{
               items: [
                 %StellarBase.XDR.SCVal{
                   value: %StellarBase.XDR.SCSymbol{value: "dev"},
@@ -83,7 +82,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
         address: address,
         nonce: nonce,
         signature_expiration_ledger: signature_expiration_ledger,
-        signature_args: SCVec.new([])
+        signature: SCVal.new(vec: [])
       )
 
     address_credentials = SorobanCredentials.new(address: soroban_address_credentials)
@@ -100,12 +99,13 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
       soroban_auth_entry: soroban_auth_entry,
       xdr: xdr,
       base_64:
-        "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftY69WqNb/7SRQAAAAAAAAAAAAAAAAAAAAEYaWENrVfrP3DtntX8suGy/f52r9ikRgXsGYWrbdStxwAAAANpbmMAAAAAAgAAABIAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAACQAAAAAAAAAAAAAAAAAAAAIAAAAA",
+        "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYOvJBkmBOF7wAAAAAAAAABAAAAAAAAAAEJjPko7iuhBRtsY0aDQ2Einilpmj/rDyGds/qx5seSNAAAAANpbmMAAAAAAgAAABIAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAACQAAAAAAAAAAAAAAAAAAAAIAAAAA",
       secret_key: "SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK",
       latest_ledger: 164_256,
       sign_xdr:
-        "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftY69WqNb/7SRQACgaMAAAABAAAAEQAAAAEAAAACAAAADwAAAApwdWJsaWNfa2V5AAAAAAANAAAAIMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAADwAAAAlzaWduYXR1cmUAAAAAAAANAAAAQOdgROP+0omN51SCii/Ttcy5PhyPfGIaPWG4FBvQNEp1jGMio+lH5IKE5boB5dvdbR0wNixWSHXZBb/35hyftAIAAAAAAAAAARhpYQ2tV+s/cO2e1fyy4bL9/nav2KRGBewZhatt1K3HAAAAA2luYwAAAAACAAAAEgAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAJAAAAAAAAAAAAAAAAAAAAAgAAAAA=",
-      soroban_auth_entry_with_address_credentials: soroban_auth_entry_with_address_credentials
+        "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYOvJBkmBOF7wACgaMAAAAQAAAAAQAAAAEAAAARAAAAAQAAAAIAAAAPAAAACnB1YmxpY19rZXkAAAAAAA0AAAAgyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAPAAAACXNpZ25hdHVyZQAAAAAAAA0AAABAIVZ/t4FbgBOE7+B6u41RkQhUrePyoyxrNwGh8oN2HtGtmyuxBwlU49nBUgUwBHmHiQMIMBEW7IbyPNGSuK4YCAAAAAAAAAABCYz5KO4roQUbbGNGg0NhIp4paZo/6w8hnbP6sebHkjQAAAADaW5jAAAAAAIAAAASAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1gAAAAkAAAAAAAAAAAAAAAAAAAACAAAAAA==",
+      soroban_auth_entry_with_address_credentials: soroban_auth_entry_with_address_credentials,
+      address_credentials: address_credentials
     }
   end
 
@@ -137,8 +137,15 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
   } do
     %SorobanAuthorizationEntry{
       credentials: %SorobanAddressCredentials{
-        signature_args: %SCVec{
-          items: [
+        address: %SCAddress{
+          type: :account,
+          value: "GDEU46HFMHBHCSFA3K336I3MJSBZCWVI3LUGSNL6AF2BW2Q2XR7NNAPM"
+        },
+        nonce: 1_078_069_780,
+        signature_expiration_ledger: 164_080,
+        signature: %SCVal{
+          type: :vec,
+          value: [
             %SCVal{
               type: :map,
               value: [

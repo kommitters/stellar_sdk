@@ -25,6 +25,7 @@ alias Stellar.TxBuild.{
   SCAddress
 }
 
+alias Stellar.KeyPair
 alias Stellar.Horizon.Accounts
 
 wasm_ref = <<some binary here>>
@@ -47,7 +48,7 @@ invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 keypair =
   {public_key, _secret} =
-  Stellar.KeyPair.from_secret_seed("SC5J4N7JTTWK6QS34OFEX67PB7X2UDLZMOPX2ORA5KTPQHFCESBKZ46D")
+  KeyPair.from_secret_seed("SC5J4N7JTTWK6QS34OFEX67PB7X2UDLZMOPX2ORA5KTPQHFCESBKZ46D")
 
 source_account = Account.new(public_key)
 
@@ -67,6 +68,11 @@ source_account
 soroban_data =
   "AAAAAAAAAAEAAAAHuoVwkiq7sFT5+6wPecWIC3zW3SXzDactjjMN9VUNzQIAAAAAAAAAAQAAAAYAAAABet+3VCiKSYoZDd/Ce32Dtp9tYwNFc64V/QfdZUJm4boAAAAUAAAAAQAAAAAAAX/UAAACyAAAAKQAAADYAAAAAAAAACs="
 
+auth = [
+  "AAAAAAAAAAEAAAAAAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1t3O7skFonbhP9PT+l5IGaavsMV+AyUtQF88+kCpS/YbAAAAAIw32Y19ZRfshxeO+Nw4BNSkE0ZhibcEWId4SVzs0PZPAAAAAA=="
+]
+
+invoke_host_function_op = InvokeHostFunction.set_auth(invoke_host_function_op, auth)
 min_resource_fee = 38_733
 fee = BaseFee.new(min_resource_fee + 100)
 
@@ -98,9 +104,10 @@ alias Stellar.TxBuild.{
   Signature
 }
 
+alias Stellar.KeyPair
 alias Stellar.Horizon.Accounts
 
-keypair = {public_key, _secret} = Stellar.KeyPair.from_secret_seed("SCA...3EK")
+keypair = {public_key, _secret} = KeyPair.from_secret_seed("SCA...3EK")
 
 asset = Asset.new(code: :ABC, issuer: public_key)
 

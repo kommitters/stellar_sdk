@@ -1,13 +1,13 @@
-defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
+defmodule Stellar.TxBuild.InvokeContractArgs do
   @moduledoc """
-  `SorobanAuthorizedContractFunction` struct definition.
+  `InvokeContractArgs` struct definition.
   """
 
   import Stellar.TxBuild.Validations,
-    only: [validate_vec: 1, validate_address: 1]
+    only: [validate_sc_vals: 1, validate_address: 1]
 
-  alias StellarBase.XDR.{SorobanAuthorizedContractFunction, SCSymbol}
-  alias Stellar.TxBuild.{SCAddress, SCVec}
+  alias StellarBase.XDR.{InvokeContractArgs, SCSymbol}
+  alias Stellar.TxBuild.{SCAddress, SCVal, SCVec}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -15,7 +15,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
   @type validation :: {:ok, any()} | error()
   @type contract_address :: SCAddress.t()
   @type function_name :: String.t()
-  @type args :: SCVec.t()
+  @type args :: list(SCVal.t())
 
   @type t :: %__MODULE__{
           contract_address: contract_address(),
@@ -35,7 +35,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
 
     with {:ok, contract_address} <- validate_address(contract_address),
          {:ok, function_name} <- validate_function_name(function_name),
-         {:ok, function_args} <- validate_vec(function_args) do
+         {:ok, function_args} <- validate_sc_vals({:vals, function_args}) do
       %__MODULE__{
         contract_address: contract_address,
         function_name: function_name,
@@ -53,11 +53,15 @@ defmodule Stellar.TxBuild.SorobanAuthorizedContractFunction do
         args: args
       }) do
     function_name = SCSymbol.new(function_name)
-    args = SCVec.to_xdr(args)
+
+    args =
+      args
+      |> SCVec.new()
+      |> SCVec.to_xdr()
 
     contract_address
     |> SCAddress.to_xdr()
-    |> SorobanAuthorizedContractFunction.new(function_name, args)
+    |> InvokeContractArgs.new(function_name, args)
   end
 
   def to_xdr(_struct), do: {:error, :invalid_struct}

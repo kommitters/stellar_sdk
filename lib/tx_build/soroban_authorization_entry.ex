@@ -8,7 +8,6 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
   alias StellarBase.XDR.HashIDPreimageSorobanAuthorization,
     as: HashIDPreimageSorobanAuthorizationXDR
 
-  alias StellarBase.XDR.SCVec, as: SCVecXDR
   alias StellarBase.XDR.SorobanAddressCredentials, as: SorobanAddressCredentialsXDR
   alias StellarBase.XDR.SorobanAuthorizedInvocation, as: SorobanAuthorizedInvocationXDR
   alias StellarBase.XDR.{EnvelopeType, Hash, Int64, SorobanAuthorizationEntry, UInt32}
@@ -19,7 +18,6 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
     HashIDPreimageSorobanAuthorization,
     SCMapEntry,
     SCVal,
-    SCVec,
     SorobanAddressCredentials,
     SorobanCredentials,
     SorobanAuthorizedInvocation
@@ -83,7 +81,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
               %SorobanAddressCredentials{
                 nonce: nonce,
                 signature_expiration_ledger: signature_expiration_ledger,
-                signature_args: signature_args
+                signature: %SCVal{value: signature_args}
               } = soroban_address_credentials
           },
           root_invocation: root_invocation
@@ -125,7 +123,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
     soroban_address_credentials = %{
       soroban_address_credentials
-      | signature_args: SCVec.append_sc_val(signature_args, signature_sc_val)
+      | signature: SCVal.new(vec: signature_args ++ [signature_sc_val])
     }
 
     %{credentials | credentials: soroban_address_credentials}
@@ -157,19 +155,19 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
     signature_expiration_ledger = UInt32.new(latest_ledger + 3)
 
-    signature_args =
+    signature =
       nonce
-      |> build_signature_args_from_xdr(
+      |> build_signature_from_xdr(
         signature_expiration_ledger,
         root_invocation,
         secret_key
       )
+      |> (&SCVal.new(vec: [&1])).()
       |> SCVal.to_xdr()
-      |> (&SCVecXDR.new([&1])).()
 
     soroban_address_credentials = %{
       soroban_address_credentials
-      | signature_args: signature_args,
+      | signature: signature,
         signature_expiration_ledger: signature_expiration_ledger
     }
 
@@ -198,13 +196,13 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
   defp validate_root_invocation(_root_invocation), do: {:error, :invalid_root_invocation}
 
-  @spec build_signature_args_from_xdr(
+  @spec build_signature_from_xdr(
           nonce :: Int64.t(),
           signature_expiration_ledger :: UInt32.t(),
           root_invocation :: SorobanAuthorizedInvocationXDR.t(),
           secret_key :: secret_key()
         ) :: SCVal.t() | error()
-  defp build_signature_args_from_xdr(
+  defp build_signature_from_xdr(
          nonce,
          signature_expiration_ledger,
          root_invocation,

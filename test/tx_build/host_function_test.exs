@@ -7,9 +7,9 @@ defmodule Stellar.TxBuild.HostFunctionTest do
     ContractIDPreimageFromAddress,
     CreateContractArgs,
     HostFunction,
+    InvokeContractArgs,
     SCAddress,
-    SCVal,
-    SCVec
+    SCVal
   }
 
   import Stellar.Test.XDRFixtures,
@@ -18,13 +18,17 @@ defmodule Stellar.TxBuild.HostFunctionTest do
   describe "HostFunction" do
     setup do
       # :invoke_contract
-      contract_address =
-        "CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y"
-        |> SCAddress.new()
-        |> (&SCVal.new(address: &1)).()
+      contract_address = SCAddress.new("CACGCFUMXOXA3KLMKQ5XD7KXDLWEWRCUTVID7GXZ45UFZTW3YFQTZD6Y")
 
-      function_name = SCVal.new(symbol: "hello")
-      invoke_args = SCVec.new([contract_address, function_name, SCVal.new(symbol: "world")])
+      function_name = "hello"
+      args = [SCVal.new(symbol: "world")]
+
+      invoke_args =
+        InvokeContractArgs.new(
+          contract_address: contract_address,
+          function_name: function_name,
+          args: args
+        )
 
       # :create_contract
       wasm_id =

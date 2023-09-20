@@ -9,8 +9,10 @@ defmodule Stellar.TxBuild.LedgerKey do
     Account,
     ClaimableBalance,
     Data,
+    ConfigSetting,
     ContractCode,
     ContractData,
+    Expiration,
     LiquidityPool,
     Offer,
     Trustline
@@ -27,6 +29,8 @@ defmodule Stellar.TxBuild.LedgerKey do
           | :liquidity_pool
           | :contract_data
           | :contract_code
+          | :config_setting
+          | :expiration
 
   @type entry ::
           Account.t()
@@ -37,6 +41,8 @@ defmodule Stellar.TxBuild.LedgerKey do
           | Trustline.t()
           | ContractData.t()
           | ContractCode.t()
+          | ConfigSetting.t()
+          | Expiration.t()
 
   @type t :: %__MODULE__{type: type(), entry: entry()}
 
@@ -122,6 +128,32 @@ defmodule Stellar.TxBuild.LedgerKey do
     end
   end
 
+  def new(
+        {:config_setting, args},
+        _opts
+      ) do
+    case ConfigSetting.new(args) do
+      %ConfigSetting{} = config_setting ->
+        %__MODULE__{type: :config_setting, entry: config_setting}
+
+      _error ->
+        {:error, :invalid_config_setting}
+    end
+  end
+
+  def new(
+        {:expiration, args},
+        _opts
+      ) do
+    case Expiration.new(args) do
+      %Expiration{} = expiration ->
+        %__MODULE__{type: :expiration, entry: expiration}
+
+      _error ->
+        {:error, :invalid_expiration}
+    end
+  end
+
   def new(_args, _opts), do: {:error, :invalid_ledger_key}
 
   @impl true
@@ -142,4 +174,6 @@ defmodule Stellar.TxBuild.LedgerKey do
   defp ledger_entry_type(:liquidity_pool), do: LedgerEntryType.new(:LIQUIDITY_POOL)
   defp ledger_entry_type(:contract_data), do: LedgerEntryType.new(:CONTRACT_DATA)
   defp ledger_entry_type(:contract_code), do: LedgerEntryType.new(:CONTRACT_CODE)
+  defp ledger_entry_type(:config_setting), do: LedgerEntryType.new(:CONFIG_SETTING)
+  defp ledger_entry_type(:expiration), do: LedgerEntryType.new(:EXPIRATION)
 end

@@ -10,7 +10,7 @@ defmodule Stellar.Test.XDRFixtures do
     SignerKey,
     SorobanAuthorizedInvocation,
     SourceAccountContractID,
-    SCVec
+    InvokeContractArgs
   }
 
   alias Stellar.TxBuild.Transaction, as: Tx
@@ -692,41 +692,33 @@ defmodule Stellar.Test.XDRFixtures do
 
   @spec host_function_xdr(
           type :: :invoke_contract,
-          args :: SCVec.t()
+          args :: InvokeContractArgs.t()
         ) :: HostFunction.t()
   def host_function_xdr(
         :invoke_contract,
-        %SCVec{}
+        %InvokeContractArgs{}
       ) do
     %StellarBase.XDR.HostFunction{
-      value: %StellarBase.XDR.SCVec{
-        items: [
-          %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.SCAddress{
-              sc_address: %StellarBase.XDR.Hash{
-                value:
-                  <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68,
-                    84, 157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
-              },
-              type: %StellarBase.XDR.SCAddressType{
-                identifier: :SC_ADDRESS_TYPE_CONTRACT
-              }
-            },
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_ADDRESS}
+      value: %StellarBase.XDR.InvokeContractArgs{
+        contract_address: %StellarBase.XDR.SCAddress{
+          sc_address: %StellarBase.XDR.Hash{
+            value:
+              <<4, 97, 22, 140, 187, 174, 13, 169, 108, 84, 59, 113, 253, 87, 26, 236, 75, 68, 84,
+                157, 80, 63, 154, 249, 231, 104, 92, 206, 219, 193, 97, 60>>
           },
-          %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.SCSymbol{value: "hello"},
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-          },
-          %StellarBase.XDR.SCVal{
-            value: %StellarBase.XDR.SCSymbol{value: "world"},
-            type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
-          }
-        ]
+          type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
+        },
+        function_name: %StellarBase.XDR.SCSymbol{value: "hello"},
+        args: %StellarBase.XDR.SCValList{
+          items: [
+            %StellarBase.XDR.SCVal{
+              value: %StellarBase.XDR.SCSymbol{value: "world"},
+              type: %StellarBase.XDR.SCValType{identifier: :SCV_SYMBOL}
+            }
+          ]
+        }
       },
-      type: %StellarBase.XDR.HostFunctionType{
-        identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT
-      }
+      type: %StellarBase.XDR.HostFunctionType{identifier: :HOST_FUNCTION_TYPE_INVOKE_CONTRACT}
     }
   end
 

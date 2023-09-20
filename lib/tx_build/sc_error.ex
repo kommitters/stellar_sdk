@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.SCError do
   @moduledoc """
   `ScErrorCode` struct definition.
   """
-  alias StellarBase.XDR.{SCError, SCErrorType, SCErrorCode}
+  alias StellarBase.XDR.{SCError, SCErrorType, SCErrorCode, UInt32}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -42,7 +42,7 @@ defmodule Stellar.TxBuild.SCError do
     crypto: :SCE_CRYPTO,
     events: :SCE_EVENTS,
     budget: :SCE_BUDGET,
-    code: :SCE_VALUE,
+    value: :SCE_VALUE,
     auth: :SCE_AUTH
   }
 
@@ -63,21 +63,31 @@ defmodule Stellar.TxBuild.SCError do
   def new(args, opts \\ [])
 
   def new([{type, code}], _opts)
-      when is_map_key(@types, type) and is_map_key(@codes, code) do
+      when is_map_key(@types, type) and (is_map_key(@codes, code) or is_integer(code)) do
     %__MODULE__{type: type, code: code}
   end
 
   def new(_args, _opts), do: {:error, :invalid_sc_error}
 
   @impl true
+  def to_xdr(%__MODULE__{type: :contract = type, code: code}) when is_integer(code) do
+    with {:ok, type} <- retrieve_xdr_type(type) do
+      type = SCErrorType.new(type)
+
+      code
+      |> UInt32.new()
+      |> SCError.new(type)
+    end
+  end
+
   def to_xdr(%__MODULE__{type: type, code: code}) do
     with {:ok, type} <- retrieve_xdr_type(type),
          {:ok, code} <- retrieve_xdr_code(code) do
-      code = SCErrorCode.new(code)
+      type = SCErrorType.new(type)
 
-      type
-      |> SCErrorType.new()
-      |> SCError.new(code)
+      code
+      |> SCErrorCode.new()
+      |> SCError.new(type)
     end
   end
 

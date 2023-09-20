@@ -6,9 +6,8 @@ defmodule Stellar.TxBuild.LedgerFootprintTest do
 
   setup do
     hash = "ABC123"
-    body_type = :data_entry
 
-    contract_code_args = [hash: hash, body_type: body_type]
+    contract_code_args = [hash: hash]
     read_only = [LedgerKey.new({:contract_code, contract_code_args})]
 
     read_write = [
@@ -23,8 +22,7 @@ defmodule Stellar.TxBuild.LedgerFootprintTest do
         ledger_keys: [
           %StellarBase.XDR.LedgerKey{
             entry: %StellarBase.XDR.LedgerKeyContractCode{
-              hash: %StellarBase.XDR.Hash{value: "ABC123"},
-              body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+              hash: %StellarBase.XDR.Hash{value: "ABC123"}
             },
             type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
           }
@@ -34,15 +32,13 @@ defmodule Stellar.TxBuild.LedgerFootprintTest do
         ledger_keys: [
           %StellarBase.XDR.LedgerKey{
             entry: %StellarBase.XDR.LedgerKeyContractCode{
-              hash: %StellarBase.XDR.Hash{value: "ABC123"},
-              body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+              hash: %StellarBase.XDR.Hash{value: "ABC123"}
             },
             type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
           },
           %StellarBase.XDR.LedgerKey{
             entry: %StellarBase.XDR.LedgerKeyContractCode{
-              hash: %StellarBase.XDR.Hash{value: "ABC123"},
-              body_type: %StellarBase.XDR.ContractEntryBodyType{identifier: :DATA_ENTRY}
+              hash: %StellarBase.XDR.Hash{value: "ABC123"}
             },
             type: %StellarBase.XDR.LedgerEntryType{identifier: :CONTRACT_CODE}
           }

@@ -25,16 +25,17 @@ jobs:
         uses: step-security/harden-runner@cba0d00b1fc9a034e1e642ea0f1103c282990604 # v2.5.0
         with:
           disable-sudo: true
-          egress-policy: block
-          allowed-endpoints: >
-            api.github.com:443
-            api.osv.dev:443
-            api.securityscorecards.dev:443
-            bestpractices.coreinfrastructure.org:443
-            *.sigstore.dev:443
-            github.com:443
-            sigstore-tuf-root.storage.googleapis.com:443
-            oss-fuzz-build-logs.storage.googleapis.com:443
+          egress-policy: audit
+          # egress-policy: block
+          # allowed-endpoints: >
+          #   api.github.com:443
+          #   api.osv.dev:443
+          #   api.securityscorecards.dev:443
+          #   bestpractices.coreinfrastructure.org:443
+          #   *.sigstore.dev:443
+          #   github.com:443
+          #   sigstore-tuf-root.storage.googleapis.com:443
+          #   oss-fuzz-build-logs.storage.googleapis.com:443
 
       - name: "Checkout code"
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
