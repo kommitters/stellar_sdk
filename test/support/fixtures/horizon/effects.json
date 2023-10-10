@@ -74,6 +74,50 @@
         "weight": 1,
         "public_key": "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB",
         "key": ""
+      },
+      {
+        "_links": {
+          "operation": {
+            "href": "https://horizon-futurenet.stellar.org/operations/1757857099812865"
+          },
+          "succeeds": {
+            "href": "https://horizon-futurenet.stellar.org/effects?order=desc&cursor=1757857099812865-1"
+          },
+          "precedes": {
+            "href": "https://horizon-futurenet.stellar.org/effects?order=asc&cursor=1757857099812865-1"
+          }
+        },
+        "id": "0001757857099812865-0000000001",
+        "paging_token": "1757857099812865-1",
+        "account": "GA75WSGR2QWI7WXYMMSWWTU47DLAPPNRXIBD3OTEWEGAYKUIOKW3NSZV",
+        "type": "contract_debited",
+        "type_i": 97,
+        "created_at": "2023-10-10T15:53:13Z",
+        "asset_type": "native",
+        "contract": "CAAOGAVAKLFWRVDANZFNXSCOSAIWPATYDPHDV4BCV4IMCIFQZWHVWQBR",
+        "amount": "100.0000000"
+      },
+      {
+        "_links": {
+          "operation": {
+            "href": "https://horizon-futurenet.stellar.org/operations/1757831330009089"
+          },
+          "succeeds": {
+            "href": "https://horizon-futurenet.stellar.org/effects?order=desc&cursor=1757831330009089-2"
+          },
+          "precedes": {
+            "href": "https://horizon-futurenet.stellar.org/effects?order=asc&cursor=1757831330009089-2"
+          }
+        },
+        "id": "0001757831330009089-0000000002",
+        "paging_token": "1757831330009089-2",
+        "account": "GA75WSGR2QWI7WXYMMSWWTU47DLAPPNRXIBD3OTEWEGAYKUIOKW3NSZV",
+        "type": "contract_credited",
+        "type_i": 96,
+        "created_at": "2023-10-10T15:52:40Z",
+        "asset_type": "native",
+        "contract": "CAAOGAVAKLFWRVDANZFNXSCOSAIWPATYDPHDV4BCV4IMCIFQZWHVWQBR",
+        "amount": "100.0000000"
       }
     ]
   }

@@ -99,6 +99,32 @@ defmodule Stellar.Horizon.EffectsTest do
            paging_token: "12884905985-3",
            type: "signer_created",
            type_i: 10
+         },
+         %Effect{
+           id: "0001757857099812865-0000000001",
+           paging_token: "1757857099812865-1",
+           account: "GA75WSGR2QWI7WXYMMSWWTU47DLAPPNRXIBD3OTEWEGAYKUIOKW3NSZV",
+           type: "contract_debited",
+           type_i: 97,
+           attributes: %{
+             amount: "100.0000000",
+             asset_type: "native",
+             contract: "CAAOGAVAKLFWRVDANZFNXSCOSAIWPATYDPHDV4BCV4IMCIFQZWHVWQBR"
+           },
+           created_at: ~U[2023-10-10 15:53:13Z]
+         },
+         %Effect{
+           id: "0001757831330009089-0000000002",
+           paging_token: "1757831330009089-2",
+           account: "GA75WSGR2QWI7WXYMMSWWTU47DLAPPNRXIBD3OTEWEGAYKUIOKW3NSZV",
+           type: "contract_credited",
+           type_i: 96,
+           attributes: %{
+             amount: "100.0000000",
+             asset_type: "native",
+             contract: "CAAOGAVAKLFWRVDANZFNXSCOSAIWPATYDPHDV4BCV4IMCIFQZWHVWQBR"
+           },
+           created_at: ~U[2023-10-10 15:52:40Z]
          }
        ]
      }} = Effects.all(limit: 3)

@@ -186,7 +186,9 @@ defmodule Stellar.Horizon.OperationsTest do
        records: [
          %Effect{type: "account_created", created_at: ~U[2015-09-30 17:15:54Z]},
          %Effect{type: "account_debited", created_at: ~U[2015-09-30 17:16:54Z]},
-         %Effect{type: "signer_created", created_at: ~U[2015-09-30 17:17:54Z]}
+         %Effect{type: "signer_created", created_at: ~U[2015-09-30 17:17:54Z]},
+         %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
+         %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
      }} = Operations.list_effects(operation_id, limit: 3)
   end
