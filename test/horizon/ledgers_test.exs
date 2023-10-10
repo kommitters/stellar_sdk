@@ -224,7 +224,7 @@ defmodule Stellar.Horizon.LedgersTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = Ledgers.list_effects(ledger_sequence, limit: 3)
+     }} = Ledgers.list_effects(ledger_sequence, limit: 5)
   end
 
   test "paginate_collection prev" do

@@ -277,7 +277,7 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = LiquidityPools.list_effects(liquidity_pool_id, limit: 3)
+     }} = LiquidityPools.list_effects(liquidity_pool_id, limit: 5)
   end
 
   test "list_trades/2", %{liquidity_pool_id: liquidity_pool_id} do
