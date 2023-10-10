@@ -14,21 +14,33 @@ defmodule Stellar.Horizon.AssetTest do
   test "new/2", %{attrs: attrs} do
     %Asset{
       asset_type: "credit_alphanum4",
-      asset_code: "USD",
-      asset_issuer: "GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SW5UN3ARVMO6QSRDWP5YLEX",
-      claimable_balances_amount: "36303.8674450",
-      amount: "1347404.4083346",
-      num_accounts: 9390,
-      accounts: %{
-        authorized: 9390,
-        authorized_to_maintain_liabilities: 1240,
-        unauthorized: 5
-      },
-      balances: %{
-        authorized: "1347404.4083346",
-        authorized_to_maintain_liabilities: "177931.9984610",
-        unauthorized: "717.4677360"
-      }
+        asset_code: "USD",
+        asset_issuer: "GA223QARVHSYZPRRXK3P2U4I33CEUCGBNDE4UHU2UZKFG63AJXBSPNKO",
+        paging_token: "USD_GA223QARVHSYZPRRXK3P2U4I33CEUCGBNDE4UHU2UZKFG63AJXBSPNKO_credit_alphanum4",
+        num_accounts: 4,
+        num_claimable_balances: 0,
+        num_liquidity_pools: 0,
+        num_contracts: 0,
+        amount: "100.0000000",
+        accounts: %{
+          authorized: 4,
+          authorized_to_maintain_liabilities: 0,
+          unauthorized: 0
+        },
+        claimable_balances_amount: "0.0000000",
+        liquidity_pools_amount: "0.0000000",
+        contracts_amount: "0.0000000",
+        balances: %{
+          authorized: "100.0000000",
+          authorized_to_maintain_liabilities: "0.0000000",
+          unauthorized: "0.0000000"
+        },
+        flags: %{
+          auth_required: false,
+          auth_revocable: false,
+          auth_immutable: false,
+          auth_clawback_enabled: false
+        }
     } = Asset.new(attrs)
   end
 
@@ -41,7 +53,9 @@ defmodule Stellar.Horizon.AssetTest do
       amount: nil,
       num_accounts: nil,
       accounts: nil,
-      balances: nil
+      balances: nil,
+      num_liquidity_pools: nil,
+      liquidity_pools_amount: nil
     } = Asset.new(%{})
   end
 end

@@ -18,20 +18,28 @@ defmodule Stellar.Horizon.Asset do
           claimable_balances_amount: String.t(),
           amount: String.t(),
           num_accounts: non_neg_integer(),
-          flags: map()
+          flags: map(),
+          contracts_amount: String.t(),
+          num_contracts: non_neg_integer(),
+          num_liquidity_pools: non_neg_integer(),
+          liquidity_pools_amount: String.t()
         }
 
   defstruct [
-    :paging_token,
     :asset_type,
     :asset_code,
     :asset_issuer,
-    :accounts,
-    :num_claimable_balances,
-    :balances,
-    :claimable_balances_amount,
-    :amount,
+    :paging_token,
     :num_accounts,
+    :num_claimable_balances,
+    :num_liquidity_pools,
+    :num_contracts,
+    :amount,
+    :accounts,
+    :claimable_balances_amount,
+    :liquidity_pools_amount,
+    :contracts_amount,
+    :balances,
     :flags
   ]
 
