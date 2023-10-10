@@ -1,6 +1,6 @@
 defmodule Stellar.Horizon.Operation.InvokeHostFunction do
   @moduledoc """
-  Represents a `InvokeHostFunction` operation from Horizon API.
+  Represents an `InvokeHostFunction` operation from Horizon API.
   """
 
   @behaviour Stellar.Horizon.Resource
@@ -9,10 +9,10 @@ defmodule Stellar.Horizon.Operation.InvokeHostFunction do
 
   @type t :: %__MODULE__{
           function: String.t(),
-          parameters: list(map()),
+          parameters: list(map()) | nil,
           address: String.t(),
           salt: String.t(),
-          asset_balance_changes: list()
+          asset_balance_changes: list(map()) | nil
         }
 
   defstruct [:function, :parameters, :address, :salt, :asset_balance_changes]
@@ -20,5 +20,7 @@ defmodule Stellar.Horizon.Operation.InvokeHostFunction do
   @impl true
   def new(attrs, opts \\ [])
 
-  def new(attrs, _opts), do: Mapping.build(%__MODULE__{}, attrs)
+  def new(attrs, _opts) do
+    Mapping.build(%__MODULE__{}, attrs)
+  end
 end

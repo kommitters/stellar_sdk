@@ -8,21 +8,21 @@ defmodule Stellar.Horizon.Asset do
   alias Stellar.Horizon.Mapping
 
   @type t :: %__MODULE__{
-          paging_token: String.t(),
           asset_type: String.t(),
           asset_code: String.t(),
           asset_issuer: String.t(),
-          accounts: map(),
-          num_claimable_balances: non_neg_integer(),
-          balances: map(),
-          claimable_balances_amount: String.t(),
-          amount: String.t(),
+          paging_token: String.t(),
           num_accounts: non_neg_integer(),
-          flags: map(),
-          contracts_amount: String.t(),
-          num_contracts: non_neg_integer(),
+          num_claimable_balances: non_neg_integer(),
           num_liquidity_pools: non_neg_integer(),
-          liquidity_pools_amount: String.t()
+          num_contracts: non_neg_integer(),
+          amount: String.t(),
+          accounts: map(),
+          claimable_balances_amount: String.t(),
+          liquidity_pools_amount: String.t(),
+          contracts_amount: String.t(),
+          balances: map(),
+          flags: map()
         }
 
   defstruct [

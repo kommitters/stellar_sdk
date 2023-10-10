@@ -7,14 +7,14 @@ defmodule Stellar.Horizon.Operation.BumpFootprintExpiration do
 
   alias Stellar.Horizon.Mapping
 
-  @type t :: %__MODULE__{
-          ledgers_to_expire: String.t()
-        }
+  @type t :: %__MODULE__{ledgers_to_expire: non_neg_integer()}
 
   defstruct [:ledgers_to_expire]
 
   @impl true
   def new(attrs, opts \\ [])
 
-  def new(attrs, _opts), do: Mapping.build(%__MODULE__{}, attrs)
+  def new(attrs, _opts) do
+    Mapping.build(%__MODULE__{}, attrs)
+  end
 end
