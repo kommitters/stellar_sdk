@@ -73,6 +73,8 @@ defmodule Stellar.TxBuild.SCVal do
           | atom()
           | SCAddress.t()
 
+  @type map_entry :: StellarBase.XDR.SCMapEntry.t()
+
   @type t :: %__MODULE__{
           type: type(),
           value: value()
@@ -330,7 +332,7 @@ defmodule Stellar.TxBuild.SCVal do
     end
   end
 
-  def to_native_from_xdr(_xdr), do: {:error, :invalid_XDR}
+  def to_native_from_xdr(_xdr), do: {:error, :invalid_xdr}
 
   @spec to_native(SCVal.t()) :: any
   def to_native(%SCVal{
@@ -493,6 +495,7 @@ defmodule Stellar.TxBuild.SCVal do
     end
   end
 
+  @spec map_entry_to_native(map_entry :: map_entry()) :: tuple()
   defp map_entry_to_native(%StellarBase.XDR.SCMapEntry{key: key, val: val}),
     do: {to_native(key), to_native(val)}
 
