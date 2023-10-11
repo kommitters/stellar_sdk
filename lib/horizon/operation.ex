@@ -11,6 +11,7 @@ defmodule Stellar.Horizon.Operation do
     AccountMerge,
     AllowTrust,
     BeginSponsoringFutureReserves,
+    BumpFootprintExpiration,
     BumpSequence,
     ChangeTrust,
     CreateAccount,
@@ -18,6 +19,7 @@ defmodule Stellar.Horizon.Operation do
     ClaimClaimableBalance,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
+    InvokeHostFunction,
     LiquidityPoolDeposit,
     LiquidityPoolWithdraw,
     ManageBuyOffer,
@@ -113,6 +115,7 @@ defmodule Stellar.Horizon.Operation do
 
   @spec operation_type_mapping(type :: any()) :: Keyword.t()
   defp operation_type_mapping(nil), do: @mapping
+  defp operation_type_mapping("restore_footprint"), do: @mapping
 
   defp operation_type_mapping(type),
     do: Keyword.merge(@mapping, body: {:struct, operation_type(type)})
@@ -138,4 +141,6 @@ defmodule Stellar.Horizon.Operation do
   defp operation_type("revoke_sponsorship"), do: RevokeSponsorship
   defp operation_type("liquidity_pool_deposit"), do: LiquidityPoolDeposit
   defp operation_type("liquidity_pool_withdraw"), do: LiquidityPoolWithdraw
+  defp operation_type("invoke_host_function"), do: InvokeHostFunction
+  defp operation_type("bump_footprint_expiration"), do: BumpFootprintExpiration
 end

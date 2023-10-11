@@ -97,38 +97,48 @@ defmodule Stellar.TxBuild.SCValTest do
       %{sc_error: SCError.new(auth: :unexpected_size)}
     ]
 
-    xdr_discriminants = [
+    xdr_discriminants_with_native_value = [
       %{
         val_type: :SCV_BOOL,
         module: %StellarBase.XDR.Bool{value: true},
         type: :bool,
-        value: true
-      },
-      %{val_type: :SCV_VOID, module: %StellarBase.XDR.Void{value: nil}, type: :void, value: nil},
-      %{
-        val_type: :SCV_ERROR,
-        module: %StellarBase.XDR.SCError{
-          type: %StellarBase.XDR.SCErrorType{identifier: :SCE_CONTRACT},
-          value: %StellarBase.XDR.SCErrorCode{identifier: :SCEC_ARITH_DOMAIN}
-        },
-        type: :error,
-        value: SCError.new(contract: :arith_domain)
-      },
-      %{val_type: :SCV_U32, module: %StellarBase.XDR.UInt32{datum: 123}, type: :u32, value: 123},
-      %{val_type: :SCV_I32, module: %StellarBase.XDR.Int32{datum: 123}, type: :i32, value: 123},
-      %{val_type: :SCV_U64, module: %StellarBase.XDR.UInt64{datum: 123}, type: :u64, value: 123},
-      %{val_type: :SCV_I64, module: %StellarBase.XDR.Int64{datum: 123}, type: :i64, value: 123},
-      %{
-        val_type: :SCV_TIMEPOINT,
-        module: %StellarBase.XDR.TimePoint{value: 123},
-        type: :time_point,
-        value: 123
+        value: true,
+        native_value: true
       },
       %{
-        val_type: :SCV_DURATION,
-        module: %StellarBase.XDR.Duration{value: 123},
-        type: :duration,
-        value: 123
+        val_type: :SCV_VOID,
+        module: %StellarBase.XDR.Void{value: nil},
+        type: :void,
+        value: nil,
+        native_value: nil
+      },
+      %{
+        val_type: :SCV_U32,
+        module: %StellarBase.XDR.UInt32{datum: 123},
+        type: :u32,
+        value: 123,
+        native_value: 123
+      },
+      %{
+        val_type: :SCV_I32,
+        module: %StellarBase.XDR.Int32{datum: 123},
+        type: :i32,
+        value: 123,
+        native_value: 123
+      },
+      %{
+        val_type: :SCV_U64,
+        module: %StellarBase.XDR.UInt64{datum: 123},
+        type: :u64,
+        value: 123,
+        native_value: 123
+      },
+      %{
+        val_type: :SCV_I64,
+        module: %StellarBase.XDR.Int64{datum: 123},
+        type: :i64,
+        value: 123,
+        native_value: 123
       },
       %{
         val_type: :SCV_U128,
@@ -137,7 +147,8 @@ defmodule Stellar.TxBuild.SCValTest do
           lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :u128,
-        value: %{hi: 123, lo: 123}
+        value: %{hi: 123, lo: 123},
+        native_value: 2_268_949_521_066_274_848_891
       },
       %{
         val_type: :SCV_I128,
@@ -146,7 +157,8 @@ defmodule Stellar.TxBuild.SCValTest do
           lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :i128,
-        value: %{hi: 123, lo: 123}
+        value: %{hi: 123, lo: 123},
+        native_value: 2_268_949_521_066_274_848_891
       },
       %{
         val_type: :SCV_U256,
@@ -157,7 +169,9 @@ defmodule Stellar.TxBuild.SCValTest do
           lo_lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :u256,
-        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}
+        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123},
+        native_value:
+          772_083_513_452_561_733_993_656_830_185_818_400_188_853_745_904_250_009_944_187
       },
       %{
         val_type: :SCV_I256,
@@ -168,31 +182,37 @@ defmodule Stellar.TxBuild.SCValTest do
           lo_lo: %StellarBase.XDR.UInt64{datum: 123}
         },
         type: :i256,
-        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123}
+        value: %{hi_hi: 123, hi_lo: 123, lo_hi: 123, lo_lo: 123},
+        native_value:
+          772_083_513_452_561_733_993_656_830_185_818_400_188_853_745_904_250_009_944_187
       },
       %{
         val_type: :SCV_BYTES,
         module: %StellarBase.XDR.SCBytes{value: "Hello"},
         type: :bytes,
-        value: "Hello"
+        value: "Hello",
+        native_value: "Hello"
       },
       %{
         val_type: :SCV_STRING,
         module: %StellarBase.XDR.SCString{value: "Hello"},
         type: :string,
-        value: "Hello"
+        value: "Hello",
+        native_value: "Hello"
       },
       %{
         val_type: :SCV_SYMBOL,
         module: %StellarBase.XDR.SCSymbol{value: "Hello"},
         type: :symbol,
-        value: "Hello"
+        value: "Hello",
+        native_value: "Hello"
       },
       %{
         val_type: :SCV_VEC,
         module: %StellarBase.XDR.OptionalSCVec{sc_vec: nil},
         type: :vec,
-        value: nil
+        value: nil,
+        native_value: []
       },
       %{
         val_type: :SCV_VEC,
@@ -207,13 +227,15 @@ defmodule Stellar.TxBuild.SCValTest do
           }
         },
         type: :vec,
-        value: [sc_val]
+        value: [sc_val],
+        native_value: [123]
       },
       %{
         val_type: :SCV_MAP,
         module: %StellarBase.XDR.OptionalSCMap{sc_map: nil},
         type: :map,
-        value: nil
+        value: nil,
+        native_value: %{}
       },
       %{
         val_type: :SCV_MAP,
@@ -234,56 +256,83 @@ defmodule Stellar.TxBuild.SCValTest do
           }
         },
         type: :map,
-        value: [sc_map_entry]
-      },
-      %{
-        val_type: :SCV_CONTRACT_INSTANCE,
-        module: %StellarBase.XDR.SCContractInstance{
-          executable: %StellarBase.XDR.ContractExecutable{
-            value: %StellarBase.XDR.Hash{value: "hash"},
-            type: %StellarBase.XDR.ContractExecutableType{
-              identifier: :CONTRACT_EXECUTABLE_WASM
-            }
-          },
-          storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
-        },
-        type: :contract_instance,
-        value: {:wasm_ref, "hash"}
-      },
-      %{
-        val_type: :SCV_CONTRACT_INSTANCE,
-        module: %StellarBase.XDR.SCContractInstance{
-          executable: %StellarBase.XDR.ContractExecutable{
-            value: %StellarBase.XDR.Void{value: nil},
-            type: %StellarBase.XDR.ContractExecutableType{
-              identifier: :CONTRACT_EXECUTABLE_TOKEN
-            }
-          },
-          storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
-        },
-        type: :contract_instance,
-        value: :token
-      },
-      %{val_type: :SCV_ADDRESS, module: sc_address_xdr, type: :address, value: sc_address},
-      %{
-        val_type: :SCV_LEDGER_KEY_CONTRACT_INSTANCE,
-        module: %StellarBase.XDR.Void{value: nil},
-        type: :ledger_key_contract_instance,
-        value: nil
-      },
-      %{
-        val_type: :SCV_LEDGER_KEY_NONCE,
-        module: %StellarBase.XDR.SCNonceKey{nonce: Int64.new(123_654)},
-        type: :ledger_key_nonce,
-        value: 123_654
+        value: [sc_map_entry],
+        native_value: %{"sc_val_key" => 123}
       }
     ]
+
+    xdr_discriminants =
+      [
+        %{
+          val_type: :SCV_ERROR,
+          module: %StellarBase.XDR.SCError{
+            type: %StellarBase.XDR.SCErrorType{identifier: :SCE_CONTRACT},
+            value: %StellarBase.XDR.SCErrorCode{identifier: :SCEC_ARITH_DOMAIN}
+          },
+          type: :error,
+          value: SCError.new(contract: :arith_domain)
+        },
+        %{
+          val_type: :SCV_TIMEPOINT,
+          module: %StellarBase.XDR.TimePoint{value: 123},
+          type: :time_point,
+          value: 123
+        },
+        %{
+          val_type: :SCV_DURATION,
+          module: %StellarBase.XDR.Duration{value: 123},
+          type: :duration,
+          value: 123
+        },
+        %{
+          val_type: :SCV_CONTRACT_INSTANCE,
+          module: %StellarBase.XDR.SCContractInstance{
+            executable: %StellarBase.XDR.ContractExecutable{
+              value: %StellarBase.XDR.Hash{value: "hash"},
+              type: %StellarBase.XDR.ContractExecutableType{
+                identifier: :CONTRACT_EXECUTABLE_WASM
+              }
+            },
+            storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
+          },
+          type: :contract_instance,
+          value: {:wasm_ref, "hash"}
+        },
+        %{
+          val_type: :SCV_CONTRACT_INSTANCE,
+          module: %StellarBase.XDR.SCContractInstance{
+            executable: %StellarBase.XDR.ContractExecutable{
+              value: %StellarBase.XDR.Void{value: nil},
+              type: %StellarBase.XDR.ContractExecutableType{
+                identifier: :CONTRACT_EXECUTABLE_TOKEN
+              }
+            },
+            storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}
+          },
+          type: :contract_instance,
+          value: :token
+        },
+        %{val_type: :SCV_ADDRESS, module: sc_address_xdr, type: :address, value: sc_address},
+        %{
+          val_type: :SCV_LEDGER_KEY_CONTRACT_INSTANCE,
+          module: %StellarBase.XDR.Void{value: nil},
+          type: :ledger_key_contract_instance,
+          value: nil
+        },
+        %{
+          val_type: :SCV_LEDGER_KEY_NONCE,
+          module: %StellarBase.XDR.SCNonceKey{nonce: Int64.new(123_654)},
+          type: :ledger_key_nonce,
+          value: 123_654
+        }
+      ] ++ xdr_discriminants_with_native_value
 
     %{
       sc_error_discriminants: sc_error_discriminants,
       discriminants: discriminants,
       invalid_discriminants: invalid_discriminants,
-      xdr_discriminants: xdr_discriminants
+      xdr_discriminants: xdr_discriminants,
+      xdr_discriminants_with_native_value: xdr_discriminants_with_native_value
     }
   end
 
@@ -317,5 +366,30 @@ defmodule Stellar.TxBuild.SCValTest do
         value: ^module
       } = SCVal.new([{type, value}]) |> SCVal.to_xdr()
     end
+  end
+
+  test "to_native_from_xdr/1" do
+    "Hello" = SCVal.to_native_from_xdr("AAAADgAAAAVIZWxsbwAAAA==")
+  end
+
+  test "to_native_from_xdr/1 with invalid args" do
+    {:error, :invalid_xdr} = SCVal.to_native_from_xdr(123)
+  end
+
+  test "to_native_from_xdr/1 with invalid base 64" do
+    {:error, :invalid_base64} = SCVal.to_native_from_xdr("invalid_base_64")
+  end
+
+  test "to_native/1", %{
+    xdr_discriminants_with_native_value: xdr_discriminants_with_native_value
+  } do
+    xdr_discriminants_with_native_value
+    |> Enum.each(fn %{type: type, value: value, native_value: native_value} ->
+      ^native_value = SCVal.new([{type, value}]) |> SCVal.to_xdr() |> SCVal.to_native()
+    end)
+  end
+
+  test "to_native/1 with invalid SCVal" do
+    {:error, :invalid_or_not_supported_sc_val} = SCVal.to_native("invalid")
   end
 end

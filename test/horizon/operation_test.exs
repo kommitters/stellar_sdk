@@ -8,6 +8,7 @@ defmodule Stellar.Horizon.OperationTest do
     AccountMerge,
     AllowTrust,
     BeginSponsoringFutureReserves,
+    BumpFootprintExpiration,
     BumpSequence,
     ChangeTrust,
     CreateAccount,
@@ -15,6 +16,7 @@ defmodule Stellar.Horizon.OperationTest do
     ClaimClaimableBalance,
     CreatePassiveSellOffer,
     EndSponsoringFutureReserves,
+    InvokeHostFunction,
     LiquidityPoolDeposit,
     LiquidityPoolWithdraw,
     ManageBuyOffer,
@@ -105,7 +107,10 @@ defmodule Stellar.Horizon.OperationTest do
           {17, "end_sponsoring_future_reserves", %EndSponsoringFutureReserves{}},
           {19, "revoke_sponsorship", %RevokeSponsorship{}},
           {22, "liquidity_pool_deposit", %LiquidityPoolDeposit{}},
-          {23, "liquidity_pool_withdraw", %LiquidityPoolWithdraw{}}
+          {23, "liquidity_pool_withdraw", %LiquidityPoolWithdraw{}},
+          {24, "invoke_host_function", %InvokeHostFunction{}},
+          {25, "bump_footprint_expiration", %BumpFootprintExpiration{}},
+          {26, "restore_footprint", %{}}
         ] do
       %Operation{body: ^body, type_i: ^type_i, type: ^type} =
         Operation.new(%{type_i: type_i, type: type})
