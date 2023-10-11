@@ -13,11 +13,15 @@ The **Stellar SDK** enables the construction, signing and encoding of Stellar [t
 
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
+> **Note**
+> If you are a smart contract developer building on Soroban, we recommend using [Soroban.ex][soroban.ex], a library built on top of Stellar SDK which offers a developer-friendly interface for interacting with Soroban smart contracts and Soroban-RPC server.
+
 #### Protocol Version Support
 | Protocol  | Version      |
 | --------- | ------------ |
 | 18        | >= v0.8      |
 | 19        | >= v0.9      |
+| 20        | >= v0.18     |
 
 ## Documentation
 The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
@@ -31,7 +35,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.18.0"}
+    {:stellar_sdk, "~> 0.18.1"}
   ]
 end
 ```
@@ -920,3 +924,4 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [stellar-cap-27]: https://stellar.org/protocol/cap-27
 [stellar-protocol-19]: https://stellar.org/blog/announcing-protocol-19
 [stellar-docs-account-seq-num-age]: https://developers.stellar.org/docs/glossary/accounts/#sequence-time-and-ledger
+[soroban.ex]: https://github.com/kommitters/soroban.ex
