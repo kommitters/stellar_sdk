@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.1 (11.10.2023)
+
+* Add remaining changes for Protocol 20: Soroban.
+  - Add function to be able to obtain native value from a `SCVal`.
+  - Fix Horizon API responses related to Effects, Assets, and Soroban Operations.
+
 ## 0.18.0 (20.09.2023)
 
 * Add Soroban Preview 11 support.
