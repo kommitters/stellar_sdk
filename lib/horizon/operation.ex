@@ -11,7 +11,7 @@ defmodule Stellar.Horizon.Operation do
     AccountMerge,
     AllowTrust,
     BeginSponsoringFutureReserves,
-    BumpFootprintExpiration,
+    ExtendFootprintTTL,
     BumpSequence,
     ChangeTrust,
     CreateAccount,
@@ -142,5 +142,5 @@ defmodule Stellar.Horizon.Operation do
   defp operation_type("liquidity_pool_deposit"), do: LiquidityPoolDeposit
   defp operation_type("liquidity_pool_withdraw"), do: LiquidityPoolWithdraw
   defp operation_type("invoke_host_function"), do: InvokeHostFunction
-  defp operation_type("bump_footprint_expiration"), do: BumpFootprintExpiration
+  defp operation_type("extend_footprint_ttl"), do: ExtendFootprintTTL
 end

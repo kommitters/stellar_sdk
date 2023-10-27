@@ -28,10 +28,10 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
         write_bytes: write_bytes
       )
 
-    refundable_fee = 100
+    resource_fee = 100
 
     soroban_transaction_data =
-      SorobanTransactionData.new(resources: resources, refundable_fee: refundable_fee)
+      SorobanTransactionData.new(resources: resources, resource_fee: resource_fee)
 
     xdr = %StellarBase.XDR.SorobanTransactionData{
       ext: %StellarBase.XDR.ExtensionPoint{
@@ -71,29 +71,29 @@ defmodule Stellar.TxBuild.SorobanTransactionDataTest do
         read_bytes: %StellarBase.XDR.UInt32{datum: 1024},
         write_bytes: %StellarBase.XDR.UInt32{datum: 512}
       },
-      refundable_fee: %StellarBase.XDR.Int64{datum: 100}
+      resource_fee: %StellarBase.XDR.Int64{datum: 100}
     }
 
     %{
       resources: resources,
-      refundable_fee: refundable_fee,
+      resource_fee: resource_fee,
       soroban_transaction_data: soroban_transaction_data,
       xdr: xdr
     }
   end
 
-  test "new/1", %{resources: resources, refundable_fee: refundable_fee} do
-    %SorobanTransactionData{resources: ^resources, refundable_fee: ^refundable_fee} =
-      SorobanTransactionData.new(resources: resources, refundable_fee: refundable_fee)
+  test "new/1", %{resources: resources, resource_fee: resource_fee} do
+    %SorobanTransactionData{resources: ^resources, resource_fee: ^resource_fee} =
+      SorobanTransactionData.new(resources: resources, resource_fee: resource_fee)
   end
 
   test "new/1 with invalid soroban transaction args" do
     {:error, :invalid_soroban_transaction_data} = SorobanTransactionData.new(:invalid)
   end
 
-  test "new/1 with invalid resources", %{refundable_fee: refundable_fee} do
+  test "new/1 with invalid resources", %{resource_fee: resource_fee} do
     {:error, :invalid_resources} =
-      SorobanTransactionData.new(resources: :invalid, refundable_fee: refundable_fee)
+      SorobanTransactionData.new(resources: :invalid, resource_fee: resource_fee)
   end
 
   test "to_xdr/1", %{soroban_transaction_data: soroban_transaction_data, xdr: xdr} do

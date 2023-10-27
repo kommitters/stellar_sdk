@@ -1,8 +1,8 @@
-defmodule Stellar.TxBuild.Ledger.Expiration do
+defmodule Stellar.TxBuild.Ledger.TTL do
   @moduledoc """
-  Ledger `Expiration` struct definition.
+  Ledger `TTL` struct definition.
   """
-  alias StellarBase.XDR.{Hash, LedgerKeyExpiration}
+  alias StellarBase.XDR.{Hash, LedgerKeyTTL}
 
   @behaviour Stellar.TxBuild.XDR
 
@@ -15,13 +15,13 @@ defmodule Stellar.TxBuild.Ledger.Expiration do
 
   def new(key_hash, _opts) when is_binary(key_hash), do: %__MODULE__{key_hash: key_hash}
 
-  def new(_key_hash, _opts), do: {:error, :invalid_expiration}
+  def new(_key_hash, _opts), do: {:error, :invalid_ttl}
 
   @impl true
   def to_xdr(%__MODULE__{key_hash: key_hash}) do
     key_hash
     |> Hash.new()
-    |> LedgerKeyExpiration.new()
+    |> LedgerKeyTTL.new()
   end
 
   def to_xdr(_struct), do: {:error, :invalid_struct}

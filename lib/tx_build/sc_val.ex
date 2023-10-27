@@ -308,7 +308,7 @@ defmodule Stellar.TxBuild.SCVal do
 
   def to_xdr(%__MODULE__{type: :contract_instance, value: :token}) do
     type = SCValType.new(:SCV_CONTRACT_INSTANCE)
-    contract_code = ContractExecutableType.new(:CONTRACT_EXECUTABLE_TOKEN)
+    contract_code = ContractExecutableType.new(:CONTRACT_EXECUTABLE_STELLAR_ASSET)
 
     Void.new()
     |> ContractExecutable.new(contract_code)

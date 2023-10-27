@@ -1,12 +1,12 @@
-defmodule Stellar.Horizon.Operation.BumpFootprintExpirationTest do
+defmodule Stellar.Horizon.Operation.ExtendFootprintTTLTest do
   use ExUnit.Case
 
-  alias Stellar.Horizon.Operation.BumpFootprintExpiration
+  alias Stellar.Horizon.Operation.ExtendFootprintTTL
 
   setup do
     %{
       attrs: %{
-        ledgers_to_expire: 100_000
+        extend_to: 100_000
       }
     }
   end
@@ -14,17 +14,17 @@ defmodule Stellar.Horizon.Operation.BumpFootprintExpirationTest do
   test "new/2", %{
     attrs:
       %{
-        ledgers_to_expire: ledgers_to_expire
+        extend_to: extend_to
       } = attrs
   } do
-    %BumpFootprintExpiration{
-      ledgers_to_expire: ^ledgers_to_expire
-    } = BumpFootprintExpiration.new(attrs)
+    %ExtendFootprintTTL{
+      extend_to: ^extend_to
+    } = ExtendFootprintTTL.new(attrs)
   end
 
   test "new/2 empty_attrs" do
-    %BumpFootprintExpiration{
-      ledgers_to_expire: nil
-    } = BumpFootprintExpiration.new(%{})
+    %ExtendFootprintTTL{
+      extend_to: nil
+    } = ExtendFootprintTTL.new(%{})
   end
 end

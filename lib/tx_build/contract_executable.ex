@@ -10,17 +10,17 @@ defmodule Stellar.TxBuild.ContractExecutable do
   @type value :: String.t() | nil
   @type type ::
           :wasm_ref
-          | :token
+          | :stellar_asset
   @type t :: %__MODULE__{type: type(), value: value()}
 
   defstruct [:type, :value]
 
-  @allowed_types ~w(wasm_ref token)a
+  @allowed_types ~w(wasm_ref stellar_asset)a
 
   @impl true
   def new(value, opts \\ [])
 
-  def new(:token, _opts), do: %__MODULE__{type: :token, value: nil}
+  def new(:stellar_asset, _opts), do: %__MODULE__{type: :stellar_asset, value: nil}
 
   def new([{type, value}], _opts)
       when type in @allowed_types and is_binary(value) do
@@ -38,8 +38,8 @@ defmodule Stellar.TxBuild.ContractExecutable do
     |> ContractExecutable.new(type)
   end
 
-  def to_xdr(%__MODULE__{type: :token, value: nil}) do
-    type = ContractExecutableType.new(:CONTRACT_EXECUTABLE_TOKEN)
+  def to_xdr(%__MODULE__{type: :stellar_asset, value: nil}) do
+    type = ContractExecutableType.new(:CONTRACT_EXECUTABLE_STELLAR_ASSET)
     ContractExecutable.new(Void.new(), type)
   end
 

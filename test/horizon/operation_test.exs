@@ -8,7 +8,7 @@ defmodule Stellar.Horizon.OperationTest do
     AccountMerge,
     AllowTrust,
     BeginSponsoringFutureReserves,
-    BumpFootprintExpiration,
+    ExtendFootprintTTL,
     BumpSequence,
     ChangeTrust,
     CreateAccount,
@@ -109,7 +109,7 @@ defmodule Stellar.Horizon.OperationTest do
           {22, "liquidity_pool_deposit", %LiquidityPoolDeposit{}},
           {23, "liquidity_pool_withdraw", %LiquidityPoolWithdraw{}},
           {24, "invoke_host_function", %InvokeHostFunction{}},
-          {25, "bump_footprint_expiration", %BumpFootprintExpiration{}},
+          {25, "extend_footprint_ttl", %ExtendFootprintTTL{}},
           {26, "restore_footprint", %{}}
         ] do
       %Operation{body: ^body, type_i: ^type_i, type: ^type} =

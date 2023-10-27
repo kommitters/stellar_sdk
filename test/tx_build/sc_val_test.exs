@@ -304,7 +304,7 @@ defmodule Stellar.TxBuild.SCValTest do
             executable: %StellarBase.XDR.ContractExecutable{
               value: %StellarBase.XDR.Void{value: nil},
               type: %StellarBase.XDR.ContractExecutableType{
-                identifier: :CONTRACT_EXECUTABLE_TOKEN
+                identifier: :CONTRACT_EXECUTABLE_STELLAR_ASSET
               }
             },
             storage: %StellarBase.XDR.OptionalSCMap{sc_map: nil}

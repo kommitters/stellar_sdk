@@ -1,6 +1,6 @@
-defmodule Stellar.TxBuild.BumpFootprintExpiration do
+defmodule Stellar.TxBuild.ExtendFootprintTTL do
   @moduledoc """
-  `BumpFootprintExpiration` struct definition.
+  `ExtendFootprintTTL` struct definition.
   """
   import Stellar.TxBuild.Validations, only: [validate_optional_account: 1]
 
@@ -10,44 +10,44 @@ defmodule Stellar.TxBuild.BumpFootprintExpiration do
     ExtensionPoint,
     OperationBody,
     OperationType,
-    Operations.BumpFootprintExpiration,
+    Operations.ExtendFootprintTTL,
     UInt32,
     Void
   }
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type ledgers_to_expire :: integer()
+  @type extend_to :: integer()
 
   @type t :: %__MODULE__{
-          ledgers_to_expire: ledgers_to_expire(),
+          extend_to: extend_to(),
           source_account: OptionalAccount.t()
         }
 
-  defstruct [:ledgers_to_expire, :source_account]
+  defstruct [:extend_to, :source_account]
 
   @impl true
   def new(args, opts \\ [])
 
   def new(args, _opts) when is_list(args) do
-    ledgers_to_expire = Keyword.get(args, :ledgers_to_expire, 1)
+    extend_to = Keyword.get(args, :extend_to, 1)
     source_account = Keyword.get(args, :source_account)
 
     with {:ok, source_account} <- validate_optional_account({:source_account, source_account}) do
-      %__MODULE__{ledgers_to_expire: ledgers_to_expire, source_account: source_account}
+      %__MODULE__{extend_to: extend_to, source_account: source_account}
     end
   end
 
   def new(_value, _opts), do: {:error, :invalid_bump_footprint_op}
 
   @impl true
-  def to_xdr(%__MODULE__{ledgers_to_expire: ledgers_to_expire}) do
-    op_type = OperationType.new(:BUMP_FOOTPRINT_EXPIRATION)
-    ledgers_to_expire = UInt32.new(ledgers_to_expire)
+  def to_xdr(%__MODULE__{extend_to: extend_to}) do
+    op_type = OperationType.new(:EXTEND_FOOTPRINT_TTL)
+    extend_to = UInt32.new(extend_to)
 
     Void.new()
     |> ExtensionPoint.new(0)
-    |> BumpFootprintExpiration.new(ledgers_to_expire)
+    |> ExtendFootprintTTL.new(extend_to)
     |> OperationBody.new(op_type)
   end
 

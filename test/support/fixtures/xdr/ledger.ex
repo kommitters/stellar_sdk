@@ -389,13 +389,13 @@ defmodule Stellar.Test.Fixtures.XDR.Ledger do
     }
   end
 
-  @spec ledger_key_expiration() :: LedgerKey.t()
-  def ledger_key_expiration do
+  @spec ledger_key_ttl() :: LedgerKey.t()
+  def ledger_key_ttl do
     %StellarBase.XDR.LedgerKey{
-      entry: %StellarBase.XDR.LedgerKeyExpiration{
+      entry: %StellarBase.XDR.LedgerKeyTTL{
         key_hash: %StellarBase.XDR.Hash{value: "ABC123"}
       },
-      type: %StellarBase.XDR.LedgerEntryType{identifier: :EXPIRATION}
+      type: %StellarBase.XDR.LedgerEntryType{identifier: :TTL}
     }
   end
 

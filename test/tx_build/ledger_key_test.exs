@@ -11,7 +11,7 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
     Data,
     ContractCode,
     ContractData,
-    Expiration,
+    TTL,
     LiquidityPool,
     Offer,
     Trustline
@@ -297,27 +297,27 @@ defmodule Stellar.TxBuild.LedgerKeyTest do
     end
   end
 
-  describe "expiration" do
+  describe "ttl" do
     setup do
       hash = "ABC123"
 
       %{
         hash: hash,
-        expiration_entry: Expiration.new(hash),
-        xdr: XDRFixtures.ledger_key_expiration()
+        ttl_entry: TTL.new(hash),
+        xdr: XDRFixtures.ledger_key_ttl()
       }
     end
 
-    test "new/2", %{hash: hash, expiration_entry: expiration_entry} do
-      %LedgerKey{entry: ^expiration_entry, type: :expiration} = LedgerKey.new({:expiration, hash})
+    test "new/2", %{hash: hash, ttl_entry: ttl_entry} do
+      %LedgerKey{entry: ^ttl_entry, type: :ttl} = LedgerKey.new({:ttl, hash})
     end
 
     test "new/2 with_invalid_attributes" do
-      {:error, :invalid_expiration} = LedgerKey.new({:expiration, 123})
+      {:error, :invalid_ttl} = LedgerKey.new({:ttl, 123})
     end
 
     test "to_xdr/1", %{hash: hash, xdr: xdr} do
-      ^xdr = LedgerKey.new({:expiration, hash}) |> LedgerKey.to_xdr()
+      ^xdr = LedgerKey.new({:ttl, hash}) |> LedgerKey.to_xdr()
     end
   end
 end
