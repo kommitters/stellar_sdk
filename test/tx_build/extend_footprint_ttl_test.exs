@@ -16,7 +16,7 @@ defmodule Stellar.TxBuild.ExtendFootprintTTLTest do
   end
 
   test "new/1 with invalid extend_to" do
-    {:error, :invalid_bump_footprint_op} = ExtendFootprintTTL.new("ABC")
+    {:error, :invalid_operation_attributes} = ExtendFootprintTTL.new("ABC")
   end
 
   test "to_xdr/1", %{extend_to: extend_to} do

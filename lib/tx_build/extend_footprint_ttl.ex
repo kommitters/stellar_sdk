@@ -38,7 +38,7 @@ defmodule Stellar.TxBuild.ExtendFootprintTTL do
     end
   end
 
-  def new(_value, _opts), do: {:error, :invalid_bump_footprint_op}
+  def new(_value, _opts), do: {:error, :invalid_operation_attributes}
 
   @impl true
   def to_xdr(%__MODULE__{extend_to: extend_to}) do
