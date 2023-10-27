@@ -37,7 +37,7 @@ defmodule Stellar.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:stellar_base, git: "git@github.com:kommitters/stellar_base.git", branch: "v0.15"},
+      {:stellar_base, git: "https://github.com/kommitters/stellar_base.git", branch: "v0.15"},
       {:ed25519, "~> 1.3"},
       {:hackney, "~> 1.17"},
       {:jason, "~> 1.0"},
