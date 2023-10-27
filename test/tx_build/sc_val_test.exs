@@ -22,6 +22,8 @@ defmodule Stellar.TxBuild.SCValTest do
     # SCAddress
     public_key = "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
     sc_address = SCAddress.new(public_key)
+    contract = "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN"
+    sc_address_contract = SCAddress.new(contract)
 
     sc_address_xdr = %StellarBase.XDR.SCAddress{
       sc_address: %StellarBase.XDR.AccountID{
@@ -35,6 +37,15 @@ defmodule Stellar.TxBuild.SCValTest do
         }
       },
       type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+    }
+
+    sc_address_contract_xdr = %StellarBase.XDR.SCAddress{
+      sc_address: %StellarBase.XDR.Hash{
+        value:
+          <<136, 199, 21, 221, 153, 62, 83, 56, 9, 112, 55, 17, 157, 226, 244, 109, 177, 22, 241,
+            170, 12, 226, 193, 229, 39, 50, 103, 40, 26, 129, 1, 237>>
+      },
+      type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
     }
 
     discriminants = [
@@ -56,6 +67,7 @@ defmodule Stellar.TxBuild.SCValTest do
       %{type: :vec, value: [sc_val]},
       %{type: :map, value: [sc_map_entry]},
       %{type: :address, value: sc_address},
+      %{type: :address, value: sc_address_contract},
       %{type: :ledger_key_contract_instance, value: nil},
       %{type: :ledger_key_nonce, value: 132_131},
       %{type: :contract_instance, value: :token},
@@ -258,6 +270,20 @@ defmodule Stellar.TxBuild.SCValTest do
         type: :map,
         value: [sc_map_entry],
         native_value: %{"sc_val_key" => 123}
+      },
+      %{
+        val_type: :SCV_ADDRESS,
+        module: sc_address_xdr,
+        type: :address,
+        value: sc_address,
+        native_value: "GB6FIXFOEK46VBDAG5USXRKKDJYFOBQZDMAPOYY6MC4KMRTSPVUH3X2A"
+      },
+      %{
+        val_type: :SCV_ADDRESS,
+        module: sc_address_contract_xdr,
+        type: :address,
+        value: sc_address_contract,
+        native_value: "CCEMOFO5TE7FGOAJOA3RDHPC6RW3CFXRVIGOFQPFE4ZGOKA2QEA636SN"
       }
     ]
 

@@ -485,6 +485,32 @@ defmodule Stellar.TxBuild.SCVal do
     %{}
   end
 
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_ADDRESS},
+        value: %StellarBase.XDR.SCAddress{
+          sc_address: %StellarBase.XDR.AccountID{
+            account_id: %StellarBase.XDR.PublicKey{
+              public_key: %StellarBase.XDR.UInt256{
+                datum: public_key
+              }
+            }
+          },
+          type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_ACCOUNT}
+        }
+      }) do
+    StellarBase.StrKey.encode!(public_key, :ed25519_public_key)
+  end
+
+  def to_native(%SCVal{
+        type: %StellarBase.XDR.SCValType{identifier: :SCV_ADDRESS},
+        value: %StellarBase.XDR.SCAddress{
+          sc_address: %StellarBase.XDR.Hash{value: hash},
+          type: %StellarBase.XDR.SCAddressType{identifier: :SC_ADDRESS_TYPE_CONTRACT}
+        }
+      }) do
+    StellarBase.StrKey.encode!(hash, :contract)
+  end
+
   def to_native(_sc_val), do: {:error, :invalid_or_not_supported_sc_val}
 
   @spec validate_xdr_decoding(xdr :: String.t()) :: validation()
