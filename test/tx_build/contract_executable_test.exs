@@ -17,11 +17,11 @@ defmodule Stellar.TxBuild.ContractExecutableTest do
     } = TxContractExecutable.new(wasm_ref: hash)
   end
 
-  test "new/1 when type is token" do
+  test "new/1 when type is stellar_asset" do
     %TxContractExecutable{
-      type: :token,
+      type: :stellar_asset,
       value: nil
-    } = TxContractExecutable.new(:token)
+    } = TxContractExecutable.new(:stellar_asset)
   end
 
   test "new/1 with invalid type", %{hash: hash} do
@@ -45,11 +45,11 @@ defmodule Stellar.TxBuild.ContractExecutableTest do
     } = TxContractExecutable.new(wasm_ref: hash) |> TxContractExecutable.to_xdr()
   end
 
-  test "to_xdr/1 with token type" do
+  test "to_xdr/1 with stellar_asset type" do
     %ContractExecutable{
       value: %Void{value: nil},
-      type: %ContractExecutableType{identifier: :CONTRACT_EXECUTABLE_TOKEN}
-    } = TxContractExecutable.new(:token) |> TxContractExecutable.to_xdr()
+      type: %ContractExecutableType{identifier: :CONTRACT_EXECUTABLE_STELLAR_ASSET}
+    } = TxContractExecutable.new(:stellar_asset) |> TxContractExecutable.to_xdr()
   end
 
   test "to_xdr/1 with invalid struct" do
