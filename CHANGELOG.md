@@ -2,7 +2,7 @@
 
 ## 0.19.0 (27.10.2023)
 
-* Add support for `SCAddress` type in the `SCVal` to obtain the elixir native value.
+* Add support for `SCAddress` type in the `SCVal` to obtain the Elixir native value.
 
 ## 0.18.1 (11.10.2023)
 
