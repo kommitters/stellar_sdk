@@ -21,7 +21,7 @@ This library is aimed at developers building Elixir applications that interact w
 | --------- | ------------ |
 | 18        | >= v0.8      |
 | 19        | >= v0.9      |
-| 20        | >= v0.18     |
+| 20        | >= v0.20     |
 
 ## Documentation
 The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
@@ -35,7 +35,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.19.0"}
+    {:stellar_sdk, "~> 0.20.0"}
   ]
 end
 ```
