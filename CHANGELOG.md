@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.20.0 (20.12.2023)
+
+* Add Soroban stable Protocol 20 Support.
+
 ## 0.19.0 (27.10.2023)
 
 * Add support for `SCAddress` type in the `SCVal` to obtain the Elixir native value.
