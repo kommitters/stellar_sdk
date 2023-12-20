@@ -3,6 +3,7 @@
 ## 0.20.0 (20.12.2023)
 
 * Add Soroban stable Protocol 20 Support.
+* Add allowed endpoints for CI, CD, and Scorecards workflows.
 
 ## 0.19.0 (27.10.2023)
 
