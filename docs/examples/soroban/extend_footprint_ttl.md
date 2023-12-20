@@ -1,6 +1,6 @@
-# Bump Footprint Expiration
+# Extend Footprint TTL
 
-The `BumpFootprintExpirationOp` operation is used to extend a contract data entry's lifetime.
+The `ExtendFootprintTTLOp` operation is used to extend a contract data entry's lifetime.
 
 A contract instance, wasm hash, and data storage entry (persistent/instance/temporary) can expire, so you can use this bump operation to extend its lifetime.
 Read more about it:
@@ -20,7 +20,7 @@ In this example, we will bump the contract instance and the wasm of an already d
 alias Stellar.TxBuild.{
   Account,
   BaseFee,
-  BumpFootprintExpiration,
+  ExtendFootprintTTL,
   LedgerFootprint,
   LedgerKey,
   SCAddress,
@@ -63,19 +63,19 @@ soroban_data =
   write_bytes: 0
 ]
 |> SorobanResources.new()
-|> (&SorobanTransactionData.new(resources: &1, refundable_fee: 0)).()
+|> (&SorobanTransactionData.new(resources: &1, resource_fee: 0)).()
 |> SorobanTransactionData.to_xdr()
 
 source_account = Account.new(public_key)
 {:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
 sequence_number = SequenceNumber.new(seq_num)
 signature = Signature.new(keypair)
-bump_footprint_op = BumpFootprintExpiration.new(ledgers_to_expire: 1000)
+extend_footprint_ttl_op = ExtendFootprintTTL.new(extend_to: 1000)
 
 # Use this XDR to simulate the transaction and get the soroban_data and min_resource_fee
 source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
-|> Stellar.TxBuild.add_operation(bump_footprint_op)
+|> Stellar.TxBuild.add_operation(extend_footprint_ttl_op)
 |> Stellar.TxBuild.set_soroban_data(soroban_data)
 |> Stellar.TxBuild.envelope()
 
@@ -89,7 +89,7 @@ fee = BaseFee.new(min_resource_fee + 100)
 # Use the XDR generated here to send it to the futurenet
 source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
-|> Stellar.TxBuild.add_operation(bump_footprint_op)
+|> Stellar.TxBuild.add_operation(extend_footprint_ttl_op)
 |> Stellar.TxBuild.set_soroban_data(soroban_data)
 |> Stellar.TxBuild.set_base_fee(fee)
 |> Stellar.TxBuild.sign(signature)

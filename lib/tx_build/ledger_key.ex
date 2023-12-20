@@ -12,7 +12,7 @@ defmodule Stellar.TxBuild.LedgerKey do
     ConfigSetting,
     ContractCode,
     ContractData,
-    Expiration,
+    TTL,
     LiquidityPool,
     Offer,
     Trustline
@@ -30,7 +30,7 @@ defmodule Stellar.TxBuild.LedgerKey do
           | :contract_data
           | :contract_code
           | :config_setting
-          | :expiration
+          | :ttl
 
   @type entry ::
           Account.t()
@@ -42,7 +42,7 @@ defmodule Stellar.TxBuild.LedgerKey do
           | ContractData.t()
           | ContractCode.t()
           | ConfigSetting.t()
-          | Expiration.t()
+          | TTL.t()
 
   @type t :: %__MODULE__{type: type(), entry: entry()}
 
@@ -142,15 +142,15 @@ defmodule Stellar.TxBuild.LedgerKey do
   end
 
   def new(
-        {:expiration, args},
+        {:ttl, args},
         _opts
       ) do
-    case Expiration.new(args) do
-      %Expiration{} = expiration ->
-        %__MODULE__{type: :expiration, entry: expiration}
+    case TTL.new(args) do
+      %TTL{} = ttl ->
+        %__MODULE__{type: :ttl, entry: ttl}
 
       _error ->
-        {:error, :invalid_expiration}
+        {:error, :invalid_ttl}
     end
   end
 
@@ -175,5 +175,5 @@ defmodule Stellar.TxBuild.LedgerKey do
   defp ledger_entry_type(:contract_data), do: LedgerEntryType.new(:CONTRACT_DATA)
   defp ledger_entry_type(:contract_code), do: LedgerEntryType.new(:CONTRACT_CODE)
   defp ledger_entry_type(:config_setting), do: LedgerEntryType.new(:CONFIG_SETTING)
-  defp ledger_entry_type(:expiration), do: LedgerEntryType.new(:EXPIRATION)
+  defp ledger_entry_type(:ttl), do: LedgerEntryType.new(:TTL)
 end

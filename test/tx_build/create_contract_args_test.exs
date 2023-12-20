@@ -12,7 +12,7 @@ defmodule Stellar.TxBuild.CreateContractArgsTest do
 
   setup do
     asset = Asset.new(:native)
-    contract_executable = ContractExecutable.new(:token)
+    contract_executable = ContractExecutable.new(:stellar_asset)
     contract_id_preimage = ContractIDPreimage.new(from_asset: asset)
 
     %{
@@ -68,7 +68,9 @@ defmodule Stellar.TxBuild.CreateContractArgsTest do
       },
       executable: %StellarBase.XDR.ContractExecutable{
         value: %StellarBase.XDR.Void{value: nil},
-        type: %StellarBase.XDR.ContractExecutableType{identifier: :CONTRACT_EXECUTABLE_TOKEN}
+        type: %StellarBase.XDR.ContractExecutableType{
+          identifier: :CONTRACT_EXECUTABLE_STELLAR_ASSET
+        }
       }
     } =
       CreateContractArgs.new(

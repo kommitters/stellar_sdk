@@ -16,14 +16,14 @@ defmodule Stellar.TxBuild.SorobanTransactionData do
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
   @type resources :: SorobanResources.t()
-  @type refundable_fee :: non_neg_integer()
+  @type resource_fee :: non_neg_integer()
 
   @type t :: %__MODULE__{
           resources: resources(),
-          refundable_fee: refundable_fee()
+          resource_fee: resource_fee()
         }
 
-  defstruct [:resources, :refundable_fee]
+  defstruct [:resources, :resource_fee]
 
   @impl true
   def new(args, opts \\ [])
@@ -31,15 +31,15 @@ defmodule Stellar.TxBuild.SorobanTransactionData do
   def new(
         [
           {:resources, resources},
-          {:refundable_fee, refundable_fee}
+          {:resource_fee, resource_fee}
         ],
         _opts
       )
-      when is_integer(refundable_fee) and refundable_fee >= 0 do
+      when is_integer(resource_fee) and resource_fee >= 0 do
     with {:ok, resources} <- validate_resources(resources) do
       %__MODULE__{
         resources: resources,
-        refundable_fee: refundable_fee
+        resource_fee: resource_fee
       }
     end
   end
@@ -47,13 +47,13 @@ defmodule Stellar.TxBuild.SorobanTransactionData do
   def new(_args, _opts), do: {:error, :invalid_soroban_transaction_data}
 
   @impl true
-  def to_xdr(%__MODULE__{resources: resources, refundable_fee: refundable_fee}) do
+  def to_xdr(%__MODULE__{resources: resources, resource_fee: resource_fee}) do
     resources = SorobanResources.to_xdr(resources)
-    refundable_fee = Int64.new(refundable_fee)
+    resource_fee = Int64.new(resource_fee)
 
     Void.new()
     |> ExtensionPoint.new(0)
-    |> SorobanTransactionData.new(resources, refundable_fee)
+    |> SorobanTransactionData.new(resources, resource_fee)
   end
 
   def to_xdr(_struct), do: {:error, :invalid_struct}

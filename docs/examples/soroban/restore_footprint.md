@@ -59,7 +59,7 @@ soroban_data =
   write_bytes: 0
 ]
 |> SorobanResources.new()
-|> (&SorobanTransactionData.new(resources: &1, refundable_fee: 0)).()
+|> (&SorobanTransactionData.new(resources: &1, resource_fee: 0)).()
 |> SorobanTransactionData.to_xdr()
 
 source_account = Account.new(public_key)
@@ -71,7 +71,7 @@ restore_footprint_op = RestoreFootprint.new()
 # Use this XDR to simulate the transaction and get the soroban_data and min_resource_fee
 source_account
 |> Stellar.TxBuild.new(sequence_number: sequence_number)
-|> Stellar.TxBuild.add_operation(bump_footprint_op)
+|> Stellar.TxBuild.add_operation(restore_footprint_op)
 |> Stellar.TxBuild.set_soroban_data(soroban_data)
 |> Stellar.TxBuild.envelope()
 
