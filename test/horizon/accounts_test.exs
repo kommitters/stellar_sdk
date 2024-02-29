@@ -166,7 +166,8 @@ defmodule Stellar.Horizon.AccountsTest do
     Offer,
     Operation,
     Trade,
-    Transaction
+    Transaction,
+    Server
   }
 
   alias Stellar.Horizon.Operation.{CreateAccount, Payment, SetOptions}
@@ -225,11 +226,11 @@ defmodule Stellar.Horizon.AccountsTest do
          low_threshold: 1,
          med_threshold: 2
        }
-     }} = Accounts.retrieve(account_id)
+     }} = Accounts.retrieve(Server.testnet(), account_id)
   end
 
   test "fetch_next_sequence_number/1", %{account_id: account_id} do
-    {:ok, 17_218_523_889_681} = Accounts.fetch_next_sequence_number(account_id)
+    {:ok, 17_218_523_889_681} = Accounts.fetch_next_sequence_number(Server.testnet(), account_id)
   end
 
   test "all/1" do
@@ -240,7 +241,7 @@ defmodule Stellar.Horizon.AccountsTest do
          %Account{id: "GAP2KHWUMOHY7IO37UJY7SEBIITJIDZS5DRIIQRPEUT4VUKHZQGIRWS4"},
          %Account{id: "GALPCCZN4YXA3YMJHKL6CVIECKPLJJCTVMSNYWBTKJW4K5HQLYLDMZTB"}
        ]
-     }} = Accounts.all()
+     }} = Accounts.all(Server.testnet())
   end
 
   test "list_effects/1", %{account_id: account_id} do
@@ -253,7 +254,7 @@ defmodule Stellar.Horizon.AccountsTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = Accounts.list_effects(account_id, limit: 5)
+     }} = Accounts.list_effects(Server.testnet(), account_id, limit: 5)
   end
 
   test "list_offers/1", %{account_id: account_id} do
@@ -279,7 +280,7 @@ defmodule Stellar.Horizon.AccountsTest do
            amount: "24.9999990"
          }
        ]
-     }} = Accounts.list_offers(account_id)
+     }} = Accounts.list_offers(Server.testnet(), account_id)
   end
 
   test "list_trades/1", %{account_id: account_id} do
@@ -302,7 +303,7 @@ defmodule Stellar.Horizon.AccountsTest do
            base_amount: "748.5338945"
          }
        ]
-     }} = Accounts.list_trades(account_id)
+     }} = Accounts.list_trades(Server.testnet(), account_id)
   end
 
   test "list_transactions/1", %{account_id: account_id} do
@@ -325,7 +326,7 @@ defmodule Stellar.Horizon.AccountsTest do
            ledger: 7855
          }
        ]
-     }} = Accounts.list_transactions(account_id, limit: 3, order: :asc)
+     }} = Accounts.list_transactions(Server.testnet(), account_id, limit: 3, order: :asc)
   end
 
   test "list_operations/1", %{account_id: account_id} do
@@ -351,7 +352,7 @@ defmodule Stellar.Horizon.AccountsTest do
            type_i: 0
          }
        ]
-     }} = Accounts.list_operations(account_id, limit: 3, order: :desc)
+     }} = Accounts.list_operations(Server.testnet(), account_id, limit: 3, order: :desc)
   end
 
   test "list_payments/1", %{account_id: account_id} do
@@ -374,22 +375,22 @@ defmodule Stellar.Horizon.AccountsTest do
            type_i: 1
          }
        ]
-     }} = Accounts.list_payments(account_id, limit: 3)
+     }} = Accounts.list_payments(Server.testnet(), account_id, limit: 3)
   end
 
   test "data/1", %{account_id: account_id} do
-    {:ok, %Account.Data{value: "QkdFR0ZFVEVHRUhIRUVI"}} = Accounts.data(account_id, "NFT")
+    {:ok, %Account.Data{value: "QkdFR0ZFVEVHRUhIRUVI"}} = Accounts.data(Server.testnet(), account_id, "NFT")
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Accounts.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Accounts.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Accounts.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Accounts.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -402,7 +403,7 @@ defmodule Stellar.Horizon.AccountsTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = Accounts.retrieve("not_found")
+     }} = Accounts.retrieve(Server.testnet(), "not_found")
   end
 
   test "fetch_next_sequence_number error" do
@@ -412,6 +413,6 @@ defmodule Stellar.Horizon.AccountsTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = Accounts.fetch_next_sequence_number("not_found")
+     }} = Accounts.fetch_next_sequence_number(Server.testnet(), "not_found")
   end
 end
