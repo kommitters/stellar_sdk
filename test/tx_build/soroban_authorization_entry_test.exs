@@ -193,7 +193,11 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
     network_passphrase: network_passphrase
   } do
     {:error, :invalid_sign_args} =
-      SorobanAuthorizationEntry.sign(soroban_auth_entry_with_address_credentials, :secret_key, network_passphrase)
+      SorobanAuthorizationEntry.sign(
+        soroban_auth_entry_with_address_credentials,
+        :secret_key,
+        network_passphrase
+      )
   end
 
   test "sign_xdr/4", %{
@@ -207,7 +211,11 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
       SorobanAuthorizationEntry.sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
   end
 
-  test "sign_xdr/4 invalid secret_key", %{base_64: base_64, latest_ledger: latest_ledger, network_passphrase: network_passphrase} do
+  test "sign_xdr/4 invalid secret_key", %{
+    base_64: base_64,
+    latest_ledger: latest_ledger,
+    network_passphrase: network_passphrase
+  } do
     {:error, :invalid_sign_args} =
       SorobanAuthorizationEntry.sign_xdr(base_64, :secret_key, latest_ledger, network_passphrase)
   end
