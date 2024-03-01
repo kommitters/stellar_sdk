@@ -75,7 +75,8 @@ defmodule Stellar.Horizon.Assets do
       iex> Assets.list_by_asset_code(Stellar.Horizon.Server.testnet(), "TEST")
       {:ok, %Collection{records: [%Asset{asset_code: "TEST"}, ...]}}
   """
-  @spec list_by_asset_code(server :: server(), asset_code :: asset_code(), options :: options()) :: response()
+  @spec list_by_asset_code(server :: server(), asset_code :: asset_code(), options :: options()) ::
+          response()
   def list_by_asset_code(server, asset_code, options \\ []) do
     options
     |> Keyword.put(:asset_code, asset_code)
@@ -101,7 +102,11 @@ defmodule Stellar.Horizon.Assets do
       iex> Assets.list_by_asset_issuer(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%Asset{asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_asset_issuer(server :: server(), asset_issuer :: asset_issuer(), options :: options()) :: response()
+  @spec list_by_asset_issuer(
+          server :: server(),
+          asset_issuer :: asset_issuer(),
+          options :: options()
+        ) :: response()
   def list_by_asset_issuer(server, asset_issuer, options \\ []) do
     options
     |> Keyword.put(:asset_issuer, asset_issuer)

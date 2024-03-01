@@ -10,7 +10,6 @@ defmodule Stellar.Horizon.Trades do
 
   alias Stellar.Horizon.{Collection, Error, Request, Trade, RequestParams, Server}
 
-
   @type server :: Server.t()
   @type options :: Keyword.t()
   @type resource :: Trade.t() | Collection.t()

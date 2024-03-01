@@ -379,7 +379,8 @@ defmodule Stellar.Horizon.AccountsTest do
   end
 
   test "data/1", %{account_id: account_id} do
-    {:ok, %Account.Data{value: "QkdFR0ZFVEVHRUhIRUVI"}} = Accounts.data(Server.testnet(), account_id, "NFT")
+    {:ok, %Account.Data{value: "QkdFR0ZFVEVHRUhIRUVI"}} =
+      Accounts.data(Server.testnet(), account_id, "NFT")
   end
 
   test "paginate_collection prev" do

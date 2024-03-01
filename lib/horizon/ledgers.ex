@@ -95,7 +95,8 @@ defmodule Stellar.Horizon.Ledgers do
       iex> Ledgers.list_transactions(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(server :: server(), sequence :: sequence(), params :: params()) :: response()
+  @spec list_transactions(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
   def list_transactions(server, sequence, params \\ []) do
     server
     |> Request.new(:get, @endpoint, path: sequence, segment: "transactions")
@@ -127,7 +128,8 @@ defmodule Stellar.Horizon.Ledgers do
       iex> Ledgers.list_operations(Stellar.Horizon.Server.testnet(), 27147222, join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(server :: server(), sequence :: sequence(), params :: params()) :: response()
+  @spec list_operations(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
   def list_operations(server, sequence, params \\ []) do
     server
     |> Request.new(:get, @endpoint, path: sequence, segment: "operations")
@@ -159,7 +161,8 @@ defmodule Stellar.Horizon.Ledgers do
       iex> Ledgers.list_payments(Stellar.Horizon.Server.testnet(), 27147222, include_failed: true)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
   """
-  @spec list_payments(server :: server(), sequence :: sequence(), params :: params()) :: response()
+  @spec list_payments(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
   def list_payments(server, sequence, params \\ []) do
     server
     |> Request.new(:get, @endpoint, path: sequence, segment: "payments")

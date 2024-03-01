@@ -242,7 +242,8 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            ledger: 7855
          }
        ]
-     }} = LiquidityPools.list_transactions(Server.testnet(), liquidity_pool_id, limit: 3, order: :asc)
+     }} =
+      LiquidityPools.list_transactions(Server.testnet(), liquidity_pool_id, limit: 3, order: :asc)
   end
 
   test "list_operations/1", %{liquidity_pool_id: liquidity_pool_id} do
@@ -265,7 +266,8 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            type_i: 0
          }
        ]
-     }} = LiquidityPools.list_operations(Server.testnet(), liquidity_pool_id, limit: 3, order: :desc)
+     }} =
+      LiquidityPools.list_operations(Server.testnet(), liquidity_pool_id, limit: 3, order: :desc)
   end
 
   test "list_effects/1", %{liquidity_pool_id: liquidity_pool_id} do

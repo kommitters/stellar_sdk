@@ -11,7 +11,15 @@ defmodule Stellar.Horizon.ClaimableBalances do
   Horizon API reference: https://developers.stellar.org/api/resources/claimablebalances/
   """
 
-  alias Stellar.Horizon.{ClaimableBalance, Collection, Error, Operation, Request, Transaction, Server}
+  alias Stellar.Horizon.{
+    ClaimableBalance,
+    Collection,
+    Error,
+    Operation,
+    Request,
+    Transaction,
+    Server
+  }
 
   @type server :: Server.t()
   @type claimable_balance_id :: String.t()
@@ -102,14 +110,20 @@ defmodule Stellar.Horizon.ClaimableBalances do
       iex> ClaimableBalances.list_transactions(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(server :: server(), claimable_balance_id :: claimable_balance_id(), options :: options()) ::
+  @spec list_transactions(
+          server :: server(),
+          claimable_balance_id :: claimable_balance_id(),
+          options :: options()
+        ) ::
           response()
   def list_transactions(server, claimable_balance_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: claimable_balance_id, segment: "transactions")
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(collection: {Transaction, &list_transactions(server, claimable_balance_id, &1)})
+    |> Request.results(
+      collection: {Transaction, &list_transactions(server, claimable_balance_id, &1)}
+    )
   end
 
   @doc """
@@ -135,14 +149,20 @@ defmodule Stellar.Horizon.ClaimableBalances do
       iex> ClaimableBalances.list_operations(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(server :: server(), claimable_balance_id :: claimable_balance_id(), options :: options()) ::
+  @spec list_operations(
+          server :: server(),
+          claimable_balance_id :: claimable_balance_id(),
+          options :: options()
+        ) ::
           response()
   def list_operations(server, claimable_balance_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: claimable_balance_id, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_operations(server, claimable_balance_id, &1)})
+    |> Request.results(
+      collection: {Operation, &list_operations(server, claimable_balance_id, &1)}
+    )
   end
 
   @doc """
@@ -163,7 +183,8 @@ defmodule Stellar.Horizon.ClaimableBalances do
       iex> ClaimableBalances.list_by_sponsor(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_sponsor(server :: server(), sponsor :: account_id(), options :: options()) :: response()
+  @spec list_by_sponsor(server :: server(), sponsor :: account_id(), options :: options()) ::
+          response()
   def list_by_sponsor(server, sponsor, options \\ []) do
     options
     |> Keyword.put(:sponsor, sponsor)
@@ -188,7 +209,8 @@ defmodule Stellar.Horizon.ClaimableBalances do
       iex> ClaimableBalances.list_by_claimant("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_claimant(server :: server(), claimant :: account_id(), options :: options()) :: response()
+  @spec list_by_claimant(server :: server(), claimant :: account_id(), options :: options()) ::
+          response()
   def list_by_claimant(server, claimant, options \\ []) do
     options
     |> Keyword.put(:claimant, claimant)

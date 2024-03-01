@@ -27,7 +27,8 @@ defmodule Stellar.Horizon.Accounts do
     Operation,
     Request,
     Trade,
-    Transaction
+    Transaction,
+    Server
   }
 
   @type server :: Server.t()
@@ -138,7 +139,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_transactions(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_transactions(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_transactions(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "transactions")
@@ -170,7 +172,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_transactions(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_operations(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_operations(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "operations")
@@ -202,7 +205,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_payments(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", include_failed: true)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
   """
-  @spec list_payments(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_payments(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_payments(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "payments")
@@ -228,7 +232,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_effects(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_effects(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_effects(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "effects")
@@ -254,7 +259,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_offers(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Offer{}, ...]}}
   """
-  @spec list_offers(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_offers(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_offers(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "offers")
@@ -280,7 +286,8 @@ defmodule Stellar.Horizon.Accounts do
       iex> Accounts.list_trades(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Trade{}, ...]}}
   """
-  @spec list_trades(server :: server(), account_id :: account_id(), options :: options()) :: response()
+  @spec list_trades(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
   def list_trades(server, account_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: account_id, segment: "trades")

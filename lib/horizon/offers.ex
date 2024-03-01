@@ -125,7 +125,8 @@ defmodule Stellar.Horizon.Offers do
       iex> Offers.list_trades(Stellar.Horizon.Server.testnet(), 165563085, limit: 20)
       {:ok, %Collection{records: [%Trade{}, ...]}}
   """
-  @spec list_trades(server :: server(), offer_id :: offer_id(), options :: options()) :: response()
+  @spec list_trades(server :: server(), offer_id :: offer_id(), options :: options()) ::
+          response()
   def list_trades(server, offer_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: offer_id, segment: "trades")

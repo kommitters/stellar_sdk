@@ -91,7 +91,6 @@ defmodule Stellar.Horizon.Client.DefaultTest do
     test "not_acceptable", %{server: server} do
       {:error, %Error{title: "Not Acceptable", status_code: 406}} =
         Default.request(server, :get, "/accounts/id.html")
-
     end
 
     test "before_history", %{server: server} do

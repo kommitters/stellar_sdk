@@ -34,7 +34,8 @@ defmodule Stellar.Horizon.Operations do
       iex> Operations.retrieve(Stellar.Horizon.Server.testnet(), 121693057904021505)
       {:ok, %Operation{}}
   """
-  @spec retrieve(server :: server(), operation_id :: operation_id(), options :: options()) :: response()
+  @spec retrieve(server :: server(), operation_id :: operation_id(), options :: options()) ::
+          response()
   def retrieve(server, operation_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: operation_id)
@@ -123,7 +124,8 @@ defmodule Stellar.Horizon.Operations do
       iex> Operations.list_effects(Stellar.Horizon.Server.testnet(), 121693057904021505, limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(server :: server(), operation_id :: operation_id(), options :: options()) :: response()
+  @spec list_effects(server :: server(), operation_id :: operation_id(), options :: options()) ::
+          response()
   def list_effects(server, operation_id, options \\ []) do
     server
     |> Request.new(:get, @endpoint, path: operation_id, segment: "effects")
