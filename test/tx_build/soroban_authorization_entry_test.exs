@@ -13,6 +13,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
     SorobanCredentials
   }
 
+  alias Stellar.Network
+
   setup do
     fn_args = [SCVal.new(symbol: "dev")]
 
@@ -102,6 +104,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
         "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYOvJBkmBOF7wAAAAAAAAABAAAAAAAAAAEJjPko7iuhBRtsY0aDQ2Einilpmj/rDyGds/qx5seSNAAAAANpbmMAAAAAAgAAABIAAAAAAAAAAMlOeOVhwnFIoNq3vyNsTIORWqja6Gk1fgF0G2oavH7WAAAACQAAAAAAAAAAAAAAAAAAAAIAAAAA",
       secret_key: "SCAVFA3PI3MJLTQNMXOUNBSEUOSY66YMG3T2KCQKLQBENNVLVKNPV3EK",
       latest_ledger: 164_256,
+      network_passphrase: Network.testnet_passphrase(),
       sign_xdr:
         "AAAAAQAAAAAAAAAAyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYOvJBkmBOF7wACgaMAAAAQAAAAAQAAAAEAAAARAAAAAQAAAAIAAAAPAAAACnB1YmxpY19rZXkAAAAAAA0AAAAgyU545WHCcUig2re/I2xMg5FaqNroaTV+AXQbahq8ftYAAAAPAAAACXNpZ25hdHVyZQAAAAAAAA0AAABAIVZ/t4FbgBOE7+B6u41RkQhUrePyoyxrNwGh8oN2HtGtmyuxBwlU49nBUgUwBHmHiQMIMBEW7IbyPNGSuK4YCAAAAAAAAAABCYz5KO4roQUbbGNGg0NhIp4paZo/6w8hnbP6sebHkjQAAAADaW5jAAAAAAIAAAASAAAAAAAAAADJTnjlYcJxSKDat78jbEyDkVqo2uhpNX4BdBtqGrx+1gAAAAkAAAAAAAAAAAAAAAAAAAACAAAAAA==",
       soroban_auth_entry_with_address_credentials: soroban_auth_entry_with_address_credentials,
@@ -133,7 +136,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
   test "sign/2", %{
     soroban_auth_entry_with_address_credentials: soroban_auth_entry_with_address_credentials,
     root_invocation: root_invocation,
-    secret_key: secret_key
+    secret_key: secret_key,
+    network_passphrase: network_passphrase
   } do
     %SorobanAuthorizationEntry{
       credentials: %SorobanAddressCredentials{
@@ -176,7 +180,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
         }
       },
       root_invocation: ^root_invocation
-    } = SorobanAuthorizationEntry.sign(soroban_auth_entry_with_address_credentials, secret_key)
+    } = SorobanAuthorizationEntry.sign(soroban_auth_entry_with_address_credentials, secret_key, network_passphrase)
   end
 
   test "sign/2 invalid secret_key", %{
@@ -190,9 +194,10 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
     base_64: base_64,
     secret_key: secret_key,
     latest_ledger: latest_ledger,
+    network_passphrase: network_passphrase,
     sign_xdr: sign_xdr
   } do
-    ^sign_xdr = SorobanAuthorizationEntry.sign_xdr(base_64, secret_key, latest_ledger)
+    ^sign_xdr = SorobanAuthorizationEntry.sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
   end
 
   test "sign_xdr/3 invalid secret_key", %{base_64: base_64, latest_ledger: latest_ledger} do

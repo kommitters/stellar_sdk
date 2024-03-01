@@ -31,6 +31,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
   @type secret_key :: String.t()
   @type sign_authorization :: String.t()
   @type latest_ledger :: non_neg_integer()
+  @type network_passphrase :: String.t()
   @type credentials :: SorobanCredentials.t()
   @type root_invocation :: SorobanAuthorizedInvocation.t()
 
@@ -86,12 +87,13 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
           },
           root_invocation: root_invocation
         } = credentials,
-        secret_key
+        secret_key,
+        network_passphrase
       )
       when is_binary(secret_key) do
     {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
     raw_public_key = KeyPair.raw_public_key(public_key)
-    network_id = network_id_xdr()
+    network_id = Network.network_id(network_passphrase)
 
     signature =
       [
@@ -134,10 +136,11 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
   @spec sign_xdr(
           base_64 :: base_64(),
           secret_key :: secret_key(),
-          latest_ledger :: latest_ledger()
+          latest_ledger :: latest_ledger(),
+          network_passphrase :: network_passphrase()
         ) :: sign_authorization() | error()
-  def sign_xdr(base_64, secret_key, latest_ledger)
-      when is_binary(base_64) and is_binary(secret_key) and is_integer(latest_ledger) do
+  def sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
+      when is_binary(base_64) and is_binary(secret_key) and is_integer(latest_ledger) and is_binary(network_passphrase) do
     {%SorobanAuthorizationEntry{
        credentials:
          %{
@@ -160,7 +163,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
       |> build_signature_from_xdr(
         signature_expiration_ledger,
         root_invocation,
-        secret_key
+        secret_key,
+        network_passphrase
       )
       |> (&SCVal.new(vec: [&1])).()
       |> SCVal.to_xdr()
@@ -180,9 +184,6 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
   def sign_xdr(_base_64, _secret_key, _latest_ledger), do: {:error, :invalid_sign_args}
 
-  @spec network_id_xdr :: binary()
-  defp network_id_xdr, do: hash(Network.passphrase())
-
   @spec hash(data :: binary()) :: binary()
   defp hash(data), do: :crypto.hash(:sha256, data)
 
@@ -200,20 +201,23 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
           nonce :: Int64.t(),
           signature_expiration_ledger :: UInt32.t(),
           root_invocation :: SorobanAuthorizedInvocationXDR.t(),
-          secret_key :: secret_key()
+          secret_key :: secret_key(),
+          network_passphrase :: network_passphrase()
         ) :: SCVal.t() | error()
   defp build_signature_from_xdr(
          nonce,
          signature_expiration_ledger,
          root_invocation,
-         secret_key
+         secret_key,
+          network_passphrase
        ) do
     {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
     raw_public_key = KeyPair.raw_public_key(public_key)
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_SOROBAN_AUTHORIZATION)
 
     signature =
-      network_id_xdr()
+      network_passphrase
+      |> Network.network_id()
       |> Hash.new()
       |> HashIDPreimageSorobanAuthorizationXDR.new(
         nonce,
