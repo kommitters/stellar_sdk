@@ -4,7 +4,7 @@ defmodule Stellar.Horizon.Client.CannedRequestImpl do
   @behaviour Stellar.Horizon.Client.Spec
 
   @impl true
-  def request(_method, "/transactions/f08b8/effects" <> _query, _headers, _body, _opts) do
+  def request(_server, _method, "/transactions/f08b8/effects" <> _query, _headers, _body, _opts) do
     send(self(), {:horizon_requested, 200})
     {:ok, 200, [], nil}
   end
@@ -15,7 +15,7 @@ defmodule Stellar.Horizon.RequestTest do
 
   alias Stellar.Test.Fixtures.Horizon
   alias Stellar.Horizon.Client.CannedRequestImpl
-  alias Stellar.Horizon.{Collection, Error, Request, Transaction, Paths, Path}
+  alias Stellar.Horizon.{Collection, Error, Request, Transaction, Paths, Path, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client_impl, CannedRequestImpl)
@@ -24,6 +24,7 @@ defmodule Stellar.Horizon.RequestTest do
       Application.delete_env(:stellar_sdk, :http_client_impl)
     end)
 
+    server = Server.testnet()
     endpoint = "transactions"
     hash = "f08b83906eaebfbf359182cc1e47a0e5c4bbdbad1a897785d5677a2bfc54b5b1"
     body = [tx: "AAAAAgAAABAAAAAAAAAA==="]
@@ -33,6 +34,7 @@ defmodule Stellar.Horizon.RequestTest do
     segment_path = "0052d44a6c260660115f07c5a78631770e62aae3ffde96731c44b1509e9c8434"
 
     %{
+      server: server,
       endpoint: endpoint,
       hash: hash,
       segment: segment,
@@ -43,18 +45,20 @@ defmodule Stellar.Horizon.RequestTest do
     }
   end
 
-  test "new/1", %{endpoint: endpoint, hash: hash} do
-    %Request{method: :get, endpoint: ^endpoint, path: ^hash, body: [], headers: [], query: []} =
-      Request.new(:get, endpoint, path: hash)
+  test "new/1", %{server: server, endpoint: endpoint, hash: hash} do
+    %Request{server: ^server, method: :get, endpoint: ^endpoint, path: ^hash, body: [], headers: [], query: []} =
+      Request.new(server, :get, endpoint, path: hash)
   end
 
   test "new/1 with_segment", %{
+    server: server,
     endpoint: endpoint,
     hash: hash,
     segment: segment,
     segment_path: segment_path
   } do
     %Request{
+      server: ^server,
       method: :get,
       endpoint: ^endpoint,
       path: ^hash,
@@ -63,65 +67,68 @@ defmodule Stellar.Horizon.RequestTest do
       body: [],
       headers: [],
       query: []
-    } = Request.new(:get, endpoint, path: hash, segment: segment, segment_path: segment_path)
+    } = Request.new(server, :get, endpoint, path: hash, segment: segment, segment_path: segment_path)
   end
 
-  test "add_body/2", %{endpoint: endpoint, body: body} do
-    %Request{method: :post, endpoint: ^endpoint, body: ^body} =
-      :post
-      |> Request.new(endpoint)
+  test "add_body/2", %{server: server, endpoint: endpoint, body: body} do
+    %Request{server: ^server, method: :post, endpoint: ^endpoint, body: ^body} =
+      server
+      |> Request.new(:post, endpoint)
       |> Request.add_body(body)
   end
 
-  test "add_headers/2", %{endpoint: endpoint, headers: headers} do
-    %Request{method: :post, endpoint: ^endpoint, headers: ^headers} =
-      :post
-      |> Request.new(endpoint)
+  test "add_headers/2", %{server: server, endpoint: endpoint, headers: headers} do
+    %Request{server: ^server, method: :post, endpoint: ^endpoint, headers: ^headers} =
+      server
+      |> Request.new(:post, endpoint)
       |> Request.add_headers(headers)
   end
 
-  test "add_query/3", %{endpoint: endpoint, query: query} do
+  test "add_query/3", %{server: server, endpoint: endpoint, query: query} do
     %Request{
+      server: ^server,
       method: :get,
       endpoint: ^endpoint,
       query: ^query,
       encoded_query: "cursor=549755817992-1&order=desc&limit=25"
     } =
-      :get
-      |> Request.new(endpoint)
+      server
+      |> Request.new(:get, endpoint)
       |> Request.add_query(query)
   end
 
-  test "add_query/3 extra_params", %{endpoint: endpoint, query: query} do
+  test "add_query/3 extra_params", %{server: server, endpoint: endpoint, query: query} do
     query = query ++ [include_failed: true]
 
     %Request{
+      server: ^server,
       method: :get,
       endpoint: ^endpoint,
       query: ^query,
       encoded_query: "cursor=549755817992-1&order=desc&limit=25&include_failed=true"
     } =
-      :get
-      |> Request.new(endpoint)
+      server
+      |> Request.new(:get, endpoint)
       |> Request.add_query(query, extra_params: [:include_failed])
   end
 
-  test "add_query/3 invalid_params", %{endpoint: endpoint} do
+  test "add_query/3 invalid_params", %{server: server, endpoint: endpoint} do
     %Request{
+      server: ^server,
       method: :get,
       endpoint: ^endpoint,
       encoded_query: "cursor=549755817992-1"
     } =
-      :get
-      |> Request.new(endpoint)
+      server
+      |> Request.new(:get, endpoint)
       |> Request.add_query([cursor: "549755817992-1", test: "test"],
         extra_params: [:include_failed]
       )
   end
 
-  test "perform/2" do
-    :get
-    |> Request.new("transactions", path: "f08b8", segment: "effects", segment_path: "123")
+  test "perform/2", %{server: server} do
+    server
+    |> Request.new(:get, "transactions", path: "f08b8", segment: "effects", segment_path: "123")
     |> Request.add_query(limit: 10)
     |> Request.perform()
 

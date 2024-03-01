@@ -22,7 +22,7 @@ defmodule Stellar.Horizon.Client.CannedHTTPClient do
     {:ok, 400, [], json_error}
   end
 
-  def request(:get, @base_url <> "/accounts/unknow_id", _headers, _body, _opts) do
+  def request(:get, @base_url <> "/accounts/unknown_id", _headers, _body, _opts) do
     json_error = Horizon.fixture("404")
     {:ok, 404, [], json_error}
   end
@@ -55,7 +55,7 @@ end
 defmodule Stellar.Horizon.Client.DefaultTest do
   use ExUnit.Case
 
-  alias Stellar.Horizon.Error
+  alias Stellar.Horizon.{Error, Server}
   alias Stellar.Horizon.Client.{Default, CannedHTTPClient}
 
   setup do
@@ -67,49 +67,51 @@ defmodule Stellar.Horizon.Client.DefaultTest do
 
     %{
       source_account: "GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC",
-      tx_hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31"
+      tx_hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31",
+      server: Server.testnet()
     }
   end
 
   describe "request/5" do
-    test "success", %{source_account: source_account, tx_hash: tx_hash} do
+    test "success", %{source_account: source_account, tx_hash: tx_hash, server: server} do
       {:ok, %{source_account: ^source_account, hash: ^tx_hash}} =
-        Default.request(:get, "/transactions/#{tx_hash}")
+        Default.request(server, :get, "/transactions/#{tx_hash}")
     end
 
-    test "bad_request" do
+    test "bad_request", %{server: server} do
       {:error, %Error{title: "Transaction Failed", status_code: 400}} =
-        Default.request(:post, "/transactions?tx=bad")
+        Default.request(server, :post, "/transactions?tx=bad")
     end
 
-    test "not_found" do
+    test "not_found", %{server: server} do
       {:error, %Error{title: "Resource Missing", status_code: 404}} =
-        Default.request(:get, "/accounts/unknow_id")
+        Default.request(server, :get, "/accounts/unknown_id")
     end
 
-    test "not_acceptable" do
+    test "not_acceptable", %{server: server} do
       {:error, %Error{title: "Not Acceptable", status_code: 406}} =
-        Default.request(:get, "/accounts/id.html")
+        Default.request(server, :get, "/accounts/id.html")
+
     end
 
-    test "before_history" do
+    test "before_history", %{server: server} do
       {:error, %Error{title: "Data Requested Is Before Recorded History", status_code: 410}} =
-        Default.request(:get, "/accounts?cursor=old")
+        Default.request(server, :get, "/accounts?cursor=old")
     end
 
-    test "stale_history" do
+    test "stale_history", %{server: server} do
       {:error, %Error{title: "Historical DB Is Too Stale", status_code: 503}} =
-        Default.request(:post, "/transactions?tx=stale")
+        Default.request(server, :post, "/transactions?tx=stale")
     end
 
-    test "timeout" do
+    test "timeout", %{server: server} do
       {:error, %Error{title: "Timeout", status_code: 504}} =
-        Default.request(:post, "/transactions?tx=timeout")
+        Default.request(server, :post, "/transactions?tx=timeout")
     end
 
-    test "network_error" do
+    test "network_error", %{server: server} do
       {:error, %Error{title: "Network error", status_code: :network_error}} =
-        Default.request(:post, "/network_error")
+        Default.request(server, :post, "/network_error")
     end
   end
 end
