@@ -40,13 +40,4 @@ defmodule Stellar.Network do
 
   @spec local_horizon_url() :: String.t()
   def local_horizon_url, do: @horizon_urls[:local]
-
-  @spec passphrase() :: String.t()
-  def passphrase do
-    default = @passphrases[:test]
-    Keyword.get(@passphrases, current(), default)
-  end
-
-  @spec current() :: atom()
-  def current, do: Application.get_env(:stellar_sdk, :network, :test)
 end

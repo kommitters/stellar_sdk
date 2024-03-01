@@ -14,20 +14,25 @@ defmodule Stellar.TxBuild.TransactionEnvelope do
 
   @type tx_base64 :: String.t()
   @type signatures :: list(Signature.t())
+  @type network_passphrase :: String.t()
 
   @type t :: %__MODULE__{tx: Transaction.t(), signatures: signatures()}
 
-  defstruct [:tx, :signatures]
+  defstruct [:tx, :signatures, :network_passphrase]
 
   @impl true
-  def new(%Transaction{} = tx, signatures) when is_list(signatures) do
-    %__MODULE__{tx: tx, signatures: signatures}
+  def new(args, _opts \\ []) do
+    tx = Keyword.get(args, :tx)
+    signatures = Keyword.get(args, :signatures)
+    network_passphrase = Keyword.get(args, :network_passphrase)
+
+    %__MODULE__{tx: tx, signatures: signatures, network_passphrase: network_passphrase}
   end
 
   @impl true
-  def to_xdr(%__MODULE__{tx: tx, signatures: signatures}) do
+  def to_xdr(%__MODULE__{tx: tx, signatures: signatures, network_passphrase: network_passphrase}) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
-    decorated_signatures = TransactionSignature.sign(tx, signatures)
+    decorated_signatures = TransactionSignature.sign(tx, signatures, network_passphrase)
 
     tx
     |> Transaction.to_xdr()
@@ -35,11 +40,16 @@ defmodule Stellar.TxBuild.TransactionEnvelope do
     |> TransactionEnvelope.new(envelope_type)
   end
 
-  @spec add_signature(tx_base64 :: tx_base64, signature :: Signature.t()) ::
+  @spec add_signature(
+          tx_base64 :: tx_base64(),
+          signature :: Signature.t(),
+          network_passphrase :: network_passphrase()
+        ) ::
           TransactionEnvelope.t()
-  def add_signature(tx_base64, %Signature{} = signature) do
+  def add_signature(tx_base64, %Signature{} = signature, network_passphrase) do
     with %TransactionEnvelope{envelope: envelope} = tx_envelope_xdr <- from_base64(tx_base64),
-         signatures <- TransactionSignature.sign_xdr(tx_envelope_xdr, signature) do
+         signatures <-
+           TransactionSignature.sign_xdr(tx_envelope_xdr, signature, network_passphrase) do
       %{tx_envelope_xdr | envelope: %{envelope | signatures: signatures}}
     end
   end

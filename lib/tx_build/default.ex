@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.Default do
   Default TxBuild implementation.
   """
   alias StellarBase.XDR.{TransactionExt, SorobanTransactionData}
-  alias Stellar.TxBuild
+  alias Stellar.{TxBuild, Network}
 
   alias Stellar.TxBuild.{
     Account,
@@ -33,6 +33,7 @@ defmodule Stellar.TxBuild.Default do
 
   @impl true
   def new(%Account{} = source_account, opts) do
+    network_passphrase = Keyword.get(opts, :network_passphrase, Network.testnet_passphrase())
     sequence_number = Keyword.get(opts, :sequence_number, SequenceNumber.new())
     base_fee = Keyword.get(opts, :base_fee, BaseFee.new())
     memo = Keyword.get(opts, :memo, Memo.new())
@@ -52,7 +53,13 @@ defmodule Stellar.TxBuild.Default do
            operations: operations
          ) do
       %Transaction{} = transaction ->
-        {:ok, %TxBuild{tx: transaction, signatures: [], tx_envelope: nil}}
+        {:ok,
+         %TxBuild{
+           tx: transaction,
+           signatures: [],
+           tx_envelope: nil,
+           network_passphrase: network_passphrase
+         }}
 
       error ->
         error
@@ -60,6 +67,11 @@ defmodule Stellar.TxBuild.Default do
   end
 
   def new(_source_account, _opts), do: {:error, :invalid_source_account}
+
+  @impl true
+  def set_network_passphrase({:ok, %TxBuild{} = tx_build}, network_passphrase) do
+    {:ok, %{tx_build | network_passphrase: network_passphrase}}
+  end
 
   @impl true
   def add_memo({:ok, %TxBuild{tx: tx} = tx_build}, %Memo{} = memo) do
@@ -205,16 +217,29 @@ defmodule Stellar.TxBuild.Default do
   def sign(error, _signature), do: error
 
   @impl true
-  def build({:ok, %TxBuild{tx: tx, signatures: signatures} = tx_build}) do
-    {:ok, %{tx_build | tx_envelope: TransactionEnvelope.new(tx, signatures)}}
+  def build(
+        {:ok,
+         %TxBuild{tx: tx, signatures: signatures, network_passphrase: network_passphrase} =
+           tx_build}
+      ) do
+    tx_envelope =
+      TransactionEnvelope.new(
+        tx: tx,
+        signatures: signatures,
+        network_passphrase: network_passphrase
+      )
+
+    {:ok, %{tx_build | tx_envelope: tx_envelope}}
   end
 
   def build(error), do: error
 
   @impl true
-  def envelope({:ok, %TxBuild{tx: tx, signatures: signatures}}) do
-    tx
-    |> TransactionEnvelope.new(signatures)
+  def envelope(
+        {:ok, %TxBuild{tx: tx, signatures: signatures, network_passphrase: network_passphrase}}
+      ) do
+    [tx: tx, signatures: signatures, network_passphrase: network_passphrase]
+    |> TransactionEnvelope.new()
     |> TransactionEnvelope.to_xdr()
     |> TransactionEnvelope.to_base64()
     |> (&{:ok, &1}).()
@@ -242,10 +267,10 @@ defmodule Stellar.TxBuild.Default do
   def sign_envelope(_tx_base64, _signature), do: {:error, :invalid_signature}
 
   @impl true
-  def hash({:ok, %TxBuild{tx: tx}}) do
+  def hash({:ok, %TxBuild{tx: tx, network_passphrase: network_passphrase}}) do
     tx
     |> Transaction.to_xdr()
-    |> TransactionSignature.base_signature()
+    |> TransactionSignature.base_signature(network_passphrase)
     |> Base.encode16(case: :lower)
     |> (&{:ok, &1}).()
   end
