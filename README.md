@@ -13,7 +13,7 @@ The **Stellar SDK** enables the construction, signing and encoding of Stellar [t
 
 This library is aimed at developers building Elixir applications that interact with the [**Stellar network**][stellar].
 
-> **Note**
+> [!NOTE]
 > If you are a smart contract developer building on Soroban, we recommend using [Soroban.ex][soroban.ex], a library built on top of Stellar SDK which offers a developer-friendly interface for interacting with Soroban smart contracts and Soroban-RPC server.
 
 #### Protocol Version Support
@@ -105,15 +105,15 @@ Stellar relies on public key cryptography to ensure that transactions are secure
 [Transactions][stellar-docs-tx] are commands that modify the ledger state. They consist of a list of operations (up to 100) used to send payments, enter orders into the decentralized exchange, change settings on accounts, and authorize accounts to hold assets.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # initialize a transaction
-Stellar.TxBuild.new(source_account)
+Stellar.TxBuild.new(source_account) # network_passphrase defaults to Stellar.Network.testnet_passphrase()
 
 # initialize a transaction with options
-# allowed options: memo, sequence_number, base_fee, preconditions
-Stellar.TxBuild.new(source_account, memo: memo, sequence_number: sequence_number)
+# allowed options: network_passphrase, memo, sequence_number, base_fee, preconditions
+Stellar.TxBuild.new(source_account, network_passphrase: Stellar.Network.public_passphrase(), memo: memo, sequence_number: sequence_number)
 ```
 
 #### Memos
@@ -125,7 +125,7 @@ A [memo][stellar-docs-memo] contains optional extra information for the transact
 * **`MEMO_RETURN`** : A 32 byte hash intended to be interpreted as the hash of the transaction the sender is refunding.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build a memo
@@ -146,7 +146,7 @@ memo = Stellar.TxBuild.Memo.new(return: "d83f67dc041e66085100859239b58d3f3292455
 Each transaction has a [sequence number][stellar-docs-sequence-number] associated with the source account. Transactions follow a strict ordering rule when it comes to processing transactions per account in order to prevent double-spending.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # fetch next account's sequence number from Horizon
@@ -170,7 +170,7 @@ sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 Each transaction incurs a [fee][stellar-docs-fee], which is paid by the source account. When you submit a transaction, you set the maximum that you are willing to pay per operation, but you’re charged the minimum fee possible based on network activity.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build a fee
@@ -199,7 +199,7 @@ Proposed on the [Stellar protocol-19][stellar-protocol-19] implementation, [Prec
 - **Extra Signers**: A transaction can specify up to two [Extra signers][stellar-docs-extra-signers] (of any type) even if those signatures would not otherwise be required to authorize the transaction.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # TimeBounds ---------------------------------------------------------------------------
@@ -265,7 +265,7 @@ preconditions =
 [Operations][stellar-docs-list-operations] represent a desired change to the ledger: payments, offers to exchange currency, changes made to account options, etc. Operations are submitted to the Stellar network grouped in a Transaction. Single transactions may have up to 100 operations.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build a create_account operation
@@ -330,7 +330,7 @@ signature =
 In some cases, a transaction may need more than one signature. If the transaction has operations with multiple source accounts, it requires the source account signature for each operation. Additional signatures are required if the account associated with the transaction has multiple public keys.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build an operation
@@ -366,7 +366,7 @@ signature2 = Stellar.TxBuild.Signature.new(ed25519: "SA2NWVOPQMQYAU5RATOE7HJLMPL
 Once a transaction has been filled out, it is wrapped in a [Transaction envelope][stellar-docs-tx-envelope] containing the transaction as well as a set of signatures.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # build an operation
@@ -395,7 +395,7 @@ source_account
 The transaction can now be submitted to the Stellar network.
 
 ```elixir
-# set the source account (this accound should exist in the ledger)
+# set the source account (this account should exist in the ledger)
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # fetch next account's sequence number from Horizon
