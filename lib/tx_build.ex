@@ -63,8 +63,8 @@ defmodule Stellar.TxBuild do
   def envelope(tx), do: impl().envelope(tx)
 
   @impl true
-  def sign_envelope(base64_envelope, signatures),
-    do: impl().sign_envelope(base64_envelope, signatures)
+  def sign_envelope(base64_envelope, signatures, network_passphrase),
+    do: impl().sign_envelope(base64_envelope, signatures, network_passphrase)
 
   @impl true
   def hash(tx), do: impl().hash(tx)

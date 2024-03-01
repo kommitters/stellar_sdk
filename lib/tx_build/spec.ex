@@ -79,7 +79,7 @@ defmodule Stellar.TxBuild.Spec do
   @callback sign(tx_build(), signatures()) :: tx_build()
   @callback build(tx_build()) :: tx_build()
   @callback envelope(tx_build()) :: tx_envelope()
-  @callback sign_envelope(envelope(), signatures()) :: tx_envelope()
+  @callback sign_envelope(envelope(), signatures(), network_passphrase()) :: tx_envelope()
   @callback hash(tx_build()) :: tx_hash()
 
   @optional_callbacks add_memo: 2,

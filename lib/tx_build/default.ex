@@ -248,23 +248,23 @@ defmodule Stellar.TxBuild.Default do
   def envelope(error), do: error
 
   @impl true
-  def sign_envelope(tx_base64, []), do: tx_base64
-  def sign_envelope({:ok, tx_base64}, signatures), do: sign_envelope(tx_base64, signatures)
+  def sign_envelope(tx_base64, [], _network_passphrase), do: tx_base64
+  def sign_envelope({:ok, tx_base64}, signatures, network_passphrase), do: sign_envelope(tx_base64, signatures, network_passphrase)
 
-  def sign_envelope(tx_base64, [%Signature{} = signature | signatures]) do
+  def sign_envelope(tx_base64, [%Signature{} = signature | signatures], network_passphrase) do
     tx_base64
-    |> sign_envelope(signature)
-    |> sign_envelope(signatures)
+    |> sign_envelope(signature, network_passphrase)
+    |> sign_envelope(signatures, network_passphrase)
   end
 
-  def sign_envelope(tx_base64, %Signature{} = signature) do
+  def sign_envelope(tx_base64, %Signature{} = signature, network_passphrase) do
     tx_base64
-    |> TransactionEnvelope.add_signature(signature)
+    |> TransactionEnvelope.add_signature(signature, network_passphrase)
     |> TransactionEnvelope.to_base64()
     |> (&{:ok, &1}).()
   end
 
-  def sign_envelope(_tx_base64, _signature), do: {:error, :invalid_signature}
+  def sign_envelope(_tx_base64, _signature, _network_passphrase), do: {:error, :invalid_signature}
 
   @impl true
   def hash({:ok, %TxBuild{tx: tx, network_passphrase: network_passphrase}}) do
