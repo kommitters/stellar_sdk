@@ -68,7 +68,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedTradeAggregationRequests
-  alias Stellar.Horizon.{Collection, TradeAggregation, TradeAggregations, Error}
+  alias Stellar.Horizon.{Collection, TradeAggregation, TradeAggregations, Error, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedTradeAggregationRequests)
@@ -134,6 +134,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
        ]
      }} =
       TradeAggregations.list_trade_aggregations(
+        Server.testnet(),
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -153,6 +154,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
   } do
     {:ok, %Collection{prev: paginate_prev_fn}} =
       TradeAggregations.list_trade_aggregations(
+        Server.testnet(),
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -176,6 +178,7 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
   } do
     {:ok, %Collection{next: paginate_next_fn}} =
       TradeAggregations.list_trade_aggregations(
+        Server.testnet(),
         base_asset: base_asset,
         counter_asset: counter_asset,
         resolution: resolution,
@@ -197,6 +200,6 @@ defmodule Stellar.Horizon.TradeAggregationsTest do
        status_code: 400,
        title: "Bad Request",
        type: "https://stellar.org/horizon-errors/bad_request"
-     }} = TradeAggregations.list_trade_aggregations(base_asset: :error)
+     }} = TradeAggregations.list_trade_aggregations(Server.testnet(), base_asset: :error)
   end
 end

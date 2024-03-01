@@ -55,7 +55,7 @@ defmodule Stellar.Horizon.TradesTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedTradeRequests
-  alias Stellar.Horizon.{Collection, Error, Trade, Trades}
+  alias Stellar.Horizon.{Collection, Error, Trade, Trades, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedTradeRequests)
@@ -136,18 +136,18 @@ defmodule Stellar.Horizon.TradesTest do
            trade_type: nil
          }
        ]
-     }} = Trades.all(limit: 3)
+     }} = Trades.all(Server.testnet(), limit: 3)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Trades.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Trades.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Trades.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Trades.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -161,6 +161,6 @@ defmodule Stellar.Horizon.TradesTest do
        status_code: 400,
        title: "Bad Request",
        type: "https://stellar.org/horizon-errors/bad_request"
-     }} = Trades.all(cursor: "error")
+     }} = Trades.all(Server.testnet(), cursor: "error")
   end
 end

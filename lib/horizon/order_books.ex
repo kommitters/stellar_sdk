@@ -8,8 +8,9 @@ defmodule Stellar.Horizon.OrderBooks do
   Horizon API reference: https://developers.stellar.org/api/aggregations/order-books/object/
   """
 
-  alias Stellar.Horizon.{Error, OrderBook, Request, RequestParams}
+  alias Stellar.Horizon.{Error, OrderBook, Request, RequestParams, Server}
 
+  @type server :: Server.t()
   @type args :: Keyword.t()
   @type resource :: OrderBook.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
@@ -20,6 +21,7 @@ defmodule Stellar.Horizon.OrderBooks do
     Retrieve order books
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `selling_asset`: `:native` or `[code: "selling_asset_code", issuer: "selling_asset_issuer"]`
     * `buying_asset`: `:native` or `[code: "buying_asset_code", issuer: "buying_asset_issuer"]`
 
@@ -29,22 +31,25 @@ defmodule Stellar.Horizon.OrderBooks do
   ## Examples
 
       # Retrieve order books
-      iex> OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
+      iex> OrderBooks.retrieve(Stellar.Horizon.Server.testnet(), selling_asset: :native, buying_asset: :native)
       {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
 
       # Retrieve with more options
-      iex> OrderBooks.retrieve(selling_asset: :native,
-                               buying_asset: [
-                                  code: "BB1",
-                                  issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
-                                ],
-                               limit: 2
-                              )
+      iex> OrderBooks.retrieve(
+        Stellar.Horizon.Server.testnet(),
+        selling_asset: :native,
+        buying_asset: [
+          code: "BB1",
+          issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+        ],
+        limit: 2
+      )
+                                              )
       {:ok, %OrderBook{bids: [%Price{}...], asks: [%Price{}...], ...}
   """
 
-  @spec retrieve(args :: args()) :: response()
-  def retrieve(args \\ []) do
+  @spec retrieve(server :: server(), args :: args()) :: response()
+  def retrieve(server, args \\ []) do
     selling_asset = RequestParams.build_assets_params(args, :selling_asset)
     buying_asset = RequestParams.build_assets_params(args, :buying_asset)
 
@@ -54,8 +59,8 @@ defmodule Stellar.Horizon.OrderBooks do
       |> Keyword.merge(selling_asset)
       |> Keyword.merge(buying_asset)
 
-    :get
-    |> Request.new(@endpoint)
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
     |> Request.results(as: OrderBook)

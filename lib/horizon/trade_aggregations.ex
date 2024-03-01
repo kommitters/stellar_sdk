@@ -8,8 +8,9 @@ defmodule Stellar.Horizon.TradeAggregations do
   Horizon API reference: https://developers.stellar.org/api/aggregations/trade-aggregations/
   """
 
-  alias Stellar.Horizon.{Error, Request, RequestParams, TradeAggregation}
+  alias Stellar.Horizon.{Error, Request, RequestParams, TradeAggregation, Server}
 
+  @type server :: Server.t()
   @type args :: Keyword.t()
   @type resource :: TradeAggregation.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
@@ -21,6 +22,7 @@ defmodule Stellar.Horizon.TradeAggregations do
 
     ## Parameters
 
+      * `server`: The Horizon server to query.
       * `base_asset`: `:native` or `[code: "base_asset_code", issuer: "base_asset_issuer"]`
       * `counter_asset`: `:native` or `[code: "counter_asset_code", issuer: "counter_asset_issuer"]`
       * `resolution`: The segment duration represented as milliseconds.
@@ -35,30 +37,37 @@ defmodule Stellar.Horizon.TradeAggregations do
 
     ## Examples
 
-        iex> TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
+        iex> TradeAggregations.list_trade_aggregations(
+          Stellar.Horizon.Server.testnet(),
+           base_asset: :native,
+           counter_asset: :native,
+           resolution: "60000"
+          )
         {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
 
-        iex> TradeAggregations.list_trade_aggregations(base_asset: :native,
-                                                      counter_asset: [
-                                                        code: "EURT",
-                                                        issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
-                                                      ],
-                                                      resolution: "3600000",
-                                                      start_time: "1582156800000",
-                                                      end_time: "1582178400000"
-                                                      )
+        iex> TradeAggregations.list_trade_aggregations(
+          Stellar.Horizon.Server.testnet(),
+           base_asset: :native,
+           counter_asset: [
+             code: "EURT",
+             issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
+           ],
+           resolution: "3600000",
+           start_time: "1582156800000",
+           end_time: "1582178400000"
+          )
         {:ok, %Collection{records: [%TradeAggregation{}, ...]}}
   """
 
-  @spec list_trade_aggregations(args :: args()) :: response()
-  def list_trade_aggregations(args \\ []) do
+  @spec list_trade_aggregations(server :: server(), args :: args()) :: response()
+  def list_trade_aggregations(server, args \\ []) do
     params = resolve_params(args)
 
-    :get
-    |> Request.new(@endpoint)
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
-    |> Request.results(collection: {TradeAggregation, &list_trade_aggregations/1})
+    |> Request.results(collection: {TradeAggregation, &list_trade_aggregations(server, &1)})
   end
 
   @spec resolve_params(args :: args()) :: Keyword.t()
