@@ -20,10 +20,12 @@ defmodule Stellar.Horizon.LiquidityPools do
     LiquidityPool,
     Operation,
     Request,
+    Server,
     Trade,
-    Transaction
+    Transaction,
   }
 
+  @type server :: Server.t()
   @type liquidity_pool_id :: String.t()
   @type options :: Keyword.t()
   @type resource :: LiquidityPool.t() | Collection.t()
@@ -35,23 +37,27 @@ defmodule Stellar.Horizon.LiquidityPools do
   Retrieves information of a specific liquidity pool.
 
   ## Parameters:
+    * `server`: The Horizon server to query.
     * `liquidity_pool_id`: A liquidity pool’s id encoded in a hex string representation.
 
   ## Examples
 
-      iex> LiquidityPools.retrieve("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc")
+      iex> LiquidityPools.retrieve(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc")
       {:ok, %LiquidityPool{}}
   """
-  @spec retrieve(liquidity_pool_id :: liquidity_pool_id()) :: response()
-  def retrieve(liquidity_pool_id) do
-    :get
-    |> Request.new(@endpoint, path: liquidity_pool_id)
+  @spec retrieve(server :: server(), liquidity_pool_id :: liquidity_pool_id()) :: response()
+  def retrieve(server, liquidity_pool_id) do
+    server
+    |> Request.new(:get, @endpoint, path: liquidity_pool_id)
     |> Request.perform()
     |> Request.results(as: LiquidityPool)
   end
 
   @doc """
   Lists all available claimable balances.
+
+  ## Parameters:
+    * `server`: The Horizon server to query.
 
   ## Options
 
@@ -63,30 +69,31 @@ defmodule Stellar.Horizon.LiquidityPools do
 
   ## Examples
 
-      iex> LiquidityPools.all(limit: 2, order: :asc)
+      iex> LiquidityPools.all(Stellar.Horizon.Server.testnet(), limit: 2, order: :asc)
       {:ok, %Collection{records: [%LiquidityPool{}, ...]}}
 
       # list by reserves
-      iex> LiquidityPools.all(reserves: "TEST:GCXMW..., TEST2:GCXMW...")
+      iex> LiquidityPools.all(Stellar.Horizon.Server.testnet(), reserves: "TEST:GCXMW..., TEST2:GCXMW...")
       {:ok, %Collection{records: [%LiquidityPool{}, ...]}}
 
       # list by account
-      iex> LiquidityPools.all(account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+      iex> LiquidityPools.all(Stellar.Horizon.Server.testnet(), account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
       {:ok, %Collection{records: [%LiquidityPool{}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(options, extra_options: [:reserves, :account])
     |> Request.perform()
-    |> Request.results(collection: {LiquidityPool, &all/1})
+    |> Request.results(collection: {LiquidityPool, &all(server, &1)})
   end
 
   @doc """
   Lists the effects of a specific liquidity pool.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `liquidity_pool_id`: A liquidity pool’s id encoded in a hex string representation.
 
   ## Options
@@ -96,22 +103,23 @@ defmodule Stellar.Horizon.LiquidityPools do
 
   ## Examples
 
-      iex> LiquidityPools.list_effects("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+      iex> LiquidityPools.list_effects(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(liquidity_pool_id :: liquidity_pool_id(), options :: options()) :: response()
-  def list_effects(liquidity_pool_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: liquidity_pool_id, segment: "effects")
+  @spec list_effects(server :: server(), liquidity_pool_id :: liquidity_pool_id(), options :: options()) :: response()
+  def list_effects(server, liquidity_pool_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: liquidity_pool_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Effect, &list_effects(liquidity_pool_id, &1)})
+    |> Request.results(collection: {Effect, &list_effects(server, liquidity_pool_id, &1)})
   end
 
   @doc """
   Lists the successful trades fulfilled by the given liquidity pool.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `liquidity_pool_id`: A liquidity pool’s id encoded in a hex string representation.
 
   ## Options
@@ -121,22 +129,23 @@ defmodule Stellar.Horizon.LiquidityPools do
 
   ## Examples
 
-      iex> LiquidityPools.list_trades("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+      iex> LiquidityPools.list_trades(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
       {:ok, %Collection{records: [%Trade{}, ...]}}
   """
-  @spec list_trades(liquidity_pool_id :: liquidity_pool_id(), options :: options()) :: response()
-  def list_trades(liquidity_pool_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: liquidity_pool_id, segment: "trades")
+  @spec list_trades(server :: server(), liquidity_pool_id :: liquidity_pool_id(), options :: options()) :: response()
+  def list_trades(server, liquidity_pool_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: liquidity_pool_id, segment: "trades")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Trade, &list_trades(liquidity_pool_id, &1)})
+    |> Request.results(collection: {Trade, &list_trades(server, liquidity_pool_id, &1)})
   end
 
   @doc """
   Lists successful transactions referencing a given liquidity pool.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `liquidity_pool_id`: A liquidity pool’s id encoded in a hex string representation.
 
   ## Options
@@ -147,23 +156,24 @@ defmodule Stellar.Horizon.LiquidityPools do
 
   ## Examples
 
-      iex> LiquidityPools.list_transactions("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+      iex> LiquidityPools.list_transactions(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(liquidity_pool_id :: liquidity_pool_id(), options :: options()) ::
+  @spec list_transactions(server :: server(), liquidity_pool_id :: liquidity_pool_id(), options :: options()) ::
           response()
-  def list_transactions(liquidity_pool_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: liquidity_pool_id, segment: "transactions")
+  def list_transactions(server, liquidity_pool_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: liquidity_pool_id, segment: "transactions")
     |> Request.add_query(options, extra_options: [:include_failed])
     |> Request.perform()
-    |> Request.results(collection: {Transaction, &list_transactions(liquidity_pool_id, &1)})
+    |> Request.results(collection: {Transaction, &list_transactions(server, liquidity_pool_id, &1)})
   end
 
   @doc """
   Lists successful operations referencing a given liquidity pool.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `liquidity_pool_id`: A liquidity pool’s id encoded in a hex string representation.
 
   ## Options
@@ -175,20 +185,20 @@ defmodule Stellar.Horizon.LiquidityPools do
 
   ## Examples
 
-      iex> LiquidityPools.list_operations("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+      iex> LiquidityPools.list_operations(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # join transactions
-      iex> LiquidityPools.list_operations("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", join: "transactions")
+      iex> LiquidityPools.list_operations(Stellar.Horizon.Server.testnet(), "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(liquidity_pool_id :: liquidity_pool_id(), options :: options()) ::
+  @spec list_operations(server :: server(), liquidity_pool_id :: liquidity_pool_id(), options :: options()) ::
           response()
-  def list_operations(liquidity_pool_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: liquidity_pool_id, segment: "operations")
+  def list_operations(server, liquidity_pool_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: liquidity_pool_id, segment: "operations")
     |> Request.add_query(options, extra_options: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_operations(liquidity_pool_id, &1)})
+    |> Request.results(collection: {Operation, &list_operations(server, liquidity_pool_id, &1)})
   end
 end

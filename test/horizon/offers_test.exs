@@ -53,7 +53,7 @@ defmodule Stellar.Horizon.OffersTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedOfferRequests
-  alias Stellar.Horizon.{Collection, Error, Offer, Offers, Trade}
+  alias Stellar.Horizon.{Collection, Error, Offer, Offers, Trade, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedOfferRequests)
@@ -83,7 +83,7 @@ defmodule Stellar.Horizon.OffersTest do
          asset_type: "credit_alphanum4"
        },
        sponsor: nil
-     }} = Offers.retrieve(offer_id)
+     }} = Offers.retrieve(Server.testnet(), offer_id)
   end
 
   test "all/1" do
@@ -109,7 +109,7 @@ defmodule Stellar.Horizon.OffersTest do
            price: "12.8899964"
          }
        ]
-     }} = Offers.all()
+     }} = Offers.all(Server.testnet())
   end
 
   test "list_trades/2", %{offer_id: offer_id} do
@@ -120,18 +120,18 @@ defmodule Stellar.Horizon.OffersTest do
          %Trade{base_offer_id: ^offer_id, base_amount: "10.0000000"},
          %Trade{base_offer_id: ^offer_id, base_amount: "748.5338945"}
        ]
-     }} = Offers.list_trades(offer_id)
+     }} = Offers.list_trades(Server.testnet(), offer_id)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Offers.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Offers.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Offers.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Offers.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -144,6 +144,6 @@ defmodule Stellar.Horizon.OffersTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = Offers.retrieve("not_found")
+     }} = Offers.retrieve(Server.testnet(), "not_found")
   end
 end

@@ -11,8 +11,9 @@ defmodule Stellar.Horizon.ClaimableBalances do
   Horizon API reference: https://developers.stellar.org/api/resources/claimablebalances/
   """
 
-  alias Stellar.Horizon.{ClaimableBalance, Collection, Error, Operation, Request, Transaction}
+  alias Stellar.Horizon.{ClaimableBalance, Collection, Error, Operation, Request, Transaction, Server}
 
+  @type server :: Server.t()
   @type claimable_balance_id :: String.t()
   @type account_id :: String.t()
   @type asset :: String.t()
@@ -26,23 +27,27 @@ defmodule Stellar.Horizon.ClaimableBalances do
   Retrieves information of a specific claimable balance.
 
   ## Parameters:
+    * `server`: The Horizon server to query.
     * `claimable_balance_id`: A unique identifier for the claimable balance.
 
   ## Examples
 
-      iex> ClaimableBalances.retrieve("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695")
+      iex> ClaimableBalances.retrieve(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695")
       {:ok, %ClaimableBalance{}}
   """
-  @spec retrieve(claimable_balance_id :: claimable_balance_id()) :: response()
-  def retrieve(claimable_balance_id) do
-    :get
-    |> Request.new(@endpoint, path: claimable_balance_id)
+  @spec retrieve(server :: server(), claimable_balance_id :: claimable_balance_id()) :: response()
+  def retrieve(server, claimable_balance_id) do
+    server
+    |> Request.new(:get, @endpoint, path: claimable_balance_id)
     |> Request.perform()
     |> Request.results(as: ClaimableBalance)
   end
 
   @doc """
   Lists all available claimable balances.
+
+  ## Parameters:
+    * `server`: The Horizon server to query.
 
   ## Options
 
@@ -55,34 +60,35 @@ defmodule Stellar.Horizon.ClaimableBalances do
 
   ## Examples
 
-      iex> ClaimableBalances.all(limit: 2, order: :asc)
+      iex> ClaimableBalances.all(Stellar.Horizon.Server.testnet(), limit: 2, order: :asc)
       {:ok, %Collection{records: [%ClaimableBalance{}, ...]}}
 
       # list by sponsor
-      iex> ClaimableBalances.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> ClaimableBalances.all(Stellar.Horizon.Server.testnet(), sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{}, ...]}}
 
       # list by claimant
-      iex> ClaimableBalances.all(claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+      iex> ClaimableBalances.all(Stellar.Horizon.Server.testnet(), claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
       {:ok, %Collection{records: [%ClaimableBalance{}, ...]}}
 
       # list by canonical asset address
-      iex> ClaimableBalances.all(asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> ClaimableBalances.all(Stellar.Horizon.Server.testnet(), asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%ClaimableBalance{}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(options, extra_params: [:sponsor, :asset, :claimant])
     |> Request.perform()
-    |> Request.results(collection: {ClaimableBalance, &all/1})
+    |> Request.results(collection: {ClaimableBalance, &all(server, &1)})
   end
 
   @doc """
   Lists successful transactions referencing a given claimable balance.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `claimable_balance_id`: A unique identifier for the claimable balance.
 
   ## Options
@@ -93,23 +99,24 @@ defmodule Stellar.Horizon.ClaimableBalances do
 
   ## Examples
 
-      iex> ClaimableBalances.list_transactions("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
+      iex> ClaimableBalances.list_transactions(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(claimable_balance_id :: claimable_balance_id(), options :: options()) ::
+  @spec list_transactions(server :: server(), claimable_balance_id :: claimable_balance_id(), options :: options()) ::
           response()
-  def list_transactions(claimable_balance_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: claimable_balance_id, segment: "transactions")
+  def list_transactions(server, claimable_balance_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: claimable_balance_id, segment: "transactions")
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(collection: {Transaction, &list_transactions(claimable_balance_id, &1)})
+    |> Request.results(collection: {Transaction, &list_transactions(server, claimable_balance_id, &1)})
   end
 
   @doc """
   Lists successful operations referencing a given claimable balance.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `claimable_balance_id`: A unique identifier for the claimable balance.
 
   ## Options
@@ -121,28 +128,28 @@ defmodule Stellar.Horizon.ClaimableBalances do
 
   ## Examples
 
-      iex> ClaimableBalances.list_operations("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
+      iex> ClaimableBalances.list_operations(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # join transactions
-      iex> ClaimableBalances.list_operations("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", join: "transactions")
+      iex> ClaimableBalances.list_operations(Stellar.Horizon.Server.testnet(), "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(claimable_balance_id :: claimable_balance_id(), options :: options()) ::
+  @spec list_operations(server :: server(), claimable_balance_id :: claimable_balance_id(), options :: options()) ::
           response()
-  def list_operations(claimable_balance_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: claimable_balance_id, segment: "operations")
+  def list_operations(server, claimable_balance_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: claimable_balance_id, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_operations(claimable_balance_id, &1)})
+    |> Request.results(collection: {Operation, &list_operations(server, claimable_balance_id, &1)})
   end
 
   @doc """
   Lists claimable balances matching the given sponsor.
 
   ## Parameters:
-
+    * `server`: The Horizon server to query.
     * `sponsor`: Account ID of the sponsor.
 
   ## Options
@@ -153,21 +160,21 @@ defmodule Stellar.Horizon.ClaimableBalances do
 
   ## Examples
 
-      iex> ClaimableBalances.list_by_sponsor("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> ClaimableBalances.list_by_sponsor(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_sponsor(sponsor :: account_id(), options :: options()) :: response()
-  def list_by_sponsor(sponsor, options \\ []) do
+  @spec list_by_sponsor(server :: server(), sponsor :: account_id(), options :: options()) :: response()
+  def list_by_sponsor(server, sponsor, options \\ []) do
     options
     |> Keyword.put(:sponsor, sponsor)
-    |> all()
+    |> (&all(server, &1)).()
   end
 
   @doc """
   Lists claimable balances matching the given claimant.
 
   ## Parameters:
-
+    * `server`: The Horizon server to query.
     * `claimant`: Account ID of the destination address.
 
   ## Options
@@ -181,11 +188,11 @@ defmodule Stellar.Horizon.ClaimableBalances do
       iex> ClaimableBalances.list_by_claimant("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_claimant(claimant :: account_id(), options :: options()) :: response()
-  def list_by_claimant(claimant, options \\ []) do
+  @spec list_by_claimant(server :: server(), claimant :: account_id(), options :: options()) :: response()
+  def list_by_claimant(server, claimant, options \\ []) do
     options
     |> Keyword.put(:claimant, claimant)
-    |> all()
+    |> (&all(server, &1)).()
   end
 
   @doc """
@@ -203,13 +210,13 @@ defmodule Stellar.Horizon.ClaimableBalances do
 
   ## Examples
 
-      iex> ClaimableBalances.list_by_asset("TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> ClaimableBalances.list_by_asset(Stellar.Horizon.Server.testnet(), "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%ClaimableBalance{asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_asset(asset :: asset(), options :: options()) :: response()
-  def list_by_asset(asset, options \\ []) do
+  @spec list_by_asset(server :: server(), asset :: asset(), options :: options()) :: response()
+  def list_by_asset(server, asset, options \\ []) do
     options
     |> Keyword.put(:asset, asset)
-    |> all()
+    |> (&all(server, &1)).()
   end
 end

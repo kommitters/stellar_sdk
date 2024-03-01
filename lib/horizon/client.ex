@@ -7,8 +7,8 @@ defmodule Stellar.Horizon.Client do
   @behaviour Client.Spec
 
   @impl true
-  def request(method, path, headers \\ [], body \\ "", opts \\ []),
-    do: impl().request(method, path, headers, body, opts)
+  def request(server, method, path, headers \\ [], body \\ "", opts \\ []),
+    do: impl().request(server, method, path, headers, body, opts)
 
   @spec impl() :: atom()
   defp impl do

@@ -55,7 +55,7 @@ defmodule Stellar.Horizon.EffectsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedEffectRequests
-  alias Stellar.Horizon.{Collection, Error, Effect, Effects}
+  alias Stellar.Horizon.{Collection, Error, Effect, Effects, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedEffectRequests)
@@ -127,18 +127,18 @@ defmodule Stellar.Horizon.EffectsTest do
            created_at: ~U[2023-10-10 15:52:40Z]
          }
        ]
-     }} = Effects.all(limit: 3)
+     }} = Effects.all(Server.testnet(), limit: 3)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Effects.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Effects.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Effects.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Effects.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -152,6 +152,6 @@ defmodule Stellar.Horizon.EffectsTest do
        status_code: 400,
        title: "Bad Request",
        type: "https://stellar.org/horizon-errors/bad_request"
-     }} = Effects.all(cursor: "error")
+     }} = Effects.all(Server.testnet(), cursor: "error")
   end
 end

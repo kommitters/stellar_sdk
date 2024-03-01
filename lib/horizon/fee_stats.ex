@@ -8,8 +8,9 @@ defmodule Stellar.Horizon.FeeStats do
   Horizon API reference: https://developers.stellar.org/api/aggregations/fee-stats/
   """
 
-  alias Stellar.Horizon.{Error, FeeStat, Request}
+  alias Stellar.Horizon.{Error, FeeStat, Request, Server}
 
+  @type server :: Server.t()
   @type resource :: FeeStat.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
 
@@ -18,16 +19,19 @@ defmodule Stellar.Horizon.FeeStats do
   @doc """
   Retrieves information of the fee stats.
 
+  ## Parameters
+    * `server`: The Horizon server to query.
+
   ## Examples
 
-      iex> FeeStats.retrieve()
+      iex> FeeStats.retrieve(Stellar.Horizon.Server.testnet())
       {:ok, %FeeStat{}}
   """
 
-  @spec retrieve :: response()
-  def retrieve do
-    :get
-    |> Request.new(@endpoint)
+  @spec retrieve(server :: server()) :: response()
+  def retrieve(server) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.perform()
     |> Request.results(as: FeeStat)
   end
