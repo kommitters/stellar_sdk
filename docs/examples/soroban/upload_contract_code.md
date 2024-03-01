@@ -19,6 +19,8 @@ alias Stellar.TxBuild.{
 alias Stellar.Horizon.Accounts
 alias Stellar.KeyPair
 
+server = Stellar.Horizon.Server.testnet()
+
 # read file
 {:ok, code} = File.read("file_path/file.wasm")
 
@@ -30,7 +32,7 @@ keypair = {public_key, _secret} = KeyPair.from_secret_seed("SDR...Q24")
 
 source_account = Account.new(public_key)
 
-{:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
+{:ok, seq_num} = Accounts.fetch_next_sequence_number(server, public_key)
 sequence_number = SequenceNumber.new(seq_num)
 
 signature = Signature.new(keypair)
