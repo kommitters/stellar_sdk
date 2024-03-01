@@ -4,7 +4,7 @@ defmodule Stellar.Horizon.ServerTest do
   alias Stellar.Horizon.Server
 
   test "new/1" do
-    %Server{url: "https://standalone-horizon.com"} = Server.new("https://standalone-horizon.com")
+    %Server{url: "https://horizon-standalone.com"} = Server.new("https://horizon-standalone.com")
   end
 
   test "public/0" do

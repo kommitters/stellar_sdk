@@ -41,10 +41,6 @@ end
 ```
 
 ## Configuration
-```elixir
-config :stellar_sdk, network: :test # Default is `:test`. To use the public network, set it to `:public`
-
-```
 
 The default HTTP Client is `:hackney`. Options to `:hackney` can be passed through configuration params.
 ```elixir
@@ -154,7 +150,11 @@ Each transaction has a [sequence number][stellar-docs-sequence-number] associate
 source_account = Stellar.TxBuild.Account.new("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
 
 # fetch next account's sequence number from Horizon
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number("GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW")
+{:ok, seq_num} =
+  Stellar.Horizon.Accounts.fetch_next_sequence_number(
+    Stellar.Horizon.Server.testnet(),
+    "GDC3W2X5KUTZRTQIKXM5D2I5WG5JYSEJQWEELVPQ5YMWZR6CA2JJ35RW"
+  )
 
 # set the sequence number
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
@@ -436,6 +436,28 @@ More examples can be found in the [**tests**][sdk-tests].
 ## Querying Horizon
 Horizon is an API for interacting with the Stellar network.
 
+To query Horizon, you need to specify the Horizon server to use.
+
+```elixir
+# public horizon server
+Stellar.Horizon.Server.public()
+
+# testnet horizon server
+Stellar.Horizon.Server.testnet()
+
+# futurenet horizon server
+Stellar.Horizon.Server.futurenet()
+
+# local horizon server
+Stellar.Horizon.Server.local()
+
+# custom horizon server
+Stellar.Horizon.Server.new("https://horizon-standalone.com")
+```
+
+See [**Stellar.Horizon.Server**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Server.html) for more details.
+
+
 To make it possible to explore the millions of records for resources like transactions and operations, this library paginates the data it returns for collection-based resources. Each individual transaction, operation, ledger, etc. is returned as a record.
 
 ```elixir
@@ -446,7 +468,7 @@ To make it possible to explore the millions of records for resources like transa
    failed_transaction_count: 0,
    fee_pool: 3.0e-5,
    ...
- }} = Ledgers.retrieve(1234)
+ }} = Ledgers.retrieve(Stellar.Horizon.Server.testnet(), 1234)
 ```
 
 A group of records is called a **collection**, records are returned as a list in the [**Stellar.Horizon.Collection**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Collection.html#content) structure. To move between pages of a collection of records, use the `next` and `prev` attributes.
@@ -462,7 +484,7 @@ A group of records is called a **collection**, records are returned as a list in
      %Stellar.Horizon.Ledger{...},
      %Stellar.Horizon.Ledger{...}
    ]
- }} = Stellar.Horizon.Ledgers.all()
+ }} = Stellar.Horizon.Ledgers.all(Stellar.Horizon.Server.testnet())
 ```
 
 ### Pagination
@@ -474,7 +496,7 @@ The [HAL format links](https://developers.stellar.org/api/introduction/response-
    next: paginate_next_fn,
    prev: paginate_prev_fn,
    records: [...]
- }} = Stellar.Horizon.Transactions.all()
+ }} = Stellar.Horizon.Transactions.all(Stellar.Horizon.Server.testnet())
 
 # next page records for the collection
 paginate_next_fn.()
@@ -500,28 +522,57 @@ paginate_prev_fn.()
 ### Accounts
 ```elixir
 # retrieve an account
-Stellar.Horizon.Accounts.retrieve("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Accounts.retrieve(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 
 # fetch the ledger's sequence number for the account
-Stellar.Horizon.Accounts.fetch_next_sequence_number("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Accounts.fetch_next_sequence_number(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 
 # list accounts
-Stellar.Horizon.Accounts.all(limit: 10, order: :asc)
+Stellar.Horizon.Accounts.all(
+  Stellar.Horizon.Server.testnet(),
+  limit: 10,
+  order: :asc
+)
 
 # list accounts by sponsor
-Stellar.Horizon.Accounts.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Accounts.all(
+  Stellar.Horizon.Server.testnet(),
+  sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 
 # list accounts by signer
-Stellar.Horizon.Accounts.all(signer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+Stellar.Horizon.Accounts.all(
+  Stellar.Horizon.Server.testnet(),
+  signer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  order: :desc
+)
 
 # list accounts by canonical asset address
-Stellar.Horizon.Accounts.all(asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+Stellar.Horizon.Accounts.all(
+  Stellar.Horizon.Server.testnet(),
+  asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  limit: 20
+)
 
 # list account's transactions
-Stellar.Horizon.Accounts.list_transactions("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+Stellar.Horizon.Accounts.list_transactions(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  limit: 20
+)
 
 # list account's payments
-Stellar.Horizon.Accounts.list_payments("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+Stellar.Horizon.Accounts.list_payments(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  limit: 20
+)
 ```
 
 See [**Stellar.Horizon.Accounts**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Accounts.html#content) for more details.
@@ -529,25 +580,37 @@ See [**Stellar.Horizon.Accounts**](https://hexdocs.pm/stellar_sdk/Stellar.Horizo
 ### Transactions
 ```elixir
 # submit a transaction
-Stellar.Horizon.Transactions.create(base64_tx_envelope)
+Stellar.Horizon.Transactions.create(Stellar.Horizon.Server.testnet(), base64_tx_envelope)
 
 # retrieve a transaction
-Stellar.Horizon.Transactions.retrieve("5ebd5c0af4385500b53dd63b0ef5f6e8feef1a7e1c86989be3cdcce825f3c0cc")
+Stellar.Horizon.Transactions.retrieve(Stellar.Horizon.Server.testnet(), "5ebd5c0af4385500b53dd63b0ef5f6e8feef1a7e1c86989be3cdcce825f3c0cc")
 
 # list transactions
-Stellar.Horizon.Transactions.all(limit: 10, order: :asc)
+Stellar.Horizon.Transactions.all(Stellar.Horizon.Server.testnet(), limit: 10, order: :asc)
 
 # include failed transactions
-Stellar.Horizon.Transactions.all(limit: 10, include_failed: true)
+Stellar.Horizon.Transactions.all(Stellar.Horizon.Server.testnet(), limit: 10, include_failed: true)
 
 # list transaction's effects
-Stellar.Horizon.Transactions.list_effects("6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a", limit: 20)
+Stellar.Horizon.Transactions.list_effects(
+  Stellar.Horizon.Server.testnet(),
+  "6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a",
+  limit: 20
+)
 
 # list transaction's operations
-Stellar.Horizon.Transactions.list_operations("6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a", limit: 20)
+Stellar.Horizon.Transactions.list_operations(
+  Stellar.Horizon.Server.testnet(),
+  "6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a",
+  limit: 20
+)
 
 # join transactions in the operations response
-Stellar.Horizon.Transactions.list_operations("6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a", join: "transactions")
+Stellar.Horizon.Transactions.list_operations(
+  Stellar.Horizon.Server.testnet(),
+  "6b983a4e0dc3c04f4bd6b9037c55f70a09c434dfd01492be1077cf7ea68c2e4a",
+  join: "transactions"
+)
 ```
 
 See [**Stellar.Horizon.Transactions**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Transactions.html#content) for more details.
@@ -556,22 +619,22 @@ See [**Stellar.Horizon.Transactions**](https://hexdocs.pm/stellar_sdk/Stellar.Ho
 ### Operations
 ```elixir
 # retrieve an operation
-Stellar.Horizon.Operations.retrieve(121693057904021505)
+Stellar.Horizon.Operations.retrieve(Stellar.Horizon.Server.testnet(), 121693057904021505)
 
 # list operations
-Stellar.Horizon.Operations.all(limit: 10, order: :asc)
+Stellar.Horizon.Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, order: :asc)
 
 # include failed operations
-Stellar.Horizon.Operations.all(limit: 10, include_failed: true)
+Stellar.Horizon.Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, include_failed: true)
 
 # include operation's transactions
-Stellar.Horizon.Operations.all(limit: 10, join: "transactions")
+Stellar.Horizon.Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, join: "transactions")
 
 # list operation's payments
-Stellar.Horizon.Operations.list_payments(limit: 20)
+Stellar.Horizon.Operations.list_payments(Stellar.Horizon.Server.testnet(), limit: 20)
 
 # list operation's effects
-Stellar.Horizon.Operations.list_effects(121693057904021505, limit: 20)
+Stellar.Horizon.Operations.list_effects(Stellar.Horizon.Server.testnet(), 121693057904021505, limit: 20)
 ```
 
 See [**Stellar.Horizon.Operations**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Operations.html#content) for more details.
@@ -580,18 +643,24 @@ See [**Stellar.Horizon.Operations**](https://hexdocs.pm/stellar_sdk/Stellar.Hori
 ### Assets
 ```elixir
 # list ledger's assets
-Stellar.Horizon.Assets.all(limit: 20, order: :desc)
+Stellar.Horizon.Assets.all(Stellar.Horizon.Server.testnet(), limit: 20, order: :desc)
 
 # list assets by asset issuer
-Stellar.Horizon.Assets.all(asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Assets.all(Stellar.Horizon.Server.testnet(), asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
 
 # list assets by asset code
-Stellar.Horizon.Assets.list_by_asset_code("TEST")
-Stellar.Horizon.Assets.all(asset_code: "TEST")
+Stellar.Horizon.Assets.list_by_asset_code(Stellar.Horizon.Server.testnet(), "TEST")
+Stellar.Horizon.Assets.all(Stellar.Horizon.Server.testnet(), asset_code: "TEST")
 
 # list assets by asset issuer
-Stellar.Horizon.Assets.all(asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
-Stellar.Horizon.Assets.list_by_asset_issuer("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Assets.all(
+  Stellar.Horizon.Server.testnet(),
+  asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
+Stellar.Horizon.Assets.list_by_asset_issuer(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 ```
 
 See [**Stellar.Horizon.Assets**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Assets.html#content) for more details.
@@ -600,22 +669,22 @@ See [**Stellar.Horizon.Assets**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.
 ### Ledgers
 ```elixir
 # retrieve a ledger
-Stellar.Horizon.Ledgers.retrieve(27147222)
+Stellar.Horizon.Ledgers.retrieve(Stellar.Horizon.Server.testnet(), 27147222)
 
 # list ledgers
-Stellar.Horizon.Ledgers.all(limit: 10, order: :asc)
+Stellar.Horizon.Ledgers.all(Stellar.Horizon.Server.testnet(), limit: 10, order: :asc)
 
 # list ledger's transactions
-Stellar.Horizon.Ledgers.list_transactions(27147222, limit: 20)
+Stellar.Horizon.Ledgers.list_transactions(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
 
 # list ledger's operations
-Stellar.Horizon.Ledgers.list_operations(27147222, join: "transactions")
+Stellar.Horizon.Ledgers.list_operations(Stellar.Horizon.Server.testnet(), 27147222, join: "transactions")
 
 # list ledger's payments including failed transactions
-Stellar.Horizon.Ledgers.list_payments(27147222, include_failed: true)
+Stellar.Horizon.Ledgers.list_payments(Stellar.Horizon.Server.testnet(), 27147222, include_failed: true)
 
 # list ledger's effects
-Stellar.Horizon.Ledgers.list_effects(27147222, limit: 20)
+Stellar.Horizon.Ledgers.list_effects(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
 ```
 
 See [**Stellar.Horizon.Ledgers**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Ledgers.html#content) for more details.
@@ -624,16 +693,24 @@ See [**Stellar.Horizon.Ledgers**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon
 ### Offers
 ```elixir
 # list offers
-Stellar.Horizon.Offers.all(limit: 20, order: :asc)
+Stellar.Horizon.Offers.all(Stellar.Horizon.Server.testnet(), limit: 20, order: :asc)
 
 # list offers by sponsor
-Stellar.Horizon.Offers.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.Offers.all(
+  Stellar.Horizon.Server.testnet(),
+  sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 
 # list offers by seller
-Stellar.Horizon.Offers.all(seller: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+Stellar.Horizon.Offers.all(
+  Stellar.Horizon.Server.testnet(),
+  seller: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  order: :desc
+)
 
 # list offers by selling_asset
 Stellar.Horizon.Offers.all(
+  Stellar.Horizon.Server.testnet(),
   selling_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -642,6 +719,7 @@ Stellar.Horizon.Offers.all(
 
 # list offers by buying_asset
 Stellar.Horizon.Offers.all(
+  Stellar.Horizon.Server.testnet(),
   buying_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -650,6 +728,7 @@ Stellar.Horizon.Offers.all(
 
 # list offers by selling_asset and buying_asset
 Stellar.Horizon.Trades.all(
+  Stellar.Horizon.Server.testnet(),
   selling_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -661,6 +740,7 @@ Stellar.Horizon.Trades.all(
 )
 
 Stellar.Horizon.Offers.all(
+  Stellar.Horizon.Server.testnet(),
   selling_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -669,7 +749,7 @@ Stellar.Horizon.Offers.all(
 )
 
 # list offer's trades
-Stellar.Horizon.Offers.list_trades(165563085, limit: 20)
+Stellar.Horizon.Offers.list_trades(Stellar.Horizon.Server.testnet(), 165563085, limit: 20)
 ```
 
 See [**Stellar.Horizon.Offers**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Offers.html#content) for more details.
@@ -678,13 +758,14 @@ See [**Stellar.Horizon.Offers**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.
 ### Trades
 ```elixir
 # list tardes
-Stellar.Horizon.Trades.all(limit: 20, order: :asc)
+Stellar.Horizon.Trades.all(Stellar.Horizon.Server.testnet(), limit: 20, order: :asc)
 
 # list trades by offer_id
-Stellar.Horizon.Trades.all(offer_id: 165563085)
+Stellar.Horizon.Trades.all(Stellar.Horizon.Server.testnet(), offer_id: 165563085)
 
 # list trades by specific orderbook
 Stellar.Horizon.Trades.all(
+  Stellar.Horizon.Server.testnet(),
   base_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -696,7 +777,8 @@ Stellar.Horizon.Trades.all(
 )
 
 Stellar.Horizon.Trades.all(
-    base_asset: [
+  Stellar.Horizon.Server.testnet(),
+  base_asset: [
     code: "TEST",
     issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
   ],
@@ -704,7 +786,7 @@ Stellar.Horizon.Trades.all(
 )
 
 # list trades by trade_type
-Stellar.Horizon.Trades.all(trade_type: "liquidity_pools", limit: 20)
+Stellar.Horizon.Trades.all(Stellar.Horizon.Server.testnet(), trade_type: "liquidity_pools", limit: 20)
 ```
 
 See [**Stellar.Horizon.Trades**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Trades.html#content) for more details.
@@ -713,31 +795,66 @@ See [**Stellar.Horizon.Trades**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.
 ### ClaimableBalances
 ```elixir
 # retrieve a claimable balance
-Stellar.Horizon.ClaimableBalances.retrieve("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695")
+Stellar.Horizon.ClaimableBalances.retrieve(
+  Stellar.Horizon.Server.testnet(),
+  "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695"
+)
 
 # list claimable balances
-Stellar.Horizon.ClaimableBalances.all(limit: 2, order: :asc)
+Stellar.Horizon.ClaimableBalances.all(Stellar.Horizon.Server.testnet(), limit: 2, order: :asc)
 
 # list claimable balances by sponsor
-Stellar.Horizon.ClaimableBalances.list_by_sponsor("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
-Stellar.Horizon.ClaimableBalances.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+Stellar.Horizon.ClaimableBalances.list_by_sponsor(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
+Stellar.Horizon.ClaimableBalances.all(
+  Stellar.Horizon.Server.testnet(),
+  sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
 
 # list claimable balances by claimant
-Stellar.Horizon.ClaimableBalances.list_by_claimant("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
-Stellar.Horizon.ClaimableBalances.all(claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+Stellar.Horizon.ClaimableBalances.list_by_claimant(
+  Stellar.Horizon.Server.testnet(),
+  "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
+Stellar.Horizon.ClaimableBalances.all(
+  Stellar.Horizon.Server.testnet(),
+  claimant: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  order: :desc
+)
 
 # list claimable balances by canonical asset address
-Stellar.Horizon.ClaimableBalances.list_by_asset("TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
-Stellar.Horizon.ClaimableBalances.all(asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+Stellar.Horizon.ClaimableBalances.list_by_asset(
+  Stellar.Horizon.Server.testnet(),
+  "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
+)
+Stellar.Horizon.ClaimableBalances.all(
+  Stellar.Horizon.Server.testnet(),
+  asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  limit: 20
+)
 
 # list claimable balance's transactions
-Stellar.Horizon.ClaimableBalances.list_transactions("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
+Stellar.Horizon.ClaimableBalances.list_transactions(
+  Stellar.Horizon.Server.testnet(),
+  "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695",
+  limit: 20
+)
 
 # list claimable balance's operations
-Stellar.Horizon.ClaimableBalances.list_operations("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", limit: 20)
+Stellar.Horizon.ClaimableBalances.list_operations(
+  Stellar.Horizon.Server.testnet(),
+  "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695",
+  limit: 20
+)
 
 # join transactions in the operations response
-Stellar.Horizon.ClaimableBalances.list_operations("00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695", join: "transactions")
+Stellar.Horizon.ClaimableBalances.list_operations(
+  Stellar.Horizon.Server.testnet(),
+  "00000000ca6aba5fb0993844e0076f75bee53f2b8014be29cd8f2e6ae19fb0a17fc68695",
+  join: "transactions"
+)
 ```
 
 See [**Stellar.Horizon.Balances**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.ClaimableBalances.html#content) for more details.
@@ -746,28 +863,54 @@ See [**Stellar.Horizon.Balances**](https://hexdocs.pm/stellar_sdk/Stellar.Horizo
 ### LiquidityPools
 ```elixir
 # retrieve a liquidity pool
-Stellar.Horizon.LiquidityPools.retrieve("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc")
+Stellar.Horizon.LiquidityPools.retrieve(
+  Stellar.Horizon.Server.testnet(),
+  "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc"
+)
 
 # list liquidity pools
-Stellar.Horizon.LiquidityPools.all(limit: 2, order: :asc)
+Stellar.Horizon.LiquidityPools.all(Stellar.Horizon.Server.testnet(), limit: 2, order: :asc)
 
 # list liquidity pools by reserves
-Stellar.Horizon.LiquidityPools.all(reserves: "TEST:GCXMW..., TEST2:GCXMW...")
+Stellar.Horizon.LiquidityPools.all(
+  Stellar.Horizon.Server.testnet(),
+  reserves: "TEST:GCXMW..., TEST2:GCXMW..."
+)
 
 # list liquidity pools by account
-Stellar.Horizon.LiquidityPools.all(account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+Stellar.Horizon.LiquidityPools.all(
+  Stellar.Horizon.Server.testnet(),
+  account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
+  order: :desc
+)
 
 # list liquidity pool's effects
-Stellar.Horizon.LiquidityPools.list_effects("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+Stellar.Horizon.LiquidityPools.list_effects(
+  Stellar.Horizon.Server.testnet(),
+  "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc",
+  limit: 20
+)
 
 # list liquidity pool's trades
-Stellar.Horizon.LiquidityPools.list_trades("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+Stellar.Horizon.LiquidityPools.list_trades(
+  Stellar.Horizon.Server.testnet(),
+  "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc",
+  limit: 20
+)
 
 # list liquidity pool's transactions
-Stellar.Horizon.LiquidityPools.list_transactions("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+Stellar.Horizon.LiquidityPools.list_transactions(
+  Stellar.Horizon.Server.testnet(),
+  "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc",
+  limit: 20
+)
 
 # list liquidity pool's operations
-Stellar.Horizon.LiquidityPools.list_operations("001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc", limit: 20)
+Stellar.Horizon.LiquidityPools.list_operations(
+  Stellar.Horizon.Server.testnet(),
+  "001365fc79ca661f31ba3ee0849ae4ba36f5c377243242d37fad5b1bb8912dbc",
+  limit: 20
+)
 ```
 
 See [**Stellar.Horizon.Pools**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.LiquidityPools.html#content) for more details.
@@ -776,7 +919,11 @@ See [**Stellar.Horizon.Pools**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.L
 ### Effects
 ```elixir
 # list effects
-Stellar.Horizon.Effects.all(limit: 10, order: :asc)
+Stellar.Horizon.Effects.all(
+  Stellar.Horizon.Server.testnet(),
+  limit: 10,
+  order: :asc
+)
 ```
 
 See [**Stellar.Horizon.Effects**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon.Effects.html#content) for more details.
@@ -784,7 +931,7 @@ See [**Stellar.Horizon.Effects**](https://hexdocs.pm/stellar_sdk/Stellar.Horizon
 ### FeeStats
 ```elixir
 # retrieve fee stats
-Stellar.Horizon.FeeStats.retrieve()
+Stellar.Horizon.FeeStats.retrieve(Stellar.Horizon.Server.testnet())
 ```
 
 See [**Stellar.Horizon.FeeStats**](https://developers.stellar.org/api/aggregations/fee-stats/single/) for more details.
@@ -799,7 +946,12 @@ This will return information about potential path payments:
 - [Optional] destination_account. The Stellar address of the reciever.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C", destination_asset: :native, destination_amount: 5)
+Stellar.Horizon.PaymentPaths.list_paths(
+  Stellar.Horizon.Server.testnet(),
+  source_account: "GBRSLTT74SKP62KJ7ENTMP5V4R7UGB6E5UQESNIIRWUNRCCUO4ZMFM4C",
+  destination_asset: :native,
+  destination_amount: 5
+)
 ```
 
 #### List strict receive payment paths
@@ -809,7 +961,12 @@ Stellar.Horizon.PaymentPaths.list_paths(source_account: "GBRSLTT74SKP62KJ7ENTMP5
 - [Optional] source_assets. A comma-separated list of assets available to the sender.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset: :native, destination_amount: 5, source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO")
+Stellar.Horizon.PaymentPaths.list_receive_paths(
+  Stellar.Horizon.Server.testnet(),
+  destination_asset: :native,
+  destination_amount: 5,
+  source_account: "GBTKSXOTFMC5HR25SNL76MOVQW7GA3F6CQEY622ASLUV4VMLITI6TCOO"
+)
 ```
 
 #### List strict send payment paths
@@ -819,7 +976,12 @@ Stellar.Horizon.PaymentPaths.list_receive_paths(destination_asset: :native, dest
 - [Optional] destination_assets. A comma-separated list of assets that the recipient can receive.
 
 ```elixir
-Stellar.Horizon.PaymentPaths.list_send_paths(source_asset: :native, source_amount: 5, destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ")
+Stellar.Horizon.PaymentPaths.list_send_paths(
+  Stellar.Horizon.Server.testnet(),
+  source_asset: :native,
+  source_amount: 5,
+  destination_assets: "TEST:GA654JC6QLA3ZH4O5V7X5NPM7KEWHKRG5GJA4PETK4SOFBUJLCCN74KQ"
+)
 ```
 
 See [**Stellar.Horizon.Paths**](https://developers.stellar.org/api/aggregations/paths/) for more details.
@@ -833,14 +995,21 @@ Provides an order book’s bids and asks:
 - [Optional] limit. The maximum number of records returned
 
 ```elixir
-Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native, buying_asset: :native)
-Stellar.Horizon.OrderBooks.retrieve(selling_asset: :native,
-                                    buying_asset: [
-                                      code: "BB1",
-                                      issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
-                                    ],
-                                    limit: 2
-                                    )
+Stellar.Horizon.OrderBooks.retrieve(
+  Stellar.Horizon.Server.testnet(),
+  selling_asset: :native,
+  buying_asset: :native
+)
+
+Stellar.Horizon.OrderBooks.retrieve(
+  Stellar.Horizon.Server.testnet(),
+  selling_asset: :native,
+  buying_asset: [
+    code: "BB1",
+    issuer: "GD5J6HLF5666X4AZLTFTXLY46J5SW7EXRKBLEYPJP33S33MXZGV6CWFN"
+  ],
+  limit: 2
+)
 ```
 
 See [**Stellar.Horizon.OrderBooks**](https://developers.stellar.org/api/aggregations/order-books/) for more details.
@@ -859,17 +1028,24 @@ Displays trade data based on filters set in the arguments:
 - [Optional] limit. The maximum number of records returned.
 
 ```elixir
-Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native, counter_asset: :native, resolution: "60000")
-Stellar.Horizon.TradeAggregations.list_trade_aggregations(base_asset: :native,
-                                                         counter_asset: [
-                                                           code: "EURT",
-                                                           issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
-                                                         ],
-                                                         resolution: "3600000",
-                                                         start_time: "1582156800000",
-                                                         end_time: "1582178400000"
-                                                        )
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(
+  Stellar.Horizon.Server.testnet(),
+  base_asset: :native,
+  counter_asset: :native,
+  resolution: "60000"
+)
 
+Stellar.Horizon.TradeAggregations.list_trade_aggregations(
+  Stellar.Horizon.Server.testnet(),
+  base_asset: :native,
+  counter_asset: [
+    code: "EURT",
+    issuer: "GAP5LETOV6YIE62YAM56STDANPRDO7ZFDBGSNHJQIYGGKSMOZAHOOS2S"
+  ],
+  resolution: "3600000",
+  start_time: "1582156800000",
+  end_time: "1582178400000"
+)
 ```
 
 See [**Stellar.Horizon.TradeAggregations**](https://developers.stellar.org/api/aggregations/trade-aggregations/) for more details.
