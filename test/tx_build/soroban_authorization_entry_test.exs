@@ -180,7 +180,12 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
         }
       },
       root_invocation: ^root_invocation
-    } = SorobanAuthorizationEntry.sign(soroban_auth_entry_with_address_credentials, secret_key, network_passphrase)
+    } =
+      SorobanAuthorizationEntry.sign(
+        soroban_auth_entry_with_address_credentials,
+        secret_key,
+        network_passphrase
+      )
   end
 
   test "sign/2 invalid secret_key", %{
@@ -197,7 +202,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntryTest do
     network_passphrase: network_passphrase,
     sign_xdr: sign_xdr
   } do
-    ^sign_xdr = SorobanAuthorizationEntry.sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
+    ^sign_xdr =
+      SorobanAuthorizationEntry.sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
   end
 
   test "sign_xdr/3 invalid secret_key", %{base_64: base_64, latest_ledger: latest_ledger} do

@@ -249,7 +249,9 @@ defmodule Stellar.TxBuild.Default do
 
   @impl true
   def sign_envelope(tx_base64, [], _network_passphrase), do: tx_base64
-  def sign_envelope({:ok, tx_base64}, signatures, network_passphrase), do: sign_envelope(tx_base64, signatures, network_passphrase)
+
+  def sign_envelope({:ok, tx_base64}, signatures, network_passphrase),
+    do: sign_envelope(tx_base64, signatures, network_passphrase)
 
   def sign_envelope(tx_base64, [%Signature{} = signature | signatures], network_passphrase) do
     tx_base64

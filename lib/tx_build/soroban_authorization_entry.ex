@@ -74,7 +74,11 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
   def to_xdr(_struct), do: {:error, :invalid_struct}
 
-  @spec sign(credentials :: t(), secret_key :: secret_key()) :: t() | error()
+  @spec sign(
+          credentials :: t(),
+          secret_key :: secret_key(),
+          network_passphrase :: network_passphrase()
+        ) :: t() | error()
   def sign(
         %__MODULE__{
           credentials: %SorobanCredentials{
@@ -131,7 +135,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
     %{credentials | credentials: soroban_address_credentials}
   end
 
-  def sign(_args, _secret_key), do: {:error, :invalid_sign_args}
+  def sign(_args, _secret_key, _network_passphrase), do: {:error, :invalid_sign_args}
 
   @spec sign_xdr(
           base_64 :: base_64(),
@@ -140,7 +144,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
           network_passphrase :: network_passphrase()
         ) :: sign_authorization() | error()
   def sign_xdr(base_64, secret_key, latest_ledger, network_passphrase)
-      when is_binary(base_64) and is_binary(secret_key) and is_integer(latest_ledger) and is_binary(network_passphrase) do
+      when is_binary(base_64) and is_binary(secret_key) and is_integer(latest_ledger) and
+             is_binary(network_passphrase) do
     {%SorobanAuthorizationEntry{
        credentials:
          %{
@@ -182,7 +187,8 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
     |> Base.encode64()
   end
 
-  def sign_xdr(_base_64, _secret_key, _latest_ledger), do: {:error, :invalid_sign_args}
+  def sign_xdr(_base_64, _secret_key, _latest_ledger, _network_passphrase),
+    do: {:error, :invalid_sign_args}
 
   @spec hash(data :: binary()) :: binary()
   defp hash(data), do: :crypto.hash(:sha256, data)
@@ -209,7 +215,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
          signature_expiration_ledger,
          root_invocation,
          secret_key,
-          network_passphrase
+         network_passphrase
        ) do
     {public_key, _secret_key} = KeyPair.from_secret_seed(secret_key)
     raw_public_key = KeyPair.raw_public_key(public_key)

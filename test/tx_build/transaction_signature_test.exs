@@ -55,7 +55,13 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
     signature2 = Signature.new(keypair2)
 
     network_passphrase = Network.testnet_passphrase()
-    tx_envelope = TransactionEnvelope.new(tx: tx, signatures: [signature], network_passphrase: network_passphrase)
+
+    tx_envelope =
+      TransactionEnvelope.new(
+        tx: tx,
+        signatures: [signature],
+        network_passphrase: network_passphrase
+      )
 
     %{
       tx: tx,
@@ -68,7 +74,12 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
     }
   end
 
-  test "sign/3", %{tx: tx, signatures: signatures, decorated_signature: decorated_signature, network_passphrase: network_passphrase} do
+  test "sign/3", %{
+    tx: tx,
+    signatures: signatures,
+    decorated_signature: decorated_signature,
+    network_passphrase: network_passphrase
+  } do
     %DecoratedSignatures{signatures: [^decorated_signature | _signatures]} =
       TransactionSignature.sign(tx, signatures, network_passphrase)
   end
