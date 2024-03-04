@@ -13,7 +13,7 @@ permissions:
 jobs:
   tests:
     name: Run tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         otp: ['22.3', '23.3']
@@ -59,7 +59,7 @@ jobs:
 
   finish:
     needs: tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
