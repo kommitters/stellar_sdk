@@ -69,9 +69,8 @@ defmodule Stellar.TxBuild.Default do
   def new(_source_account, _opts), do: {:error, :invalid_source_account}
 
   @impl true
-  def set_network_passphrase({:ok, %TxBuild{} = tx_build}, network_passphrase) do
-    {:ok, %{tx_build | network_passphrase: network_passphrase}}
-  end
+  def set_network_passphrase({:ok, %TxBuild{} = tx_build}, network_passphrase),
+    do: {:ok, %{tx_build | network_passphrase: network_passphrase}}
 
   @impl true
   def add_memo({:ok, %TxBuild{tx: tx} = tx_build}, %Memo{} = memo) do
