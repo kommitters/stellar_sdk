@@ -57,7 +57,7 @@ defmodule Stellar.MixProject do
   defp package do
     [
       description: description(),
-      files: ["lib", "config", "mix.exs", "README*", "LICENSE"],
+      files: ["lib", "mix.exs", "README*", "LICENSE"],
       licenses: ["MIT"],
       links: %{
         "Changelog" => "#{@github_url}/blob/master/CHANGELOG.md",
