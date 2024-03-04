@@ -12,7 +12,7 @@ We want to make it as easy as possible to contribute changes that help the [Stel
 * Fork the repository on GitHub.
 * Try to keep your local repository in a "rebased" state.
 * Set the project up.
-  * Install any Elixir version above 1.10.
+  * Install any Elixir version above 1.12.
   * Compile dependencies: `mix deps.get`.
   * Run tests: `mix test`.
 
