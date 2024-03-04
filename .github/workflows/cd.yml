@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         otp: ['23.3']
-        elixir: ['1.11']
+        elixir: ['1.12']
     env:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
     steps:
@@ -26,7 +26,9 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             github.com:443
-            *.hex.pm:443
+            hex.pm:443
+            repo.hex.pm:443
+            builds.hex.pm:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: erlef/setup-elixir@904c511e63061a8f501ae4b081ce2c0e9cfc70ab # v1.17.4
