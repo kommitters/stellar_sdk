@@ -2,12 +2,12 @@ defmodule Stellar.TxBuild.TransactionSignature do
   @moduledoc """
   A module for tagging and signing transactions.
   """
+  alias Stellar.Network
   alias Stellar.TxBuild.{Transaction, Signature}
 
   alias StellarBase.XDR.{
     DecoratedSignatures,
     EnvelopeType,
-    Hash,
     TransactionEnvelope,
     TransactionSignaturePayload
   }
@@ -70,17 +70,10 @@ defmodule Stellar.TxBuild.TransactionSignature do
           binary()
   defp signature_payload(tagged_tx, network_passphrase) do
     network_passphrase
-    |> network_id_xdr()
+    |> Network.network_id_xdr()
     |> TransactionSignaturePayload.new(tagged_tx)
     |> TransactionSignaturePayload.encode_xdr!()
     |> hash()
-  end
-
-  @spec network_id_xdr(network_passphrase :: network_passphrase()) :: Hash.t()
-  defp network_id_xdr(network_passphrase) do
-    network_passphrase
-    |> hash()
-    |> Hash.new()
   end
 
   @spec hash(data :: binary()) :: binary()

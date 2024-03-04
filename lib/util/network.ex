@@ -3,6 +3,8 @@ defmodule Stellar.Network do
   Utility that handles Stellar's network configuration.
   """
 
+  alias StellarBase.XDR.Hash
+
   @passphrases [
     public: "Public Global Stellar Network ; September 2015",
     test: "Test SDF Network ; September 2015",
@@ -47,4 +49,11 @@ defmodule Stellar.Network do
 
   @spec network_id(passphrase :: passphrase()) :: hash()
   def network_id(passphrase), do: :crypto.hash(:sha256, passphrase)
+
+  @spec network_id_xdr(passphrase :: passphrase()) :: Hash.t()
+  def network_id_xdr(passphrase) do
+    passphrase
+    |> network_id()
+    |> Hash.new()
+  end
 end

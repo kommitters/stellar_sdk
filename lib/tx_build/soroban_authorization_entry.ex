@@ -10,7 +10,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
   alias StellarBase.XDR.SorobanAddressCredentials, as: SorobanAddressCredentialsXDR
   alias StellarBase.XDR.SorobanAuthorizedInvocation, as: SorobanAuthorizedInvocationXDR
-  alias StellarBase.XDR.{EnvelopeType, Hash, Int64, SorobanAuthorizationEntry, UInt32}
+  alias StellarBase.XDR.{EnvelopeType, Int64, SorobanAuthorizationEntry, UInt32}
   alias Stellar.{KeyPair, Network}
 
   alias Stellar.TxBuild.{
@@ -223,8 +223,7 @@ defmodule Stellar.TxBuild.SorobanAuthorizationEntry do
 
     signature =
       network_passphrase
-      |> Network.network_id()
-      |> Hash.new()
+      |> Network.network_id_xdr()
       |> HashIDPreimageSorobanAuthorizationXDR.new(
         nonce,
         signature_expiration_ledger,
