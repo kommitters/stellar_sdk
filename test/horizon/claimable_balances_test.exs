@@ -131,7 +131,8 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
     Collection,
     Error,
     Operation,
-    Transaction
+    Transaction,
+    Server
   }
 
   alias Stellar.Horizon.Operation.{CreateAccount, Payment, SetOptions}
@@ -178,7 +179,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
        last_modified_time: ~U[2020-02-26 19:29:16Z],
        paging_token: "00000000929b20b72e5890ab51c24f1cc46fa01c4f318d8d33367d24dd614cfdf5491072",
        sponsor: nil
-     }} = ClaimableBalances.retrieve(claimable_balance_id)
+     }} = ClaimableBalances.retrieve(Server.testnet(), claimable_balance_id)
   end
 
   test "all/1" do
@@ -235,7 +236,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
            sponsor: "GB3A3CK64CZDZ63FZTVI3OKK7ZCD75YQCPA2EKHPDFD6ABKEQ3ESTWVV"
          }
        ]
-     }} = ClaimableBalances.all()
+     }} = ClaimableBalances.all(Server.testnet())
   end
 
   test "list_by_sponsor/2" do
@@ -247,6 +248,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
        ]
      }} =
       ClaimableBalances.list_by_sponsor(
+        Server.testnet(),
         "GBXISGJYYKE6RUO6L6KXBUJ7FJU4CWF647FLQAT3TZ2Q47IZHXFNYKYH"
       )
   end
@@ -262,6 +264,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
        ]
      }} =
       ClaimableBalances.list_by_claimant(
+        Server.testnet(),
         "GATBAGTTQLQ4VKZMXLINLS6M4F2PEXMAZCK5ZE5ES4B6A2DXNGCFRX54"
       )
   end
@@ -275,6 +278,7 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
        ]
      }} =
       ClaimableBalances.list_by_asset(
+        Server.testnet(),
         "BTCN:GDGHQTCJ3SGFBWBHJGVRUFBRLZGS5VS52HEDH4GVPX5GZRJQAOW7ZM37"
       )
   end
@@ -296,7 +300,11 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
            ledger: 7855
          }
        ]
-     }} = ClaimableBalances.list_transactions(claimable_balance_id, limit: 3, order: :asc)
+     }} =
+      ClaimableBalances.list_transactions(Server.testnet(), claimable_balance_id,
+        limit: 3,
+        order: :asc
+      )
   end
 
   test "list_operations/1", %{claimable_balance_id: claimable_balance_id} do
@@ -319,18 +327,22 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
            type_i: 0
          }
        ]
-     }} = ClaimableBalances.list_operations(claimable_balance_id, limit: 3, order: :desc)
+     }} =
+      ClaimableBalances.list_operations(Server.testnet(), claimable_balance_id,
+        limit: 3,
+        order: :desc
+      )
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = ClaimableBalances.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = ClaimableBalances.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = ClaimableBalances.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = ClaimableBalances.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -343,6 +355,6 @@ defmodule Stellar.Horizon.ClaimableBalancesTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = ClaimableBalances.retrieve("not_found")
+     }} = ClaimableBalances.retrieve(Server.testnet(), "not_found")
   end
 end

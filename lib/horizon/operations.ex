@@ -11,12 +11,13 @@ defmodule Stellar.Horizon.Operations do
   Horizon API reference: https://developers.stellar.org/api/resources/operations/
   """
 
-  alias Stellar.Horizon.{Collection, Effect, Error, Operation, Request}
+  alias Stellar.Horizon.{Collection, Effect, Error, Operation, Request, Server}
 
   @type operation_id :: String.t()
   @type options :: Keyword.t()
   @type resource :: Operation.t() | Collection.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
+  @type server :: Server.t()
 
   @endpoint "operations"
   @payments_endpoint "payments"
@@ -25,17 +26,19 @@ defmodule Stellar.Horizon.Operations do
   Retrieves information of a specific operation.
 
   ## Parameters:
+    * `server`: The Horizon server to query.
     * `operation_id`: The ID number for the operation.
 
   ## Examples
 
-      iex> Operations.retrieve(121693057904021505)
+      iex> Operations.retrieve(Stellar.Horizon.Server.testnet(), 121693057904021505)
       {:ok, %Operation{}}
   """
-  @spec retrieve(operation_id :: operation_id(), options :: options()) :: response()
-  def retrieve(operation_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: operation_id)
+  @spec retrieve(server :: server(), operation_id :: operation_id(), options :: options()) ::
+          response()
+  def retrieve(server, operation_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: operation_id)
     |> Request.add_query(options, extra_params: [:join])
     |> Request.perform()
     |> Request.results(as: Operation)
@@ -44,6 +47,9 @@ defmodule Stellar.Horizon.Operations do
   @doc """
   Lists all successful operations.
 
+  ## Parameters:
+    * `server`: The Horizon server to query.
+
   ## Options
 
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
@@ -54,29 +60,32 @@ defmodule Stellar.Horizon.Operations do
 
   ## Examples
 
-      iex> Operations.all(limit: 10, order: :asc)
+      iex> Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, order: :asc)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # include failed
-      iex> Operations.all(limit: 10, include_failed: true)
+      iex> Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, include_failed: true)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # join transactions
-      iex> Operations.all(limit: 10, join: "transactions")
+      iex> Operations.all(Stellar.Horizon.Server.testnet(), limit: 10, join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &all/1})
+    |> Request.results(collection: {Operation, &all(server, &1)})
   end
 
   @doc """
   Lists successful payment-related operations.
 
+  ## Parameters
+    * `server`: The Horizon server to query.
+
   ## Options
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
     * `order`: A designation of the order in which records should appear. Options include `asc` (ascending) or `desc` (descending).
@@ -86,22 +95,23 @@ defmodule Stellar.Horizon.Operations do
 
   ## Examples
 
-      iex> Operations.list_payments(limit: 20)
+      iex> Operations.list_payments(Stellar.Horizon.Server.testnet(), limit: 20)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
   """
-  @spec list_payments(options :: options()) :: response()
-  def list_payments(options \\ []) do
-    :get
-    |> Request.new(@payments_endpoint)
+  @spec list_payments(server :: server(), options :: options()) :: response()
+  def list_payments(server, options \\ []) do
+    server
+    |> Request.new(:get, @payments_endpoint)
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_payments/1})
+    |> Request.results(collection: {Operation, &list_payments(server, &1)})
   end
 
   @doc """
   Lists the effects of a specific operation.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `operation_id`: The ID number for the operation.
 
   ## Options
@@ -111,15 +121,16 @@ defmodule Stellar.Horizon.Operations do
 
   ## Examples
 
-      iex> Operations.list_effects(121693057904021505, limit: 20)
+      iex> Operations.list_effects(Stellar.Horizon.Server.testnet(), 121693057904021505, limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(operation_id :: operation_id(), options :: options()) :: response()
-  def list_effects(operation_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: operation_id, segment: "effects")
+  @spec list_effects(server :: server(), operation_id :: operation_id(), options :: options()) ::
+          response()
+  def list_effects(server, operation_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: operation_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Effect, &list_effects(operation_id, &1)})
+    |> Request.results(collection: {Effect, &list_effects(server, operation_id, &1)})
   end
 end

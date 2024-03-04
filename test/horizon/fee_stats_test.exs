@@ -21,7 +21,7 @@ defmodule Stellar.Horizon.FeeStatsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedFeeStatRequests
-  alias Stellar.Horizon.{FeeStat, FeeStats}
+  alias Stellar.Horizon.{FeeStat, FeeStats, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedFeeStatRequests)
@@ -69,6 +69,6 @@ defmodule Stellar.Horizon.FeeStatsTest do
          p95: "100",
          p99: "100"
        }
-     }} = FeeStats.retrieve()
+     }} = FeeStats.retrieve(Server.testnet())
   end
 end

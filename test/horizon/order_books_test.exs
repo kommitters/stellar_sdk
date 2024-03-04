@@ -33,7 +33,7 @@ defmodule Stellar.Horizon.OrderBooksTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedOrderBooksRequests
-  alias Stellar.Horizon.{OrderBooks, OrderBook, Error}
+  alias Stellar.Horizon.{OrderBooks, OrderBook, Error, Server}
   alias Stellar.Horizon.OrderBook.Price
 
   setup do
@@ -92,6 +92,7 @@ defmodule Stellar.Horizon.OrderBooksTest do
        }
      }} =
       OrderBooks.retrieve(
+        Server.testnet(),
         selling_asset: selling_asset,
         buying_asset: buying_asset,
         limit: limit
@@ -104,6 +105,6 @@ defmodule Stellar.Horizon.OrderBooksTest do
        status_code: 400,
        title: "Invalid Order Book Parameters",
        type: "https://stellar.org/horizon-errors/invalid_order_book"
-     }} = OrderBooks.retrieve(buying_asset: :error)
+     }} = OrderBooks.retrieve(Server.testnet(), buying_asset: :error)
   end
 end

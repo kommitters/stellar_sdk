@@ -68,7 +68,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedPathRequests
-  alias Stellar.Horizon.{Path, Paths, PaymentPaths, Error}
+  alias Stellar.Horizon.{Path, Paths, PaymentPaths, Error, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedPathRequests)
@@ -111,6 +111,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        ]
      }} =
       PaymentPaths.list_paths(
+        Server.testnet(),
         source_account: source_account,
         destination_asset: destination_asset,
         destination_amount: destination_amount
@@ -138,6 +139,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        ]
      }} =
       PaymentPaths.list_receive_paths(
+        Server.testnet(),
         destination_asset: destination_asset,
         destination_amount: destination_amount,
         source_account: source_account
@@ -177,6 +179,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        ]
      }} =
       PaymentPaths.list_send_paths(
+        Server.testnet(),
         source_asset: source_asset,
         source_amount: source_amount,
         destination_assets: destination_assets
@@ -190,7 +193,7 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        extras: %{invalid_field: "destination_asset_type", reason: "Missing required field"},
        status_code: 400,
        title: "Bad Request"
-     }} = PaymentPaths.list_receive_paths(destination_amount: "error")
+     }} = PaymentPaths.list_receive_paths(Server.testnet(), destination_amount: "error")
   end
 
   test "list strict send error" do
@@ -200,6 +203,6 @@ defmodule Stellar.Horizon.PaymentPathsTest do
        extras: %{invalid_field: "source_asset_type", reason: "Missing required field"},
        status_code: 400,
        title: "Bad Request"
-     }} = PaymentPaths.list_send_paths(source_amount: "error")
+     }} = PaymentPaths.list_send_paths(Server.testnet(), source_amount: "error")
   end
 end

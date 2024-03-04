@@ -69,7 +69,8 @@ So here, you use the `Stellar.TxBuild.SetOptions` operation to set the signer an
 source_account = Stellar.TxBuild.Account.new(payer_pk)
 
 # 2. set the next sequence number for the source account
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(payer_pk)
+server = Stellar.Horizon.Server.testnet()
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(server, payer_pk)
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # 3. build the set_options operation setting the ed25519 signed payload as a signer with weight 1
@@ -92,7 +93,7 @@ signature = Stellar.TxBuild.Signature.new(ed25519: payer_sk)
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
 
-{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(envelope)
+{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(server, envelope)
 ```
 
 ### 4. Send a payment using the Ed25519 Signed Payload signature
@@ -104,7 +105,8 @@ Once you have established the signer, you can use the `payload` and the secret k
 source_account = Stellar.TxBuild.Account.new(payer_pk)
 
 # 2. set the next sequence number for the founder account
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(payer_pk)
+server = Stellar.Horizon.Server.testnet()
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(server, payer_pk)
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # 3. build the payment operation
@@ -127,7 +129,7 @@ signature = Stellar.TxBuild.Signature.new(signed_payload: [payload: payload, ed2
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
 
-{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(envelope)
+{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(server, envelope)
 ```
 
 > 👍 That's it!

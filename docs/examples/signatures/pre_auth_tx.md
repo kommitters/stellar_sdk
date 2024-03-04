@@ -37,7 +37,8 @@ In order to create a pre-authorized transaction, you need to create a future tra
 source_account = Stellar.TxBuild.Account.new(public_key)
 
 # 2. set the next sequence number + 1 for the source account
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(pk1)
+server = Stellar.Horizon.Server.testnet()
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(server, pk1)
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num + 1)
 
 # 3. build the payment operation
@@ -97,7 +98,7 @@ signature = Stellar.TxBuild.Signature.new(ed25519: secret_key)
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
 
-{:ok, submitted_set_options_tx} = Stellar.Horizon.Transactions.create(set_options_tx_envelope)
+{:ok, submitted_set_options_tx} = Stellar.Horizon.Transactions.create(server, set_options_tx_envelope)
 ```
 
 ### 4. Submit the payment transaction
@@ -109,7 +110,7 @@ Since it was added as a signer, it is already pre-authorized and don't need to b
 You only need to submit the transaction envelope to the network. ✅
 
 ```elixir
-{:ok, submitted_payment_tx} = Stellar.Horizon.Transactions.create(payment_tx_envelope)
+{:ok, submitted_payment_tx} = Stellar.Horizon.Transactions.create(server, payment_tx_envelope)
 ```
 
 Once this is submitted, the transaction will be removed from the account as a signer.

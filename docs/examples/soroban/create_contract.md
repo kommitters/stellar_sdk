@@ -52,7 +52,7 @@ keypair =
 
 source_account = Account.new(public_key)
 
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(public_key)
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(Stellar.Horizon.Server.testnet(), public_key)
 sequence_number = SequenceNumber.new(seq_num)
 
 signature =
@@ -126,7 +126,7 @@ invoke_host_function_op = InvokeHostFunction.new(host_function: host_function)
 
 source_account = Account.new(public_key)
 
-{:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
+{:ok, seq_num} = Accounts.fetch_next_sequence_number(Stellar.Horizon.Server.testnet(), public_key)
 sequence_number = SequenceNumber.new(seq_num)
 
 signature = Signature.new(keypair)

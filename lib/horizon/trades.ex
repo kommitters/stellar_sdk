@@ -8,8 +8,9 @@ defmodule Stellar.Horizon.Trades do
   Horizon API reference: https://developers.stellar.org/api/resources/trades/
   """
 
-  alias Stellar.Horizon.{Collection, Error, Request, Trade, RequestParams}
+  alias Stellar.Horizon.{Collection, Error, Request, Trade, RequestParams, Server}
 
+  @type server :: Server.t()
   @type options :: Keyword.t()
   @type resource :: Trade.t() | Collection.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
@@ -31,15 +32,16 @@ defmodule Stellar.Horizon.Trades do
 
   ## Examples
 
-      iex> Trades.all(limit: 20, order: :asc)
+      iex> Trades.all(Stellar.Horizon.Server.testnet(), limit: 20, order: :asc)
       {:ok, %Collection{records: [%Trade{}, ...]}}
 
       # list by offer_id
-      iex> Trades.all(offer_id: 165563085)
+      iex> Trades.all(Stellar.Horizon.Server.testnet(), offer_id: 165563085)
       {:ok, %Collection{records: [%Trade{}, ...]}}
 
       # list by specific orderbook
       iex> Trades.all(
+        Stellar.Horizon.Server.testnet(),
         base_asset: [
           code: "TEST",
           issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
@@ -50,11 +52,11 @@ defmodule Stellar.Horizon.Trades do
       {:ok, %Collection{records: [%Trade{}, ...]}}
 
       # list by trade_type
-      iex> Trades.all(trade_type: "liquidity_pools", limit: 20)
+      iex> Trades.all(Stellar.Horizon.Server.testnet(), trade_type: "liquidity_pools", limit: 20)
       {:ok, %Collection{records: [%Trade{}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
     base_asset = RequestParams.build_assets_params(options, :base_asset)
     counter_asset = RequestParams.build_assets_params(options, :counter_asset)
 
@@ -63,11 +65,11 @@ defmodule Stellar.Horizon.Trades do
       |> Keyword.merge(base_asset)
       |> Keyword.merge(counter_asset)
 
-    :get
-    |> Request.new(@endpoint)
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(params, extra_params: allowed_query_options())
     |> Request.perform()
-    |> Request.results(collection: {Trade, &all/1})
+    |> Request.results(collection: {Trade, &all(server, &1)})
   end
 
   @spec allowed_query_options() :: list()

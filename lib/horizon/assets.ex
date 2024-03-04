@@ -10,8 +10,9 @@ defmodule Stellar.Horizon.Assets do
   Horizon API reference: https://developers.stellar.org/api/resources/assets/
   """
 
-  alias Stellar.Horizon.{Asset, Collection, Error, Request}
+  alias Stellar.Horizon.{Asset, Collection, Error, Request, Server}
 
+  @type server :: Server.t()
   @type asset_code :: String.t()
   @type asset_issuer :: String.t()
   @type options :: Keyword.t()
@@ -23,6 +24,9 @@ defmodule Stellar.Horizon.Assets do
   @doc """
   Lists all assets or by one of these filters: `asset_code` or `asset_issuer`.
 
+  ## Parameters
+    * `server`: The Horizon server to query.
+
   ## Options
 
     * `asset_code`: The code of the asset you would like to filter by.
@@ -33,31 +37,31 @@ defmodule Stellar.Horizon.Assets do
 
   ## Examples
 
-      iex> Assets.all(limit: 20, order: :desc)
+      iex> Assets.all(Stellar.Horizon.Server.testnet(), limit: 20, order: :desc)
       {:ok, %Collection{records: [%Asset{}, ...]}}
 
       # list by asset_code
-      iex> Assets.all(asset_code: "TEST")
+      iex> Assets.all(Stellar.Horizon.Server.testnet(), asset_code: "TEST")
       {:ok, %Collection{records: [%Asset{}, ...]}}
 
       # list by asset_issuer
-      iex> Assets.all(asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> Assets.all(Stellar.Horizon.Server.testnet(), asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%Asset{}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(options, extra_params: [:asset_code, :asset_issuer])
     |> Request.perform()
-    |> Request.results(collection: {Asset, &all/1})
+    |> Request.results(collection: {Asset, &all(server, &1)})
   end
 
   @doc """
   Lists assets matching the given asset code.
 
   ## Parameters:
-
+    * `server`: The Horizon server to query.
     * `asset_code`: The code of the asset you would like to filter by.
 
   ## Options
@@ -68,14 +72,15 @@ defmodule Stellar.Horizon.Assets do
 
   ## Examples
 
-      iex> Assets.list_by_asset_code("TEST")
+      iex> Assets.list_by_asset_code(Stellar.Horizon.Server.testnet(), "TEST")
       {:ok, %Collection{records: [%Asset{asset_code: "TEST"}, ...]}}
   """
-  @spec list_by_asset_code(asset_code :: asset_code(), options :: options()) :: response()
-  def list_by_asset_code(asset_code, options \\ []) do
+  @spec list_by_asset_code(server :: server(), asset_code :: asset_code(), options :: options()) ::
+          response()
+  def list_by_asset_code(server, asset_code, options \\ []) do
     options
     |> Keyword.put(:asset_code, asset_code)
-    |> all()
+    |> (&all(server, &1)).()
   end
 
   @doc """
@@ -83,6 +88,7 @@ defmodule Stellar.Horizon.Assets do
 
   ## Parameters:
 
+    * `server`: The Horizon server to query.
     * `asset_issuer`: The issuer's Account ID for the asset you would like to filter by.
 
   ## Options
@@ -93,13 +99,17 @@ defmodule Stellar.Horizon.Assets do
 
   ## Examples
 
-      iex> Assets.list_by_asset_issuer("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> Assets.list_by_asset_issuer(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%Asset{asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"}, ...]}}
   """
-  @spec list_by_asset_issuer(asset_issuer :: asset_issuer(), options :: options()) :: response()
-  def list_by_asset_issuer(asset_issuer, options \\ []) do
+  @spec list_by_asset_issuer(
+          server :: server(),
+          asset_issuer :: asset_issuer(),
+          options :: options()
+        ) :: response()
+  def list_by_asset_issuer(server, asset_issuer, options \\ []) do
     options
     |> Keyword.put(:asset_issuer, asset_issuer)
-    |> all()
+    |> (&all(server, &1)).()
   end
 end
