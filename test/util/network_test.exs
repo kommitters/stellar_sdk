@@ -2,6 +2,7 @@ defmodule Stellar.NetworkTest do
   use ExUnit.Case
 
   alias Stellar.Network
+  alias StellarBase.XDR.Hash
 
   @public_passphrase "Public Global Stellar Network ; September 2015"
   @testnet_passphrase "Test SDF Network ; September 2015"
@@ -46,6 +47,35 @@ defmodule Stellar.NetworkTest do
 
     test "local_horizon_url/0" do
       @local_horizon_url = Network.local_horizon_url()
+    end
+  end
+
+  describe "network ids" do
+    setup do
+      %{
+        public_network_id:
+          <<122, 195, 57, 151, 84, 78, 49, 117, 210, 102, 189, 2, 36, 57, 178, 44, 219, 22, 80,
+            140, 1, 22, 63, 38, 229, 203, 42, 62, 16, 69, 169, 121>>,
+        test_network_id:
+          <<206, 224, 48, 45, 89, 132, 77, 50, 189, 202, 145, 92, 130, 3, 221, 68, 179, 63, 187,
+            126, 220, 25, 5, 30, 163, 122, 190, 223, 40, 236, 212, 114>>
+      }
+    end
+
+    test "network_id/1 for public network", %{public_network_id: public_network_id} do
+      ^public_network_id = Network.network_id(@public_passphrase)
+    end
+
+    test "network_id_xdr/1 for public network", %{public_network_id: public_network_id} do
+      %Hash{value: ^public_network_id} = Network.network_id_xdr(@public_passphrase)
+    end
+
+    test "network_id/1 for test network", %{test_network_id: test_network_id} do
+      ^test_network_id = Network.network_id(@testnet_passphrase)
+    end
+
+    test "network_id_xdr/1 for test network", %{test_network_id: test_network_id} do
+      %Hash{value: ^test_network_id} = Network.network_id_xdr(@testnet_passphrase)
     end
   end
 end

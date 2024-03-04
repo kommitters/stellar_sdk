@@ -3,6 +3,8 @@ defmodule Stellar.Network do
   Utility that handles Stellar's network configuration.
   """
 
+  alias StellarBase.XDR.Hash
+
   @passphrases [
     public: "Public Global Stellar Network ; September 2015",
     test: "Test SDF Network ; September 2015",
@@ -17,36 +19,41 @@ defmodule Stellar.Network do
     local: "http://localhost:8000"
   ]
 
-  @spec public_passphrase() :: String.t()
+  @type passphrase :: String.t()
+  @type url :: String.t()
+  @type hash :: String.t()
+
+  @spec public_passphrase() :: passphrase()
   def public_passphrase, do: @passphrases[:public]
 
-  @spec testnet_passphrase() :: String.t()
+  @spec testnet_passphrase() :: passphrase()
   def testnet_passphrase, do: @passphrases[:test]
 
-  @spec futurenet_passphrase() :: String.t()
+  @spec futurenet_passphrase() :: passphrase()
   def futurenet_passphrase, do: @passphrases[:future]
 
-  @spec standalone_passphrase() :: String.t()
+  @spec standalone_passphrase() :: passphrase()
   def standalone_passphrase, do: @passphrases[:standalone]
 
-  @spec public_horizon_url() :: String.t()
+  @spec public_horizon_url() :: url()
   def public_horizon_url, do: @horizon_urls[:public]
 
-  @spec testnet_horizon_url() :: String.t()
+  @spec testnet_horizon_url() :: url()
   def testnet_horizon_url, do: @horizon_urls[:test]
 
-  @spec futurenet_horizon_url() :: String.t()
+  @spec futurenet_horizon_url() :: url()
   def futurenet_horizon_url, do: @horizon_urls[:future]
 
-  @spec local_horizon_url() :: String.t()
+  @spec local_horizon_url() :: url()
   def local_horizon_url, do: @horizon_urls[:local]
 
-  @spec passphrase() :: String.t()
-  def passphrase do
-    default = @passphrases[:test]
-    Keyword.get(@passphrases, current(), default)
-  end
+  @spec network_id(passphrase :: passphrase()) :: hash()
+  def network_id(passphrase), do: :crypto.hash(:sha256, passphrase)
 
-  @spec current() :: atom()
-  def current, do: Application.get_env(:stellar_sdk, :network, :test)
+  @spec network_id_xdr(passphrase :: passphrase()) :: Hash.t()
+  def network_id_xdr(passphrase) do
+    passphrase
+    |> network_id()
+    |> Hash.new()
+  end
 end

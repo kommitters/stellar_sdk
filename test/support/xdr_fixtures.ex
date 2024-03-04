@@ -257,11 +257,15 @@ defmodule Stellar.Test.XDRFixtures do
     )
   end
 
-  @spec transaction_envelope_xdr(tx :: Tx.t(), signatures :: list(Signature.t())) ::
+  @spec transaction_envelope_xdr(
+          tx :: Tx.t(),
+          signatures :: list(Signature.t()),
+          network_passphrase :: String.t()
+        ) ::
           TransactionEnvelope.t()
-  def transaction_envelope_xdr(tx, signatures) do
+  def transaction_envelope_xdr(tx, signatures, network_passphrase) do
     envelope_type = EnvelopeType.new(:ENVELOPE_TYPE_TX)
-    decorated_signatures = TransactionSignature.sign(tx, signatures)
+    decorated_signatures = TransactionSignature.sign(tx, signatures, network_passphrase)
 
     tx
     |> Tx.to_xdr()
