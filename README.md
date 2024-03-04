@@ -1053,7 +1053,7 @@ See [**Stellar.Horizon.TradeAggregations**](https://developers.stellar.org/api/a
 ---
 
 ## Development
-* Install any Elixir version above 1.10.
+* Install any Elixir version above 1.12.
 * Compile dependencies: `mix deps.get`.
 * Run tests: `mix test`.
 
