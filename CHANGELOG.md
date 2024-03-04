@@ -5,6 +5,7 @@
 * Add Dynamic network configuration: Now you should provide Horizon URL and Network Passphrase. See [Issue #352](https://github.com/kommitters/stellar_sdk/issues/352).
 * Update all dependencies. See [PR #332](https://github.com/kommitters/stellar_sdk/pull/332).
 * Update scorecards allowed endpoints and Security Policy. See [PR #355](https://github.com/kommitters/stellar_sdk/pull/355).
+* Delete `config` from `mix.exs` file. See [PR #358](https://github.com/kommitters/stellar_sdk/pull/358).
 
 ## 0.20.0 (20.12.2023)
 
