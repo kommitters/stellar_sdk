@@ -107,7 +107,8 @@ defmodule Stellar.Horizon.TransactionsTest do
     Transactions,
     Transaction.Preconditions,
     Transaction.TimeBounds,
-    Transaction.LedgerBounds
+    Transaction.LedgerBounds,
+    Server
   }
 
   alias Stellar.Horizon.Operation.{CreateAccount, Payment, SetOptions}
@@ -129,7 +130,7 @@ defmodule Stellar.Horizon.TransactionsTest do
 
   test "create/1", %{base64_envelope: base64_envelope, hash: hash} do
     {:ok, %Transaction{successful: true, envelope_xdr: ^base64_envelope, hash: ^hash}} =
-      Transactions.create(base64_envelope)
+      Transactions.create(Server.testnet(), base64_envelope)
   end
 
   test "retrieve/1", %{
@@ -175,7 +176,7 @@ defmodule Stellar.Horizon.TransactionsTest do
            "GCO2IP3MJNUOKS4PUDI4C7LGGMQDJGXG3COYX3WSB4HHNAHKYV5YL3VC"
          ]
        }
-     }} = Transactions.retrieve(hash)
+     }} = Transactions.retrieve(Server.testnet(), hash)
   end
 
   test "all/1" do
@@ -192,7 +193,7 @@ defmodule Stellar.Horizon.TransactionsTest do
            hash: "3ce2aca2fed36da2faea31352c76c5e412348887a4c119b1e90de8d1b937396a"
          }
        ]
-     }} = Transactions.all(limit: 3)
+     }} = Transactions.all(Server.testnet(), limit: 3)
   end
 
   test "list_effects/2", %{hash: hash} do
@@ -205,7 +206,7 @@ defmodule Stellar.Horizon.TransactionsTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = Transactions.list_effects(hash, limit: 5)
+     }} = Transactions.list_effects(Server.testnet(), hash, limit: 5)
   end
 
   test "list_operations/2", %{hash: hash, source_account: source_account} do
@@ -231,18 +232,18 @@ defmodule Stellar.Horizon.TransactionsTest do
            type_i: 0
          }
        ]
-     }} = Transactions.list_operations(hash, limit: 3, order: :desc)
+     }} = Transactions.list_operations(Server.testnet(), hash, limit: 3, order: :desc)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Transactions.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Transactions.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Transactions.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Transactions.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -254,6 +255,6 @@ defmodule Stellar.Horizon.TransactionsTest do
        status_code: 400,
        title: "Transaction Failed",
        extras: %{result_codes: %{transaction: "tx_insufficient_fee"}}
-     }} = Transactions.create("bad")
+     }} = Transactions.create(Server.testnet(), "bad")
   end
 end

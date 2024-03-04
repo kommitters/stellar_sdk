@@ -34,6 +34,7 @@ alias Stellar.TxBuild.{
 alias Stellar.Horizon.Accounts
 alias Stellar.KeyPair
 
+server = Stellar.Horizon.Server.testnet()
 contract_address = "CCNVHP2UAOJAICTQUDSRVZDCB5OJKGQNOJFPOXINELWQHGX33EG34NV2"
 contract_sc_address = SCAddress.new(contract_address)
 key = SCVal.new(ledger_key_contract_instance: nil)
@@ -67,7 +68,7 @@ soroban_data =
 |> SorobanTransactionData.to_xdr()
 
 source_account = Account.new(public_key)
-{:ok, seq_num} = Accounts.fetch_next_sequence_number(public_key)
+{:ok, seq_num} = Accounts.fetch_next_sequence_number(server, public_key)
 sequence_number = SequenceNumber.new(seq_num)
 signature = Signature.new(keypair)
 extend_footprint_ttl_op = ExtendFootprintTTL.new(extend_to: 1000)

@@ -34,6 +34,7 @@ defmodule Stellar.TxBuild.Spec do
 
   @type opts :: Keyword.t()
   @type account :: Account.t()
+  @type network_passphrase :: String.t()
   @type sequence_number :: SequenceNumber.t()
   @type memo :: Memo.t()
   @type base_fee :: BaseFee.t()
@@ -66,6 +67,7 @@ defmodule Stellar.TxBuild.Spec do
   @type tx_hash :: {:ok, hash()} | {:error, atom()}
 
   @callback new(account(), opts()) :: tx_build()
+  @callback set_network_passphrase(tx_build(), network_passphrase()) :: tx_build()
   @callback add_memo(tx_build(), memo()) :: tx_build()
   @callback set_time_bounds(tx_build(), time_bounds()) :: tx_build()
   @callback set_preconditions(tx_build(), preconditions()) :: tx_build()
@@ -77,7 +79,7 @@ defmodule Stellar.TxBuild.Spec do
   @callback sign(tx_build(), signatures()) :: tx_build()
   @callback build(tx_build()) :: tx_build()
   @callback envelope(tx_build()) :: tx_envelope()
-  @callback sign_envelope(envelope(), signatures()) :: tx_envelope()
+  @callback sign_envelope(envelope(), signatures(), network_passphrase()) :: tx_envelope()
   @callback hash(tx_build()) :: tx_hash()
 
   @optional_callbacks add_memo: 2,

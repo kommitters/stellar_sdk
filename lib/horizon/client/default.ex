@@ -7,8 +7,7 @@ defmodule Stellar.Horizon.Client.Default do
 
   @behaviour Stellar.Horizon.Client.Spec
 
-  alias Stellar.Network
-  alias Stellar.Horizon.Error
+  alias Stellar.Horizon.{Error, Server}
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}, ...]
@@ -19,8 +18,7 @@ defmodule Stellar.Horizon.Client.Default do
   @type parsed_response :: {:ok, map()} | {:error, Error.t()}
 
   @impl true
-  def request(method, path, headers \\ [], body \\ "", opts \\ []) do
-    base_url = Network.base_url()
+  def request(%Server{url: base_url}, method, path, headers \\ [], body \\ "", opts \\ []) do
     options = http_options(opts)
 
     method

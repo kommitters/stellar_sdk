@@ -63,7 +63,8 @@ Setting the signer is done via the `Stellar.TxBuild.SetOptions` operation, see t
 source_account = Stellar.TxBuild.Account.new(payer_pk)
 
 # 2. set the next sequence number for the source account
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(payer_pk)
+server = Stellar.Horizon.Server.testnet()
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(server, payer_pk)
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # 3. build the set_options operation setting the hash(x) as a signer with weight 1
@@ -80,7 +81,7 @@ signature = Stellar.TxBuild.Signature.new(ed25519: payer_sk)
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
 
-{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(envelope)
+{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(server, envelope)
 ```
 
 The transaction is submitted! Now, the `hash(x)` is a signer of the account.
@@ -96,7 +97,8 @@ Let's send a payment to the destination account!
 source_account = Stellar.TxBuild.Account.new(payer_pk)
 
 # 2. set the next sequence number for the founder account
-{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(payer_pk)
+server = Stellar.Horizon.Server.testnet()
+{:ok, seq_num} = Stellar.Horizon.Accounts.fetch_next_sequence_number(server, payer_pk)
 sequence_number = Stellar.TxBuild.SequenceNumber.new(seq_num)
 
 # 3. build the payment operation
@@ -118,7 +120,7 @@ signature = Stellar.TxBuild.Signature.new(hash_x: preimage)
   |> Stellar.TxBuild.sign(signature)
   |> Stellar.TxBuild.envelope()
 
-{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(envelope)
+{:ok, submitted_tx} = Stellar.Horizon.Transactions.create(server, envelope)
 ```
 
 > 👍 That's it!

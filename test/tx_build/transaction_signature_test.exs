@@ -1,7 +1,7 @@
 defmodule Stellar.TxBuild.TransactionSignatureTest do
   use ExUnit.Case
 
-  alias Stellar.KeyPair
+  alias Stellar.{KeyPair, Network}
 
   alias Stellar.TxBuild.{
     Account,
@@ -54,24 +54,41 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
     signature = Signature.new(keypair1)
     signature2 = Signature.new(keypair2)
 
-    tx_envelope = TransactionEnvelope.new(tx, [signature])
+    network_passphrase = Network.testnet_passphrase()
+
+    tx_envelope =
+      TransactionEnvelope.new(
+        tx: tx,
+        signatures: [signature],
+        network_passphrase: network_passphrase
+      )
 
     %{
       tx: tx,
       tx_xdr: tx_xdr,
       tx_envelope: tx_envelope,
       base_signature: base_signature,
+      network_passphrase: network_passphrase,
       decorated_signature: Signature.to_xdr(signature, base_signature),
       signatures: [signature, signature2]
     }
   end
 
-  test "sign/2", %{tx: tx, signatures: signatures, decorated_signature: decorated_signature} do
+  test "sign/3", %{
+    tx: tx,
+    signatures: signatures,
+    decorated_signature: decorated_signature,
+    network_passphrase: network_passphrase
+  } do
     %DecoratedSignatures{signatures: [^decorated_signature | _signatures]} =
-      TransactionSignature.sign(tx, signatures)
+      TransactionSignature.sign(tx, signatures, network_passphrase)
   end
 
-  test "sign_xdr/2", %{tx_envelope: tx_envelope, signatures: [_signature, extra_signature]} do
+  test "sign_xdr/3", %{
+    tx_envelope: tx_envelope,
+    signatures: [_signature, extra_signature],
+    network_passphrase: network_passphrase
+  } do
     %DecoratedSignatures{
       signatures: [
         _signature,
@@ -80,10 +97,14 @@ defmodule Stellar.TxBuild.TransactionSignatureTest do
     } =
       tx_envelope
       |> TransactionEnvelope.to_xdr()
-      |> TransactionSignature.sign_xdr(extra_signature)
+      |> TransactionSignature.sign_xdr(extra_signature, network_passphrase)
   end
 
-  test "base_signature/1", %{tx_xdr: tx_xdr, base_signature: base_signature} do
-    ^base_signature = TransactionSignature.base_signature(tx_xdr)
+  test "base_signature/2", %{
+    tx_xdr: tx_xdr,
+    network_passphrase: network_passphrase,
+    base_signature: base_signature
+  } do
+    ^base_signature = TransactionSignature.base_signature(tx_xdr, network_passphrase)
   end
 end

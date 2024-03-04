@@ -2,7 +2,7 @@ defmodule Stellar.MixProject do
   use Mix.Project
 
   @github_url "https://github.com/kommitters/stellar_sdk"
-  @version "0.20.0"
+  @version "0.21.0"
 
   def project do
     [
@@ -42,9 +42,9 @@ defmodule Stellar.MixProject do
       {:hackney, "~> 1.17"},
       {:jason, "~> 1.0"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:excoveralls, "~> 0.16", only: :test},
+      {:excoveralls, "~> 0.18", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
-      {:ex_doc, "~> 0.30", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end
 

@@ -131,6 +131,7 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
     LiquidityPool,
     LiquidityPools,
     Operation,
+    Server,
     Trade,
     Transaction
   }
@@ -168,7 +169,7 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
        total_shares: "500000000.0000000",
        total_trustlines: 1,
        type: "constant_product"
-     }} = LiquidityPools.retrieve(liquidity_pool_id)
+     }} = LiquidityPools.retrieve(Server.testnet(), liquidity_pool_id)
   end
 
   test "all/1" do
@@ -221,7 +222,7 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            type: "constant_product"
          }
        ]
-     }} = LiquidityPools.all()
+     }} = LiquidityPools.all(Server.testnet())
   end
 
   test "list_transactions/1", %{liquidity_pool_id: liquidity_pool_id} do
@@ -241,7 +242,8 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            ledger: 7855
          }
        ]
-     }} = LiquidityPools.list_transactions(liquidity_pool_id, limit: 3, order: :asc)
+     }} =
+      LiquidityPools.list_transactions(Server.testnet(), liquidity_pool_id, limit: 3, order: :asc)
   end
 
   test "list_operations/1", %{liquidity_pool_id: liquidity_pool_id} do
@@ -264,7 +266,8 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
            type_i: 0
          }
        ]
-     }} = LiquidityPools.list_operations(liquidity_pool_id, limit: 3, order: :desc)
+     }} =
+      LiquidityPools.list_operations(Server.testnet(), liquidity_pool_id, limit: 3, order: :desc)
   end
 
   test "list_effects/1", %{liquidity_pool_id: liquidity_pool_id} do
@@ -277,7 +280,7 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = LiquidityPools.list_effects(liquidity_pool_id, limit: 5)
+     }} = LiquidityPools.list_effects(Server.testnet(), liquidity_pool_id, limit: 5)
   end
 
   test "list_trades/2", %{liquidity_pool_id: liquidity_pool_id} do
@@ -288,18 +291,18 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
          %Trade{base_amount: "10.0000000"},
          %Trade{base_amount: "748.5338945"}
        ]
-     }} = LiquidityPools.list_trades(liquidity_pool_id)
+     }} = LiquidityPools.list_trades(Server.testnet(), liquidity_pool_id)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = LiquidityPools.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = LiquidityPools.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = LiquidityPools.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = LiquidityPools.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -312,6 +315,6 @@ defmodule Stellar.Horizon.LiquidityPoolsTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = LiquidityPools.retrieve("not_found")
+     }} = LiquidityPools.retrieve(Server.testnet(), "not_found")
   end
 end

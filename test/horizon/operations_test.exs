@@ -82,7 +82,8 @@ defmodule Stellar.Horizon.OperationsTest do
     Effect,
     Error,
     Operation,
-    Operations
+    Operations,
+    Server
   }
 
   alias Stellar.Horizon.Operation.{CreateAccount, Payment, SetOptions, PathPaymentStrictSend}
@@ -120,7 +121,7 @@ defmodule Stellar.Horizon.OperationsTest do
        transaction_successful: true,
        type: "path_payment_strict_send",
        type_i: 13
-     }} = Operations.retrieve(operation_id)
+     }} = Operations.retrieve(Server.testnet(), operation_id)
   end
 
   test "all/1" do
@@ -177,7 +178,7 @@ defmodule Stellar.Horizon.OperationsTest do
            type_i: 0
          }
        ]
-     }} = Operations.all()
+     }} = Operations.all(Server.testnet())
   end
 
   test "list_effects/2", %{operation_id: operation_id} do
@@ -190,7 +191,7 @@ defmodule Stellar.Horizon.OperationsTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = Operations.list_effects(operation_id, limit: 5)
+     }} = Operations.list_effects(Server.testnet(), operation_id, limit: 5)
   end
 
   test "list_payments/1" do
@@ -215,18 +216,18 @@ defmodule Stellar.Horizon.OperationsTest do
            type_i: 1
          }
        ]
-     }} = Operations.list_payments(limit: 3)
+     }} = Operations.list_payments(Server.testnet(), limit: 3)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Operations.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Operations.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Operations.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Operations.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -239,6 +240,6 @@ defmodule Stellar.Horizon.OperationsTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = Operations.retrieve("error")
+     }} = Operations.retrieve(Server.testnet(), "error")
   end
 end

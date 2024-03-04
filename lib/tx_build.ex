@@ -10,17 +10,23 @@ defmodule Stellar.TxBuild do
   @type tx :: Transaction.t()
   @type signatures :: Signature.t() | list(Signature.t())
   @type tx_envelope :: TransactionEnvelope.t() | nil
+  @type network_passphrase :: String.t()
 
   @type t :: %__MODULE__{
           tx: tx(),
           signatures: signatures(),
-          tx_envelope: tx_envelope()
+          tx_envelope: tx_envelope(),
+          network_passphrase: network_passphrase()
         }
 
-  defstruct [:tx, :signatures, :tx_envelope]
+  defstruct [:tx, :signatures, :tx_envelope, :network_passphrase]
 
   @impl true
   def new(account, opts \\ []), do: impl().new(account, opts)
+
+  @impl true
+  def set_network_passphrase(tx, network_passphrase),
+    do: impl().set_network_passphrase(tx, network_passphrase)
 
   @impl true
   def add_memo(tx, memo), do: impl().add_memo(tx, memo)
@@ -57,8 +63,8 @@ defmodule Stellar.TxBuild do
   def envelope(tx), do: impl().envelope(tx)
 
   @impl true
-  def sign_envelope(base64_envelope, signatures),
-    do: impl().sign_envelope(base64_envelope, signatures)
+  def sign_envelope(base64_envelope, signatures, network_passphrase),
+    do: impl().sign_envelope(base64_envelope, signatures, network_passphrase)
 
   @impl true
   def hash(tx), do: impl().hash(tx)

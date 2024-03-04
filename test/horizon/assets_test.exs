@@ -69,7 +69,7 @@ defmodule Stellar.Horizon.AssetsTest do
   use ExUnit.Case
 
   alias Stellar.Horizon.Client.CannedAssetRequests
-  alias Stellar.Horizon.{Asset, Assets, Collection, Error}
+  alias Stellar.Horizon.{Asset, Assets, Collection, Error, Server}
 
   setup do
     Application.put_env(:stellar_sdk, :http_client, CannedAssetRequests)
@@ -104,7 +104,7 @@ defmodule Stellar.Horizon.AssetsTest do
            asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
          }
        ]
-     }} = Assets.all(limit: 3)
+     }} = Assets.all(Server.testnet(), limit: 3)
   end
 
   test "list_by_asset_code/2", %{asset_code: asset_code} do
@@ -118,7 +118,7 @@ defmodule Stellar.Horizon.AssetsTest do
          },
          _asset2
        ]
-     }} = Assets.list_by_asset_code(asset_code, limit: 3)
+     }} = Assets.list_by_asset_code(Server.testnet(), asset_code, limit: 3)
   end
 
   test "list_by_asset_issuer/2", %{asset_issuer: asset_issuer} do
@@ -135,18 +135,18 @@ defmodule Stellar.Horizon.AssetsTest do
            asset_issuer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD"
          }
        ]
-     }} = Assets.list_by_asset_issuer(asset_issuer, limit: 3)
+     }} = Assets.list_by_asset_issuer(Server.testnet(), asset_issuer, limit: 3)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Assets.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Assets.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Assets.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Assets.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -160,6 +160,6 @@ defmodule Stellar.Horizon.AssetsTest do
        status_code: 400,
        title: "Bad Request",
        type: "https://stellar.org/horizon-errors/bad_request"
-     }} = Assets.all(cursor: "error")
+     }} = Assets.all(Server.testnet(), cursor: "error")
   end
 end

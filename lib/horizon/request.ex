@@ -11,9 +11,10 @@ defmodule Stellar.Horizon.Request do
   At a minimum, a request must have the endpoint and method specified to be valid.
   """
 
-  alias Stellar.Horizon.{Collection, Error}
+  alias Stellar.Horizon.{Collection, Error, Server}
   alias Stellar.Horizon.Client, as: Horizon
 
+  @type server :: Server.t()
   @type method :: :get | :post
   @type headers :: [{binary(), binary()}, ...] | []
   @type body :: Keyword.t()
@@ -41,6 +42,7 @@ defmodule Stellar.Horizon.Request do
         }
 
   defstruct [
+    :server,
     :method,
     :headers,
     :body,
@@ -54,13 +56,14 @@ defmodule Stellar.Horizon.Request do
 
   @default_query_params ~w(cursor order limit)a
 
-  @spec new(method :: method(), endpoint :: endpoint(), opts :: opts()) :: t()
-  def new(method, endpoint, opts \\ []) when method in [:get, :post] do
+  @spec new(server :: server(), method :: method(), endpoint :: endpoint(), opts :: opts()) :: t()
+  def new(%Server{} = server, method, endpoint, opts \\ []) when method in [:get, :post] do
     path = Keyword.get(opts, :path)
     segment = Keyword.get(opts, :segment)
     segment_path = Keyword.get(opts, :segment_path)
 
     %__MODULE__{
+      server: server,
       method: method,
       endpoint: endpoint,
       path: path,
@@ -95,12 +98,12 @@ defmodule Stellar.Horizon.Request do
   end
 
   @spec perform(request :: t()) :: response()
-  def perform(%__MODULE__{method: method, headers: headers, body: body} = request) do
+  def perform(%__MODULE__{server: server, method: method, headers: headers, body: body} = request) do
     encoded_body = URI.encode_query(body)
 
     request
     |> build_request_url()
-    |> (&Horizon.request(method, &1, headers, encoded_body)).()
+    |> (&Horizon.request(server, method, &1, headers, encoded_body)).()
   end
 
   @spec results(response :: response(), resource :: Keyword.t()) :: parsed_response()

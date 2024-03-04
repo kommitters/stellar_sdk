@@ -27,9 +27,11 @@ defmodule Stellar.Horizon.Accounts do
     Operation,
     Request,
     Trade,
-    Transaction
+    Transaction,
+    Server
   }
 
+  @type server :: Server.t()
   @type account_id :: String.t()
   @type options :: Keyword.t()
   @type resource :: Account.t() | Collection.t()
@@ -41,17 +43,18 @@ defmodule Stellar.Horizon.Accounts do
   Retrieves information of a specific account.
 
   ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Examples
 
-      iex> Accounts.retrieve("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> Accounts.retrieve(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Account{}}
   """
-  @spec retrieve(account_id :: account_id()) :: response()
-  def retrieve(account_id) do
-    :get
-    |> Request.new(@endpoint, path: account_id)
+  @spec retrieve(server :: server(), account_id :: account_id()) :: response()
+  def retrieve(server, account_id) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id)
     |> Request.perform()
     |> Request.results(as: Account)
   end
@@ -61,16 +64,17 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Parameters:
 
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Examples
 
-      iex> Accounts.fetch_next_sequence_number("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> Accounts.fetch_next_sequence_number(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, 17218523889687}
   """
-  @spec fetch_next_sequence_number(account_id :: account_id()) :: response()
-  def fetch_next_sequence_number(account_id) do
-    case retrieve(account_id) do
+  @spec fetch_next_sequence_number(server :: server(), account_id :: account_id()) :: response()
+  def fetch_next_sequence_number(server, account_id) do
+    case retrieve(server, account_id) do
       {:ok, %Account{sequence: sequence}} -> {:ok, sequence + 1}
       error -> error
     end
@@ -78,6 +82,9 @@ defmodule Stellar.Horizon.Accounts do
 
   @doc """
   Lists all accounts or by one of these three filters: `signer`, `asset`, or `sponsor`.
+
+  ## Parameters:
+    * `server`: The Horizon server to query.
 
   ## Options
 
@@ -90,34 +97,35 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.all(limit: 2, order: :asc)
+      iex> Accounts.all(Stellar.Horizon.Server.testnet(), limit: 2, order: :asc)
       {:ok, %Collection{records: [%Account{}, ...]}}
 
       # list by sponsor
-      iex> Accounts.all(sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
+      iex> Accounts.all(Stellar.Horizon.Server.testnet(), sponsor: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD")
       {:ok, %Collection{records: [%Account{}, ...]}}
 
       # list by signer
-      iex> Accounts.all(signer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
+      iex> Accounts.all(Stellar.Horizon.Server.testnet(), signer: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", order: :desc)
       {:ok, %Collection{records: [%Account{}, ...]}}
 
       # list by canonical asset address
-      iex> Accounts.all(asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.all(Stellar.Horizon.Server.testnet(), asset: "TEST:GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Account{}, ...]}}
   """
-  @spec all(options :: options()) :: response()
-  def all(options \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), options :: options()) :: response()
+  def all(server, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(options, extra_params: [:sponsor, :asset, :signer, :liquidity_pool])
     |> Request.perform()
-    |> Request.results(collection: {Account, &all/1})
+    |> Request.results(collection: {Account, &all(server, &1)})
   end
 
   @doc """
   Lists successful transactions for a given account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -128,22 +136,24 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_transactions("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_transactions(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(account_id :: account_id(), options :: options()) :: response()
-  def list_transactions(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "transactions")
+  @spec list_transactions(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_transactions(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "transactions")
     |> Request.add_query(options, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(collection: {Transaction, &list_transactions(account_id, &1)})
+    |> Request.results(collection: {Transaction, &list_transactions(server, account_id, &1)})
   end
 
   @doc """
   Lists successful operations for a given account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -155,26 +165,28 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_transactions("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_transactions(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # join transactions
-      iex> Accounts.list_transactions("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", join: "transactions")
+      iex> Accounts.list_transactions(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(account_id :: account_id(), options :: options()) :: response()
-  def list_operations(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "operations")
+  @spec list_operations(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_operations(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "operations")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_operations(account_id, &1)})
+    |> Request.results(collection: {Operation, &list_operations(server, account_id, &1)})
   end
 
   @doc """
   Lists successful payments for a given account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -186,26 +198,28 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_payments("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_payments(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
 
       # include failed
-      iex> Accounts.list_payments("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", include_failed: true)
+      iex> Accounts.list_payments(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", include_failed: true)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
   """
-  @spec list_payments(account_id :: account_id(), options :: options()) :: response()
-  def list_payments(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "payments")
+  @spec list_payments(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_payments(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "payments")
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_payments(account_id, &1)})
+    |> Request.results(collection: {Operation, &list_payments(server, account_id, &1)})
   end
 
   @doc """
   Lists the effects of a specific account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -215,22 +229,24 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_effects("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_effects(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(account_id :: account_id(), options :: options()) :: response()
-  def list_effects(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "effects")
+  @spec list_effects(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_effects(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "effects")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Effect, &list_effects(account_id, &1)})
+    |> Request.results(collection: {Effect, &list_effects(server, account_id, &1)})
   end
 
   @doc """
   Lists all offers a given account has currently open.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -240,22 +256,24 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_offers("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_offers(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Offer{}, ...]}}
   """
-  @spec list_offers(account_id :: account_id(), options :: options()) :: response()
-  def list_offers(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "offers")
+  @spec list_offers(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_offers(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "offers")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Offer, &list_offers(account_id, &1)})
+    |> Request.results(collection: {Offer, &list_offers(server, account_id, &1)})
   end
 
   @doc """
   Lists all trades for a given account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
 
   ## Options
@@ -265,34 +283,36 @@ defmodule Stellar.Horizon.Accounts do
 
   ## Examples
 
-      iex> Accounts.list_trades("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
+      iex> Accounts.list_trades(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", limit: 20)
       {:ok, %Collection{records: [%Trade{}, ...]}}
   """
-  @spec list_trades(account_id :: account_id(), options :: options()) :: response()
-  def list_trades(account_id, options \\ []) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "trades")
+  @spec list_trades(server :: server(), account_id :: account_id(), options :: options()) ::
+          response()
+  def list_trades(server, account_id, options \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "trades")
     |> Request.add_query(options)
     |> Request.perform()
-    |> Request.results(collection: {Trade, &list_trades(account_id, &1)})
+    |> Request.results(collection: {Trade, &list_trades(server, account_id, &1)})
   end
 
   @doc """
   Retrieves a single data for a given account.
 
-  ## Parameters
+  ## Parameters:
+    * `server`: The Horizon server to query.
     * `account_id`: The account’s public key encoded in a base32 string representation.
     * `key`: The key name for this data.
 
   ## Examples
 
-      iex> Accounts.data("GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", "config.memo_required")
+      iex> Accounts.data(Stellar.Horizon.Server.testnet(), "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD", "config.memo_required")
       {:ok, %Account.Data{}}
   """
-  @spec data(account_id :: account_id(), key :: String.t()) :: response()
-  def data(account_id, key) do
-    :get
-    |> Request.new(@endpoint, path: account_id, segment: "data", segment_path: key)
+  @spec data(server :: server(), account_id :: account_id(), key :: String.t()) :: response()
+  def data(server, account_id, key) do
+    server
+    |> Request.new(:get, @endpoint, path: account_id, segment: "data", segment_path: key)
     |> Request.perform()
     |> Request.results(as: Data)
   end

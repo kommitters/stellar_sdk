@@ -88,6 +88,7 @@ defmodule Stellar.Horizon.LedgersTest do
     Ledger,
     Ledgers,
     Operation,
+    Server,
     Transaction
   }
 
@@ -123,7 +124,7 @@ defmodule Stellar.Horizon.LedgersTest do
        successful_transaction_count: 0,
        total_coins: "100000000000.0000000",
        tx_set_operation_count: 0
-     }} = Ledgers.retrieve(ledger_sequence)
+     }} = Ledgers.retrieve(Server.testnet(), ledger_sequence)
   end
 
   test "all/1" do
@@ -146,7 +147,7 @@ defmodule Stellar.Horizon.LedgersTest do
            protocol_version: 18
          }
        ]
-     }} = Ledgers.all()
+     }} = Ledgers.all(Server.testnet())
   end
 
   test "list_transactions/1", %{ledger_sequence: ledger_sequence} do
@@ -166,7 +167,7 @@ defmodule Stellar.Horizon.LedgersTest do
            ledger: 7855
          }
        ]
-     }} = Ledgers.list_transactions(ledger_sequence, limit: 3, order: :asc)
+     }} = Ledgers.list_transactions(Server.testnet(), ledger_sequence, limit: 3, order: :asc)
   end
 
   test "list_operations/1", %{ledger_sequence: ledger_sequence} do
@@ -189,7 +190,7 @@ defmodule Stellar.Horizon.LedgersTest do
            type_i: 0
          }
        ]
-     }} = Ledgers.list_operations(ledger_sequence, limit: 3, order: :desc)
+     }} = Ledgers.list_operations(Server.testnet(), ledger_sequence, limit: 3, order: :desc)
   end
 
   test "list_payments/1", %{ledger_sequence: ledger_sequence} do
@@ -211,7 +212,7 @@ defmodule Stellar.Horizon.LedgersTest do
            type_i: 1
          }
        ]
-     }} = Ledgers.list_payments(ledger_sequence, limit: 3)
+     }} = Ledgers.list_payments(Server.testnet(), ledger_sequence, limit: 3)
   end
 
   test "list_effects/1", %{ledger_sequence: ledger_sequence} do
@@ -224,18 +225,18 @@ defmodule Stellar.Horizon.LedgersTest do
          %Effect{type: "contract_debited", created_at: ~U[2023-10-10 15:53:13Z]},
          %Effect{type: "contract_credited", created_at: ~U[2023-10-10 15:52:40Z]}
        ]
-     }} = Ledgers.list_effects(ledger_sequence, limit: 5)
+     }} = Ledgers.list_effects(Server.testnet(), ledger_sequence, limit: 5)
   end
 
   test "paginate_collection prev" do
-    {:ok, %Collection{prev: paginate_prev_fn}} = Ledgers.all(limit: 3)
+    {:ok, %Collection{prev: paginate_prev_fn}} = Ledgers.all(Server.testnet(), limit: 3)
     paginate_prev_fn.()
 
     assert_receive({:paginated, :prev})
   end
 
   test "paginate_collection next" do
-    {:ok, %Collection{next: paginate_next_fn}} = Ledgers.all(limit: 3)
+    {:ok, %Collection{next: paginate_next_fn}} = Ledgers.all(Server.testnet(), limit: 3)
     paginate_next_fn.()
 
     assert_receive({:paginated, :next})
@@ -248,6 +249,6 @@ defmodule Stellar.Horizon.LedgersTest do
        status_code: 404,
        title: "Resource Missing",
        type: "https://stellar.org/horizon-errors/not_found"
-     }} = Ledgers.retrieve("not_found")
+     }} = Ledgers.retrieve(Server.testnet(), "not_found")
   end
 end

@@ -6,6 +6,7 @@ defmodule Stellar.Horizon.Client.Spec do
   The default is :hackney.
   """
 
+  @type server :: Stellar.Horizon.Server.t()
   @type method :: :get | :post | :put | :delete
   @type headers :: [{binary(), binary()}, ...]
   @type body :: binary()
@@ -16,6 +17,7 @@ defmodule Stellar.Horizon.Client.Spec do
   @type response_error :: {:error, any()}
 
   @callback request(
+              server :: server(),
               method :: method(),
               url :: binary(),
               body :: binary(),

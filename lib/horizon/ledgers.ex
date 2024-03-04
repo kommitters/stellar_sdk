@@ -19,13 +19,15 @@ defmodule Stellar.Horizon.Ledgers do
     Ledger,
     Operation,
     Request,
-    Transaction
+    Transaction,
+    Server
   }
 
   @type sequence :: non_neg_integer()
   @type params :: Keyword.t()
   @type resource :: Ledger.t() | Collection.t()
   @type response :: {:ok, resource()} | {:error, Error.t()}
+  @type server :: Server.t()
 
   @endpoint "ledgers"
 
@@ -33,17 +35,18 @@ defmodule Stellar.Horizon.Ledgers do
   Retrieves information of a specific ledger.
 
   ## Parameters:
+    * `server`: The Horizon server to query.
     * `sequence`: The sequence number of a specific ledger.
 
   ## Examples
 
-      iex> Ledgers.retrieve(27147222)
+      iex> Ledgers.retrieve(Stellar.Horizon.Server.testnet(), 27147222)
       {:ok, %Ledger{}}
   """
-  @spec retrieve(sequence :: sequence()) :: response()
-  def retrieve(sequence) do
-    :get
-    |> Request.new(@endpoint, path: sequence)
+  @spec retrieve(server :: server(), sequence :: sequence()) :: response()
+  def retrieve(server, sequence) do
+    server
+    |> Request.new(:get, @endpoint, path: sequence)
     |> Request.perform()
     |> Request.results(as: Ledger)
   end
@@ -51,6 +54,9 @@ defmodule Stellar.Horizon.Ledgers do
   @doc """
   Lists all ledgers.
 
+  ## Parameters:
+    * `server`: The Horizon server to query.
+
   ## Options
 
     * `cursor`: A number that points to a specific location in a collection of responses and is pulled from the `paging_token` value of a record.
@@ -59,22 +65,23 @@ defmodule Stellar.Horizon.Ledgers do
 
   ## Examples
 
-      iex> Ledgers.all(limit: 10, order: :asc)
+      iex> Ledgers.all(Stellar.Horizon.Server.testnet(), limit: 10, order: :asc)
       {:ok, %Collection{records: [%Ledger{}, ...]}}
   """
-  @spec all(params :: params()) :: response()
-  def all(params \\ []) do
-    :get
-    |> Request.new(@endpoint)
+  @spec all(server :: server(), params :: params()) :: response()
+  def all(server, params \\ []) do
+    server
+    |> Request.new(:get, @endpoint)
     |> Request.add_query(params)
     |> Request.perform()
-    |> Request.results(collection: {Ledger, &all/1})
+    |> Request.results(collection: {Ledger, &all(server, &1)})
   end
 
   @doc """
   Lists successful transactions in a specific ledger.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `sequence`: The sequence number of a specific ledger.
 
   ## Options
@@ -85,22 +92,24 @@ defmodule Stellar.Horizon.Ledgers do
 
   ## Examples
 
-      iex> Ledgers.list_transactions(27147222, limit: 20)
+      iex> Ledgers.list_transactions(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
       {:ok, %Collection{records: [%Transaction{}, ...]}}
   """
-  @spec list_transactions(sequence :: sequence(), params :: params()) :: response()
-  def list_transactions(sequence, params \\ []) do
-    :get
-    |> Request.new(@endpoint, path: sequence, segment: "transactions")
+  @spec list_transactions(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
+  def list_transactions(server, sequence, params \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: sequence, segment: "transactions")
     |> Request.add_query(params, extra_params: [:include_failed])
     |> Request.perform()
-    |> Request.results(collection: {Transaction, &list_transactions(sequence, &1)})
+    |> Request.results(collection: {Transaction, &list_transactions(server, sequence, &1)})
   end
 
   @doc """
   Lists successful operations in a specific ledger.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `sequence`: The sequence number of a specific ledger.
 
   ## Options
@@ -112,26 +121,28 @@ defmodule Stellar.Horizon.Ledgers do
 
   ## Examples
 
-      iex> Ledgers.list_operations(27147222, limit: 20)
+      iex> Ledgers.list_operations(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
       {:ok, %Collection{records: [%Operation{}, ...]}}
 
       # join transactions
-      iex> Ledgers.list_operations(27147222, join: "transactions")
+      iex> Ledgers.list_operations(Stellar.Horizon.Server.testnet(), 27147222, join: "transactions")
       {:ok, %Collection{records: [%Operation{transaction: %Transaction{}}, ...]}}
   """
-  @spec list_operations(sequence :: sequence(), params :: params()) :: response()
-  def list_operations(sequence, params \\ []) do
-    :get
-    |> Request.new(@endpoint, path: sequence, segment: "operations")
+  @spec list_operations(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
+  def list_operations(server, sequence, params \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: sequence, segment: "operations")
     |> Request.add_query(params, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_operations(sequence, &1)})
+    |> Request.results(collection: {Operation, &list_operations(server, sequence, &1)})
   end
 
   @doc """
   Lists successful payments in a specific ledger.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `sequence`: The sequence number of a specific ledger.
 
   ## Options
@@ -143,26 +154,28 @@ defmodule Stellar.Horizon.Ledgers do
 
   ## Examples
 
-      iex> Ledgers.list_payments(27147222, limit: 20)
+      iex> Ledgers.list_payments(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
 
       # include failed
-      iex> Ledgers.list_payments(27147222, include_failed: true)
+      iex> Ledgers.list_payments(Stellar.Horizon.Server.testnet(), 27147222, include_failed: true)
       {:ok, %Collection{records: [%Operation{body: %Payment{}}, ...]}}
   """
-  @spec list_payments(sequence :: sequence(), params :: params()) :: response()
-  def list_payments(sequence, params \\ []) do
-    :get
-    |> Request.new(@endpoint, path: sequence, segment: "payments")
+  @spec list_payments(server :: server(), sequence :: sequence(), params :: params()) ::
+          response()
+  def list_payments(server, sequence, params \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: sequence, segment: "payments")
     |> Request.add_query(params, extra_params: [:include_failed, :join])
     |> Request.perform()
-    |> Request.results(collection: {Operation, &list_payments(sequence, &1)})
+    |> Request.results(collection: {Operation, &list_payments(server, sequence, &1)})
   end
 
   @doc """
   Lists the effects of a specific ledger.
 
   ## Parameters
+    * `server`: The Horizon server to query.
     * `sequence`: The sequence number of a specific ledger.
 
   ## Options
@@ -172,15 +185,15 @@ defmodule Stellar.Horizon.Ledgers do
 
   ## Examples
 
-      iex> Ledgers.list_effects(27147222, limit: 20)
+      iex> Ledgers.list_effects(Stellar.Horizon.Server.testnet(), 27147222, limit: 20)
       {:ok, %Collection{records: [%Effect{}, ...]}}
   """
-  @spec list_effects(sequence :: sequence(), params :: params()) :: response()
-  def list_effects(sequence, params \\ []) do
-    :get
-    |> Request.new(@endpoint, path: sequence, segment: "effects")
+  @spec list_effects(server :: server(), sequence :: sequence(), params :: params()) :: response()
+  def list_effects(server, sequence, params \\ []) do
+    server
+    |> Request.new(:get, @endpoint, path: sequence, segment: "effects")
     |> Request.add_query(params)
     |> Request.perform()
-    |> Request.results(collection: {Effect, &list_effects(sequence, &1)})
+    |> Request.results(collection: {Effect, &list_effects(server, sequence, &1)})
   end
 end

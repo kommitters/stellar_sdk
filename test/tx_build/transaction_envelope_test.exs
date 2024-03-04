@@ -3,7 +3,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
 
   alias Stellar.Test.Fixtures.XDR, as: XDRFixtures
 
-  alias Stellar.KeyPair
+  alias Stellar.{Network, KeyPair}
 
   alias Stellar.TxBuild.{
     Account,
@@ -41,20 +41,33 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
 
     signature = Signature.new({public_key, secret})
     signatures = [signature]
+    network_passphrase = Network.testnet_passphrase()
+
+    tx_envelope =
+      TransactionEnvelope.new(
+        tx: tx,
+        signatures: signatures,
+        network_passphrase: network_passphrase
+      )
 
     %{
       tx: tx,
       signatures: signatures,
-      tx_envelope: TransactionEnvelope.new(tx, signatures),
+      network_passphrase: network_passphrase,
+      tx_envelope: tx_envelope,
       tx_envelope_xdr: XDRFixtures.transaction_envelope(),
       tx_envelope_base64:
         "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAfQAAAAAAAHiQAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAP+vE9o3jcA09johM/VtYWpdEhIl0TD4eRCmqtPEhGJNAAAAAADk4cAAAAAAAAAAAcSEYk0AAABA4XBteCIyqJn86GK0xMYA6h2lweeWfo0DNRY+rwiVGlAQyZkV+tYUbR0KmJMzScPRqMX7eEyDdOIMd7IkuEpNAQ=="
     }
   end
 
-  test "new/2", %{tx: tx, signatures: signatures} do
+  test "new/2", %{tx: tx, signatures: signatures, network_passphrase: network_passphrase} do
     %TransactionEnvelope{tx: ^tx, signatures: ^signatures} =
-      TransactionEnvelope.new(tx, signatures)
+      TransactionEnvelope.new(
+        tx: tx,
+        signatures: signatures,
+        network_passphrase: network_passphrase
+      )
   end
 
   test "to_xdr/1", %{tx_envelope: tx_envelope, tx_envelope_xdr: tx_envelope_xdr} do
@@ -76,7 +89,10 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
     assert_raise ArgumentError, fn -> TransactionEnvelope.from_base64("AAAAA==") end
   end
 
-  test "add_signature/2", %{tx_envelope_base64: tx_envelope_base64} do
+  test "add_signature/2", %{
+    tx_envelope_base64: tx_envelope_base64,
+    network_passphrase: network_passphrase
+  } do
     secret_seed = "SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3"
 
     extra_signature =
@@ -86,6 +102,7 @@ defmodule Stellar.TxBuild.TransactionEnvelopeTest do
 
     xdr = XDRFixtures.transaction_envelope(extra_signatures: [secret_seed])
 
-    ^xdr = TransactionEnvelope.add_signature(tx_envelope_base64, extra_signature)
+    ^xdr =
+      TransactionEnvelope.add_signature(tx_envelope_base64, extra_signature, network_passphrase)
   end
 end

@@ -10,6 +10,12 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
+  def set_network_passphrase(_tx, _network_passphrase) do
+    send(self(), {:set_network_passphrase, "NETWORK_PASSPHRASE_SET"})
+    :ok
+  end
+
+  @impl true
   def add_memo(_tx, _memo) do
     send(self(), {:add_memo, "MEMO_ADDED"})
     :ok
@@ -64,7 +70,7 @@ defmodule Stellar.TxBuild.CannedTxBuildImpl do
   end
 
   @impl true
-  def sign_envelope(_base64, _signatures) do
+  def sign_envelope(_base64, _signatures, _network_passphrase) do
     send(self(), {:sign_envelope, "ENVELOPE_SIGNED"})
     :ok
   end
@@ -153,7 +159,7 @@ defmodule Stellar.TxBuildTest do
   end
 
   test "sign_envelope/2" do
-    Stellar.TxBuild.sign_envelope("AAAAA==", :signature)
+    Stellar.TxBuild.sign_envelope("AAAAA==", :signature, "NETWORK_PASSPHRASE")
     assert_receive({:sign_envelope, "ENVELOPE_SIGNED"})
   end
 

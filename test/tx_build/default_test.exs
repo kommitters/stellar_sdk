@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.DefaultTest do
   use ExUnit.Case
 
   alias StellarBase.XDR.{SorobanTransactionData, TransactionExt}
-  alias Stellar.{KeyPair, TxBuild}
+  alias Stellar.{KeyPair, Network, TxBuild}
 
   alias Stellar.TxBuild.{
     Account,
@@ -35,7 +35,10 @@ defmodule Stellar.TxBuild.DefaultTest do
     extra_signers = ["GD726E62G6G4ANHWHIQTH5LNMFVF2EQSEXITB6DZCCTKVU6EQRRE2SJS"]
 
     # tx_build with empty preconditions
-    {:ok, %TxBuild{tx: tx}} = tx_build = TxBuild.new(source_account)
+    network_passphrase = Network.testnet_passphrase()
+
+    {:ok, %TxBuild{tx: tx}} =
+      tx_build = TxBuild.new(source_account, network_passphrase: network_passphrase)
 
     # tx_build with only time_bounds as preconditions
     tx_build_precond_time = TxBuild.set_time_bounds(tx_build, time_bounds)
@@ -54,13 +57,15 @@ defmodule Stellar.TxBuild.DefaultTest do
 
     %{
       source_account: source_account,
+      network_passphrase: network_passphrase,
       keypair: keypair,
       signature: signature,
       tx: tx,
       tx_build: tx_build,
       tx_build_precond_time: tx_build_precond_time,
       tx_build_precond_v2: tx_build_precond_v2,
-      tx_envelope: TransactionEnvelope.new(tx, []),
+      tx_envelope:
+        TransactionEnvelope.new(tx: tx, signatures: [], network_passphrase: network_passphrase),
       tx_envelope_base64:
         "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO",
       tx_hash: "02eef2a9f2941077b5aa76fb7023494291f9c4e97e65c0e3c705475a69272484"
@@ -71,7 +76,11 @@ defmodule Stellar.TxBuild.DefaultTest do
     {:ok, %TxBuild{tx: ^tx, signatures: [], tx_envelope: nil}} = TxBuild.new(source_account)
   end
 
-  test "new/2 with_options", %{source_account: source_account, keypair: {public_key, _secret}} do
+  test "new/2 with_options", %{
+    source_account: source_account,
+    keypair: {public_key, _secret},
+    network_passphrase: network_passphrase
+  } do
     sequence_number = SequenceNumber.new(123_456)
     base_fee = BaseFee.new(500)
     memo = Memo.new(text: "TEST")
@@ -85,6 +94,7 @@ defmodule Stellar.TxBuild.DefaultTest do
 
     {:ok,
      %TxBuild{
+       network_passphrase: ^network_passphrase,
        tx: %Transaction{
          sequence_number: ^sequence_number,
          base_fee: ^base_fee,
@@ -94,6 +104,7 @@ defmodule Stellar.TxBuild.DefaultTest do
      }} =
       TxBuild.new(
         source_account,
+        network_passphrase: network_passphrase,
         sequence_number: sequence_number,
         base_fee: base_fee,
         memo: memo,
@@ -144,6 +155,13 @@ defmodule Stellar.TxBuild.DefaultTest do
 
   test "new/2 invalid_source_account" do
     {:error, :invalid_source_account} = TxBuild.new("ABCD")
+  end
+
+  test "set_network_passphrase/2", %{tx_build: tx_build} do
+    network_passphrase = Network.public_passphrase()
+
+    {:ok, %TxBuild{network_passphrase: ^network_passphrase}} =
+      TxBuild.set_network_passphrase(tx_build, network_passphrase)
   end
 
   test "add_memo/2", %{tx_build: tx_build} do
@@ -382,15 +400,23 @@ defmodule Stellar.TxBuild.DefaultTest do
     {:ok, %TxBuild{signatures: ^signatures}} = TxBuild.sign(tx_build, signatures)
   end
 
-  test "sign_envelope/2", %{keypair: keypair, tx_envelope_base64: tx_envelope_base64} do
+  test "sign_envelope/3", %{
+    keypair: keypair,
+    tx_envelope_base64: tx_envelope_base64,
+    network_passphrase: network_passphrase
+  } do
     signature = Signature.new(keypair)
 
     {:ok,
      "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYOxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO"} =
-      TxBuild.sign_envelope(tx_envelope_base64, signature)
+      TxBuild.sign_envelope(tx_envelope_base64, signature, network_passphrase)
   end
 
-  test "sign_envelope/2 multiple", %{signature: signature, tx_envelope_base64: tx_envelope_base64} do
+  test "sign_envelope/3 multiple", %{
+    signature: signature,
+    tx_envelope_base64: tx_envelope_base64,
+    network_passphrase: network_passphrase
+  } do
     {pk, sk} =
       KeyPair.from_secret_seed("SAALZGBDHMY5NQGU2L6G4GHQ65ESCDQD5TNYPWM5AZDVB3HICLKF4KI3")
 
@@ -398,12 +424,17 @@ defmodule Stellar.TxBuild.DefaultTest do
 
     {:ok,
      "AAAAAgAAAAD/rxPaN43ANPY6ITP1bWFqXRISJdEw+HkQpqrTxIRiTQAAAGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYOxIRiTQAAAEDGQ1zlNXPps1aYpgCyHFzNgApPhKWhZqXlzPDMYXrZKilBt2SlWDkyki5pkiwKZ5Uc0bLNS1uqu31CJ5GFSWYO8057hgAAAEC70Ava49XnFEQ6d9ed+IvfiMWL6do55bekG9LctPFnjTrRITSFs9cuHTfvbkSTCcFxw5IrZxqgeupuYb+ubU8H"} =
-      TxBuild.sign_envelope(tx_envelope_base64, signatures)
+      TxBuild.sign_envelope(tx_envelope_base64, signatures, network_passphrase)
   end
 
-  test "sign_envelope/2 invalid_signature", %{tx_envelope_base64: tx_envelope_base64} do
+  test "sign_envelope/3 invalid_signature", %{
+    tx_envelope_base64: tx_envelope_base64,
+    network_passphrase: network_passphrase
+  } do
     signature = Signature.new({"PUBLIC", "SECRET"})
-    {:error, :invalid_signature} = TxBuild.sign_envelope(tx_envelope_base64, signature)
+
+    {:error, :invalid_signature} =
+      TxBuild.sign_envelope(tx_envelope_base64, signature, network_passphrase)
   end
 
   test "build/1", %{tx_build: tx_build, tx_envelope: tx_envelope} do
