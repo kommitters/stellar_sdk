@@ -6,6 +6,7 @@
 * Update all dependencies. See [PR #332](https://github.com/kommitters/stellar_sdk/pull/332).
 * Update scorecards allowed endpoints and Security Policy. See [PR #355](https://github.com/kommitters/stellar_sdk/pull/355).
 * Delete `config` from `mix.exs` file. See [PR #358](https://github.com/kommitters/stellar_sdk/pull/358).
+* Bump Elixir version to 1.12. See [PR #360](https://github.com/kommitters/stellar_sdk/pull/360).
 
 ## 0.20.0 (20.12.2023)
 
