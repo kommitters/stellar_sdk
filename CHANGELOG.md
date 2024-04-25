@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.1 (25.04.2024)
+
+* Add stale issues policy. See [PR #363](https://github.com/kommitters/stellar_sdk/pull/363)
+
 ## 0.21.0 (04.03.2024)
 
 * Add Dynamic network configuration: Now you should provide Horizon URL and Network Passphrase. See [Issue #352](https://github.com/kommitters/stellar_sdk/issues/352).
