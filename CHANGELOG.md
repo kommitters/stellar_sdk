@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.21.2 (23.07.2024)
+
+- Update stellar base dependency.
+
 ## 0.21.1 (25.04.2024)
 
 * Add stale issues policy. See [PR #363](https://github.com/kommitters/stellar_sdk/pull/363)

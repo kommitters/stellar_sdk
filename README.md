@@ -17,11 +17,12 @@ This library is aimed at developers building Elixir applications that interact w
 > If you are a smart contract developer building on Soroban, we recommend using [Soroban.ex][soroban.ex], a library built on top of Stellar SDK which offers a developer-friendly interface for interacting with Soroban smart contracts and Soroban-RPC server.
 
 #### Protocol Version Support
-| Protocol  | Version      |
-| --------- | ------------ |
-| 18        | >= v0.8      |
-| 19        | >= v0.9      |
-| 20        | >= v0.20     |
+| Protocol | Version    |
+| -------- | ---------- |
+| 18       | >= v0.8    |
+| 19       | >= v0.9    |
+| 20       | >= v0.20   |
+| 21       | >= v0.21.2 |
 
 ## Documentation
 The **Stellar SDK** is composed of two complementary components: **`TxBuild`** + **`Horizon`**.
@@ -35,7 +36,7 @@ The **Stellar SDK** is composed of two complementary components: **`TxBuild`** +
 ```elixir
 def deps do
   [
-    {:stellar_sdk, "~> 0.21.1"}
+    {:stellar_sdk, "~> 0.21.2"}
   ]
 end
 ```
