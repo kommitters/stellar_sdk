@@ -21,6 +21,7 @@ defmodule Stellar.Horizon.Transactions do
   @type response :: {:ok, resource()} | {:error, Error.t()}
 
   @endpoint "transactions"
+  @endpoint_async "transactions_async"
 
   @doc """
   Creates a transaction to the Stellar network.
@@ -151,5 +152,27 @@ defmodule Stellar.Horizon.Transactions do
     |> Request.add_query(options, extra_params: [:include_failed, :join])
     |> Request.perform()
     |> Request.results(collection: {Operation, &list_operations(server, hash, &1)})
+  end
+
+  @doc """
+    Creates a transaction to the Stellar network asynchronously.
+
+    ## Parameters:
+      * `server`: The Horizon server to query.
+      * `tx`: The base64-encoded XDR of the transaction.
+
+    ## Examples
+
+        iex> Transactions.create_async(Stellar.Horizon.Server.testnet(), "AAAAAgAAAACQcEK2yfQA9CHrX+2UMkRIb/1wzltKqHpbdIcJbp+b/QAAAGQAAiEYAAAAAQAAAAEAAAAAAAAAAAAAAABgXP3QAAAAAQAAABBUZXN0IFRyYW5zYWN0aW9uAAAAAQAAAAAAAAABAAAAAJBwQrbJ9AD0Ietf7ZQyREhv/XDOW0qoelt0hwlun5v9AAAAAAAAAAAF9eEAAAAAAAAAAAFun5v9AAAAQKdJnG8QRiv9xGp1Oq7ACv/xR2BnNqjfUHrGNua7m4tWbrun3+GmAj6ca3xz+4ZppWRTbvTUcCxvpbHERZ85QgY=")
+        {:ok, %Transaction{}}
+  """
+  @spec create_async(server :: server(), base64_envelope :: String.t()) :: response()
+  def create_async(server, base64_envelope) do
+    server
+    |> Request.new(:post, @endpoint_async)
+    |> Request.add_headers([{"Content-Type", "application/x-www-form-urlencoded"}])
+    |> Request.add_body(tx: base64_envelope)
+    |> Request.perform()
+    |> Request.results(as: Transaction)
   end
 end
