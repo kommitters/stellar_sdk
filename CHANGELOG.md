@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.22.0 (16.08.2024)
+
+- Add hash to handle transaction timeout response. See [PR #374](https://github.com/kommitters/stellar_sdk/pull/374)
+- Add new async transaction submission endpoint. See [PR #373](https://github.com/kommitters/stellar_sdk/pull/373)
+
 ## 0.21.2 (23.07.2024)
 
 - Update stellar base dependency.
