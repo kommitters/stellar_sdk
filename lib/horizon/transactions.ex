@@ -176,7 +176,6 @@ defmodule Stellar.Horizon.Transactions do
   """
   @spec create_async(server :: server(), base64_envelope :: String.t()) :: response()
   def create_async(server, base64_envelope) do
-
     server
     |> Request.new(:post, @endpoint_async)
     |> Request.add_headers([{"Content-Type", "application/x-www-form-urlencoded"}])
