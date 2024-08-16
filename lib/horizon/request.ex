@@ -11,7 +11,7 @@ defmodule Stellar.Horizon.Request do
   At a minimum, a request must have the endpoint and method specified to be valid.
   """
 
-  alias Stellar.Horizon.{Collection, Error, Server}
+  alias Stellar.Horizon.{Collection, Server}
   alias Stellar.Horizon.Client, as: Horizon
 
   @type server :: Server.t()
@@ -26,8 +26,8 @@ defmodule Stellar.Horizon.Request do
   @type opts :: Keyword.t()
   @type params :: Keyword.t()
   @type query_params :: list(atom())
-  @type response :: {:ok, map()} | {:error, Error.t()}
-  @type parsed_response :: {:ok, struct()} | {:error, Error.t()}
+  @type response :: {:ok, map()} | {:error, struct()}
+  @type parsed_response :: {:ok, struct()} | {:error, struct()}
 
   @type t :: %__MODULE__{
           method: method(),

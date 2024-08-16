@@ -7,7 +7,7 @@ defmodule Stellar.Horizon.Client.Default do
 
   @behaviour Stellar.Horizon.Client.Spec
 
-  alias Stellar.Horizon.{Error, Server}
+  alias Stellar.Horizon.{ErrorMapper, Server}
 
   @type status :: pos_integer()
   @type headers :: [{binary(), binary()}, ...]
@@ -15,7 +15,7 @@ defmodule Stellar.Horizon.Client.Default do
   @type success_response :: {:ok, status(), headers(), body()}
   @type error_response :: {:error, status(), headers(), body()} | {:error, any()}
   @type client_response :: success_response() | error_response()
-  @type parsed_response :: {:ok, map()} | {:error, Error.t()}
+  @type parsed_response :: {:ok, map()} | {:error, struct()}
 
   @impl true
   def request(%Server{url: base_url}, method, path, headers \\ [], body \\ "", opts \\ []) do
@@ -34,13 +34,11 @@ defmodule Stellar.Horizon.Client.Default do
 
   defp handle_response({:ok, status, _headers, body}) when status >= 400 and status <= 599 do
     decoded_body = json_library().decode!(body, keys: :atoms)
-    error = Error.new({:horizon, decoded_body})
-    {:error, error}
+    ErrorMapper.build({:horizon, decoded_body})
   end
 
   defp handle_response({:error, reason}) do
-    error = Error.new({:network, reason})
-    {:error, error}
+    ErrorMapper.build({:network, reason})
   end
 
   @spec http_client() :: atom()

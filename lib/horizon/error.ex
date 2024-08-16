@@ -9,6 +9,7 @@ defmodule Stellar.Horizon.Error do
   @type detail :: String.t() | nil
   @type base64_xdr :: String.t()
   @type result_code :: String.t()
+
   @type result_codes :: %{
           optional(:transaction) => result_code(),
           optional(:operations) => list(result_code())
@@ -16,7 +17,8 @@ defmodule Stellar.Horizon.Error do
   @type extras :: %{
           optional(:envelope_xdr) => base64_xdr(),
           optional(:result_codes) => result_codes(),
-          optional(:result_xdr) => base64_xdr()
+          optional(:result_xdr) => base64_xdr(),
+          optional(:error) => detail()
         }
   @type error_source :: :horizon | :network
   @type error_body :: map() | atom() | String.t()
@@ -30,7 +32,13 @@ defmodule Stellar.Horizon.Error do
           extras: extras()
         }
 
-  defstruct [:type, :title, :status_code, :detail, extras: %{}]
+  defstruct [
+    :type,
+    :title,
+    :status_code,
+    :detail,
+    extras: %{}
+  ]
 
   @spec new(error :: error()) :: t()
   def new({:horizon, %{type: type, title: title, status: status_code, detail: detail} = error}) do
