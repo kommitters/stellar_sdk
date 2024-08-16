@@ -9,13 +9,14 @@ defmodule Stellar.Horizon.Error do
   @type detail :: String.t() | nil
   @type base64_xdr :: String.t()
   @type result_code :: String.t()
+  @type hash :: String.t()
 
   @type result_codes :: %{
           optional(:transaction) => result_code(),
           optional(:operations) => list(result_code())
         }
   @type extras :: %{
-          optional(:hash) => base64_xdr(),
+          optional(:hash) => hash(),
           optional(:envelope_xdr) => base64_xdr(),
           optional(:result_codes) => result_codes(),
           optional(:result_xdr) => base64_xdr(),
