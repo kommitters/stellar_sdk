@@ -583,6 +583,9 @@ See [**Stellar.Horizon.Accounts**](https://hexdocs.pm/stellar_sdk/Stellar.Horizo
 # submit a transaction
 Stellar.Horizon.Transactions.create(Stellar.Horizon.Server.testnet(), base64_tx_envelope)
 
+# submit a transaction asynchronously
+Stellar.Horizon.Transactions.create_async(Stellar.Horizon.Server.testnet(), base64_tx_envelope)
+
 # retrieve a transaction
 Stellar.Horizon.Transactions.retrieve(Stellar.Horizon.Server.testnet(), "5ebd5c0af4385500b53dd63b0ef5f6e8feef1a7e1c86989be3cdcce825f3c0cc")
 

@@ -4,7 +4,6 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
   alias Stellar.Test.Fixtures.Horizon
 
   @base_url "https://horizon-testnet.stellar.org"
-
   @spec request(
           method :: atom(),
           url :: String.t(),
@@ -91,6 +90,37 @@ defmodule Stellar.Horizon.Client.CannedTransactionRequests do
     json_body = Horizon.fixture("transaction")
     {:ok, 200, [], json_body}
   end
+
+  def request(
+        :post,
+        @base_url <> "/transactions_async",
+        _headers,
+        "tx=AAAAAgAAAABp0mQhoc0djMaRJSbxa417D7Lx8Dw%2ByWmvhALa5UuYkgAAAGQADk7SAAAAUQAAAAAAAAABAAAABE1FTU8AAAABAAAAAAAAAAEAAAAAv6Mnl0vbOahrXvJAay9nTrMHQ1pZcvYeA4wrv0xOeA4AAAAAAAAAAAL68IAAAAAAAAAAAA%3D%3D",
+        _opts
+      ) do
+    json_error = Horizon.fixture("400_async_transaction_error_result_xdr")
+    {:ok, 400, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions_async", _headers, "tx=tx_malformed", _opts) do
+    json_error = Horizon.fixture("400_transaction_malformed")
+    {:ok, 400, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions_async", _headers, "tx=duplicate", _opts) do
+    json_error = Horizon.fixture("409_async_transaction_duplicate")
+    {:ok, 409, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions_async", _headers, "tx=try_again_later", _opts) do
+    json_error = Horizon.fixture("409_async_transaction_try_again_later")
+    {:ok, 503, [], json_error}
+  end
+
+  def request(:post, @base_url <> "/transactions_async", _headers, "tx=" <> _envelope, _opts) do
+    json_body = Horizon.fixture("async_transaction")
+    {:ok, 201, [], json_body}
+  end
 end
 
 defmodule Stellar.Horizon.TransactionsTest do
@@ -104,6 +134,8 @@ defmodule Stellar.Horizon.TransactionsTest do
     Error,
     Operation,
     Transaction,
+    AsyncTransaction,
+    AsyncTransactionError,
     Transactions,
     Transaction.Preconditions,
     Transaction.TimeBounds,
@@ -120,17 +152,45 @@ defmodule Stellar.Horizon.TransactionsTest do
       Application.delete_env(:stellar_sdk, :http_client)
     end)
 
+    async_transaction_error = %{
+      # An erroneously generated base64_envelope may be generated when, e.g. the transaction is not signed.
+      bad_base64_envelope:
+        "AAAAAgAAAABp0mQhoc0djMaRJSbxa417D7Lx8Dw+yWmvhALa5UuYkgAAAGQADk7SAAAAUQAAAAAAAAABAAAABE1FTU8AAAABAAAAAAAAAAEAAAAAv6Mnl0vbOahrXvJAay9nTrMHQ1pZcvYeA4wrv0xOeA4AAAAAAAAAAAL68IAAAAAAAAAAAA==",
+      tx_status: "ERROR",
+      hash: "12958c37b341802a19ddada4c2a56b453a9cba728b2eefdfbc0b622e37379222",
+      errorResultXdr: "AAAAAAAAAGT////6AAAAAA=="
+    }
+
+    async_transaction = %{
+      base64_envelope:
+        "AAAAAgAAAABp0mQhoc0djMaRJSbxa417D7Lx8Dw+yWmvhALa5UuYkgAAAGQADk7SAAAAUQAAAAAAAAABAAAABE1FTU8AAAABAAAAAAAAAAEAAAAAv6Mnl0vbOahrXvJAay9nTrMHQ1pZcvYeA4wrv0xOeA4AAAAAAAAAAAL68IAAAAAAAAAAAeVLmJIAAABAk2E4qeHPsMKzj3kuCBoFC9stkVhOWpoJ3Fr5qf5zDu2eSz8blBi+4msu+PV8pg5e2MdymSOEBbPY2XLJcefRCw==",
+      tx_status: "PENDING",
+      hash: "12958c37b341802a19ddada4c2a56b453a9cba728b2eefdfbc0b622e37379222"
+    }
+
     %{
       source_account: "GCXMWUAUF37IWOOV2FRDKWEX3O2IHLM2FYH4WPI4PYUKAIFQEUU5X3TD",
       base64_envelope:
         "AAAAAJ2kP2xLaOVLj6DRwX1mMyA0mubYnYvu0g8OdoDqxXuFAAAAZADjfzAACzBMAAAAAQAAAAAAAAAAAAAAAF4vYIYAAAABAAAABjI5ODQyNAAAAAAAAQAAAAAAAAABAAAAAKdeYELovtcnTxqPEVsdbxHLMoMRalZsK7lo/+3ARzUZAAAAAAAAAADUFJPYAAAAAAAAAAHqxXuFAAAAQBpLpQyh+mwDd5nDSxTaAh5wopBBUaSD1eOK9MdiO+4kWKVTqSr/Ko3kYE/+J42Opsewf81TwINONPbY2CtPggE=",
-      hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31"
+      hash: "132c440e984ab97d895f3477015080aafd6c4375f6a70a87327f7f95e13c4e31",
+      async_transaction: async_transaction,
+      async_transaction_error: async_transaction_error
     }
   end
 
   test "create/1", %{base64_envelope: base64_envelope, hash: hash} do
     {:ok, %Transaction{successful: true, envelope_xdr: ^base64_envelope, hash: ^hash}} =
       Transactions.create(Server.testnet(), base64_envelope)
+  end
+
+  test "create_async/1", %{
+    async_transaction: %{base64_envelope: base64_envelope, hash: hash, tx_status: tx_status}
+  } do
+    {:ok,
+     %Stellar.Horizon.AsyncTransaction{
+       hash: ^hash,
+       tx_status: ^tx_status
+     }} = Transactions.create_async(Server.testnet(), base64_envelope)
   end
 
   test "retrieve/1", %{
@@ -256,5 +316,50 @@ defmodule Stellar.Horizon.TransactionsTest do
        title: "Transaction Failed",
        extras: %{result_codes: %{transaction: "tx_insufficient_fee"}}
      }} = Transactions.create(Server.testnet(), "bad")
+  end
+
+  test "malformed async transaction error" do
+    {:error,
+     %Error{
+       type: "https://stellar.org/horizon-errors/transaction_malformed",
+       title: "Transaction Malformed",
+       status_code: 400,
+       detail: _detail,
+       extras: %{envelope_xdr: "tx_malformed", error: %{}}
+     }} = Transactions.create_async(Server.testnet(), "tx_malformed")
+  end
+
+  test "async transaction duplicate" do
+    # This happens when the same request is sent twice in a row to enpoint ‘transaction_async’.
+    {:error,
+     %AsyncTransaction{
+       hash: "822a283337b124f82b0b8725b39738d2f3e86b699e25b9b646809336384bf41c",
+       tx_status: "DUPLICATE"
+     }} = Transactions.create_async(Server.testnet(), "duplicate")
+  end
+
+  test "async transaction try_again_later" do
+    # This happens when the same request is spammed multiple times to enpoint ‘transaction_async’.
+    {:error,
+     %AsyncTransaction{
+       hash: "822a283337b124f82b0b8725b39738d2f3e86b699e25b9b646809336384bf41c",
+       tx_status: "TRY_AGAIN_LATER"
+     }} = Transactions.create_async(Server.testnet(), "try_again_later")
+  end
+
+  test "async transaction errorResultXdr", %{
+    async_transaction_error: %{
+      bad_base64_envelope: bad_base64_envelope,
+      hash: hash,
+      tx_status: tx_status,
+      errorResultXdr: error_result_xdr
+    }
+  } do
+    {:error,
+     %AsyncTransactionError{
+       hash: ^hash,
+       tx_status: ^tx_status,
+       errorResultXdr: ^error_result_xdr
+     }} = Transactions.create_async(Server.testnet(), bad_base64_envelope)
   end
 end
