@@ -104,8 +104,15 @@ defmodule Stellar.Horizon.Client.DefaultTest do
     end
 
     test "timeout", %{server: server} do
-      {:error, %Error{title: "Timeout", status_code: 504}} =
-        Default.request(server, :post, "/transactions?tx=timeout")
+      {:error,
+       %Error{
+         title: "Transaction Submission Timeout",
+         status_code: 504,
+         extras: %{
+           hash: _hash,
+           envelope_xdr: _envelope_xdr
+         }
+       }} = Default.request(server, :post, "/transactions?tx=timeout")
     end
 
     test "network_error", %{server: server} do

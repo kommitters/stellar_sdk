@@ -1,6 +1,10 @@
 {
-  "type": "https://stellar.org/horizon-errors/timeout",
-  "title": "Timeout",
+  "type": "https://developers.stellar.org/docs/data/horizon/api-reference/errors/http-status-codes/horizon-specific/timeout",
+  "title": "Transaction Submission Timeout",
   "status": 504,
-  "detail": "Your request timed out before completing.  Please try your request again. If you are submitting a transaction make sure you are sending exactly the same transaction (with the same sequence number)."
+  "detail": "Your transaction submission request has timed out. This does not necessarily mean the submission has failed. Before resubmitting, please use the transaction hash provided in `extras.hash` to poll the GET /transactions endpoint for sometime and check if it was included in a ledger.",
+  "extras": {
+    "hash": "12958c37b341802a19ddada4c2a56b453a9cba728b2eefdfbc0b622e37379222",
+    "envelope_xdr": "AAAAAJ2kP2xLaOVLj6DRwX1mMyA0mubYnYvu0g8OdoDqxXuFAAAAZADjfzAACzBMAAAAAQAAAAAAAAAAAAAAAF4vYIYAAAABAAAABjI5ODQyNAAAAAAAAQAAAAAAAAABAAAAAKdeYELovtcnTxqPEVsdbxHLMoMRalZsK7lo/+3ARzUZAAAAAAAAAADUFJPYAAAAAAAAAAHqxXuFAAAAQBpLpQyh+mwDd5nDSxTaAh5wopBBUaSD1eOK9MdiO+4kWKVTqSr/Ko3kYE/+J42Opsewf81TwINONPbY2CtPggE="
+  }
 }
