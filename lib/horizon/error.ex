@@ -15,6 +15,7 @@ defmodule Stellar.Horizon.Error do
           optional(:operations) => list(result_code())
         }
   @type extras :: %{
+          optional(:hash) => base64_xdr(),
           optional(:envelope_xdr) => base64_xdr(),
           optional(:result_codes) => result_codes(),
           optional(:result_xdr) => base64_xdr(),
