@@ -3,9 +3,7 @@ defmodule Stellar.Horizon.AsyncTransactionTest do
 
   alias Stellar.Test.Fixtures.Horizon
 
-  alias Stellar.Horizon.{
-    AsyncTransaction
-  }
+  alias Stellar.Horizon.AsyncTransaction
 
   setup do
     json_body = Horizon.fixture("async_transaction")
