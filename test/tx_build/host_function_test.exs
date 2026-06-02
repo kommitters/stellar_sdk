@@ -6,6 +6,7 @@ defmodule Stellar.TxBuild.HostFunctionTest do
     ContractIDPreimage,
     ContractIDPreimageFromAddress,
     CreateContractArgs,
+    CreateContractArgsV2,
     HostFunction,
     InvokeContractArgs,
     SCAddress,
@@ -51,6 +52,13 @@ defmodule Stellar.TxBuild.HostFunctionTest do
           contract_executable: contract_executable
         )
 
+      create_contract_v2_args =
+        CreateContractArgsV2.new(
+          contract_id_preimage: contract_id_preimage,
+          contract_executable: contract_executable,
+          constructor_args: [SCVal.new(i32: 123)]
+        )
+
       # :upload_contract_wasm
       code =
         <<0, 97, 115, 109, 1, 0, 0, 0, 1, 19, 4, 96, 1, 126, 1, 126, 96, 2, 126, 126, 1, 126, 96,
@@ -66,6 +74,9 @@ defmodule Stellar.TxBuild.HostFunctionTest do
         create_contract_args: create_contract_args,
         create_contract_function: HostFunction.new(create_contract: create_contract_args),
         create_contract_xdr: host_function_xdr(:create_contract, create_contract_args),
+        create_contract_v2_args: create_contract_v2_args,
+        create_contract_v2_function:
+          HostFunction.new(create_contract_v2: create_contract_v2_args),
         upload_contract_wasm_args: upload_contract_wasm_args,
         upload_contract_wasm_function:
           HostFunction.new(upload_contract_wasm: upload_contract_wasm_args),
@@ -101,6 +112,15 @@ defmodule Stellar.TxBuild.HostFunctionTest do
       } = HostFunction.new(upload_contract_wasm: upload_contract_wasm_args)
     end
 
+    test "new/2 create_contract_v2", %{
+      create_contract_v2_args: create_contract_v2_args
+    } do
+      %HostFunction{
+        type: :create_contract_v2,
+        value: ^create_contract_v2_args
+      } = HostFunction.new(create_contract_v2: create_contract_v2_args)
+    end
+
     test "new/2 invalid attributes" do
       {:error, :invalid_operation_attributes} = HostFunction.new(:invalid)
     end
@@ -121,6 +141,17 @@ defmodule Stellar.TxBuild.HostFunctionTest do
       create_contract_function: create_contract_function
     } do
       ^create_contract_xdr = HostFunction.to_xdr(create_contract_function)
+    end
+
+    test "to_xdr/1 create_contract_v2", %{
+      create_contract_v2_function: create_contract_v2_function
+    } do
+      %StellarBase.XDR.HostFunction{
+        type: %StellarBase.XDR.HostFunctionType{
+          identifier: :HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2
+        },
+        value: %StellarBase.XDR.CreateContractArgsV2{}
+      } = HostFunction.to_xdr(create_contract_v2_function)
     end
 
     test "to_xdr/1 upload_contract_wasm", %{
