@@ -2,7 +2,7 @@ defmodule Stellar.TxBuild.CreateContractArgsV2 do
   @moduledoc """
   `CreateContractArgsV2` struct definition for Protocol 22+.
   """
-  alias StellarBase.XDR.CreateContractArgsV2
+  alias StellarBase.XDR.{CreateContractArgsV2, SCValList}
   alias Stellar.TxBuild.{ContractExecutable, ContractIDPreimage, SCVal}
 
   @behaviour Stellar.TxBuild.XDR
@@ -55,7 +55,7 @@ defmodule Stellar.TxBuild.CreateContractArgsV2 do
     constructor_args_xdr =
       constructor_args
       |> Enum.map(&SCVal.to_xdr/1)
-      |> StellarBase.XDR.SCValList.new()
+      |> SCValList.new()
 
     CreateContractArgsV2.new(
       contract_id_preimage_xdr,
