@@ -75,7 +75,11 @@ defmodule Stellar.Horizon.RequestTest do
       headers: [],
       query: []
     } =
-      Request.new(server, :get, endpoint, path: hash, segment: segment, segment_path: segment_path)
+      Request.new(server, :get, endpoint,
+        path: hash,
+        segment: segment,
+        segment_path: segment_path
+      )
   end
 
   test "add_body/2", %{server: server, endpoint: endpoint, body: body} do

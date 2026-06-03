@@ -13,11 +13,12 @@ permissions:
 jobs:
   tests:
     name: Run tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ['23.3', '24.3']
-        elixir: ['1.12', '1.13']
+        include:
+          - otp: '26.2'
+            elixir: '1.16'
     env:
       MIX_ENV: test
     steps:
@@ -32,11 +33,11 @@ jobs:
             *.hex.pm:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - uses: erlef/setup-beam@904c511e63061a8f501ae4b081ce2c0e9cfc70ab # v1.17.4
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
-      - uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+      - uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
@@ -59,7 +60,7 @@ jobs:
 
   finish:
     needs: tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
