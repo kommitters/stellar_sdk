@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.23.0 (02.06.2026)
+
+- Support Protocol 22, 23, and 26 features.
+- Upgrade `stellar_base` dependency to `~> 0.17.0`.
+- Add `CreateContractArgsV2` for Smart Contract Constructor support (CAP-0058).
+- Update `HostFunction` to support `:create_contract_v2` host function type.
+
 ## 0.22.0 (16.08.2024)
 
 - Add hash to handle transaction timeout response. See [PR #374](https://github.com/kommitters/stellar_sdk/pull/374)

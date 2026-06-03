@@ -2,18 +2,20 @@ defmodule Stellar.TxBuild.HostFunction do
   @moduledoc """
     `HostFunction` struct definition.
   """
-  alias Stellar.TxBuild.{CreateContractArgs, InvokeContractArgs}
+  alias Stellar.TxBuild.{CreateContractArgs, CreateContractArgsV2, InvokeContractArgs}
   alias StellarBase.XDR.{HostFunction, HostFunctionType, VariableOpaque}
 
   @behaviour Stellar.TxBuild.XDR
 
-  @type value :: CreateContractArgs.t() | InvokeContractArgs.t() | binary()
+  @type value ::
+          CreateContractArgs.t() | CreateContractArgsV2.t() | InvokeContractArgs.t() | binary()
   @type error :: {:error, atom()}
   @type validation :: {:ok, any()} | error()
   @type type ::
           :invoke_contract
           | :create_contract
           | :upload_contract_wasm
+          | :create_contract_v2
   @type t :: %__MODULE__{
           type: type(),
           value: value()
@@ -21,7 +23,7 @@ defmodule Stellar.TxBuild.HostFunction do
 
   defstruct [:type, :value]
 
-  @allowed_types ~w(invoke_contract create_contract upload_contract_wasm)a
+  @allowed_types ~w(invoke_contract create_contract upload_contract_wasm create_contract_v2)a
 
   @impl true
   def new(args, opts \\ [])
@@ -61,6 +63,17 @@ defmodule Stellar.TxBuild.HostFunction do
   end
 
   def to_xdr(%__MODULE__{
+        type: :create_contract_v2,
+        value: value
+      }) do
+    type = HostFunctionType.new(:HOST_FUNCTION_TYPE_CREATE_CONTRACT_V2)
+
+    value
+    |> CreateContractArgsV2.to_xdr()
+    |> HostFunction.new(type)
+  end
+
+  def to_xdr(%__MODULE__{
         type: :upload_contract_wasm,
         value: value
       }) do
@@ -74,6 +87,9 @@ defmodule Stellar.TxBuild.HostFunction do
   @spec validate_host_function({type :: atom(), value :: value()}) :: validation()
   defp validate_host_function({:invoke_contract, %InvokeContractArgs{} = value}), do: {:ok, value}
   defp validate_host_function({:create_contract, %CreateContractArgs{} = value}), do: {:ok, value}
+
+  defp validate_host_function({:create_contract_v2, %CreateContractArgsV2{} = value}),
+    do: {:ok, value}
 
   defp validate_host_function({:upload_contract_wasm, value}) when is_binary(value),
     do: {:ok, value}
